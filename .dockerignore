@@ -1,0 +1,8 @@
+/media
+/tmp
+*.pyc
+.git
+__pycache__
+*.pyc
+env/
+db.sqlite3

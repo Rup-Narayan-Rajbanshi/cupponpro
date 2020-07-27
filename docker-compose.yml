@@ -1,0 +1,48 @@
+version: '3'
+services:
+  db:
+    image: mariadb:latest
+    ports:
+      - "3381:3306"
+    volumes:
+      - ./tmp/db:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'womcs_db'
+      MYSQL_USER: 'womcs'
+      MYSQL_PASSWORD: 'womcs_password'
+      MYSQL_ROOT_PASSWORD: 'greengrowth_password'
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: docker/frontend/frontend.Dockerfile
+    volumes:
+      - ./staticfiles:/usr/share/nginx/html/static
+      - ./media:/usr/share/nginx/html/media
+
+    restart: "no"
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+  backend:
+    build:
+      context: ./
+      dockerfile: docker/backend/backend.Dockerfile
+    # command: ["./docker/entry.sh"]
+    restart: "no"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+    environment:
+      SECRET_KEY: 'tg7703_ddewirye6t0d^mam7-=42&!k&wv5dhi$$(35kouzi3ks'
+      DATABASE_ENGINE: django.db.backends.mysql
+      DATABASE_HOST: db
+      DATABASE_NAME: womcs_db
+      DATABASE_USER: womcs
+      DATABASE_PASSWORD: womcs_password
+      DATABASE_PORT: 3306

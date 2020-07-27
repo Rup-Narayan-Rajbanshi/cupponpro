@@ -1,0 +1,24 @@
+#Django
+Django==2.2.2  # https://www.djangoproject.com/
+
+Pillow # https://github.com/python-pillow/Pillow
+
+# Django REST Framework
+djangorestframework # https://github.com/encode/django-rest-framework
+djangorestframework-jwt
+#markdown==2.1
+
+django-rest-swagger
+django-cors-headers
+rest-framework-generic-relations
+django-filter
+mysql
+django-debug-toolbar
+django_extensions
+
+
+#Documentation
+coreapi
+
+# gunicorn
+gunicorn==19.8.1  # https://github.com/benoitc/gunicorn
