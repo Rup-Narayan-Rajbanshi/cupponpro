@@ -8,11 +8,15 @@ from django.utils import timezone
 from commonapp.models import Address
 from categoryapp.models import Category
 
+from userapp.models import User
+
 
 class Company(Address):
     name = models.CharField(max_length=200)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,\
         related_name="company_category")
+    author = models.ForeignKey(User, on_delete=models.PROTECT,\
+        related_name="company_author", null=True)
     image = models.ImageField(upload_to='banner_image/')
     created_at = models.DateTimeField(editable=False)
     status = models.BooleanField(default=True)
