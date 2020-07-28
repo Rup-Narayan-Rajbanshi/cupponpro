@@ -54,6 +54,9 @@ THIRD_PARTY_APPS = [
 # All apps developed at GreenGrowth goes here
 DEV_APPS = [
     'userapp',
+    'bannerapp',
+    'categoryapp',
+    'commonapp',
 ]
 
 
