@@ -4,20 +4,17 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from bannerapp.serializers.banner import BannerSerializer
 from bannerapp.models import Banner
-
-
+from permission import Permission
 
 class BannerListView(APIView):
+    permission_classes = (Permission ,)
     serializer_class = BannerSerializer
 
     def get(self, request):
-        if request.user.admin:
-            banner_obj = Banner.objects.all()
-            serializer = BannerSerializer(banner_obj, many=True,\
-                context={"request":request})
-            return Response(serializer.data, status=200)
-        return Response({"message":"You do not have permission to list a user."},\
-            status=403)
+        banner_obj = Banner.objects.all()
+        serializer = BannerSerializer(banner_obj, many=True,\
+            context={"request":request})
+        return Response(serializer.data, status=200)
 
     def post(self, request):
         if request.user.admin:

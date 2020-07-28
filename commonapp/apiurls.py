@@ -1,13 +1,12 @@
 # -*- coding:utf-8 -*-
 from django.urls import path
-from bannerapp.api.banner import BannerListView, BannerUpdateView
+from commonapp.api.company import CompanyListView
 
 # from userapp.api.staticpage import StaticPageView
 
-app_name = 'bannerapp'
+app_name = 'commonapp'
 
 urlpatterns = [
-	path('banners', BannerListView.as_view(), name='banner_list'),
-	path('banners/<banner_id>', BannerUpdateView.as_view(), name='banner_update'),
+	path('companys', CompanyListView.as_view(), name='company_list'),
 
     ]
