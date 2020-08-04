@@ -19,8 +19,18 @@ class CompanyInfoListView(APIView):
     permission_classes = (Permission ,)
     serializer_class = CompanyInfoSerializer
 
-    def get(self, request):
-        company_info_obj = CompanyInfo.objects.all()
-        serializer = CompanyInfoSerializer(company_info_obj, many=True,\
-            context={"request":request})
-        return Response(serializer.data, status=200)
+    def get(self, request, company_id):
+        company_info_obj = CompanyInfo.objects.filter(company=company_id)
+        if company_info_obj:
+            serializer = CompanyInfoSerializer(company_info_obj, many=True,\
+                context={"request":request})
+            data = {
+                'success' : 1,
+                'companyinfo' : serializer.data}
+            return Response(data, status=200)
+        else:
+            data = {
+                'success' : 0,
+                "message" : "There is no companyinfo data, that you are looking for."
+            }
+            return Response(data, status=404)
