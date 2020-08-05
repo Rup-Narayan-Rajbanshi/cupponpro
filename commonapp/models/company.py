@@ -38,12 +38,13 @@ class Company(Address):
 
 class CompanyInfo(models.Model):
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True)
-    token = models.CharField(max_length=8)
+    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
     token_expiry_date = models.DateField()
     token_created_at = models.DateField(auto_now=True)
     discount = models.PositiveIntegerField()
-    product_name = models.CharField(max_length=50,null=True,blank=True)
-    price = models.PositiveIntegerField(null=True,blank=True)
+    product_name = models.CharField(max_length=50, null=True, blank=True)
+    price = models.PositiveIntegerField(null=True, blank=True)
+    image = models.ImageField(upload_to='companyinfo_image/', null=True, blank=True)
 
     def __str__(self):
         return self.company.name

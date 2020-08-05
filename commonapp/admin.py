@@ -31,7 +31,7 @@ class AdminCompanyInfoapp(admin.ModelAdmin):
     fieldsets = (
             (_("Company info"), {
                 'fields':(
-                    'company', 'token_expiry_date', 'discount', 'product_name', 'price'
+                    'company', 'token_expiry_date', 'discount', 'product_name', 'price', 'image'
                     )
                 }
             ),
