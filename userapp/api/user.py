@@ -14,10 +14,17 @@ class UserListView(APIView):
         if request.user.admin:
             user_obj = User.objects.all()
             serializer = UserSerializer(user_obj, many=True,\
-                context={"request":request})
-            return Response(serializer.data, status=200)
-        return Response({"message":"You do not have permission to list a user."},\
-            status=403)
+                context={"request": request})
+            data = {
+                'success': 1,
+                'user': serializer.data,
+            }
+            return Response(data, status=200)
+        data = {
+            'success': 0,
+            'message': "You do not have permission to list an user."
+        }
+        return Response(data, status=403)
 
     def post(self, request):
         if request.user.admin:
@@ -31,11 +38,26 @@ class UserListView(APIView):
                     user_obj.email = serializer.validated_data['email']
                     user_obj.phone_number = serializer.validated_data['phone_number']
                     user_obj.save()
-                    return Response(serializer.data, status=200)
-                return Response({"message":"Pasword do not match"}, status=400)
-            return Response(serializer.errors, status=400)
-        return Response({"message":"You do not have permission to add a crm."},\
-            status=403)
+                    data = {
+                        'success': 1,
+                        'user': serializer.data
+                    }
+                    return Response(data, status=200)
+                data = {
+                    'success': 0,
+                    'message': 'Password do not match.'
+                }
+                return Response(data, status=400)
+            data = {
+                'success': 0,
+                'message': serializer.errors
+            }
+            return Response(data, status=400)
+        data = {
+            'success': 0,
+            'message': 'You do not have permission to add an user.'
+        }
+        return Response(data, status=403)
 
 
 
@@ -48,10 +70,21 @@ class UpdateUser(APIView):
                 user_obj = User.objects.get(id=user_id)
                 serializer = UserSerializer(user_obj,\
                     context={'request': request})
-                return Response(serializer.data)
-            return Response({"message":"User id do not match"}, status=400)
-        return Response({"message":"You do not have permission to show a user."},\
-            status=403)
+                data = {
+                    'success': 1,
+                    'user': serializer.data
+                }
+                return Response(data, status=200)
+            data = {
+                'success': 0,
+                'message': 'User id not found.'
+            }
+            return Response(data, status=400)
+        data = {
+            'success': 0,
+            'message': 'You do not have permission to show user.'
+        }
+        return Response(data, status=403)
 
     def put(self, request, user_id):
         if request.user.admin:
@@ -61,19 +94,44 @@ class UpdateUser(APIView):
                     data=request.data, partial=True)
                 if serializer.is_valid():
                     serializer.save()
-                    return Response(serializer.data, status=200)
-                return Response(serializer.errors, status=400)
-            return Response({"message":"User id do not match"}, status=400)
-        return Response({"message":"You do not have permission to update a crm."},\
-            status=403)
+                    data = {
+                        'success': 1,
+                        'user': serializer.data
+                    }
+                    return Response(data, status=200)
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+            data = {
+                'success': 0,
+                'message': 'User id not found.'
+            }
+            return Response(data, status=400)
+        data = {
+            'success': 0,
+            'message': 'You do not have permission to update user.'
+        }
+        return Response(data, status=403)
 
     def delete(self, request, user_id):
         if request.user.admin:
             if User.objects.filter(id=user_id):
                 user_obj = User.objects.get(id=user_id)
                 user_obj.delete()
-                return Response({"message":"crm item deleted successfully"},\
-                    status=200)
-            return Response({"message":"User id do not match"}, status=400)
-        return Response({"message":"You do not have permission to delete a crm."},\
-            status=403)
+                data = {
+                    'success': 1,
+                    'user': 'User deleted successfully.'
+                }
+                return Response(data, status=200)
+            data = {
+                'success': 0,
+                'message': 'User id not found.'
+            }
+            return Response(data, status=400)
+        data = {
+            'success': 0,
+            'message': 'You do not have permission to delete user.'
+        }
+        return Response(data, status=403)
