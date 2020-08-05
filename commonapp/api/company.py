@@ -13,7 +13,11 @@ class CompanyListView(APIView):
         company_obj = Company.objects.all()
         serializer = CompanySerializer(company_obj, many=True,\
             context={"request":request})
-        return Response(serializer.data, status=200)
+        data = {
+            'success' : 1,
+            'company' : serializer.data,
+        }
+        return Response(data, status=200)
 
 class CompanyInfoListView(APIView):
     permission_classes = (Permission ,)
@@ -26,11 +30,12 @@ class CompanyInfoListView(APIView):
                 context={"request":request})
             data = {
                 'success' : 1,
-                'companyinfo' : serializer.data}
+                'companyinfo' : serializer.data
+            }
             return Response(data, status=200)
         else:
             data = {
                 'success' : 0,
-                "message" : "There is no companyinfo data, that you are looking for."
+                "message" : "Companyinfo id not found."
             }
             return Response(data, status=404)
