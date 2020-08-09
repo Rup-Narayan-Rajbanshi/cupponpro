@@ -1,4 +1,5 @@
-from uuid import uuid4
+# from uuid import uuid4
+import shortuuid
 import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -34,3 +35,26 @@ class Company(Address):
         if not self.id:
             self.created_at = timezone.now()
         return super(Company, self).save(*args, **kwargs)
+
+class CompanyInfo(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True)
+    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
+    token_expiry_date = models.DateField()
+    token_created_at = models.DateField(auto_now=True)
+    discount = models.PositiveIntegerField()
+    product_name = models.CharField(max_length=50, null=True, blank=True)
+    price = models.PositiveIntegerField(null=True, blank=True)
+    image = models.ImageField(upload_to='companyinfo_image/', null=True, blank=True)
+
+    def __str__(self):
+        return self.company.name
+
+    class Meta:
+        db_table = 'companyinfo'
+        verbose_name_plural = "companies info"
+
+    def save(self, *args, **kwargs):
+        ''' on save, update token '''
+        if not self.token:
+            self.token = shortuuid.ShortUUID().random(length=8)
+        super(CompanyInfo, self).save(*args, **kwargs)
