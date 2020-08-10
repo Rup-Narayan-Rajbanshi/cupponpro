@@ -1,10 +1,7 @@
 # from uuid import uuid4
 import shortuuid
-import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.dispatch import receiver
-import os
 from django.utils import timezone
 from commonapp.models import Address
 from categoryapp.models import Category
@@ -37,7 +34,7 @@ class Company(Address):
         return super(Company, self).save(*args, **kwargs)
 
 class CompanyInfo(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
     token = models.CharField(max_length=8, editable=False, null=False, blank=True)
     token_expiry_date = models.DateField()
     token_created_at = models.DateField(auto_now=True)
@@ -46,12 +43,12 @@ class CompanyInfo(models.Model):
     price = models.PositiveIntegerField(null=True, blank=True)
     image = models.ImageField(upload_to='companyinfo_image/', null=True, blank=True)
 
-    def __str__(self):
-        return self.company.name
-
     class Meta:
         db_table = 'companyinfo'
         verbose_name_plural = "companies info"
+    
+    def __str__(self):
+        return self.company.name
 
     def save(self, *args, **kwargs):
         ''' on save, update token '''

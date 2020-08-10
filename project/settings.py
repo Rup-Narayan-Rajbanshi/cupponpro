@@ -55,6 +55,7 @@ DEV_APPS = [
     'bannerapp',
     'categoryapp',
     'commonapp',
+    'productapp',
 ]
 
 

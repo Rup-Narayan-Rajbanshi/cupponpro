@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 
-from categoryapp.models import Category
-from categoryapp.serializers.category import CategorySerializer
+from categoryapp.models.category import Category, ProductCategory
+from categoryapp.serializers.category import CategorySerializer, ProductCategorySerializer
 from permission import Permission
 
 
@@ -19,5 +19,19 @@ class CategoryListView(APIView):
         data = {
             'success': 1,
             'category': serializer.data
+        }
+        return Response(data, status=200)
+
+class ProductCategoryListView(APIView):
+    permission_classes = (Permission ,)
+    serializer_class = ProductCategorySerializer
+
+    def get(self, request):
+        product_category_obj = ProductCategory.objects.all()
+        serializer = CategorySerializer(product_category_obj, many=True,\
+        context={"request": request})
+        data = {
+            'success': 1,
+            'productcategory': serializer.data
         }
         return Response(data, status=200)

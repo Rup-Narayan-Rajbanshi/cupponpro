@@ -1,2 +1,2 @@
 from .address import Address
-from .company import Company
+from .company import Company, CompanyInfo

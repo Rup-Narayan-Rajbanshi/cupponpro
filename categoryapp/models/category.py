@@ -23,3 +23,20 @@ class Category(models.Model):
         if not self.id:
             self.created_at = timezone.now()
         return super(Category, self).save(*args, **kwargs)
+
+class ProductCategory(models.Model):
+    name = models.CharField(max_length=30, unique=True)
+    created_at = models.DateTimeField(editable=False)
+
+    class Meta:
+        db_table = 'productcategory'
+        verbose_name_plural = "product categories"
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created_at = timezone.now()
+        return super(ProductCategory, self).save(*args, **kwargs)
