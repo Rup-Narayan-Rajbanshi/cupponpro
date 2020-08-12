@@ -92,7 +92,7 @@ class BannerUpdateView(APIView):
             return Response(data, status=400)
         data = {
             'success': 0,
-            'message': "You do not have permission to add banner."
+            'message': "You do not have permission to update banner."
         }
         return Response(data, status=403)
 
