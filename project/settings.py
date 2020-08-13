@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
 
 # All apps developed at GreenGrowth goes here
 DEV_APPS = [
+    'billapp',
     'userapp',
     'bannerapp',
     'categoryapp',
@@ -113,7 +114,7 @@ DATABASES = {
         'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.mysql'),
         'NAME': os.environ.get('DATABASE_NAME', 'womcs_db'),
         'USER': os.environ.get('DATABASE_USER', 'womcs'),
-        'HOST': os.environ.get('DATABASE_HOST', 'db'),
+        # 'HOST': os.environ.get('DATABASE_HOST', 'db'),
         'PORT': os.environ.get('DATABASE_PORT', 3306),
         'PASSWORD':os.environ.get('DATABASES_PASSWORD', 'womcs_password'),
     }
