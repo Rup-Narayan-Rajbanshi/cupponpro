@@ -6,11 +6,13 @@ from rest_framework import permissions
 from categoryapp.models.category import Category, ProductCategory
 from categoryapp.serializers.category import CategorySerializer, ProductCategorySerializer
 from permission import Permission
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class CategoryListView(APIView):
     permission_classes = (Permission ,)
     serializer_class = CategorySerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get(self, request):
         category_obj = Category.objects.all()
@@ -21,6 +23,21 @@ class CategoryListView(APIView):
             'category': serializer.data
         }
         return Response(data, status=200)
+
+    def post(self, request):
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                'success': 1,
+                'category': serializer.data
+            }
+            return Response(data, status=200)
+        data = {
+            'success': 0,
+            'category': serializer.errors
+        }
+        return Response(data, status=400)
 
 class ProductCategoryListView(APIView):
     permission_classes = (Permission ,)

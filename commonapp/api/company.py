@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from commonapp.serializers.company import CompanySerializer, CompanyInfoSerializer
-from commonapp.models.company import Company, CompanyInfo
+from commonapp.serializers.company import CompanySerializer, CouponSerializer
+from commonapp.models.company import Company, Coupon
 from permission import Permission
 
 class CompanyListView(APIView):
@@ -19,28 +19,28 @@ class CompanyListView(APIView):
         }
         return Response(data, status=200)
 
-class CompanyInfoListView(APIView):
+class CouponListView(APIView):
     permission_classes = (Permission ,)
-    serializer_class = CompanyInfoSerializer
+    serializer_class = CouponSerializer
 
     def get(self, request):
-        company_info_obj = CompanyInfo.objects.all()
-        serializer = CompanyInfoSerializer(company_info_obj, many=True,\
+        coupon_obj = Coupon.objects.all()
+        serializer = CouponSerializer(coupon_obj, many=True,\
             context={"request":request})
         data = {
             'success' : 1,
-            'companyinfo' : serializer.data
+            'coupon' : serializer.data
         }
         return Response(data, status=200)
 
     def post(self, request):
         if request.user.admin:
-            serializer = CompanyInfoSerializer(data=request.data)
+            serializer = CouponSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 data = {
                     'success': 1,
-                    'companyinfo': serializer.data,
+                    'coupon': serializer.data,
                 }
                 return Response(data, status=200)
             data = {
@@ -50,42 +50,42 @@ class CompanyInfoListView(APIView):
             return Response(data, status=400)
         data = {
             'success': 0,
-            'message': "You do not have permission to add a companyinfo."
+            'message': "You do not have permission to add a coupon."
         }
         return Response(data, status=403)
 
-class  CompanyInfoDetailView(APIView):
+class CouponDetailView(APIView):
     permission_classes = (Permission, )
-    serializer_class = CompanyInfoSerializer
+    serializer_class = CouponSerializer
 
-    def get(self, request, companyinfo_id):
-        if CompanyInfo.objects.filter(id=companyinfo_id):
-            company_info_obj = CompanyInfo.objects.get(id=companyinfo_id)
-            serializer = CompanyInfoSerializer(company_info_obj,\
+    def get(self, request, coupon_id):
+        if Coupon.objects.filter(id=coupon_id):
+            coupon_obj = Coupon.objects.get(id=coupon_id)
+            serializer = CouponSerializer(coupon_obj,\
                 context={"request":request})
             data = {
                 'success' : 1,
-                'companyinfo' : serializer.data
+                'coupon' : serializer.data
             }
             return Response(data, status=200)
         else:
             data = {
                 'success' : 0,
-                "message" : "Companyinfo id not found."
+                "message" : "Coupon id not found."
             }
             return Response(data, status=404)
 
-    def put(self, request, companyinfo_id):
+    def put(self, request, coupon_id):
         if request.user.admin:
-            if CompanyInfo.objects.filter(id=companyinfo_id):
-                company_info_obj = CompanyInfo.objects.get(id=companyinfo_id)
-                serializer = CompanyInfoSerializer(instance=company_info_obj,\
+            if Coupon.objects.filter(id=coupon_id):
+                coupon_obj = Coupon.objects.get(id=coupon_id)
+                serializer = CouponSerializer(instance=coupon_obj,\
                     data=request.data)
                 if serializer.is_valid():
                     serializer.save()
                     data = {
                         'success': 1,
-                        'companyinfo': serializer.data
+                        'coupon': serializer.data
                     }
                     return Response(data, status=200)
                 data = {
@@ -95,32 +95,32 @@ class  CompanyInfoDetailView(APIView):
                 return Response(data, status=400)
             data = {
                 'success': 0,
-                'message': "Companyinfo id not found."
+                'message': "Coupon id not found."
             }
             return Response(data, status=400)
         data = {
             'success': 0,
-            'message': "You do not have permission to update companyinfo."
+            'message': "You do not have permission to update coupon."
         }
         return Response(data, status=403)
 
-    def delete(self, request, companyinfo_id):
+    def delete(self, request, dcoupon_id):
         if request.user.admin:
-            if CompanyInfo.objects.filter(id=companyinfo_id):
-                company_info_obj = CompanyInfo.objects.get(id=companyinfo_id)
-                company_info_obj.delete()
+            if Coupon.objects.filter(id=dcoupon_id):
+                coupon_obj = Coupon.objects.get(id=dcoupon_id)
+                coupon_obj.delete()
                 data = {
                     'success': 1,
-                    'banner': "Companyinfo deleted successfully."
+                    'coupon': "Coupon deleted successfully."
                 }
                 return Response(data, status=200)
             data = {
                 'success': 0,
-                'message': "Companyinfo id not found."
+                'message': "Coupon id not found."
             }
             return Response(data, status=400)
         data = {
             'success': 0,
-            'message': "You do not have permission to delete companyinfo."
+            'message': "You do not have permission to delete Coupon."
         }
         return Response(data, status=403)

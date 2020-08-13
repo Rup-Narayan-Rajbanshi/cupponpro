@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from commonapp.models.company import Company, CompanyInfo
+from commonapp.models.company import Company, Coupon
 
 class CompanySerializer(serializers.ModelSerializer):
 
@@ -7,8 +7,8 @@ class CompanySerializer(serializers.ModelSerializer):
         model = Company
         fields = "__all__"
 
-class CompanyInfoSerializer(serializers.ModelSerializer):
+class CouponSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = CompanyInfo
+        model = Coupon
         fields = "__all__" 

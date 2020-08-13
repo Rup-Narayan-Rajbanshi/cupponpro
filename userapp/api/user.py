@@ -5,10 +5,7 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from userapp.serializers.user import UserSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer, ResetPasswordSerializer
 from userapp.models.user import User, PasswordResetToken
-from rest_framework.permissions import IsAuthenticated
-from permission import PasswordResetPermission
-
-
+from rest_framework.permissions import AllowAny
 
 class UserListView(APIView):
     serializer_class = UserSerializer
@@ -145,7 +142,6 @@ class ChangePasswordView(generics.UpdateAPIView):
     """
     serializer_class = ChangePasswordSerializer
     model = User
-    permission_classes = (IsAuthenticated,)
 
     def get_object(self, queryset=None):
         obj = self.request.user
@@ -179,29 +175,11 @@ class ChangePasswordView(generics.UpdateAPIView):
         return Response(data, status=400)
 
 class GeneratePasswordResetTokenView(APIView):
+    """
+    An endpoint for generating password reset token.
+    """
     serializer_class = PasswordResetTokenSerializer
-
-    def get(self, request):
-        if 'email' in request.data:
-            user = User.objects.filter(email=request.data['email'])
-            if user:
-                data = {
-                        'success': 1,
-                        'user': 'User exist.'
-                    }
-                status = 200
-            else:
-                data = {
-                        'success': 0,
-                        'message': 'User doesn\'t exist.'
-                    }
-                status = 400
-            return Response(data, status)
-        data = {
-            'success': 0,
-            'message': 'Enter email.'
-        }
-        return Response(data, status=400)
+    permission_classes = (AllowAny, )
 
     def post(self, request):
         user = User.objects.filter(email=request.data['email'])
@@ -235,7 +213,7 @@ class ResetPasswordView(generics.UpdateAPIView):
     """
     serializer_class = ResetPasswordSerializer
     model = User
-    permission_classes = (PasswordResetPermission, )
+    permission_classes = (AllowAny, )
 
     def update(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

@@ -1,4 +1,4 @@
-from uuid import uuid4
+import shortuuid
 import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -10,7 +10,8 @@ from django.utils import timezone
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True)
     created_at = models.DateTimeField(editable=False)
-
+    icon = models.CharField(max_length=20, null=True, blank=True)
+    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
 
     class Meta:
         db_table = 'category'
@@ -22,11 +23,13 @@ class Category(models.Model):
         ''' On save, update timestamps '''
         if not self.id:
             self.created_at = timezone.now()
+            self.token = shortuuid.ShortUUID().random(length=8)
         return super(Category, self).save(*args, **kwargs)
 
 class ProductCategory(models.Model):
     name = models.CharField(max_length=30, unique=True)
     created_at = models.DateTimeField(editable=False)
+    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
 
     class Meta:
         db_table = 'productcategory'
@@ -39,4 +42,5 @@ class ProductCategory(models.Model):
         ''' On save, update timestamps '''
         if not self.id:
             self.created_at = timezone.now()
+            self.token = shortuuid.ShortUUID().random(length=8)
         return super(ProductCategory, self).save(*args, **kwargs)

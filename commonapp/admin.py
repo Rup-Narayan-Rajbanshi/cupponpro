@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from commonapp.models.company import Address, Company, CompanyInfo
+from commonapp.models.company import Address, Company, Coupon
 from commonapp.models.rating import Rating
 
 from django.utils.translation import ugettext_lazy as _
@@ -26,7 +26,7 @@ class AdminCompanyapp(admin.ModelAdmin):
 
             (_("Permission"), {'fields':('status',)}),)
 
-class AdminCompanyInfoapp(admin.ModelAdmin):
+class AdminCouponapp(admin.ModelAdmin):
     list_display = ('id', 'company', 'token')
     fieldsets = (
             (_("Company info"), {
@@ -49,5 +49,5 @@ class AdminRatingapp(admin.ModelAdmin):
     )
 
 admin.site.register(Company, AdminCompanyapp)
-admin.site.register(CompanyInfo, AdminCompanyInfoapp)
+admin.site.register(Coupon, AdminCouponapp)
 admin.site.register(Rating, AdminRatingapp)

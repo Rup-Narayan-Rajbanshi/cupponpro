@@ -31,6 +31,7 @@ class Product(models.Model):
     unit_price = models.PositiveIntegerField()
     total_price = models.PositiveIntegerField(editable=False)
     created_at = models.DateTimeField(editable=False)
+    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
 
     class Meta:
         db_table = 'product'
@@ -42,6 +43,7 @@ class Product(models.Model):
         ''' On save, update timestamps '''
         if not self.id:
             self.created_at = timezone.now()
+            self.token = shortuuid.ShortUUID().random(length=8)
         if self.bulk_quantity:
             self.total_price = self.unit_price * self.bulk_quantity.quantity
         else:

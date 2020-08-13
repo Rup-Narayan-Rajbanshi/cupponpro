@@ -8,7 +8,6 @@ from categoryapp.models import Category
 
 from userapp.models import User
 
-
 class Company(Address):
     name = models.CharField(max_length=200)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,\
@@ -33,7 +32,7 @@ class Company(Address):
             self.created_at = timezone.now()
         return super(Company, self).save(*args, **kwargs)
 
-class CompanyInfo(models.Model):
+class Coupon(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
     token = models.CharField(max_length=8, editable=False, null=False, blank=True)
     token_expiry_date = models.DateField()
@@ -41,11 +40,10 @@ class CompanyInfo(models.Model):
     discount = models.PositiveIntegerField()
     product_name = models.CharField(max_length=50, null=True, blank=True)
     price = models.PositiveIntegerField(null=True, blank=True)
-    image = models.ImageField(upload_to='companyinfo_image/', null=True, blank=True)
+    image = models.ImageField(upload_to='coupon_image/', null=True, blank=True)
 
     class Meta:
-        db_table = 'companyinfo'
-        verbose_name_plural = "companies info"
+        db_table = 'coupon'
     
     def __str__(self):
         return self.company.name
@@ -54,4 +52,4 @@ class CompanyInfo(models.Model):
         ''' on save, update token '''
         if not self.token:
             self.token = shortuuid.ShortUUID().random(length=8)
-        super(CompanyInfo, self).save(*args, **kwargs)
+        super(Coupon, self).save(*args, **kwargs)
