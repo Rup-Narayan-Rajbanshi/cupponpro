@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from userapp.models import User
+from userapp.models import User, PasswordResetToken
 from django.contrib.auth.models import Group
 from rest_framework.authtoken.models import Token
 
@@ -21,9 +21,14 @@ class AdminUserapp(admin.ModelAdmin):
             ),
             (_("Permission"), {'fields':('staff',)}),)
 
+class AdminPasswordResetTokenapp(admin.ModelAdmin):
+    list_display = ('id', 'email', 'is_used')
+
 
 admin.site.register(User, AdminUserapp)
+admin.site.register(PasswordResetToken, AdminPasswordResetTokenapp)
 
 admin.site.unregister(Group)
 
 admin.site.unregister(Token)
+

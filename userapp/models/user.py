@@ -1,4 +1,6 @@
 import re
+import shortuuid
+from django.utils import timezone
 from rest_framework.response import Response
 from django.core.validators import RegexValidator
 from django.db import models
@@ -91,12 +93,18 @@ class User(AbstractBaseUser):
         self.email = self.email.lower()
         text_email = str(self.email)
         self.username = text_email.split('@')[0]
+        # this section has some fault, so everytime save is triggered, password gets modified
         if (self.admin != 'True' and self.update_password):
             self.set_password(self.password)
         elif(self.admin == 'True' and self.update_password == True):
             self.set_password(self.password)
+        # faulty section ends
         super(User, self).save(*args, **kwargs)
 
+    # temporary solution to bypass fault in save method
+    def save_password(self ,password, *args, **kwargs):
+        self.set_password(password)
+        super(User, self).save(*args, **kwargs)
 
     def has_perm(self, perm, obj=None):
         return True
@@ -124,6 +132,22 @@ class User(AbstractBaseUser):
     def is_active(self):
         return self.active
 
+class PasswordResetToken(models.Model):
+    email = models.EmailField(max_length=50)
+    token = models.CharField(max_length=6)
+    created_at = models.DateTimeField(editable=False)
+    is_used = models.BooleanField(default=False, editable=True)
+
+    class Meta:
+        db_table = 'passwordresettoken'
+        verbose_name_plural = "password reset tokens"
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created_at = timezone.now()
+            self.token = shortuuid.ShortUUID().random(length=6)
+        return super(PasswordResetToken, self).save(*args, **kwargs)
 
 receiver(models.signals.post_delete, sender=User)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
