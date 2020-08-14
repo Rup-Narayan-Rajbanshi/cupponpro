@@ -160,9 +160,8 @@ class ChangePasswordView(generics.UpdateAPIView):
                 }
                 return Response(data, status=400)
             # set_password also hashes the password that the user will get
-            # self.object.set_password(serializer.data.get("new_password"))
-            self.object.save_password(serializer.data.get("new_password"))
-            print(self.object.check_password(serializer.data.get("new_password")))
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
             data = {
                 'success': 1,
                 'message': "Password changed successfully.",
@@ -229,8 +228,8 @@ class ResetPasswordView(generics.UpdateAPIView):
             # set_password also hashes the password that the user will get
             user = User.objects.filter(email = token_obj[0].email)
             user = user[0]
-            # user.set_password(serializer.data.get("new_password"))
-            user.save_password(serializer.data.get("new_password"))
+            user.set_password(serializer.data.get("new_password"))
+            user.save()
             token_obj[0].is_used = True
             token_obj[0].save()
             data = {

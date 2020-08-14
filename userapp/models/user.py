@@ -73,7 +73,8 @@ class User(AbstractBaseUser):
     admin = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
-    created_at = models.DateField(auto_now=True)
+    created_at = models.DateField(auto_now_add=True)
+    dob = models.DateField(null=True, blank=True)
     update_password = True
     USERNAME_FIELD = 'email'
 
@@ -90,20 +91,12 @@ class User(AbstractBaseUser):
         return self.username
 
     def save(self, *args, **kwargs):
-        self.email = self.email.lower()
-        text_email = str(self.email)
-        self.username = text_email.split('@')[0]
-        # this section has some fault, so everytime save is triggered, password gets modified
-        if (self.admin != 'True' and self.update_password):
-            self.set_password(self.password)
-        elif(self.admin == 'True' and self.update_password == True):
-            self.set_password(self.password)
-        # faulty section ends
-        super(User, self).save(*args, **kwargs)
-
-    # temporary solution to bypass fault in save method
-    def save_password(self ,password, *args, **kwargs):
-        self.set_password(password)
+        if not self.id:
+            self.email = self.email.lower()
+            text_email = str(self.email)
+            self.username = text_email.split('@')[0]
+            if self.admin:
+                self.set_password(self.password)
         super(User, self).save(*args, **kwargs)
 
     def has_perm(self, perm, obj=None):
