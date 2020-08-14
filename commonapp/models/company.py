@@ -1,9 +1,11 @@
 # from uuid import uuid4
 import shortuuid
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from commonapp.models import Address
+from commonapp.models.address import Address
+from commonapp.models.image import Image
 from categoryapp.models import Category
 
 from userapp.models import User
@@ -14,7 +16,7 @@ class Company(Address):
         related_name="company_category")
     author = models.ForeignKey(User, on_delete=models.PROTECT,\
         related_name="company_author", null=True)
-    image = models.ImageField(upload_to='banner_image/')
+    images = GenericRelation(Image)
     created_at = models.DateTimeField(editable=False)
     status = models.BooleanField(default=True)
     phone = models.CharField(max_length=15)
@@ -31,25 +33,3 @@ class Company(Address):
         if not self.id:
             self.created_at = timezone.now()
         return super(Company, self).save(*args, **kwargs)
-
-class Coupon(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
-    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
-    token_expiry_date = models.DateField()
-    token_created_at = models.DateField(auto_now=True)
-    discount = models.PositiveIntegerField()
-    product_name = models.CharField(max_length=50, null=True, blank=True)
-    price = models.PositiveIntegerField(null=True, blank=True)
-    image = models.ImageField(upload_to='coupon_image/', null=True, blank=True)
-
-    class Meta:
-        db_table = 'coupon'
-    
-    def __str__(self):
-        return self.company.name
-
-    def save(self, *args, **kwargs):
-        ''' on save, update token '''
-        if not self.token:
-            self.token = shortuuid.ShortUUID().random(length=8)
-        super(Coupon, self).save(*args, **kwargs)

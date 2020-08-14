@@ -1,8 +1,7 @@
 # -*- coding:utf-8 -*-
 from django.urls import path
-from commonapp.api.company import CompanyListView, CouponListView, CouponDetailView
-
-# from userapp.api.staticpage import StaticPageView
+from commonapp.api.company import CompanyListView
+from commonapp.api.coupon import CouponListView, CouponDetailView
 
 app_name = 'commonapp'
 

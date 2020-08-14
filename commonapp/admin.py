@@ -1,7 +1,9 @@
 from django.contrib import admin
 
 # Register your models here.
-from commonapp.models.company import Address, Company, Coupon
+from commonapp.models.company import Address, Company
+from commonapp.models.coupon import Coupon
+from commonapp.models.image import Image
 from commonapp.models.rating import Rating
 
 from django.utils.translation import ugettext_lazy as _
@@ -10,9 +12,9 @@ from django.utils.translation import ugettext_lazy as _
 class AdminCompanyapp(admin.ModelAdmin):
     list_display = ('id', 'name')
     fieldsets = (
-            (_("Company info"), {
+            (_("Company Info"), {
                 'fields':(
-                    'name', 'image', 'phone', 'category', 'author'
+                    'name', 'phone', 'category', 'author'
                     )
                 }
             ),
@@ -29,9 +31,20 @@ class AdminCompanyapp(admin.ModelAdmin):
 class AdminCouponapp(admin.ModelAdmin):
     list_display = ('id', 'company', 'token')
     fieldsets = (
-            (_("Company info"), {
+            (_("Coupon Info"), {
                 'fields':(
-                    'company', 'token_expiry_date', 'discount', 'product_name', 'price', 'image'
+                    'company', 'token_expiry_date', 'discount', 'product_name', 'price'
+                )
+            }
+        ),
+    )
+
+class AdminImageapp(admin.ModelAdmin):
+    list_display = ('id', 'image', 'content_type')
+    fieldsets = (
+            (_("Image Info"), {
+                'fields':(
+                    'image', 'content_type', 'object_id',
                 )
             }
         ),
@@ -50,4 +63,5 @@ class AdminRatingapp(admin.ModelAdmin):
 
 admin.site.register(Company, AdminCompanyapp)
 admin.site.register(Coupon, AdminCouponapp)
+admin.site.register(Image, AdminImageapp)
 admin.site.register(Rating, AdminRatingapp)

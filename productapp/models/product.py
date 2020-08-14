@@ -1,5 +1,7 @@
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils import timezone
+from commonapp.models.image import Image
 from categoryapp.models.category import ProductCategory
 from commonapp.models.company import Company
 from userapp.models import User
@@ -26,7 +28,7 @@ class Product(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=20)
     product_category= models.ForeignKey(ProductCategory, on_delete=models.PROTECT)
-    image = models.ImageField(upload_to='product/', null=True, blank=True)
+    images = GenericRelation(Image)
     bulk_quantity = models.ForeignKey(BulkQuantity, on_delete=models.PROTECT, null=True, blank=True)
     unit_price = models.PositiveIntegerField()
     total_price = models.PositiveIntegerField(editable=False)
