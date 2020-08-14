@@ -15,6 +15,7 @@ class Category(models.Model):
 
     class Meta:
         db_table = 'category'
+        verbose_name_plural = "categories"
 
     def __str__(self):
         return self.name
@@ -25,6 +26,17 @@ class Category(models.Model):
             self.created_at = timezone.now()
             self.token = shortuuid.ShortUUID().random(length=8)
         return super(Category, self).save(*args, **kwargs)
+
+class SubCategory(models.Model):
+    name = models.CharField(max_length=15, unique=True)
+    created_at = models.DateField(auto_now=True)
+
+    class Meta:
+        db_table = 'subcategory'
+        verbose_name_plural = "sub categories"
+
+    def __str__(self):
+        return self.name
 
 class ProductCategory(models.Model):
     name = models.CharField(max_length=30, unique=True)

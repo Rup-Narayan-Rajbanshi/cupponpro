@@ -1,10 +1,12 @@
 from django.contrib import admin
 
 # Register your models here.
-from commonapp.models.company import Address, Company
+from commonapp.models.company import Address, Company, FavouriteCompany
 from commonapp.models.coupon import Coupon
 from commonapp.models.image import Image
 from commonapp.models.rating import Rating
+from commonapp.models.links import SocialLink
+from commonapp.models.facility import Facility
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -65,3 +67,6 @@ admin.site.register(Company, AdminCompanyapp)
 admin.site.register(Coupon, AdminCouponapp)
 admin.site.register(Image, AdminImageapp)
 admin.site.register(Rating, AdminRatingapp)
+admin.site.register(SocialLink)
+admin.site.register(FavouriteCompany)
+admin.site.register(Facility)

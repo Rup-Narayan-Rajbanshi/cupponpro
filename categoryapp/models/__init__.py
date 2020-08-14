@@ -1,1 +1,1 @@
-from .category import Category, ProductCategory
+from .category import Category, SubCategory, ProductCategory

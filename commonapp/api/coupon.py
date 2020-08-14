@@ -5,7 +5,7 @@ from commonapp.models.coupon import Coupon
 from commonapp.serializers.coupon import CouponSerializer
 
 class CouponListView(APIView):
-    permission_classes = (Permission ,)
+    permission_classes = (Permission, )
     serializer_class = CouponSerializer
 
     def get(self, request):

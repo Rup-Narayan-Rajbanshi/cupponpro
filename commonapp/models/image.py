@@ -12,5 +12,7 @@ class Image(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    class Meta:
+        db_table = 'image'
     def __str__(self):
         return os.path.basename(self.image.name)

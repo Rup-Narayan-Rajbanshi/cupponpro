@@ -24,6 +24,7 @@ class Company(Address):
 
     class Meta:
         db_table = 'company'
+        verbose_name_plural = "companies"
 
     def __str__(self):
         return self.name
@@ -33,3 +34,16 @@ class Company(Address):
         if not self.id:
             self.created_at = timezone.now()
         return super(Company, self).save(*args, **kwargs)
+
+class FavouriteCompany(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    is_favourite = models.BooleanField(default=True)
+    created_at = models.DateField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'favouritecompany'
+        verbose_name_plural = "favourite companies"
+
+    def __str__(self):
+        return self.user.username + ' loves ' + self.company.name
