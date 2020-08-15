@@ -2,7 +2,6 @@ from django.contrib import admin
 
 # Register your models here.
 from userapp.models import User, PasswordResetToken
-from django.contrib.auth.models import Group
 from rest_framework.authtoken.models import Token
 
 from django.utils.translation import ugettext_lazy as _
@@ -19,6 +18,12 @@ class AdminUserapp(admin.ModelAdmin):
                     )
                 }
             ),
+            (_("Group"), {
+                'fields':(
+                    'groups',
+                    )
+                }
+            ),
             (_("Permission"), {'fields':('staff',)}),)
 
 class AdminPasswordResetTokenapp(admin.ModelAdmin):
@@ -28,7 +33,7 @@ class AdminPasswordResetTokenapp(admin.ModelAdmin):
 admin.site.register(User, AdminUserapp)
 admin.site.register(PasswordResetToken, AdminPasswordResetTokenapp)
 
-admin.site.unregister(Group)
+# admin.site.register(Group)
 
 admin.site.unregister(Token)
 

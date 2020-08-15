@@ -33,14 +33,15 @@ class UserManager(BaseUserManager):
         user_obj = self.model(
             email=email
         )
+        user_obj.username = email.split('@')[0]
         user_obj.first_name = first_name
         user_obj.middle_name = middle_name
         user_obj.last_name = last_name
         user_obj.phone_number = phone_number
-        user_obj.password = password
         user_obj.staff = is_staff
         user_obj.admin = is_admin
         user_obj.active = is_active
+        user_obj.set_password(password)
         user_obj.save(using=self._db)
         return user_obj
 
@@ -75,7 +76,7 @@ class User(AbstractBaseUser):
     active = models.BooleanField(default=True)
     created_at = models.DateField(auto_now_add=True)
     dob = models.DateField(null=True, blank=True)
-    update_password = True
+    groups = models.ManyToManyField(Group)
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['first_name', 'middle_name',\
@@ -89,15 +90,6 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.username
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.email = self.email.lower()
-            text_email = str(self.email)
-            self.username = text_email.split('@')[0]
-            if self.admin:
-                self.set_password(self.password)
-        super(User, self).save(*args, **kwargs)
 
     def has_perm(self, perm, obj=None):
         return True

@@ -102,23 +102,23 @@ CORS_ALLOW_CREDENTIALS = True
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
 DATABASES = {
-    'default':{
-        'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.mysql'),
-        'NAME': os.environ.get('DATABASE_NAME', 'womcs_db'),
-        'USER': os.environ.get('DATABASE_USER', 'womcs'),
-        'HOST': os.environ.get('DATABASE_HOST', 'db'),
-        'PORT': os.environ.get('DATABASE_PORT', 3306),
-        'PASSWORD':os.environ.get('DATABASES_PASSWORD', 'womcs_password'),
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# DATABASES = {
+#     'default':{
+#         'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.mysql'),
+#         'NAME': os.environ.get('DATABASE_NAME', 'womcs_db'),
+#         'USER': os.environ.get('DATABASE_USER', 'womcs'),
+#         # 'HOST': os.environ.get('DATABASE_HOST', 'db'),
+#         'PORT': os.environ.get('DATABASE_PORT', 3306),
+#         'PASSWORD':os.environ.get('DATABASES_PASSWORD', 'womcs_password'),
+#     }
+# }
 
 
 # Password validation
