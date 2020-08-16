@@ -11,12 +11,18 @@ class CompanyRatingListView(APIView):
 
     def get(self, request, company_id):
         rating_obj = Rating.objects.filter(company=company_id)
-        serializer = RatingSerializer(rating_obj, many=True)
+        if rating_obj:
+            serializer = RatingSerializer(rating_obj, many=True)
+            data = {
+                'success' : 1,
+                'rating' : serializer.data,
+            }
+            return Response(data, status=200)
         data = {
-            'success' : 1,
-            'rating' : serializer.data,
+            'success' : 0,
+            'message' : 'No rating found.',
         }
-        return Response(data, status=200)
+        return Response(data, status=400)
 
     def post(self, request, company_id):
         serializer = RatingSerializer(data=request.data)
