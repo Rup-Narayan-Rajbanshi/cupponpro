@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class CategoryListView(APIView):
-    permission_classes = (Permission ,)
+    permission_classes = (Permission, )
     serializer_class = CategorySerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
