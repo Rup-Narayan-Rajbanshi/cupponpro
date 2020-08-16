@@ -181,7 +181,14 @@ class GeneratePasswordResetTokenView(APIView):
     permission_classes = (AllowAny, )
 
     def post(self, request):
-        user = User.objects.filter(email=request.data['email'])
+        if 'email' in request.data:
+            user = User.objects.filter(email=request.data['email'])
+        else:
+            data = {
+                'success': 0,
+                'message': 'Enter email field'
+            }
+            return Response(data, status=400)
         if user:
             password_reset_token_obj = PasswordResetToken.objects.filter(email=request.data['email'], is_used=False)
             for obj in password_reset_token_obj:
