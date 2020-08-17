@@ -16,7 +16,7 @@ class AdminCompanyapp(admin.ModelAdmin):
     fieldsets = (
             (_("Company Info"), {
                 'fields':(
-                    'name', 'phone', 'category', 'author'
+                    'name', 'phone', 'category', 'sub_category', 'author'
                     )
                 }
             ),
@@ -27,6 +27,8 @@ class AdminCompanyapp(admin.ModelAdmin):
                     )
                 }
             ),
+
+            (_("Partner Client"), {'fields':('is_partner',)}),
 
             (_("Permission"), {'fields':('status',)}),)
 
