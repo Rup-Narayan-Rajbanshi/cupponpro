@@ -1,7 +1,10 @@
+from django.core.paginator import Paginator
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from permission import Permission
+from categoryapp.models.category import Category
 from commonapp.models.coupon import Coupon
+from commonapp.models.company import Company
 from commonapp.serializers.coupon import CouponSerializer
 
 class CouponListView(APIView):
@@ -109,3 +112,34 @@ class CouponDetailView(APIView):
             'message': "You do not have permission to delete Coupon."
         }
         return Response(data, status=403)
+
+class CategoryCouponListView(APIView):
+    permission_classes = (Permission, )
+    serializer_class = CouponSerializer
+
+    def get(self, request, category_id):
+        company_obj = Company.objects.filter(category=category_id)
+        if company_obj:
+            coupon_obj = Coupon.objects.filter(company__id__in=company_obj).order_by('-id')
+            paginator = Paginator(coupon_obj,15)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+            if coupon_obj:
+                serializer = CouponSerializer(page_obj, many=True)
+                data = {
+                    'success': 1,
+                    'category': Category.objects.get(id=category_id).name,
+                    'coupon': serializer.data,                    
+                }
+                return Response(data, status=200)
+            data = {
+                'success' : 0,
+                'message' : 'No coupon found.',
+            }
+            return Response(data, status=400)
+        else:
+            data = {
+                'success' : 0,
+                'coupon' : 'No coupon found',
+            }
+            return Response(data, status=400)

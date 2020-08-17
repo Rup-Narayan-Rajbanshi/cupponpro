@@ -14,6 +14,16 @@ class UserSerializer(serializers.ModelSerializer):
             'confirm_password', 'image', 'full_name',)
         read_only_fields = ('image', 'active', 'admin')
 
+class UserDetailSerializer(serializers.ModelSerializer):
+    middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'middle_name', 'last_name',\
+            'username', 'email', 'phone_number', 'active', 'admin',\
+            'image', 'full_name',)
+        read_only_fields = ('image', 'active', 'admin')
+
 class ChangePasswordSerializer(serializers.Serializer):
     model = User
     
@@ -24,17 +34,24 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
 
 
-class PasswordResetTokenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PasswordResetToken
-        fields = ('email',)
-
-class ResetPasswordSerializer(serializers.Serializer):
-    model = User
-    
+class PasswordResetTokenSerializer(serializers.Serializer):
     """
     Serializer for password change endpoint.
     """
+    model = PasswordResetToken
+
+    email = serializers.EmailField(max_length=50)
+
+    def create(self, validated_data):
+        user = User.objects.get(email=validated_data.get('email'))
+        return PasswordResetToken.objects.create(user=user)    
+
+class ResetPasswordSerializer(serializers.Serializer):  
+    """
+    Serializer for password change endpoint.
+    """
+    model = User
+
     token = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 

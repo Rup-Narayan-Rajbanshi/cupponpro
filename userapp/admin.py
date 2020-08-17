@@ -27,7 +27,7 @@ class AdminUserapp(admin.ModelAdmin):
             (_("Permission"), {'fields':('staff',)}),)
 
 class AdminPasswordResetTokenapp(admin.ModelAdmin):
-    list_display = ('id', 'email', 'is_used')
+    list_display = ('id', 'user', 'is_used')
 
 
 admin.site.register(User, AdminUserapp)

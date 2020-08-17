@@ -1,4 +1,5 @@
 import re
+import os
 import shortuuid
 from django.utils import timezone
 from rest_framework.response import Response
@@ -9,12 +10,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import Group
 from django.dispatch import receiver
-
-
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.contrib.sites.shortcuts import get_current_site
+from project.settings import EMAIL_HOST_USER
 
 class UserManager(BaseUserManager):
-    def create_user(self, first_name, middle_name, last_name, email, phone_number,\
-        password=None, is_active=False, is_staff=False, is_admin=False):
+    def _create_user(self, first_name, middle_name, last_name, email, phone_number,\
+        password, is_active, is_staff, is_admin):
         if not first_name:
             raise ValueError(_("User must have a First name."))
 
@@ -45,14 +48,14 @@ class UserManager(BaseUserManager):
         user_obj.save(using=self._db)
         return user_obj
 
-    def create_staffuser(self, first_name, middle_name, last_name, email,\
+    def create_user(self, first_name, middle_name, last_name, email,\
         phone_number, password=None):
-        self.create_user(first_name, middle_name, last_name,\
+        return self._create_user(first_name, middle_name, last_name,\
             email, phone_number, password, is_staff=False, is_admin=False, is_active=True)
 
     def create_superuser(self, first_name, middle_name, last_name, email,\
         phone_number, password=None):
-        user = self.create_user(first_name, middle_name, last_name,\
+        return self._create_user(first_name, middle_name, last_name,\
             email, phone_number, password, is_staff=True, is_admin=True, is_active=True)
 
 
@@ -123,10 +126,10 @@ class User(AbstractBaseUser):
         return self.active
 
 class PasswordResetToken(models.Model):
-    email = models.EmailField(max_length=50)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     token = models.CharField(max_length=6)
-    created_at = models.DateTimeField(editable=False)
-    is_used = models.BooleanField(default=False, editable=True)
+    created_at = models.DateTimeField(auto_now=True)
+    is_used = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'passwordresettoken'
@@ -135,11 +138,45 @@ class PasswordResetToken(models.Model):
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
         if not self.id:
-            self.created_at = timezone.now()
             self.token = shortuuid.ShortUUID().random(length=6)
         return super(PasswordResetToken, self).save(*args, **kwargs)
 
-receiver(models.signals.post_delete, sender=User)
+@receiver(models.signals.post_save, sender=PasswordResetToken)
+def auto_delete_token_email(sender, instance, **kwargs):
+    """
+    Send email with the password reset token
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        user = User.objects.get(id=instance.user.id)
+        token = PasswordResetToken.objects.get(id=instance.pk).token
+        user_name = user.full_name
+        user_email = user.email
+        subject = 'Password Reset Token'
+
+        text_template = get_template('email/passwordResetTokenEmail.txt')
+        html_template = get_template('email/passwordResetTokenEmail.html')
+        context = {
+            'subject': subject,
+            'user_name': user_name,
+            'user_email': user_email,
+            'token': token,
+            'domain_name': 'http://127.0.0.1:8000'
+        }
+        text_content = text_template.render(context)
+        html_content = html_template.render(context)
+        email_from = EMAIL_HOST_USER
+
+        mail = EmailMultiAlternatives(subject, text_content, email_from, [user_email])
+        mail.attach_alternative(html_content, "text/html")
+        mail.send()
+
+    except sender.DoesNotExist:
+        return False
+
+@receiver(models.signals.post_delete, sender=User)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     Deletes file from filesystem
