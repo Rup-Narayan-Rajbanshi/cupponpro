@@ -20,7 +20,7 @@ class AdminUserapp(admin.ModelAdmin):
             ),
             (_("Group"), {
                 'fields':(
-                    'groups',
+                    'group',
                     )
                 }
             ),

@@ -8,6 +8,9 @@ from userapp.models.user import User, PasswordResetToken
 from rest_framework.permissions import AllowAny
 
 class UserListView(APIView):
+    """
+    An endpoint for get all user or create new user.
+    """
     serializer_class = UserSerializer
 
     def get(self, request):
@@ -56,6 +59,9 @@ class UserListView(APIView):
         return Response(data, status=400)
 
 class UpdateUser(APIView):
+    """
+    An endpoint for get, update or delete user info.
+    """
     serializer_class = UserDetailSerializer
 
     def get(self, request, user_id):
@@ -215,8 +221,7 @@ class ResetPasswordView(generics.UpdateAPIView):
                 }
                 return Response(data, status=400)
             # set_password also hashes the password that the user will get
-            user = User.objects.filter(id = token_obj[0].user__id)
-            user = user[0]
+            user = User.objects.get(id = token_obj[0].user.id)
             user.set_password(serializer.data.get("new_password"))
             user.save()
             token_obj[0].is_used = True
@@ -231,3 +236,15 @@ class ResetPasswordView(generics.UpdateAPIView):
             'message': serializer.errors,
         }
         return Response(data, status=400)
+
+class LoginView(APIView):
+
+    def get(self, request):
+        user_type = request.user.group.name
+        serializer = UserDetailSerializer(request.user)
+        data = {
+            'success': 1,
+            'user_type': user_type,
+            'user': serializer.data
+        }
+        return Response(data, status=200)

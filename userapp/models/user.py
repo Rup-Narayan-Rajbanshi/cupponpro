@@ -55,8 +55,13 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, first_name, middle_name, last_name, email,\
         phone_number, password=None):
-        return self._create_user(first_name, middle_name, last_name,\
+        user = self._create_user(first_name, middle_name, last_name,\
             email, phone_number, password, is_staff=True, is_admin=True, is_active=True)
+        # assign admin as group
+        group, created = Group.objects.get_or_create(name='admin')
+        user.group = group
+        user.save()
+        return user
 
 
 class User(AbstractBaseUser):
@@ -79,7 +84,7 @@ class User(AbstractBaseUser):
     active = models.BooleanField(default=True)
     created_at = models.DateField(auto_now_add=True)
     dob = models.DateField(null=True, blank=True)
-    groups = models.ManyToManyField(Group)
+    group = models.ForeignKey(Group, on_delete=models.PROTECT, null=True, blank=True)
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['first_name', 'middle_name',\
@@ -150,28 +155,29 @@ def auto_delete_token_email(sender, instance, **kwargs):
         return False
 
     try:
-        user = User.objects.get(id=instance.user.id)
-        token = PasswordResetToken.objects.get(id=instance.pk).token
-        user_name = user.full_name
-        user_email = user.email
-        subject = 'Password Reset Token'
+        if not instance.is_used:
+            user = User.objects.get(id=instance.user.id)
+            token = PasswordResetToken.objects.get(id=instance.pk).token
+            user_name = user.full_name
+            user_email = user.email
+            subject = 'Password Reset Token'
 
-        text_template = get_template('email/passwordResetTokenEmail.txt')
-        html_template = get_template('email/passwordResetTokenEmail.html')
-        context = {
-            'subject': subject,
-            'user_name': user_name,
-            'user_email': user_email,
-            'token': token,
-            'domain_name': 'http://127.0.0.1:8000'
-        }
-        text_content = text_template.render(context)
-        html_content = html_template.render(context)
-        email_from = EMAIL_HOST_USER
+            text_template = get_template('email/passwordResetTokenEmail.txt')
+            html_template = get_template('email/passwordResetTokenEmail.html')
+            context = {
+                'subject': subject,
+                'user_name': user_name,
+                'user_email': user_email,
+                'token': token,
+                'domain_name': 'http://127.0.0.1:8000'
+            }
+            text_content = text_template.render(context)
+            html_content = html_template.render(context)
+            email_from = EMAIL_HOST_USER
 
-        mail = EmailMultiAlternatives(subject, text_content, email_from, [user_email])
-        mail.attach_alternative(html_content, "text/html")
-        mail.send()
+            mail = EmailMultiAlternatives(subject, text_content, email_from, [user_email])
+            mail.attach_alternative(html_content, "text/html")
+            mail.send()
 
     except sender.DoesNotExist:
         return False
