@@ -15,8 +15,8 @@ class Address(models.Model):
     country = models.CharField(max_length=30)
     state = models.CharField(max_length=30)
     city = models.CharField(max_length=30)
-    address1 = models.CharField(max_length=30)
-    address2 = models.CharField(max_length=30, null=True, blank=True)
+    address = models.CharField(max_length=30)
+    zip_code = models.CharField(max_length=30)
 
     class Meta:
         db_table = 'address'

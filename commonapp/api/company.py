@@ -27,6 +27,11 @@ class PartnerListView(APIView):
         company_obj = Company.objects.filter(is_partner=True).order_by('-id')
         serializer = CompanySerializer(company_obj, many=True,\
             context={"request":request})
+        for each_serializer in serializer.data:
+            company = company_obj.get(id=each_serializer['id'])
+            company_images = company.images.all()
+            company_images = [request.META['HTTP_HOST'] + '/media/' + str(image.image) for image in company_images]
+            each_serializer['images'] = company_images
         data = {
             'success' : 1,
             'company' : serializer.data,
