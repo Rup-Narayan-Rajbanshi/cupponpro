@@ -12,7 +12,6 @@ from django.contrib.auth.models import Group
 from django.dispatch import receiver
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
-from django.contrib.sites.shortcuts import get_current_site
 from project.settings import EMAIL_HOST_USER
 
 class UserManager(BaseUserManager):
@@ -32,11 +31,11 @@ class UserManager(BaseUserManager):
 
         if not password:
             raise ValueError(_("User must have a password."))
-
+   
         user_obj = self.model(
             email=email
         )
-        user_obj.username = email.split('@')[0]
+        user_obj.username = email.split('@')[0] + '_' + str(User.objects.last().id + 1)
         user_obj.first_name = first_name
         user_obj.middle_name = middle_name
         user_obj.last_name = last_name
@@ -65,7 +64,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    username = models.CharField(max_length=20, unique=True, editable=False)
+    username = models.CharField(max_length=30, unique=True, editable=False)
     first_name = models.CharField(max_length=50,\
         validators=[RegexValidator(
             regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
@@ -76,7 +75,8 @@ class User(AbstractBaseUser):
             regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
             )],)
     email = models.EmailField(max_length=50, unique=True)
-    phone_number = models.CharField(max_length=30, unique=True)
+    phone_number = models.CharField(max_length=15, unique=True,\
+        validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
     image = models.ImageField(upload_to='profile/', blank=False, null=True,\
         default='profile/default.png')
     admin = models.BooleanField(default=False)
@@ -98,11 +98,6 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.username
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.username = self.email.split('@')[0]
-        return super(User, self).save(*args, **kwargs)
 
     def has_perm(self, perm, obj=None):
         return True
@@ -147,7 +142,7 @@ class PasswordResetToken(models.Model):
         return super(PasswordResetToken, self).save(*args, **kwargs)
 
 @receiver(models.signals.post_save, sender=PasswordResetToken)
-def auto_delete_token_email(sender, instance, **kwargs):
+def auto_send_token_email(sender, instance, **kwargs):
     """
     Send email with the password reset token
     """
