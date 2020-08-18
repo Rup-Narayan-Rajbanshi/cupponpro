@@ -5,7 +5,7 @@ import os
 
 class Image(models.Model):
     def get_upload_path(self, filename):
-        return '{}/{}'.format(self.content_type.model_class().__name__.lower(),filename)
+        return '{}/{}'.format(self.content_type.model_class().__name__.lower(), filename)
 
     image = models.ImageField(upload_to=get_upload_path)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)

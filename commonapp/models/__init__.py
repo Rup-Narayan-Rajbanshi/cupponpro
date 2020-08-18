@@ -1,7 +1,8 @@
 from .address import Address
 from .company import Company, FavouriteCompany
 from .coupon import Coupon
-from .image import Image
-from .rating import Rating
-from .links import SocialLink
+from .document import Document
 from .facility import Facility
+from .image import Image
+from .links import SocialLink
+from .rating import Rating
