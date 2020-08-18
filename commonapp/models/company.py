@@ -41,6 +41,7 @@ class CompanyUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     is_staff = models.BooleanField(default=True)
+    created_at = models.DateField(auto_now=True)
 
     class Meta:
         db_table = 'company_user'

@@ -1,9 +1,11 @@
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
-from commonapp.models.company import Company
+from commonapp.models.company import Company, CompanyUser
 from commonapp.models.rating import Rating
+from userapp.models.user import User
 from commonapp.serializers.company import CompanySerializer
+from userapp.serializers.user import UserDetailSerializer
 
 class CompanyListView(APIView):
     permission_classes = (AllowAny,)
@@ -51,6 +53,32 @@ class CompanyListView(APIView):
         }
         return Response(data, status=400)
         
+class CompanyUserListView(APIView):
+    # permission_classes = () set only company owner and manager to see detail and to admin as well
+
+    def get(self, request, company_id):
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            company_user_obj = CompanyUser.objects.filter(company=company_obj[0])
+            # get user data from related company user data
+            user_ids = [x.user.id for x in company_user_obj]
+            user_obj = User.objects.filter(id__in = user_ids)
+            serializer = UserDetailSerializer(user_obj, many=True)
+            for each_serializer in serializer.data:
+                del each_serializer['admin']
+                each_serializer['staff'] = company_user_obj.get(user__id =each_serializer['id']).is_staff
+                
+            data = {
+                'success': 1,
+                'user': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': "Company doesn't exist."
+            }
+            return Response(data, status=400)
 
 class PartnerListView(APIView):
     permission_classes = (AllowAny, )
