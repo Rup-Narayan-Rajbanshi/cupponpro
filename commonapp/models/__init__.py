@@ -1,5 +1,5 @@
 from .address import Address
-from .company import Company, FavouriteCompany
+from .company import Company, CompanyUser, FavouriteCompany
 from .coupon import Coupon
 from .document import Document
 from .facility import Facility

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from commonapp.models.company import Address, Company, FavouriteCompany
+from commonapp.models.company import Address, Company, CompanyUser, FavouriteCompany
 from commonapp.models.coupon import Coupon
 from commonapp.models.document import Document
 from commonapp.models.facility import Facility
@@ -69,6 +69,7 @@ class AdminRatingapp(admin.ModelAdmin):
     )
 
 admin.site.register(Company, AdminCompanyapp)
+admin.site.register(CompanyUser)
 admin.site.register(Coupon, AdminCouponapp)
 admin.site.register(Document)
 admin.site.register(Facility)

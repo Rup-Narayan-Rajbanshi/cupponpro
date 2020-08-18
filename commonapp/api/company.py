@@ -4,11 +4,9 @@ from rest_framework.views import APIView
 from commonapp.models.company import Company
 from commonapp.models.rating import Rating
 from commonapp.serializers.company import CompanySerializer
-from permission import Permission
-
 
 class CompanyListView(APIView):
-    permission_classes = (Permission ,)
+    permission_classes = (AllowAny,)
     serializer_class = CompanySerializer
 
     def get(self, request):
@@ -37,6 +35,22 @@ class CompanyListView(APIView):
             'company' : serializer.data,
         }
         return Response(data, status=200)
+
+    def post(self, request):
+        serializer = CompanySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                'success': 1,
+                'company': serializer.data
+            }
+            return Response(data, status=200)
+        data = {
+            'success': 0,
+            'message': serializer.errors
+        }
+        return Response(data, status=400)
+        
 
 class PartnerListView(APIView):
     permission_classes = (AllowAny, )

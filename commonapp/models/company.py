@@ -37,6 +37,18 @@ class Company(Address):
             self.key = shortuuid.ShortUUID().random(length=8)
         return super(Company, self).save(*args, **kwargs)
 
+class CompanyUser(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    is_staff = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'company_user'
+        verbose_name_plural = 'company users'
+
+    def __str__(self):
+        return self.user.username
+
 class FavouriteCompany(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
@@ -44,7 +56,7 @@ class FavouriteCompany(models.Model):
     created_at = models.DateField(auto_now_add=True)
 
     class Meta:
-        db_table = 'favouritecompany'
+        db_table = 'favourite_company'
         verbose_name_plural = "favourite companies"
 
     def __str__(self):
