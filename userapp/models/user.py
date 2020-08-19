@@ -82,7 +82,7 @@ class User(AbstractBaseUser):
     admin = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     dob = models.DateField(null=True, blank=True)
     group = models.ForeignKey(Group, on_delete=models.PROTECT, null=True, blank=True)
     USERNAME_FIELD = 'email'
