@@ -22,7 +22,7 @@ class Company(Address):
     phone = models.CharField(max_length=15)
     register_number = models.CharField(_('PAN/VAT Number'), max_length=50)
     is_partner = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'company'
@@ -41,7 +41,7 @@ class CompanyUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     is_staff = models.BooleanField(default=True)
-    created_at = models.DateField(auto_now=True)
+    created_at = models.DateField(auto_now_add=True)
 
     class Meta:
         db_table = 'company_user'

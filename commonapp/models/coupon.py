@@ -8,11 +8,11 @@ class Coupon(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
     token = models.CharField(max_length=8, editable=False, null=False, blank=True)
     token_expiry_date = models.DateField()
-    created_at = models.DateField(auto_now=True)
     discount = models.PositiveIntegerField()
     product_name = models.CharField(max_length=50, null=True, blank=True)
     price = models.PositiveIntegerField(null=True, blank=True)
     images = GenericRelation(Image)
+    created_at = models.DateField(auto_now_add=True)
 
     class Meta:
         db_table = 'coupon'
