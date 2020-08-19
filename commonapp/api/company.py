@@ -145,9 +145,9 @@ class PartnerListView(APIView):
                     rating += each_rating_obj.rate
                 rating /= rating_count
 
-        each_serializer['images'] = company_images
-        each_serializer['rating'] = rating
-        each_serializer['rating_count'] = rating_count
+            each_serializer['images'] = company_images
+            each_serializer['rating'] = rating
+            each_serializer['rating_count'] = rating_count
 
         data = {
             'success' : 1,

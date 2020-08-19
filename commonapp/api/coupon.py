@@ -92,10 +92,10 @@ class CouponDetailView(APIView):
         }
         return Response(data, status=403)
 
-    def delete(self, request, dcoupon_id):
+    def delete(self, request, coupon_id):
         if request.user.admin:
-            if Coupon.objects.filter(id=dcoupon_id):
-                coupon_obj = Coupon.objects.get(id=dcoupon_id)
+            if Coupon.objects.filter(id=coupon_id):
+                coupon_obj = Coupon.objects.get(id=coupon_id)
                 coupon_obj.delete()
                 data = {
                     'success': 1,
