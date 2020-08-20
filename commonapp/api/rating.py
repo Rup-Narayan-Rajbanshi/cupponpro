@@ -3,10 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from commonapp.serializers.rating import RatingSerializer
 from commonapp.models.rating import Rating
-from permission import Permission
+from permission import Permission, isUser
 
 class CompanyRatingListView(APIView):
-    permission_classes = (Permission, )
+    permission_classes = (isUser, )
     serializer_class = RatingSerializer
 
     def get(self, request, company_id):
@@ -47,7 +47,7 @@ class CompanyRatingListView(APIView):
             return Response(data, status=400)
 
 class CompanyRatingDetailView(APIView):
-    permission_classes = (Permission, )
+    permission_classes = (isUser, )
     serializer_class = RatingSerializer
 
     def get(self, request, company_id, rating_id):

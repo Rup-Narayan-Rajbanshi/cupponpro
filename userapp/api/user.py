@@ -1,11 +1,26 @@
 from django.shortcuts import render
+from django.contrib.auth.models import Group
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
-from userapp.serializers.user import UserSerializer, UserDetailSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer, ResetPasswordSerializer
+from userapp.serializers.user import UserSerializer, UserDetailSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer, ResetPasswordSerializer, GroupSerializer
 from userapp.models.user import User, PasswordResetToken
 from rest_framework.permissions import AllowAny
+from permission import isAdmin
+
+class GroupListView(APIView):
+    serializer_class = GroupSerializer
+    permission_classes = (isAdmin, )
+
+    def get(self, request):
+        group_obj = Group.objects.all()
+        serializer = GroupSerializer(group_obj, many=True)
+        data = {
+            'success': 1,
+            'group': serializer.data
+        }
+        return Response(data, status=200)
 
 class UserListView(APIView):
     """

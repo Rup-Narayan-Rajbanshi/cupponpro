@@ -1,6 +1,6 @@
-from userapp.models.user import User, PasswordResetToken
 from rest_framework import serializers
-
+from django.contrib.auth.models import Group
+from userapp.models.user import User, PasswordResetToken
 
 class UserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
@@ -56,10 +56,7 @@ class ResetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
 
 
-# class UpdateUserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ('id', 'username', 'first_name', 'middle_name', 'last_name',\
-#             'phone_number', 'email', 'group', 'active', 'admin', 'password',\
-#             'confirm_password', 'image')
-#         read_only_fields = ('image', 'active')
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('id', 'name')
