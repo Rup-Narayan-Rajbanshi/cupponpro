@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from billapp.serializers.bill import BillSerializer
 from billapp.models.bill import Bill
-from permission import Permission
+from permission import isCompanyOwner,isCompanyManager
 
 class BillListView(APIView):
-    permission_classes = (Permission ,)
+    permission_classes = (isCompanyOwner, isCompanyManager)
     serializer_class = BillSerializer
 
     def get(self, request):
@@ -40,3 +40,23 @@ class BillListView(APIView):
             'message': "You do not have permission to add a banner."
         }
         return Response(data, status=403)
+
+class BillDetailView(APIView):
+    permission_classes = (isCompanyOwner, isCompanyManager)
+    serializer_class = BillSerializer
+
+    def get(self, request, bill_id):
+        bill_obj = Bill.objects.filter(id=bill_id)
+        if bill_obj:
+            serializer = BillSerializer(bill_obj[0])
+            data = {
+                'success': 1,
+                'bill': serializer.data,
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 1,
+                'bill': 'Bill id not found.',
+            }
+            return Response(data, status=400)

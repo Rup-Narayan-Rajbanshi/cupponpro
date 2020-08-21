@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from bannerapp.serializers.banner import BannerSerializer
 from bannerapp.models import Banner
-from permission import Permission
+from permission import isAdminOrReadOnly
 
 class BannerListView(APIView):
-    permission_classes = (Permission, )
+    permission_classes = (isAdminOrReadOnly, )
     serializer_class = BannerSerializer
 
     def get(self, request):
@@ -38,7 +38,7 @@ class BannerListView(APIView):
 
 class BannerUpdateView(APIView):
     serializer_class = BannerSerializer
-    permission_classes = (Permission, )
+    permission_classes = (isAdminOrReadOnly, )
 
     def get(self, request, banner_id):
         banner_obj = Banner.objects.filter(id=banner_id)

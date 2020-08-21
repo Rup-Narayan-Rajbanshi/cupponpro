@@ -1,14 +1,14 @@
 from django.core.paginator import Paginator
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from permission import Permission
+from permission import isAdminOrReadOnly
 from categoryapp.models.category import Category
 from commonapp.models.coupon import Coupon
 from commonapp.models.company import Company
 from commonapp.serializers.coupon import CouponSerializer
 
 class CouponListView(APIView):
-    permission_classes = (Permission, )
+    permission_classes = (isAdminOrReadOnly, )
     serializer_class = CouponSerializer
 
     def get(self, request):
@@ -43,7 +43,7 @@ class CouponListView(APIView):
         return Response(data, status=403)
 
 class CouponDetailView(APIView):
-    permission_classes = (Permission, )
+    permission_classes = (isAdminOrReadOnly, )
     serializer_class = CouponSerializer
 
     def get(self, request, coupon_id):
@@ -114,7 +114,7 @@ class CouponDetailView(APIView):
         return Response(data, status=403)
 
 class CategoryCouponListView(APIView):
-    permission_classes = (Permission, )
+    permission_classes = (isAdminOrReadOnly, )
     serializer_class = CouponSerializer
 
     def get(self, request, category_id):

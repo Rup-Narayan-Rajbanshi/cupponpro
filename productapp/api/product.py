@@ -2,10 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from productapp.serializers.product import BulkQuantitySerializer, ProductSerializer
 from productapp.models.product import BulkQuantity, Product
-from permission import Permission
+from permission import isCompanyOwner, isCompanyManager
 
 class BulkQuantityListView(APIView):
-    permission_classes = (Permission ,)
+    permission_classes = (isCompanyOwner, isCompanyManager)
     serializer_class = BulkQuantitySerializer
 
     def get(self, request):
@@ -40,7 +40,7 @@ class BulkQuantityListView(APIView):
         return Response(data, status=403)
 
 class BulkQuantityDetailView(APIView):
-    permission_classes = (Permission ,)
+    permission_classes = (isCompanyOwner, isCompanyManager)
     serializer_class = BulkQuantitySerializer
 
     def get(self, request, bulk_quantity_id):
@@ -111,7 +111,7 @@ class BulkQuantityDetailView(APIView):
         return Response(data, status=403)
 
 class ProductListView(APIView):
-    permission_classes = (Permission ,)
+    permission_classes = (isCompanyOwner, isCompanyManager)
     serializer_class = ProductSerializer
 
     def get(self, request):
@@ -146,7 +146,7 @@ class ProductListView(APIView):
         return Response(data, status=403)
 
 class ProductDetailView(APIView):
-    permission_classes = (Permission ,)
+    permission_classes = (isCompanyOwner, isCompanyManager)
     serializer_class = ProductSerializer
 
     def get(self, request, product_id):

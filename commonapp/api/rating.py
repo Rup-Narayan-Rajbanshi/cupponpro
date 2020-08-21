@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from commonapp.serializers.rating import RatingSerializer
 from commonapp.models.rating import Rating
-from permission import Permission, isUser
+from permission import isUser
 
 class CompanyRatingListView(APIView):
     permission_classes = (isUser, )

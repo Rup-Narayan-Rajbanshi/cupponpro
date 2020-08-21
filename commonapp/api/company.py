@@ -17,9 +17,6 @@ class CompanyListView(APIView):
             context={"request":request})
         for each_serializer in serializer.data:
             company = company_obj.get(id=each_serializer['id'])
-            company_images = company.images.all()
-            company_images = [request.META['HTTP_HOST'] + '/media/' + str(image.image) for image in company_images]
-
             rating_obj = Rating.objects.filter(company=company.id)
             rating_count = len(rating_obj)
             rating = 0
@@ -28,7 +25,6 @@ class CompanyListView(APIView):
                     rating += each_rating_obj.rate
                 rating /= rating_count
 
-            each_serializer['images'] = company_images
             each_serializer['rating'] = rating
             each_serializer['rating_count'] = rating_count
 
@@ -134,9 +130,6 @@ class PartnerListView(APIView):
             context={"request":request})
         for each_serializer in serializer.data:
             company = company_obj.get(id=each_serializer['id'])
-            company_images = company.images.all()
-            company_images = [request.META['HTTP_HOST'] + '/media/' + str(image.image) for image in company_images]
-
             rating_obj = Rating.objects.filter(company=company.id)
             rating_count = len(rating_obj)
             rating = 0
@@ -145,7 +138,6 @@ class PartnerListView(APIView):
                     rating += each_rating_obj.rate
                 rating /= rating_count
 
-            each_serializer['images'] = company_images
             each_serializer['rating'] = rating
             each_serializer['rating_count'] = rating_count
 

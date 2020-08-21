@@ -1,16 +1,14 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions
-
 from categoryapp.models.category import Category, ProductCategory
 from categoryapp.serializers.category import CategorySerializer, ProductCategorySerializer
-from permission import Permission
+from permission import isAdminOrReadOnly
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class CategoryListView(APIView):
-    permission_classes = (Permission, )
+    permission_classes = (isAdminOrReadOnly, )
     serializer_class = CategorySerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
@@ -39,8 +37,68 @@ class CategoryListView(APIView):
         }
         return Response(data, status=400)
 
+class CategoryDetailView(APIView):
+    serializer_class = CategorySerializer
+    permission_classes = (isAdminOrReadOnly, )
+
+    def get(self, request, category_id):
+        category_obj = Category.objects.filter(id=category_id)
+        if category_obj:
+            serializer = CategorySerializer(category_obj[0])
+            data = {
+                'success': 1,
+                'category': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': 'Category id not found.'
+            }
+            return Response(data, status=200)
+    
+    def put(self, request, category_id):
+        category_obj = Category.objects.filter(id=category_id)
+        if category_obj:
+            serializer = CategorySerializer(category_obj[0], data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'category': serializer.data
+                }
+                return Response(data, status=200)
+            else:
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': 'Category id not found.'
+            }
+            return Response(data, status=400)
+
+    def delete(self, request, category_id):
+        category_obj = Category.objects.filter(id=category_id)
+        if category_obj:
+            category_obj[0].delete()
+            data = {
+                'success': 1,
+                'category': 'Category deleted successfully.'
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': 'Category id not found.'
+            }
+            return Response(data, status=400)
+
 class ProductCategoryListView(APIView):
-    permission_classes = (Permission ,)
+    permission_classes = (isAdminOrReadOnly ,)
     serializer_class = ProductCategorySerializer
 
     def get(self, request):
