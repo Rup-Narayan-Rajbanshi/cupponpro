@@ -2,7 +2,7 @@ import shortuuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from commonapp.models.company import Company
-from commonapp.models.image import  Image
+from commonapp.models.image import Image
 
 class Coupon(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
