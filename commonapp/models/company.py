@@ -12,6 +12,7 @@ from userapp.models import User
 
 class Company(Address):
     name = models.CharField(max_length=200)
+    logo = models.ImageField(upload_to='logo/', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,\
         related_name="company_category")
     sub_category = models.ForeignKey(SubCategory, on_delete=models.PROTECT, null=True, blank=True)
