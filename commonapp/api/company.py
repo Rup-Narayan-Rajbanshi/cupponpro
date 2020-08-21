@@ -103,7 +103,7 @@ class CompanyUserListView(APIView):
             # get user data from related company user data
             user_ids = [x.user.id for x in company_user_obj]
             user_obj = User.objects.filter(id__in = user_ids)
-            serializer = UserDetailSerializer(user_obj, many=True)
+            serializer = UserDetailSerializer(user_obj, many=True, context={"request":request})
             for each_serializer in serializer.data:
                 del each_serializer['admin']
                 each_serializer['staff'] = company_user_obj.get(user__id =each_serializer['id']).is_staff

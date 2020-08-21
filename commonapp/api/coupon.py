@@ -125,7 +125,7 @@ class CategoryCouponListView(APIView):
             page_number = request.GET.get('page')
             page_obj = paginator.get_page(page_number)
             if coupon_obj:
-                serializer = CouponSerializer(page_obj, many=True)
+                serializer = CouponSerializer(page_obj, many=True, context={"request":request})
                 data = {
                     'success': 1,
                     'category': Category.objects.get(id=category_id).name,
