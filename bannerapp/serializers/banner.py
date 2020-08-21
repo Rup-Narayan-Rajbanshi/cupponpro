@@ -6,9 +6,7 @@ class BannerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Banner
-        fields = ('id', 'title', 'description', 'banner_image',\
-            'status', 'created_at',)
-        read_only_fields = ('created_at',)
+        fields = '__all__'
 
 
 # class UpdateUserSerializer(serializers.ModelSerializer):

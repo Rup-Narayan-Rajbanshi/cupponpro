@@ -14,7 +14,7 @@ from django.utils import timezone
 class Banner(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    banner_image = models.ImageField(upload_to='banner_image/')
+    image = models.ImageField(upload_to='banner_image/')
     created_at = models.DateTimeField(editable=False)
     status = models.BooleanField(default=False)
 
