@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from commonapp.models.address import Address
 from commonapp.models.image import Image
-from categoryapp.models import Category, SubCategory
+from commonapp.models.category import Category, SubCategory
 
 from userapp.models import User
 
@@ -33,7 +33,7 @@ class Company(Address):
         return self.name
 
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
+        ''' On save, create key '''
         if not self.id:
             self.key = shortuuid.ShortUUID().random(length=8)
         return super(Company, self).save(*args, **kwargs)

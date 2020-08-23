@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from permission import isAdminOrReadOnly
-from categoryapp.models.category import Category
+from commonapp.models.category import Category
 from commonapp.models.coupon import Coupon
 from commonapp.models.company import Company
 from commonapp.serializers.coupon import CouponSerializer

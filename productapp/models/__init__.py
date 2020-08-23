@@ -1,1 +1,1 @@
-from .product import BulkQuantity, Product
+from .product import BulkQuantity, Product, ProductCategory

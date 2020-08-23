@@ -16,7 +16,7 @@ class Salesitem(models.Model):
     created_at = models.DateTimeField(editable=False)
 
     class Meta:
-        db_table = 'salesitem'
+        db_table = 'sales_item'
 
 
     def save(self, *args, **kwargs):

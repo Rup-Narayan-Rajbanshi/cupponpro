@@ -1,11 +1,6 @@
 import shortuuid
-import datetime
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.dispatch import receiver
-import os
-from django.utils import timezone
-
+# from commonapp.models.serializer import Company
 
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -22,7 +17,7 @@ class Category(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        ''' On save, add token '''
+        ''' On save, create token '''
         if not self.id:
             self.token = shortuuid.ShortUUID().random(length=8)
         return super(Category, self).save(*args, **kwargs)
@@ -33,27 +28,8 @@ class SubCategory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'subcategory'
+        db_table = 'sub_category'
         verbose_name_plural = "sub categories"
 
     def __str__(self):
         return self.name
-
-class ProductCategory(models.Model):
-    name = models.CharField(max_length=30, unique=True)
-    created_at = models.DateTimeField(editable=False)
-    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
-
-    class Meta:
-        db_table = 'productcategory'
-        verbose_name_plural = "product categories"
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.id:
-            self.created_at = timezone.now()
-            self.token = shortuuid.ShortUUID().random(length=8)
-        return super(ProductCategory, self).save(*args, **kwargs)

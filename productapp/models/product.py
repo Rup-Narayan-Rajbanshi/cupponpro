@@ -2,7 +2,6 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils import timezone
 from commonapp.models.image import Image
-from categoryapp.models.category import ProductCategory
 from commonapp.models.company import Company
 from userapp.models import User
 
@@ -12,7 +11,7 @@ class BulkQuantity(models.Model):
     created_at = models.DateTimeField(editable=False)
 
     class Meta:
-        db_table = 'bulkquantity'
+        db_table = 'bulk_quantity'
         verbose_name_plural = "bulk quantities"
 
     def __str__(self):
@@ -24,10 +23,28 @@ class BulkQuantity(models.Model):
             self.created_at = timezone.now()
         return super(BulkQuantity, self).save(*args, **kwargs)
 
+class ProductCategory(models.Model):
+    name = models.CharField(max_length=30, unique=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'product_category'
+        verbose_name_plural = "product categories"
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        ''' On save, create token '''
+        if not self.id:
+            self.token = shortuuid.ShortUUID().random(length=8)
+        return super(ProductCategory, self).save(*args, **kwargs)
+
 class Product(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=20)
-    product_category= models.ForeignKey(ProductCategory, on_delete=models.PROTECT)
     images = GenericRelation(Image)
     bulk_quantity = models.ForeignKey(BulkQuantity, on_delete=models.PROTECT, null=True, blank=True)
     unit_price = models.PositiveIntegerField()

@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from categoryapp.models.category import Category, ProductCategory, SubCategory
-from categoryapp.serializers.category import CategorySerializer, SubCategorySerializer, ProductCategorySerializer
+from commonapp.models.category import Category, SubCategory
+from commonapp.serializers.category import CategorySerializer, SubCategorySerializer
 from permission import isAdminOrReadOnly
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -142,7 +142,7 @@ class SubCategoryDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': 'Category id not found.'
+                'message': 'Sub-category id not found.'
             }
             return Response(data, status=200)
     
@@ -177,27 +177,12 @@ class SubCategoryDetailView(APIView):
             sub_category_objj[0].delete()
             data = {
                 'success': 1,
-                'category': 'Category deleted successfully.'
+                'category': 'Sub-category deleted successfully.'
             }
             return Response(data, status=200)
         else:
             data = {
                 'success': 0,
-                'message': 'Category id not found.'
+                'message': 'Sub-Category id not found.'
             }
             return Response(data, status=400)
-
-
-class ProductCategoryListView(APIView):
-    permission_classes = (isAdminOrReadOnly ,)
-    serializer_class = ProductCategorySerializer
-
-    def get(self, request):
-        product_category_obj = ProductCategory.objects.all()
-        serializer = CategorySerializer(product_category_obj, many=True,\
-        context={"request": request})
-        data = {
-            'success': 1,
-            'productcategory': serializer.data
-        }
-        return Response(data, status=200)

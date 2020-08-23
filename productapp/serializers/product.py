@@ -1,11 +1,17 @@
 from rest_framework import serializers
-from productapp.models.product import BulkQuantity, Product
+from productapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.serializers.image import ImageSerializer
 
 class BulkQuantitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BulkQuantity
+        fields = "__all__"
+
+class ProductCategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProductCategory
         fields = "__all__"
 
 class ProductSerializer(serializers.ModelSerializer):

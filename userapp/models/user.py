@@ -35,7 +35,7 @@ class UserManager(BaseUserManager):
         user_obj = self.model(
             email=email
         )
-        user_obj.username = email.split('@')[0] + '_' + str(User.objects.last().id + 1)
+        user_obj.username = email.split('@')[0]
         user_obj.first_name = first_name
         user_obj.middle_name = middle_name
         user_obj.last_name = last_name
@@ -132,7 +132,7 @@ class PasswordResetToken(models.Model):
     is_used = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'passwordresettoken'
+        db_table = 'password_reset_token'
         verbose_name_plural = "password reset tokens"
 
     def save(self, *args, **kwargs):

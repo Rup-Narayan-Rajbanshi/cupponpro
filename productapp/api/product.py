@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from productapp.serializers.product import BulkQuantitySerializer, ProductSerializer
-from productapp.models.product import BulkQuantity, Product
-from permission import isCompanyOwner, isCompanyManager
+from productapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
+from commonapp.models.company import Company
+from productapp.models.product import BulkQuantity, Product, ProductCategory
+from permission import isAdminOrReadOnly, isCompanyOwner, isCompanyManager
 
 class BulkQuantityListView(APIView):
     permission_classes = (isCompanyOwner, isCompanyManager)
@@ -215,3 +216,56 @@ class ProductDetailView(APIView):
             'message': "You do not have permission to delete product."
         }
         return Response(data, status=403)
+
+class ProductCategoryListView(APIView):
+    permission_classes = (isAdminOrReadOnly ,)
+    serializer_class = ProductCategorySerializer
+
+    def get(self, request):
+        product_category_obj = ProductCategory.objects.all()
+        serializer = ProductCategorySerializer(product_category_obj, many=True,\
+        context={"request": request})
+        data = {
+            'success': 1,
+            'product_category': serializer.data
+        }
+        return Response(data, status=200)
+
+class CompanyProductCategoryListView(APIView):
+    permission_classes = (isAdminOrReadOnly ,)
+    serializer_class = ProductCategorySerializer
+
+    def get(self, request, company_id):
+        company_obj = Company.objects.filter(id=company_obj)
+        if company_obj:
+            product_category_obj = ProductCategory.objects.filter(company = company_obj[0])
+            serializer = ProductCategorySerializer(product_category_obj, many=True,\
+            context={"request": request})
+            data = {
+                'success': 1,
+                'product_category': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': 'No product category associated with the company.'
+            }
+            return Response(data, status=200)
+
+
+    def post(self, request):
+        serializer = ProductCategorySerializer(data=request.data, context={'request':request})
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                'success': 1,
+                'product_category': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 1,
+                'message': serializer.errors
+            }
+            return Response(data, status=400)

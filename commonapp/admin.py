@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
+from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Address, Company, CompanyUser, FavouriteCompany
 from commonapp.models.coupon import Coupon
 from commonapp.models.document import Document
@@ -8,11 +9,10 @@ from commonapp.models.facility import Facility
 from commonapp.models.image import Image
 from commonapp.models.links import SocialLink
 from commonapp.models.rating import Rating
-
-
-
 from django.utils.translation import ugettext_lazy as _
 
+class AdminCategoryapp(admin.ModelAdmin):
+    list_display = ('id', 'name', 'created_at')
 
 class AdminCompanyapp(admin.ModelAdmin):
     list_display = ('id', 'name')
@@ -68,6 +68,7 @@ class AdminRatingapp(admin.ModelAdmin):
         ),
     )
 
+admin.site.register(Category, AdminCategoryapp)
 admin.site.register(Company, AdminCompanyapp)
 admin.site.register(CompanyUser)
 admin.site.register(Coupon, AdminCouponapp)
@@ -77,4 +78,5 @@ admin.site.register(FavouriteCompany)
 admin.site.register(Image, AdminImageapp)
 admin.site.register(Rating, AdminRatingapp)
 admin.site.register(SocialLink)
+admin.site.register(SubCategory)
 
