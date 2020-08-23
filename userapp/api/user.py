@@ -99,7 +99,7 @@ class UpdateUser(APIView):
         if User.objects.filter(id=user_id):
             user_obj = User.objects.get(id=user_id)
             serializer = UserSerializer(instance=user_obj,\
-                data=request.data, partial=True)
+                data=request.data, partial=True, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {

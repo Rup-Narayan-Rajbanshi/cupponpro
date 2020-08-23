@@ -99,6 +99,11 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.username
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.username = self.email.split('@')[0]
+        return super(User, self).save(*args, **kwargs)
+
     def has_perm(self, perm, obj=None):
         return True
 
