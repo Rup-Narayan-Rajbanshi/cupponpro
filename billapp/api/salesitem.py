@@ -29,7 +29,7 @@ class SalesitemListView(APIView):
     
     def post(self, request, bill_id):
         if int(request.data['bill']) == bill_id:
-            serializer = SalesitemSerializer(data=request.data)
+            serializer = SalesitemSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {

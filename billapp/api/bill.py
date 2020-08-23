@@ -22,7 +22,7 @@ class BillListView(APIView):
     
     def post(self,request):
         if request.user.admin:
-            serializer = BillSerializer(data=request.data)
+            serializer = BillSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {
@@ -48,7 +48,7 @@ class BillDetailView(APIView):
     def get(self, request, bill_id):
         bill_obj = Bill.objects.filter(id=bill_id)
         if bill_obj:
-            serializer = BillSerializer(bill_obj[0])
+            serializer = BillSerializer(bill_obj[0], context={'request':request})
             data = {
                 'success': 1,
                 'bill': serializer.data,

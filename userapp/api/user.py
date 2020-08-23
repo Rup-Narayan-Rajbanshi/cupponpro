@@ -15,7 +15,7 @@ class GroupListView(APIView):
 
     def get(self, request):
         group_obj = Group.objects.all()
-        serializer = GroupSerializer(group_obj, many=True)
+        serializer = GroupSerializer(group_obj, many=True, context={'request':request})
         data = {
             'success': 1,
             'group': serializer.data
@@ -24,7 +24,7 @@ class GroupListView(APIView):
 
 class UserListView(APIView):
     """
-    An endpoint for get all user or create new user.
+    An endpoint for getting all user or create new user.
     """
     serializer_class = UserSerializer
 
@@ -45,7 +45,7 @@ class UserListView(APIView):
         return Response(data, status=403)
 
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             if serializer.validated_data['password'] == serializer.validated_data['confirm_password']:
                 user_obj = User.objects.create_user(
@@ -152,7 +152,7 @@ class ChangePasswordView(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         self.object = self.get_object()
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={'request':request})
 
         if serializer.is_valid():
             # Check old password
@@ -189,7 +189,7 @@ class GeneratePasswordResetTokenView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': 'Enter email field'
+                'message': 'Enter email field.'
             }
             return Response(data, status=400)
         if user:
@@ -197,7 +197,7 @@ class GeneratePasswordResetTokenView(APIView):
             for obj in password_reset_token_obj:
                 obj.is_used = True
                 obj.save()
-            serializer = PasswordResetTokenSerializer(data = request.data)
+            serializer = PasswordResetTokenSerializer(data = request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {
@@ -225,7 +225,7 @@ class ResetPasswordView(generics.UpdateAPIView):
     permission_classes = (AllowAny, )
 
     def update(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             # Check token exist
             token_obj = PasswordResetToken.objects.filter(token=serializer.data.get("token"), is_used=False)
@@ -256,7 +256,7 @@ class LoginView(APIView):
 
     def get(self, request):
         user_type = request.user.group.name
-        serializer = UserDetailSerializer(request.user)
+        serializer = UserDetailSerializer(request.user, context={'request':request})
         data = {
             'success': 1,
             'user_type': user_type,

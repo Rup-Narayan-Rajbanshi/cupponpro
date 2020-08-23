@@ -20,7 +20,7 @@ class BulkQuantityListView(APIView):
 
     def post(self, request):
         if request.user.admin:
-            serializer = BulkQuantitySerializer(data=request.data)
+            serializer = BulkQuantitySerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {
@@ -65,7 +65,7 @@ class BulkQuantityDetailView(APIView):
             if BulkQuantity.objects.filter(id=bulk_quantity_id):
                 bulk_quantity_obj = BulkQuantity.objects.get(id=bulk_quantity_id)
                 serializer = BulkQuantitySerializer(instance=bulk_quantity_obj,\
-                    data=request.data)
+                    data=request.data, context={'request':request})
                 if serializer.is_valid():
                     serializer.save()
                     data = {
@@ -126,7 +126,7 @@ class ProductListView(APIView):
 
     def post(self, request):
         if request.user.admin:
-            serializer = ProductSerializer(data=request.data)
+            serializer = ProductSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {
@@ -171,7 +171,7 @@ class ProductDetailView(APIView):
             if Product.objects.filter(id=product_id):
                 product_obj = Product.objects.get(id=product_id)
                 serializer = ProductSerializer(instance=product_obj,\
-                    data=request.data)
+                    data=request.data, context={'request':request})
                 if serializer.is_valid():
                     serializer.save()
                     data = {

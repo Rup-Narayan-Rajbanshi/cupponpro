@@ -14,7 +14,7 @@ class NewsArticleListView(APIView):
         paginator = Paginator(news_obj,5)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-        serializer = NewsArticleSerializer(page_obj, many=True)
+        serializer = NewsArticleSerializer(page_obj, many=True, context={'request':request})
         data = {
             'success': 1,
             'news_article': serializer.data
@@ -22,7 +22,7 @@ class NewsArticleListView(APIView):
         return Response(data, status=200)
 
     def post(self, request):
-        serializer = NewsArticleSerializer(data=request.data)
+        serializer = NewsArticleSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -44,7 +44,7 @@ class NewsArticleDetailView(APIView):
     def get(self, request, news_id):
         news_obj = NewsArticle.objects.filter(id=news_id)
         if news_obj:
-            serializer = NewsArticleSerializer(news_obj[0])
+            serializer = NewsArticleSerializer(news_obj[0], context={'request':request})
             data = {
                 'success': 1,
                 'news_article': serializer.data
@@ -60,7 +60,7 @@ class NewsArticleDetailView(APIView):
     def put(self, request, news_id):
         news_obj = NewsArticle.objects.filter(id=news_id)
         if news_obj:
-            serializer = NewsArticleSerializer(instance=news_obj[0], data=request.data)
+            serializer = NewsArticleSerializer(instance=news_obj[0], data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {

@@ -23,7 +23,7 @@ class CouponListView(APIView):
 
     def post(self, request):
         if request.user.admin:
-            serializer = CouponSerializer(data=request.data)
+            serializer = CouponSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {
@@ -68,7 +68,7 @@ class CouponDetailView(APIView):
             if Coupon.objects.filter(id=coupon_id):
                 coupon_obj = Coupon.objects.get(id=coupon_id)
                 serializer = CouponSerializer(instance=coupon_obj,\
-                    data=request.data)
+                    data=request.data, context={'request':request})
                 if serializer.is_valid():
                     serializer.save()
                     data = {

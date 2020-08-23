@@ -35,7 +35,7 @@ class CompanyListView(APIView):
         return Response(data, status=200)
 
     def post(self, request):
-        serializer = CompanySerializer(data=request.data)
+        serializer = CompanySerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -56,7 +56,7 @@ class CompanyFavouriteView(APIView):
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             favourite_company_obj, created = FavouriteCompany.objects.get_or_create(user=request.user, company=company_obj[0])
-            serializer = FavouriteCompanySerializer(favourite_company_obj)
+            serializer = FavouriteCompanySerializer(favourite_company_obj, context={'request':request})
             data = {
                 'success': 1,
                 'favourtie_company': serializer.data
@@ -73,7 +73,8 @@ class CompanyFavouriteView(APIView):
         if (int(request.data['user']) == request.user.id) and (int(request.data['company']) == company_id):
             favourite_company_obj = FavouriteCompany.objects.filter(user=request.user, company=company_id)
             if favourite_company_obj:
-                serializer = FavouriteCompanySerializer(favourite_company_obj[0], data=request.data)
+                serializer = FavouriteCompanySerializer(favourite_company_obj[0], data=request.data,\
+                    context={'request':request})
                 if serializer.is_valid():
                     serializer.save()
                     data = {

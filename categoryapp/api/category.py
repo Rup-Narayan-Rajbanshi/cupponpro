@@ -23,7 +23,7 @@ class CategoryListView(APIView):
         return Response(data, status=200)
 
     def post(self, request):
-        serializer = CategorySerializer(data=request.data)
+        serializer = CategorySerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -44,7 +44,7 @@ class CategoryDetailView(APIView):
     def get(self, request, category_id):
         category_obj = Category.objects.filter(id=category_id)
         if category_obj:
-            serializer = CategorySerializer(category_obj[0])
+            serializer = CategorySerializer(category_obj[0], context={'request':request})
             data = {
                 'success': 1,
                 'category': serializer.data
@@ -60,7 +60,8 @@ class CategoryDetailView(APIView):
     def put(self, request, category_id):
         category_obj = Category.objects.filter(id=category_id)
         if category_obj:
-            serializer = CategorySerializer(category_obj[0], data=request.data, partial=True)
+            serializer = CategorySerializer(category_obj[0], data=request.data,\
+                partial=True, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {

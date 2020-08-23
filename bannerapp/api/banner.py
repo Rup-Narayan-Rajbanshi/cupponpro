@@ -20,7 +20,7 @@ class BannerListView(APIView):
         return Response(data, status=200)
 
     def post(self, request):
-        serializer = BannerSerializer(data=request.data)
+        serializer = BannerSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -59,7 +59,7 @@ class BannerUpdateView(APIView):
         banner_obj = Banner.objects.filter(id=banner_id)
         if banner_obj:
             serializer = BannerSerializer(instance=banner_obj[0],\
-                data=request.data, partial=True)
+                data=request.data, partial=True, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {

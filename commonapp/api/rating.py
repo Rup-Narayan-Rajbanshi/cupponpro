@@ -12,7 +12,8 @@ class CompanyRatingListView(APIView):
     def get(self, request, company_id):
         rating_obj = Rating.objects.filter(company=company_id)
         if rating_obj:
-            serializer = RatingSerializer(rating_obj, many=True)
+            serializer = RatingSerializer(rating_obj, many=True,\
+                context={'request':request})
             data = {
                 'success' : 1,
                 'rating' : serializer.data,
@@ -26,7 +27,7 @@ class CompanyRatingListView(APIView):
 
     def post(self, request, company_id):
         if int(request.data['company']) == company_id:
-            serializer = RatingSerializer(data=request.data)
+            serializer = RatingSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {
@@ -53,7 +54,7 @@ class CompanyRatingDetailView(APIView):
     def get(self, request, company_id, rating_id):
         rating_obj = Rating.objects.filter(id=rating_id, company=company_id)
         if rating_obj:
-            serializer = RatingSerializer(rating_obj[0])
+            serializer = RatingSerializer(rating_obj[0], context={'request':request})
             data = {
                 'success' : 1,
                 'rating' : serializer.data,
@@ -70,7 +71,7 @@ class CompanyRatingDetailView(APIView):
             rating_obj = Rating.objects.filter(id=rating_id, company=company_id)
             if rating_obj:
                 serializer = RatingSerializer(instance=rating_obj[0],\
-                    data=request.data, partial=True)
+                    data=request.data, partial=True, context={'request':request})
                 if serializer.is_valid():
                     serializer.save()
                     data = {
