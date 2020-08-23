@@ -9,9 +9,10 @@ from django.utils import timezone
 
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True)
-    created_at = models.DateTimeField(editable=False)
     icon = models.CharField(max_length=20, null=True, blank=True)
+    image = models.ImageField(upload_to='category/', null=True, blank=True)
     token = models.CharField(max_length=8, editable=False, null=False, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'category'
@@ -21,14 +22,14 @@ class Category(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
+        ''' On save, add token '''
         if not self.id:
-            self.created_at = timezone.now()
             self.token = shortuuid.ShortUUID().random(length=8)
         return super(Category, self).save(*args, **kwargs)
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=15, unique=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
