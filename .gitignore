@@ -2,10 +2,12 @@
 /htmlcov/
 .coverage
 /__pycache__/
+db.sqlite3
 *.pyc
 .pytest_cache/
 ngrok
 .vscode
 /log/
+media
 */migrations
 assets
