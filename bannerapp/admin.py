@@ -12,7 +12,7 @@ class AdminBannerapp(admin.ModelAdmin):
     fieldsets = (
             (_("Basic info"), {
                 'fields':(
-                    'title', 'description', 'banner_image'
+                    'title', 'description', 'image'
                     )
                 }
             ),

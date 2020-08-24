@@ -15,19 +15,14 @@ class Banner(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     image = models.ImageField(upload_to='banner_image/')
-    created_at = models.DateTimeField(editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'banner'
 
-
-    def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.id:
-            self.created_at = timezone.now()
-        return super(Banner, self).save(*args, **kwargs)
-
+    def __str__(self):
+        return self.title
 
 @receiver(models.signals.pre_save, sender=Banner)
 def auto_delete_file_on_change(sender, instance, **kwargs):
@@ -40,11 +35,11 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         return False
 
     try:
-        old_file = sender.objects.get(pk=instance.pk).banner_image
+        old_file = sender.objects.get(pk=instance.pk).image
     except sender.DoesNotExist:
         return False
 
-    new_file = instance.banner_image
+    new_file = instance.image
     if not old_file == new_file:
         if os.path.isfile(old_file.path):
             os.remove(old_file.path)
