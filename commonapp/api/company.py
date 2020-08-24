@@ -15,19 +15,6 @@ class CompanyListView(APIView):
         company_obj = Company.objects.all()
         serializer = CompanySerializer(company_obj, many=True,\
             context={"request":request})
-        for each_serializer in serializer.data:
-            company = company_obj.get(id=each_serializer['id'])
-            rating_obj = Rating.objects.filter(company=company.id)
-            rating_count = len(rating_obj)
-            rating = 0
-            if rating_obj:
-                for each_rating_obj in rating_obj:
-                    rating += each_rating_obj.rate
-                rating /= rating_count
-
-            each_serializer['rating'] = rating
-            each_serializer['rating_count'] = rating_count
-
         data = {
             'success' : 1,
             'company' : serializer.data,
@@ -49,6 +36,52 @@ class CompanyListView(APIView):
         }
         return Response(data, status=400)
 
+class CompanyDetailView(APIView):
+    serializer_class = CompanySerializer
+    permission_classes = (AllowAny, )
+
+    def get(self, request, company_id):
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            serializer = CompanySerializer(company_obj[0], context={'request':request})
+            data = {
+                'success': 1,
+                'company': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'Message': 'Company id not found.'
+            }
+            return Response(data, status=400)
+
+    def put(self, request, company_id):
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            serializer = CompanySerializer(company_obj[0], data=request.data,\
+                context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'company': serializer.data
+                }
+                return Response(data, status=200)
+            else:
+                data = {
+                    'success': 1,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'Message': 'Company id not found.'
+            }
+            return Response(data, status=400)
+
+
 class CompanyFavouriteView(APIView):
     serializer_class = FavouriteCompanySerializer
 
@@ -65,7 +98,7 @@ class CompanyFavouriteView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': "Company doesn't exist"
+                'message': "Company id not found."
             }
             return Response(data, status=400)
 
@@ -117,7 +150,7 @@ class CompanyUserListView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': "Company doesn't exist."
+                'message': "Company id not found."
             }
             return Response(data, status=400)
 
@@ -129,19 +162,6 @@ class PartnerListView(APIView):
         company_obj = Company.objects.filter(is_partner=True).order_by('-id')
         serializer = CompanySerializer(company_obj, many=True,\
             context={"request":request})
-        for each_serializer in serializer.data:
-            company = company_obj.get(id=each_serializer['id'])
-            rating_obj = Rating.objects.filter(company=company.id)
-            rating_count = len(rating_obj)
-            rating = 0
-            if rating_obj:
-                for each_rating_obj in rating_obj:
-                    rating += each_rating_obj.rate
-                rating /= rating_count
-
-            each_serializer['rating'] = rating
-            each_serializer['rating_count'] = rating_count
-
         data = {
             'success' : 1,
             'company' : serializer.data,

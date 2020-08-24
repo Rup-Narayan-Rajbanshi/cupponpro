@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from django.urls import path
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
-from commonapp.api.company import CompanyListView, CompanyUserListView, PartnerListView, CompanyFavouriteView
+from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView, CompanyFavouriteView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView
 from commonapp.api.rating import CompanyRatingListView, CompanyRatingDetailView
 
@@ -15,6 +15,7 @@ urlpatterns = [
     path('subcategory/<int:sub_category_id>', SubCategoryDetailView.as_view(), name='subcategory_detail'),
     # company
 	path('company', CompanyListView.as_view(), name='company_list'),
+    path('company/<int:company_id>', CompanyDetailView.as_view(), name='company_detail'),
     path('partner', PartnerListView.as_view(), name='partner_company_list'),
     path('company/<int:company_id>/user', CompanyUserListView.as_view(), name='company_user_list'),
     path('company/<int:company_id>/favourite', CompanyFavouriteView.as_view(), name='company_favourite_list'),
