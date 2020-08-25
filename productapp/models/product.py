@@ -4,11 +4,13 @@ from django.utils import timezone
 from commonapp.models.image import Image
 from commonapp.models.company import Company
 from userapp.models import User
+import shortuuid
 
 class BulkQuantity(models.Model):
     name = models.CharField(max_length=30, unique=True)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
-    created_at = models.DateTimeField(editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'bulk_quantity'
@@ -17,16 +19,10 @@ class BulkQuantity(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.id:
-            self.created_at = timezone.now()
-        return super(BulkQuantity, self).save(*args, **kwargs)
-
 class ProductCategory(models.Model):
     name = models.CharField(max_length=30, unique=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
+    token = models.CharField(max_length=8, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -43,15 +39,30 @@ class ProductCategory(models.Model):
         return super(ProductCategory, self).save(*args, **kwargs)
 
 class Product(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
-    name = models.CharField(max_length=20)
-    images = GenericRelation(Image)
-    bulk_quantity = models.ForeignKey(BulkQuantity, on_delete=models.PROTECT, null=True, blank=True)
-    unit_price = models.PositiveIntegerField()
-    total_price = models.PositiveIntegerField(editable=False)
-    created_at = models.DateTimeField(editable=False)
-    token = models.CharField(max_length=8, editable=False, null=False, blank=True)
+    Null = None
+    Male = "M"
+    Female = "F"
+    Unisex = "U"
+    GENDER = [
+        (Null, ''),
+        (Male, 'Male'),
+        (Female, 'Female'),
+        (Unisex, 'Unisex'),
+    ]
 
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    name = models.CharField(max_length=30)
+    product_category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT)
+    brand_name = models.CharField(max_length=30, null=True, blank=True)
+    unit_price = models.PositiveIntegerField()    
+    bulk_quantity = models.ForeignKey(BulkQuantity, on_delete=models.PROTECT, null=True, blank=True)
+    total_price = models.PositiveIntegerField(editable=False)
+    token = models.CharField(max_length=8, editable=False)
+    is_veg = models.BooleanField(default=False) #only for food item
+    gender = models.CharField(max_length=6, choices=GENDER, default=Null, blank=True) # usable for clothing and similar category
+    images = GenericRelation(Image)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     class Meta:
         db_table = 'product'
     
@@ -59,9 +70,8 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
+        ''' On save, add token, and check for bulk quantity and update price of product '''
         if not self.id:
-            self.created_at = timezone.now()
             self.token = shortuuid.ShortUUID().random(length=8)
         if self.bulk_quantity:
             self.total_price = self.unit_price * self.bulk_quantity.quantity

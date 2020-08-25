@@ -13,29 +13,26 @@ class isAdmin(permissions.BasePermission):
             return True
         return False
 
-class isCompanyOwner(permissions.BasePermission):
+class isCompanyOwnerAndAllowAll(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_authenticated and request.user.group.name == 'owner':
             return True
         return False
 
-class isCompanyManager(permissions.BasePermission):
+class isCompanyManagerAndAllowAll(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method=='GET':
+        if request.user.is_authenticated and request.user.group.name == 'manager':
             return True
-        else:
-            if request.user.is_authenticated and request.user.group.name == 'manager':
-                return True
-            return False
+        return False
 
 class isCompanySalePerson(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method=='GET':
+        # if request.method=='GET':
+        #     return True
+        # else:
+        if request.user.is_authenticated and request.user.group.name == 'sales':
             return True
-        else:
-            if request.user.is_authenticated and request.user.group.name == 'sales':
-                return True
-            return False
+        return False
 
 class isUser(permissions.BasePermission):
     def has_permission(self, request, view):

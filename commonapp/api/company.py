@@ -2,7 +2,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from commonapp.models.company import Company, CompanyUser, FavouriteCompany
-from commonapp.models.rating import Rating
 from userapp.models.user import User
 from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer
 from userapp.serializers.user import UserDetailSerializer

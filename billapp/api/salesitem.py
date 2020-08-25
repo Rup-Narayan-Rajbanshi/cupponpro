@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from billapp.serializers.salesitem import SalesitemSerializer
 from billapp.models.salesitem import Salesitem
-from permission import isCompanyOwner, isCompanyManager
+from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
 class SalesitemListView(APIView):
-    permission_classes = (isCompanyOwner, isCompanyManager, )
+    permission_classes = (isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, )
     serializer_class = SalesitemSerializer
 
     def get(self, request, bill_id):
