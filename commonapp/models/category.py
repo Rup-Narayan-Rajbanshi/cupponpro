@@ -1,6 +1,5 @@
 import shortuuid
 from django.db import models
-# from commonapp.models.serializer import Company
 
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True)

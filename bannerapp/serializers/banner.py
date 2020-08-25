@@ -1,4 +1,4 @@
-from bannerapp.models import Banner
+from bannerapp.models.banner import Banner
 from rest_framework import serializers
 
 

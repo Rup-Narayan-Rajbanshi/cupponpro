@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from bannerapp.models import Banner
+from bannerapp.models.banner import Banner
 
 
 from django.utils.translation import ugettext_lazy as _

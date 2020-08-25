@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Address, Company, CompanyUser, FavouriteCompany
-from commonapp.models.coupon import Coupon
+from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.document import Document
 from commonapp.models.facility import Facility
 from commonapp.models.image import Image
@@ -36,11 +36,11 @@ class AdminCompanyapp(admin.ModelAdmin):
             (_("Permission"), {'fields':('status',)}),)
 
 class AdminCouponapp(admin.ModelAdmin):
-    list_display = ('id', 'company', 'token')
+    list_display = ('id', 'description', 'company', 'token')
     fieldsets = (
             (_("Coupon Info"), {
                 'fields':(
-                    'company', 'token_expiry_date', 'discount', 'product_name', 'price'
+                    'company', 'description', 'expiry_date', 'discount', 'content_type', 'object_id'
                 )
             }
         ),
@@ -79,4 +79,4 @@ admin.site.register(Image, AdminImageapp)
 admin.site.register(Rating, AdminRatingapp)
 admin.site.register(SocialLink)
 admin.site.register(SubCategory)
-
+admin.site.register(Voucher)
