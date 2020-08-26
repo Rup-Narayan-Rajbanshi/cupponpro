@@ -52,7 +52,7 @@ class CategoryDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': 'Category id not found.'
+                'message': "Category doesn't exist."
             }
             return Response(data, status=200)
     
@@ -77,7 +77,7 @@ class CategoryDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': 'Category id not found.'
+                'message': "Category doesn't exist."
             }
             return Response(data, status=400)
 
@@ -93,7 +93,7 @@ class CategoryDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': 'Category id not found.'
+                'message': "Category doesn't exist."
             }
             return Response(data, status=400)
 
@@ -142,7 +142,7 @@ class SubCategoryDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': 'Sub-category id not found.'
+                'message': "Sub-category doesn't exist."
             }
             return Response(data, status=200)
     
@@ -167,7 +167,7 @@ class SubCategoryDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': 'Sub-category id not found.'
+                'message': "Sub-category doesn't exist."
             }
             return Response(data, status=400)
 
@@ -183,6 +183,6 @@ class SubCategoryDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': 'Sub-Category id not found.'
+                'message': "Sub-Category doesn't exist."
             }
             return Response(data, status=400)

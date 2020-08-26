@@ -62,7 +62,7 @@ class CompanyRatingDetailView(APIView):
             return Response(data, status=200)
         data = {
             'success' : 0,
-            'message' : 'Rating id not found.',
+            'message' : "Rating doesn't exist."
         }
         return Response(data, status=400)
 

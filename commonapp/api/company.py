@@ -51,7 +51,7 @@ class CompanyDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'Message': 'Company id not found.'
+                'Message': "Company doesn't exist."
             }
             return Response(data, status=400)
 
@@ -76,7 +76,7 @@ class CompanyDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'Message': 'Company id not found.'
+                'Message': "Company doesn't exist."
             }
             return Response(data, status=400)
 
@@ -97,7 +97,7 @@ class CompanyFavouriteView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': "Company id not found."
+                'message': "Company doesn't exist."
             }
             return Response(data, status=400)
 
@@ -149,7 +149,7 @@ class CompanyUserListView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': "Company id not found."
+                'message': "Company doesn't exist."
             }
             return Response(data, status=400)
 

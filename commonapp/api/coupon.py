@@ -59,7 +59,7 @@ class CouponDetailView(APIView):
         else:
             data = {
                 'success' : 0,
-                "message" : "Coupon id not found."
+                "message" : "Coupon doesn't exist."
             }
             return Response(data, status=404)
 
@@ -83,7 +83,7 @@ class CouponDetailView(APIView):
                 return Response(data, status=400)
             data = {
                 'success': 0,
-                'message': "Coupon id not found."
+                'message': "Coupon doesn't exist."
             }
             return Response(data, status=400)
         data = {
@@ -104,7 +104,7 @@ class CouponDetailView(APIView):
                 return Response(data, status=200)
             data = {
                 'success': 0,
-                'message': "Coupon id not found."
+                'message': "Coupon doesn't exist."
             }
             return Response(data, status=400)
         data = {

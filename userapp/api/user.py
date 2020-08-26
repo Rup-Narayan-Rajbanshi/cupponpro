@@ -91,7 +91,7 @@ class UpdateUser(APIView):
             return Response(data, status=200)
         data = {
             'success': 0,
-            'message': 'User id not found.'
+            'message': "User doesn't exist."
         }
         return Response(data, status=400)
 
@@ -114,7 +114,7 @@ class UpdateUser(APIView):
             return Response(data, status=400)
         data = {
             'success': 0,
-            'message': 'User id not found.'
+            'message': "User doesn't exist."
         }
         return Response(data, status=400)
 
@@ -130,7 +130,7 @@ class UpdateUser(APIView):
                 return Response(data, status=200)
             data = {
                 'success': 0,
-                'message': 'User id not found.'
+                'message': "User doesn't exist."
             }
             return Response(data, status=400)
         data = {
