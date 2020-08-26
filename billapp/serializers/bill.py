@@ -1,4 +1,4 @@
-from billapp.models import Bill
+from billapp.models.bill import Bill
 from rest_framework import serializers
 
 class BillSerializer(serializers.ModelSerializer):

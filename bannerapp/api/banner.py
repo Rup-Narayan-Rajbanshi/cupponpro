@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from bannerapp.serializers.banner import BannerSerializer
-from bannerapp.models import Banner
+from bannerapp.models.banner import Banner
 from permission import isAdminOrReadOnly
 
 class BannerListView(APIView):
