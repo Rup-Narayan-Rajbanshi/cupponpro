@@ -1,10 +1,6 @@
-from uuid import uuid4
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 from commonapp.models.company import Company
 from userapp.models.user import User
-
 
 class Rating(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)

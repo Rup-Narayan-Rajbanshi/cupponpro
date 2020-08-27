@@ -1,13 +1,10 @@
 import re
 import os
 import shortuuid
-from django.utils import timezone
-from rest_framework.response import Response
 from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
 from django.contrib.auth.models import Group
 from django.dispatch import receiver
 from django.core.mail import EmailMultiAlternatives
@@ -31,7 +28,7 @@ class UserManager(BaseUserManager):
 
         if not password:
             raise ValueError(_("User must have a password."))
-   
+
         user_obj = self.model(
             email=email
         )
@@ -113,7 +110,8 @@ class User(AbstractBaseUser):
 
     @property
     def full_name(self):
-        return "%s %s" %(self.first_name,self.last_name)
+        return "%s %s" %(self.first_name, self.last_name)
+
     @property
     def is_staff(self):
         return self.staff

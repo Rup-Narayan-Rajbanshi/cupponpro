@@ -1,6 +1,5 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions
 from bannerapp.serializers.banner import BannerSerializer
 from bannerapp.models.banner import Banner
 from permission import isAdminOrReadOnly
@@ -51,9 +50,9 @@ class BannerUpdateView(APIView):
             return Response(data, status=200)
         data = {
             'success': 0,
-            'message': "Banner id not found."
+            'message': "Banner doesn't exist."
         }
-        return Response(data, status=400)
+        return Response(data, status=404)
 
     def put(self, request, banner_id):
         banner_obj = Banner.objects.filter(id=banner_id)
@@ -74,9 +73,9 @@ class BannerUpdateView(APIView):
             return Response(data, status=400)
         data = {
             'success': 0,
-            'message': "Banner id not found."
+            'message': "Banner doesn't exist."
         }
-        return Response(data, status=400)
+        return Response(data, status=404)
 
     def delete(self, request, banner_id):
         banner_obj = Banner.objects.filter(id=banner_id)
@@ -89,6 +88,6 @@ class BannerUpdateView(APIView):
             return Response(data, status=200)
         data = {
             'success': 0,
-            'message': "Banner id not found."
+            'message': "Banner doesn't exist."
         }
-        return Response(data, status=400)
+        return Response(data, status=404)

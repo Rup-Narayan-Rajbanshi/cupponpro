@@ -1,12 +1,10 @@
-from django.shortcuts import render
 from django.contrib.auth.models import Group
 from rest_framework import generics
-from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework.views import APIView
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer, ResetPasswordSerializer, GroupSerializer
 from userapp.models.user import User, PasswordResetToken
-from rest_framework.permissions import AllowAny
 from permission import isAdmin
 
 class GroupListView(APIView):
@@ -91,9 +89,9 @@ class UpdateUser(APIView):
             return Response(data, status=200)
         data = {
             'success': 0,
-            'message': 'User id not found.'
+            'message': "User doesn't exist."
         }
-        return Response(data, status=400)
+        return Response(data, status=404)
 
     def put(self, request, user_id):
         if User.objects.filter(id=user_id):
@@ -114,9 +112,9 @@ class UpdateUser(APIView):
             return Response(data, status=400)
         data = {
             'success': 0,
-            'message': 'User id not found.'
+            'message': "User doesn't exist."
         }
-        return Response(data, status=400)
+        return Response(data, status=404)
 
     def delete(self, request, user_id):
         if request.user.admin:
@@ -130,9 +128,9 @@ class UpdateUser(APIView):
                 return Response(data, status=200)
             data = {
                 'success': 0,
-                'message': 'User id not found.'
+                'message': "User doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
         data = {
             'success': 0,
             'message': 'You do not have permission to delete user.'
@@ -197,24 +195,24 @@ class GeneratePasswordResetTokenView(APIView):
             for obj in password_reset_token_obj:
                 obj.is_used = True
                 obj.save()
-            serializer = PasswordResetTokenSerializer(data = request.data, context={'request':request})
+            serializer = PasswordResetTokenSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {
                     'success': 1,
                     'passwordresettoken': request.data['email']
                 }
-                return Response(data, status = 200)
+                return Response(data, status=200)
             data = {
                 'success': 0,
                 'message': serializer.errors
             }
-            return Response(data, status = 400)
+            return Response(data, status=400)
         data = {
-                'success': 0,
-                'message': 'Email not found.'
-            }
-        return Response(data, status = 400)
+            'success': 0,
+            'message': "Email doesn't exist."
+        }
+        return Response(data, status=404)
 
 class ResetPasswordView(generics.UpdateAPIView):
     """
@@ -236,7 +234,7 @@ class ResetPasswordView(generics.UpdateAPIView):
                 }
                 return Response(data, status=400)
             # set_password also hashes the password that the user will get
-            user = User.objects.get(id = token_obj[0].user.id)
+            user = User.objects.get(id=token_obj[0].user.id)
             user.set_password(serializer.data.get("new_password"))
             user.save()
             token_obj[0].is_used = True

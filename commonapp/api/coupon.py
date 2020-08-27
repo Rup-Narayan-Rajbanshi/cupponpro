@@ -59,7 +59,7 @@ class CouponDetailView(APIView):
         else:
             data = {
                 'success' : 0,
-                "message" : "Coupon id not found."
+                "message" : "Coupon doesn't exist."
             }
             return Response(data, status=404)
 
@@ -83,9 +83,9 @@ class CouponDetailView(APIView):
                 return Response(data, status=400)
             data = {
                 'success': 0,
-                'message': "Coupon id not found."
+                'message': "Coupon doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
         data = {
             'success': 0,
             'message': "You do not have permission to update coupon."
@@ -104,9 +104,9 @@ class CouponDetailView(APIView):
                 return Response(data, status=200)
             data = {
                 'success': 0,
-                'message': "Coupon id not found."
+                'message': "Coupon doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
         data = {
             'success': 0,
             'message': "You do not have permission to delete Coupon."
@@ -121,7 +121,7 @@ class CategoryCouponListView(APIView):
         company_obj = Company.objects.filter(category=category_id)
         if company_obj:
             coupon_obj = Coupon.objects.filter(company__id__in=company_obj).order_by('-id')
-            paginator = Paginator(coupon_obj,15)
+            paginator = Paginator(coupon_obj, 15)
             page_number = request.GET.get('page')
             page_obj = paginator.get_page(page_number)
             if coupon_obj:
@@ -129,17 +129,17 @@ class CategoryCouponListView(APIView):
                 data = {
                     'success': 1,
                     'category': Category.objects.get(id=category_id).name,
-                    'coupon': serializer.data,                    
+                    'coupon': serializer.data
                 }
                 return Response(data, status=200)
             data = {
-                'success' : 0,
-                'message' : 'No coupon found.',
+                'success': 0,
+                'message': "Coupon doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
         else:
             data = {
-                'success' : 0,
-                'coupon' : 'No coupon found',
+                'success': 0,
+                'coupon': "Coupon doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)

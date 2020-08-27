@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from commonapp.serializers.rating import RatingSerializer
@@ -21,7 +20,7 @@ class CompanyRatingListView(APIView):
             return Response(data, status=200)
         data = {
             'success' : 0,
-            'message' : 'No rating found.',
+            'message' : "Rating doesn't exist.",
         }
         return Response(data, status=400)
 
@@ -62,9 +61,9 @@ class CompanyRatingDetailView(APIView):
             return Response(data, status=200)
         data = {
             'success' : 0,
-            'message' : 'Rating id not found.',
+            'message' : "Rating doesn't exist."
         }
-        return Response(data, status=400)
+        return Response(data, status=404)
 
     def put(self, request, company_id, rating_id):
         if int(request.data['company']) == company_id:
@@ -86,9 +85,9 @@ class CompanyRatingDetailView(APIView):
                 return Response(data, status=400)
             data = {
                 'success': 0,
-                'message': "Rating data not found."
+                'message': "Rating doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
         else:
             data = {
                 'success': 0,
@@ -107,6 +106,6 @@ class CompanyRatingDetailView(APIView):
             return Response(data, status=200)
         data = {
             'success': 0,
-            'message': "Rating data not found."
+            'message': "Rating doesn't exist."
         }
-        return Response(data, status=400)
+        return Response(data, status=404)

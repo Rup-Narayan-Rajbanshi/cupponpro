@@ -57,6 +57,6 @@ class BillDetailView(APIView):
         else:
             data = {
                 'success': 1,
-                'bill': 'Bill id not found.',
+                'bill': "Bill doesn't exist.",
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
