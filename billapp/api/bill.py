@@ -59,4 +59,4 @@ class BillDetailView(APIView):
                 'success': 1,
                 'bill': "Bill doesn't exist.",
             }
-            return Response(data, status=400)
+            return Response(data, status=404)

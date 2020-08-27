@@ -3,7 +3,6 @@ import shortuuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 from commonapp.models.address import Address
 from commonapp.models.image import Image
 from commonapp.models.category import Category, SubCategory
@@ -23,6 +22,7 @@ class Company(Address):
     phone = models.CharField(max_length=15)
     register_number = models.CharField(_('PAN/VAT Number'), max_length=50)
     is_partner = models.BooleanField(default=False)
+    key = models.CharField(max_length=8)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

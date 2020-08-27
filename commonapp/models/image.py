@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 import os
 
 class Image(models.Model):
+
     def get_upload_path(self, filename):
         return '{}/{}'.format(self.content_type.model_class().__name__.lower(), filename)
 

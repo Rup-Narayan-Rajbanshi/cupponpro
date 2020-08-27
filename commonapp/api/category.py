@@ -1,11 +1,8 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from commonapp.models.category import Category, SubCategory
 from commonapp.serializers.category import CategorySerializer, SubCategorySerializer
 from permission import isAdminOrReadOnly
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
 
 class CategoryListView(APIView):
     permission_classes = (isAdminOrReadOnly, )
@@ -54,8 +51,8 @@ class CategoryDetailView(APIView):
                 'success': 0,
                 'message': "Category doesn't exist."
             }
-            return Response(data, status=200)
-    
+            return Response(data, status=404)
+
     def put(self, request, category_id):
         category_obj = Category.objects.filter(id=category_id)
         if category_obj:
@@ -79,7 +76,7 @@ class CategoryDetailView(APIView):
                 'success': 0,
                 'message': "Category doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
 
     def delete(self, request, category_id):
         category_obj = Category.objects.filter(id=category_id)
@@ -95,7 +92,7 @@ class CategoryDetailView(APIView):
                 'success': 0,
                 'message': "Category doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
 
 class SubCategoryListView(APIView):
     serializer_class = SubCategorySerializer
@@ -144,8 +141,8 @@ class SubCategoryDetailView(APIView):
                 'success': 0,
                 'message': "Sub-category doesn't exist."
             }
-            return Response(data, status=200)
-    
+            return Response(data, status=404)
+
     def put(self, request, sub_category_id):
         sub_category_obj = SubCategory.objects.filter(id=sub_category_id)
         if sub_category_obj:
@@ -169,7 +166,7 @@ class SubCategoryDetailView(APIView):
                 'success': 0,
                 'message': "Sub-category doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
 
     def delete(self, request, sub_category_id):
         sub_category_objj = SubCategory.objects.filter(id=sub_category_id)
@@ -185,4 +182,4 @@ class SubCategoryDetailView(APIView):
                 'success': 0,
                 'message': "Sub-Category doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)

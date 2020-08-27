@@ -1,10 +1,8 @@
+import shortuuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from django.utils import timezone
 from commonapp.models.image import Image
 from commonapp.models.company import Company
-from userapp.models import User
-import shortuuid
 
 class BulkQuantity(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -54,7 +52,7 @@ class Product(models.Model):
     name = models.CharField(max_length=30)
     product_category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT)
     brand_name = models.CharField(max_length=30, null=True, blank=True)
-    unit_price = models.PositiveIntegerField()    
+    unit_price = models.PositiveIntegerField()
     bulk_quantity = models.ForeignKey(BulkQuantity, on_delete=models.PROTECT, null=True, blank=True)
     total_price = models.PositiveIntegerField(editable=False)
     token = models.CharField(max_length=8, editable=False)
@@ -62,10 +60,10 @@ class Product(models.Model):
     gender = models.CharField(max_length=6, choices=GENDER, default=Null, blank=True) # usable for clothing and similar category
     images = GenericRelation(Image)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         db_table = 'product'
-    
+
     def __str__(self):
         return self.name
 

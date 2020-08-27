@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from productapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
 from commonapp.models.company import Company, CompanyUser
 from productapp.models.product import BulkQuantity, Product, ProductCategory
+from productapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
 class CompanyBulkQuantityListView(APIView):
@@ -28,10 +28,10 @@ class CompanyBulkQuantityListView(APIView):
                 return Response(data, status=200)
             else:
                 data = {
-                'success': 0,
-                'message': "You do not have permission to view bulk quantity."
-            }
-            return Response(data, status=403)
+                    'success': 0,
+                    'message': "You do not have permission to view bulk quantity."
+                }
+                return Response(data, status=403)
         else:
             data = {
                 'success' : 0,
@@ -91,10 +91,10 @@ class CompanyBulkQuantityDetailView(APIView):
                     return Response(data, status=404)
             else:
                 data = {
-                'success': 0,
-                'message': "You do not have permission to view bulk quantity."
-            }
-            return Response(data, status=403)
+                    'success': 0,
+                    'message': "You do not have permission to view bulk quantity."
+                }
+                return Response(data, status=403)
         else:
             data = {
                 'success' : 0,
@@ -177,7 +177,7 @@ class CompanyProductListView(APIView):
     serializer_class = ProductSerializer
 
     def get(self, request, company_id):
-        product_obj = Product.objects.filter(company = company_id)
+        product_obj = Product.objects.filter(company=company_id)
         serializer = ProductSerializer(product_obj, many=True,\
             context={"request":request})
         data = {
@@ -240,7 +240,7 @@ class CompanyProductDetailView(APIView):
             company_obj = Company.objects.filter(id=company_id)
             if company_obj:
                 product_obj = Product.objects.filter(id=product_id, company=company_obj[0])
-                if product_obj:                    
+                if product_obj:
                     serializer = ProductSerializer(instance=product_obj[0],\
                         data=request.data, context={'request':request})
                     if serializer.is_valid():
@@ -304,7 +304,7 @@ class CompanyProductDetailView(APIView):
             return Response(data, status=404)
 
 class ProductCategoryListView(APIView):
-    permission_classes = (isAdminOrReadOnly ,)
+    permission_classes = (isAdminOrReadOnly, )
     serializer_class = ProductCategorySerializer
 
     def get(self, request):
@@ -318,13 +318,13 @@ class ProductCategoryListView(APIView):
         return Response(data, status=200)
 
 class CompanyProductCategoryListView(APIView):
-    permission_classes = (isAdminOrReadOnly ,)
+    permission_classes = (isAdminOrReadOnly, )
     serializer_class = ProductCategorySerializer
 
     def get(self, request, company_id):
-        company_obj = Company.objects.filter(id=company_obj)
+        company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            product_category_obj = ProductCategory.objects.filter(company = company_obj[0])
+            product_category_obj = ProductCategory.objects.filter(company=company_obj[0])
             serializer = ProductCategorySerializer(product_category_obj, many=True,\
             context={"request": request})
             data = {
@@ -355,3 +355,4 @@ class CompanyProductCategoryListView(APIView):
                 'message': serializer.errors
             }
             return Response(data, status=400)
+            

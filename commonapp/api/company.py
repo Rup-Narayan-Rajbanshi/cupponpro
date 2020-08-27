@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from commonapp.models.company import Company, CompanyUser, FavouriteCompany
-from userapp.models.user import User
 from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer
+from userapp.models.user import User
 from userapp.serializers.user import UserDetailSerializer
 
 class CompanyListView(APIView):
@@ -53,7 +53,7 @@ class CompanyDetailView(APIView):
                 'success': 0,
                 'Message': "Company doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
 
     def put(self, request, company_id):
         company_obj = Company.objects.filter(id=company_id)
@@ -78,7 +78,7 @@ class CompanyDetailView(APIView):
                 'success': 0,
                 'Message': "Company doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
 
 
 class CompanyFavouriteView(APIView):
@@ -99,7 +99,7 @@ class CompanyFavouriteView(APIView):
                 'success': 0,
                 'message': "Company doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
 
     def put(self, request, company_id):
         if (int(request.data['user']) == request.user.id) and (int(request.data['company']) == company_id):
@@ -135,12 +135,11 @@ class CompanyUserListView(APIView):
             company_user_obj = CompanyUser.objects.filter(company=company_obj[0])
             # get user data from related company user data
             user_ids = [x.user.id for x in company_user_obj]
-            user_obj = User.objects.filter(id__in = user_ids)
+            user_obj = User.objects.filter(id__in=user_ids)
             serializer = UserDetailSerializer(user_obj, many=True, context={"request":request})
             for each_serializer in serializer.data:
                 del each_serializer['admin']
-                each_serializer['staff'] = company_user_obj.get(user__id =each_serializer['id']).is_staff
-                
+                each_serializer['staff'] = company_user_obj.get(user__id=each_serializer['id']).is_staff
             data = {
                 'success': 1,
                 'user': serializer.data
@@ -151,7 +150,7 @@ class CompanyUserListView(APIView):
                 'success': 0,
                 'message': "Company doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
 
 class PartnerListView(APIView):
     permission_classes = (AllowAny, )

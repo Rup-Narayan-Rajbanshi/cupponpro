@@ -1,8 +1,8 @@
-from articleapp.serializers.news import NewsArticleSerializer
-from articleapp.models.news import NewsArticle
 from django.core.paginator import Paginator
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from articleapp.serializers.news import NewsArticleSerializer
+from articleapp.models.news import NewsArticle
 from permission import isAdminOrReadOnly
 
 class NewsArticleListView(APIView):
@@ -11,7 +11,7 @@ class NewsArticleListView(APIView):
 
     def get(self, request):
         news_obj = NewsArticle.objects.all().order_by('-id')
-        paginator = Paginator(news_obj,5)
+        paginator = Paginator(news_obj, 5)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         serializer = NewsArticleSerializer(page_obj, many=True, context={'request':request})
