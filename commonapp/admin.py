@@ -1,15 +1,13 @@
 from django.contrib import admin
-
-# Register your models here.
+from django.utils.translation import ugettext_lazy as _
 from commonapp.models.category import Category, SubCategory
-from commonapp.models.company import Address, Company, CompanyUser, FavouriteCompany
+from commonapp.models.company import Company, CompanyUser, FavouriteCompany
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.document import Document
 from commonapp.models.facility import Facility
 from commonapp.models.image import Image
 from commonapp.models.links import SocialLink
 from commonapp.models.rating import Rating
-from django.utils.translation import ugettext_lazy as _
 
 class AdminCategoryapp(admin.ModelAdmin):
     list_display = ('id', 'name', 'created_at')
@@ -19,7 +17,7 @@ class AdminCompanyapp(admin.ModelAdmin):
     fieldsets = (
             (_("Company Info"), {
                 'fields':(
-                    'name', 'logo', 'phone', 'category', 'sub_category', 'author'
+                    'name', 'logo', 'phone_number', 'category', 'sub_category', 'author'
                     )
                 }
             ),
