@@ -8,7 +8,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Coupon
-        fields = "__all__"
+        exclude = ('token', 'content_type')
 
     def get_coupon_relation(self, obj):
         return obj.content_object.__class__.__name__
@@ -17,4 +17,4 @@ class VoucherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Coupon
-        fields = "__all__"
+        exclude = ('token', )

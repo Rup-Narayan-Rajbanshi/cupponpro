@@ -5,6 +5,7 @@ from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUse
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
 from commonapp.api.rating import CompanyRatingListView, CompanyRatingDetailView
+from commonapp.api.search import TopBarSearchView
 
 app_name = 'commonapp'
 
@@ -30,4 +31,6 @@ urlpatterns = [
     # facility
     path('company/<int:company_id>/facility', CompanyFacilityListView.as_view(), name='company_facility_list'),
     path('company/<int:company_id>/facility/<int:facility_id>', CompanyFacilityDetailView.as_view(), name='company_facility_detail'),
+    # search
+    path('topbarsearch', TopBarSearchView.as_view(), name='top_bar_search_list'),
 ]
