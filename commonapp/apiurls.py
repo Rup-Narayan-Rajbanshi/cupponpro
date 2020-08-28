@@ -3,6 +3,7 @@ from django.urls import path
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView, CompanyFavouriteView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView
+from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
 from commonapp.api.rating import CompanyRatingListView, CompanyRatingDetailView
 
 app_name = 'commonapp'
@@ -26,4 +27,7 @@ urlpatterns = [
     # rating
     path('company/<int:company_id>/rating', CompanyRatingListView.as_view(), name='company_rating_list'),
     path('company/<int:company_id>/rating/<int:rating_id>', CompanyRatingDetailView.as_view(), name='company_rating_detail'),
+    # facility
+    path('company/<int:company_id>/facility', CompanyFacilityListView.as_view(), name='company_facility_list'),
+    path('company/<int:company_id>/facility/<int:facility_id>', CompanyFacilityDetailView.as_view(), name='company_facility_detail'),
 ]

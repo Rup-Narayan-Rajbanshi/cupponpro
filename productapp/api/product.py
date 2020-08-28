@@ -104,27 +104,35 @@ class CompanyBulkQuantityDetailView(APIView):
 
     def put(self, request, company_id, bulk_quantity_id):
         if company_id == int(request.data['company']):
-            bulk_quantity_obj = BulkQuantity.objects.filter(id=bulk_quantity_id)
-            if bulk_quantity_obj:
-                serializer = BulkQuantitySerializer(instance=bulk_quantity_obj[0],\
-                    data=request.data, context={'request':request})
-                if serializer.is_valid():
-                    serializer.save()
+            company_obj = Company.objects.filter(id=company_id)
+            if company_obj:
+                bulk_quantity_obj = BulkQuantity.objects.filter(id=bulk_quantity_id, company=company_obj[0])
+                if bulk_quantity_obj:
+                    serializer = BulkQuantitySerializer(instance=bulk_quantity_obj[0],\
+                        data=request.data, context={'request':request})
+                    if serializer.is_valid():
+                        serializer.save()
+                        data = {
+                            'success': 1,
+                            'bulk_quantity': serializer.data
+                        }
+                        return Response(data, status=200)
                     data = {
-                        'success': 1,
-                        'bulk_quantity': serializer.data
+                        'success': 0,
+                        'message': serializer.errors
                     }
-                    return Response(data, status=200)
+                    return Response(data, status=400)
                 data = {
                     'success': 0,
-                    'message': serializer.errors
+                    'message': "Bulk quantity doesn't exist."
                 }
-                return Response(data, status=400)
-            data = {
-                'success': 0,
-                'message': "Bulk quantity doesn't exist."
-            }
-            return Response(data, status=404)
+                return Response(data, status=404)
+            else:
+                data = {
+                    'success': 0,
+                    'message': "Company doesn't exist."
+                }
+                return Response(data, status=404)
         data = {
             'success': 0,
             'message': "You do not have permission to update bulk quantity."
