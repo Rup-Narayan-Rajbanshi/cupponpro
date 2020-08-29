@@ -9,11 +9,11 @@ from productapp.models.product import Product
 
 
 class Salesitem(models.Model):
-    bill = models.ForeignKey(Bill, on_delete=models.PROTECT)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    bill = models.ForeignKey(Bill, on_delete=models.PROTECT, null=True)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
     amount = models.PositiveIntegerField()
     quantity = models.PositiveIntegerField()
-    created_at = models.DateTimeField(editable=False)
+    created_at = models.DateTimeField(auto_now_add=False)
 
     class Meta:
         db_table = 'sales_item'

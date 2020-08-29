@@ -5,6 +5,7 @@ class BillSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bill
-        fields = ('id', 'company', 'user', 'total', 'discount_percentage',\
-            'discount', 'grand_total', 'created_at',)
+        fields = ('id', 'company', 'user', 'name', 'phone_number',\
+            'total', 'total_discount', 'tax', 'taxed_amount',\
+            'grand_total', 'created_at',)
         read_only_fields = ('created_at',)

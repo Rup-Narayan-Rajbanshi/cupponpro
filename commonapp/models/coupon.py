@@ -1,11 +1,8 @@
 import shortuuid
-<<<<<<< HEAD
-=======
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
->>>>>>> fc6b2409d3c6e0caf475e6605dc74043170bf071
 from billapp.models.bill import Bill
 from commonapp.models.company import Company
 from commonapp.models.image import Image
@@ -57,8 +54,4 @@ class Voucher(models.Model):
         db_table = 'voucher'
     
     def __str__(self):
-<<<<<<< HEAD
         return self.user.full_name + "-" + str(self.id)
-=======
-        return self.user.full_name + "-" + str(self.id)
->>>>>>> fc6b2409d3c6e0caf475e6605dc74043170bf071

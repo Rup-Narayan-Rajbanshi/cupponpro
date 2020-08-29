@@ -9,11 +9,14 @@ from userapp.models.user import User
 
 
 class Bill(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True)
+    phone_number = models.CharField(max_length=10, null=True)
     total = models.PositiveIntegerField()
-    discount_percentage = models.PositiveIntegerField()
-    discount = models.PositiveIntegerField()
+    total_discount = models.PositiveIntegerField(null=True)
+    tax = models.PositiveIntegerField()
+    taxed_amount = models.PositiveIntegerField()
     grand_total = models.PositiveIntegerField()
     created_at = models.DateTimeField(editable=False)
 
