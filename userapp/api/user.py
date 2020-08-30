@@ -254,7 +254,10 @@ class CreateUserView(APIView):
                 user_obj.city = serializer.validated_data['city']
                 user_obj.address = serializer.validated_data['address']
                 user_obj.zip_code = serializer.validated_data['zip_code']
-                group, created = Group.objects.get_or_create(name='user')
+                if serializer.validated_data['is_user']:
+                    group, created = Group.objects.get_or_create(name='user')
+                else:
+                    group, created = Group.objects.get_or_create(name='owner')
                 user_obj.group = group
                 user_obj.save()
                 data = {

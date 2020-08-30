@@ -28,12 +28,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
+    is_user = serializers.BooleanField()
 
     class Meta:
         model = User
         fields = ('id', 'first_name', 'middle_name', 'last_name',\
             'username', 'email', 'phone_number', 'password',\
-            'confirm_password', 'image', 'country', 'state', 'city', 'address', 'zip_code')
+            'confirm_password', 'image', 'country', 'state', 'city', 'address', 'zip_code', 'is_user')
         read_only_fields = ('image', 'active', 'admin')
 
 class ChangePasswordSerializer(serializers.Serializer):  
@@ -41,7 +42,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     Serializer for password change endpoint.
     """
     model = User
-    
+
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 
