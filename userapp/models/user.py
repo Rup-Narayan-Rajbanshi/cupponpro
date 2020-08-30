@@ -1,4 +1,3 @@
-import re
 import os
 import shortuuid
 from django.core.validators import RegexValidator
@@ -10,6 +9,7 @@ from django.dispatch import receiver
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from project.settings import EMAIL_HOST_USER
+from commonapp.models.address import Address
 
 class UserManager(BaseUserManager):
     def _create_user(self, first_name, middle_name, last_name, email, phone_number,\
@@ -60,7 +60,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, Address):
     username = models.CharField(max_length=30, unique=True, editable=False)
     first_name = models.CharField(max_length=50,\
         validators=[RegexValidator(
@@ -91,7 +91,6 @@ class User(AbstractBaseUser):
 
     class Meta:
         db_table = 'user'
-
 
     def __str__(self):
         return self.username
