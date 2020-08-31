@@ -5,6 +5,7 @@ from commonapp.models.company import Company, CompanyUser, FavouriteCompany
 from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer
 from userapp.models.user import User
 from userapp.serializers.user import UserDetailSerializer
+from permission import isCompanyOwnerAndAllowAll
 
 class CompanyListView(APIView):
     permission_classes = (AllowAny,)
@@ -19,21 +20,6 @@ class CompanyListView(APIView):
             'company' : serializer.data,
         }
         return Response(data, status=200)
-
-    def post(self, request):
-        serializer = CompanySerializer(data=request.data, context={'request':request})
-        if serializer.is_valid():
-            serializer.save()
-            data = {
-                'success': 1,
-                'company': serializer.data
-            }
-            return Response(data, status=200)
-        data = {
-            'success': 0,
-            'message': serializer.errors
-        }
-        return Response(data, status=400)
 
 class CompanyDetailView(APIView):
     serializer_class = CompanySerializer
@@ -79,6 +65,34 @@ class CompanyDetailView(APIView):
                 'Message': "Company doesn't exist."
             }
             return Response(data, status=404)
+
+class CompanyCreateView(APIView):
+    serializer_class = CompanySerializer
+    permission_classes = (isCompanyOwnerAndAllowAll, )
+
+    def post(self, request):
+        if request.user.id == int(request.data['author']):
+            serializer = CompanySerializer(data=request.data, context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
+                company_obj = Company.objects.get(id=serializer.data['id'])
+                CompanyUser.objects.create(user=request.user, company=company_obj, is_staff=False)
+                data = {
+                    'success': 1,
+                    'company': serializer.data
+                }
+                return Response(data, status=200)
+            data = {
+                'success': 0,
+                'message': serializer.errors
+            }
+            return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': "You don't have permission to create company."
+            }
+            return Response(data, status=403)
 
 
 class CompanyFavouriteView(APIView):

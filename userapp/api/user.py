@@ -3,9 +3,12 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer, ResetPasswordSerializer, GroupSerializer
+from commonapp.models.company import Company, CompanyUser
+from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
+    CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
+    ResetPasswordSerializer, GroupSerializer
 from userapp.models.user import User, PasswordResetToken
-from permission import isAdmin
+from permission import isAdmin, isCompanyOwnerAndAllowAll
 
 class GroupListView(APIView):
     serializer_class = GroupSerializer
@@ -258,6 +261,7 @@ class CreateUserView(APIView):
                     group, created = Group.objects.get_or_create(name='user')
                 else:
                     group, created = Group.objects.get_or_create(name='owner')
+
                 user_obj.group = group
                 user_obj.save()
                 data = {
@@ -265,13 +269,70 @@ class CreateUserView(APIView):
                     'user': serializer.data
                 }
                 return Response(data, status=200)
+            else:
+                data = {
+                    'success': 0,
+                    'message': 'Password do not match.'
+                }
+                return Response(data, status=400)
+        else:
             data = {
                 'success': 0,
-                'message': 'Password do not match.'
+                'message': serializer.errors
             }
             return Response(data, status=400)
-        data = {
-            'success': 0,
-            'message': serializer.errors
-        }
-        return Response(data, status=400)
+
+class CreateStaffUserView(APIView):
+    permission_classes = (isCompanyOwnerAndAllowAll, )
+    serializer_class = CompanyUserRegistrationSerializer
+
+    def post(self, request, company_id):
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            serializer = CompanyUserRegistrationSerializer(data=request.data, context={'request':request})
+            if serializer.is_valid():
+                if serializer.validated_data['password'] == serializer.validated_data['confirm_password']:
+                    user_obj = User.objects.create_user(
+                        first_name=serializer.validated_data['first_name'],
+                        middle_name=serializer.validated_data['middle_name'],
+                        last_name=serializer.validated_data['last_name'],
+                        email=serializer.validated_data['email'],
+                        phone_number=serializer.validated_data['phone_number'],
+                        password=serializer.validated_data['password'],
+                    )
+                    user_obj.country = serializer.validated_data['country']
+                    user_obj.state = serializer.validated_data['state']
+                    user_obj.city = serializer.validated_data['city']
+                    user_obj.address = serializer.validated_data['address']
+                    user_obj.zip_code = serializer.validated_data['zip_code']
+                    if serializer.validated_data['is_manager']:
+                        group, created = Group.objects.get_or_create(name='manager')
+                    else:
+                        group, created = Group.objects.get_or_create(name='sales')
+
+                    user_obj.group = group
+                    user_obj.save()
+                    CompanyUser.objects.create(user=user_obj, company=company_obj[0], is_staff=True)
+                    data = {
+                        'success': 1,
+                        'user': serializer.data
+                    }
+                    return Response(data, status=200)
+                else:
+                    data = {
+                        'success': 0,
+                        'message': 'Password do not match.'
+                    }
+                    return Response(data, status=400)
+            else:
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': "Company doesn't exist."
+            }
+            return Response(data, status=404)
