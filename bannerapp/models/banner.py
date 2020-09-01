@@ -9,6 +9,7 @@ class Banner(models.Model):
     url = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    expire_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'banner'
