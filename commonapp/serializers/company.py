@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Company, FavouriteCompany
 from commonapp.models.rating import Rating
 from commonapp.serializers.image import ImageSerializer
+from userapp.models.user import User
 
 class CompanySerializer(serializers.ModelSerializer):
 
@@ -11,7 +13,8 @@ class CompanySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Company
-        fields = "__all__"
+        exclude = ('key',)
+        # fields = "__all__"
 
     def get_rating(self, obj):
         rating_obj = Rating.objects.filter(company=obj.id)

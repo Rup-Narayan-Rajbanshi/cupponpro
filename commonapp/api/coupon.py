@@ -12,7 +12,7 @@ class CouponListView(APIView):
     serializer_class = CouponSerializer
 
     def get(self, request):
-        coupon_obj = Coupon.objects.all()
+        coupon_obj = Coupon.objects.all().order_by('-id')
         serializer = CouponSerializer(coupon_obj, many=True,\
             context={"request":request})
         data = {

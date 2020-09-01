@@ -9,7 +9,7 @@ class BannerListView(APIView):
     serializer_class = BannerSerializer
 
     def get(self, request):
-        banner_obj = Banner.objects.all()
+        banner_obj = Banner.objects.all().order_by('-id')
         serializer = BannerSerializer(banner_obj, many=True,\
             context={"request":request})
         data = {

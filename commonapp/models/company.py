@@ -1,6 +1,7 @@
 # from uuid import uuid4
 import shortuuid
 from django.contrib.contenttypes.fields import GenericRelation
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from commonapp.models.address import Address
@@ -19,7 +20,8 @@ class Company(Address):
         related_name="company_author", null=True)
     images = GenericRelation(Image)
     status = models.BooleanField(default=True)
-    phone = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=15, unique=True,\
+        validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
     register_number = models.CharField(_('PAN/VAT Number'), max_length=50)
     is_partner = models.BooleanField(default=False)
     key = models.CharField(max_length=8)

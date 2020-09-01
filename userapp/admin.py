@@ -18,6 +18,12 @@ class AdminUserapp(admin.ModelAdmin):
                     )
                 }
             ),
+            (_("User Address"), {
+                'fields':(
+                    'country', 'state', 'city', 'address', 'zip_code'
+                    )
+                }
+            ),
             (_("Group"), {
                 'fields':(
                     'group',

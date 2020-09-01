@@ -9,7 +9,7 @@ class CompanyRatingListView(APIView):
     serializer_class = RatingSerializer
 
     def get(self, request, company_id):
-        rating_obj = Rating.objects.filter(company=company_id)
+        rating_obj = Rating.objects.filter(company=company_id).order_by('-id')
         if rating_obj:
             serializer = RatingSerializer(rating_obj, many=True,\
                 context={'request':request})

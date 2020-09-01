@@ -18,7 +18,7 @@ class CompanyBulkQuantityListView(APIView):
             else:
                 company_user_obj = False
             if company_user_obj:
-                bulk_quantity_obj = BulkQuantity.objects.filter(company=company_obj[0])
+                bulk_quantity_obj = BulkQuantity.objects.filter(company=company_obj[0]).order_by('-id')
                 serializer = BulkQuantitySerializer(bulk_quantity_obj, many=True,\
                     context={"request":request})
                 data = {
@@ -104,27 +104,35 @@ class CompanyBulkQuantityDetailView(APIView):
 
     def put(self, request, company_id, bulk_quantity_id):
         if company_id == int(request.data['company']):
-            bulk_quantity_obj = BulkQuantity.objects.filter(id=bulk_quantity_id)
-            if bulk_quantity_obj:
-                serializer = BulkQuantitySerializer(instance=bulk_quantity_obj[0],\
-                    data=request.data, context={'request':request})
-                if serializer.is_valid():
-                    serializer.save()
+            company_obj = Company.objects.filter(id=company_id)
+            if company_obj:
+                bulk_quantity_obj = BulkQuantity.objects.filter(id=bulk_quantity_id, company=company_obj[0])
+                if bulk_quantity_obj:
+                    serializer = BulkQuantitySerializer(instance=bulk_quantity_obj[0],\
+                        data=request.data, context={'request':request})
+                    if serializer.is_valid():
+                        serializer.save()
+                        data = {
+                            'success': 1,
+                            'bulk_quantity': serializer.data
+                        }
+                        return Response(data, status=200)
                     data = {
-                        'success': 1,
-                        'bulk_quantity': serializer.data
+                        'success': 0,
+                        'message': serializer.errors
                     }
-                    return Response(data, status=200)
+                    return Response(data, status=400)
                 data = {
                     'success': 0,
-                    'message': serializer.errors
+                    'message': "Bulk quantity doesn't exist."
                 }
-                return Response(data, status=400)
-            data = {
-                'success': 0,
-                'message': "Bulk quantity doesn't exist."
-            }
-            return Response(data, status=404)
+                return Response(data, status=404)
+            else:
+                data = {
+                    'success': 0,
+                    'message': "Company doesn't exist."
+                }
+                return Response(data, status=404)
         data = {
             'success': 0,
             'message': "You do not have permission to update bulk quantity."
@@ -177,7 +185,7 @@ class CompanyProductListView(APIView):
     serializer_class = ProductSerializer
 
     def get(self, request, company_id):
-        product_obj = Product.objects.filter(company=company_id)
+        product_obj = Product.objects.filter(company=company_id).order_by('-id')
         serializer = ProductSerializer(product_obj, many=True,\
             context={"request":request})
         data = {
@@ -214,7 +222,7 @@ class CompanyProductDetailView(APIView):
     def get(self, request, company_id, product_id):
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            product_obj = Product.objects.filter(id=product_id, company=company_obj[0])
+            product_obj = Product.objects.filter(id=product_id, company=company_obj[0]).order_by('-id')
             if product_obj:
                 serializer = ProductSerializer(product_obj[0], context={"request":request})
                 data = {
@@ -324,7 +332,7 @@ class CompanyProductCategoryListView(APIView):
     def get(self, request, company_id):
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            product_category_obj = ProductCategory.objects.filter(company=company_obj[0])
+            product_category_obj = ProductCategory.objects.filter(company=company_obj[0]).order_by('-id')
             serializer = ProductCategorySerializer(product_category_obj, many=True,\
             context={"request": request})
             data = {
