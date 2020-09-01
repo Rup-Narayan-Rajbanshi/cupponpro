@@ -23,6 +23,7 @@ class Company(Address):
     register_number = models.CharField(_('PAN/VAT Number'), max_length=50)
     is_partner = models.BooleanField(default=False)
     key = models.CharField(max_length=8)
+    currency = models.CharField(max_length=10, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

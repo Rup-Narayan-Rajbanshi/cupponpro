@@ -13,7 +13,8 @@ class Salesitem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
     amount = models.PositiveIntegerField()
     quantity = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=False)
+    currency = models.CharField(max_length=10, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'sales_item'

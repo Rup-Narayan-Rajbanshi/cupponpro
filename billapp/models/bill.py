@@ -16,7 +16,9 @@ class Bill(models.Model):
     tax = models.PositiveIntegerField()
     taxed_amount = models.PositiveIntegerField()
     grand_total = models.PositiveIntegerField()
-    created_at = models.DateTimeField(editable=False)
+    payment_mode = models.CharField(max_length=10, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     class Meta:
         db_table = 'bill'
