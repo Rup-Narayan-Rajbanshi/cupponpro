@@ -1,9 +1,6 @@
-from uuid import uuid4
 from django.utils import timezone
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from django.dispatch import receiver
-from django.utils import timezone
 from .bill import Bill
 from productapp.models.product import Product
 

@@ -1,6 +1,4 @@
-from uuid import uuid4
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from commonapp.models.company import Company
 from userapp.models.user import User
