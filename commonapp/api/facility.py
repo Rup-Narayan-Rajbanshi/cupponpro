@@ -11,7 +11,7 @@ class CompanyFacilityListView(APIView):
     def get(self, request, company_id):
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            facility_obj = Facility.objects.filter(company=company_obj[0])
+            facility_obj = Facility.objects.filter(company=company_obj[0]).order_by('-id')
             if facility_obj:
                 serializer = FacilitySerializer(facility_obj, many=True, context={'request':request})
                 data = {

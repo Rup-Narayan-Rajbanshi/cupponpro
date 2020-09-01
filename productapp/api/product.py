@@ -18,7 +18,7 @@ class CompanyBulkQuantityListView(APIView):
             else:
                 company_user_obj = False
             if company_user_obj:
-                bulk_quantity_obj = BulkQuantity.objects.filter(company=company_obj[0])
+                bulk_quantity_obj = BulkQuantity.objects.filter(company=company_obj[0]).order_by('-id')
                 serializer = BulkQuantitySerializer(bulk_quantity_obj, many=True,\
                     context={"request":request})
                 data = {
@@ -185,7 +185,7 @@ class CompanyProductListView(APIView):
     serializer_class = ProductSerializer
 
     def get(self, request, company_id):
-        product_obj = Product.objects.filter(company=company_id)
+        product_obj = Product.objects.filter(company=company_id).order_by('-id')
         serializer = ProductSerializer(product_obj, many=True,\
             context={"request":request})
         data = {
@@ -222,7 +222,7 @@ class CompanyProductDetailView(APIView):
     def get(self, request, company_id, product_id):
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            product_obj = Product.objects.filter(id=product_id, company=company_obj[0])
+            product_obj = Product.objects.filter(id=product_id, company=company_obj[0]).order_by('-id')
             if product_obj:
                 serializer = ProductSerializer(product_obj[0], context={"request":request})
                 data = {
@@ -332,7 +332,7 @@ class CompanyProductCategoryListView(APIView):
     def get(self, request, company_id):
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            product_category_obj = ProductCategory.objects.filter(company=company_obj[0])
+            product_category_obj = ProductCategory.objects.filter(company=company_obj[0]).order_by('-id')
             serializer = ProductCategorySerializer(product_category_obj, many=True,\
             context={"request": request})
             data = {

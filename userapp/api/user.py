@@ -31,7 +31,7 @@ class UserListView(APIView):
 
     def get(self, request):
         if request.user.admin:
-            user_obj = User.objects.all()
+            user_obj = User.objects.all().order_by('-id')
             serializer = UserSerializer(user_obj, many=True,\
                 context={"request": request})
             data = {

@@ -12,7 +12,7 @@ class CompanyListView(APIView):
     serializer_class = CompanySerializer
 
     def get(self, request):
-        company_obj = Company.objects.all()
+        company_obj = Company.objects.all().order_by('-id')
         serializer = CompanySerializer(company_obj, many=True,\
             context={"request":request})
         data = {
@@ -149,7 +149,7 @@ class CompanyUserListView(APIView):
             company_user_obj = CompanyUser.objects.filter(company=company_obj[0])
             # get user data from related company user data
             user_ids = [x.user.id for x in company_user_obj]
-            user_obj = User.objects.filter(id__in=user_ids)
+            user_obj = User.objects.filter(id__in=user_ids).order_by('-id')
             serializer = UserDetailSerializer(user_obj, many=True, context={"request":request})
             for each_serializer in serializer.data:
                 del each_serializer['admin']
