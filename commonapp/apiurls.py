@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 from django.urls import path
+from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView, CompanyFavouriteView, CompanyCreateView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView
@@ -32,6 +33,9 @@ urlpatterns = [
     # facility
     path('company/<int:company_id>/facility', CompanyFacilityListView.as_view(), name='company_facility_list'),
     path('company/<int:company_id>/facility/<int:facility_id>', CompanyFacilityDetailView.as_view(), name='company_facility_detail'),
+    # affiliate
+    path('affiliate', AffiliateLinkListView.as_view(), name='affiliate_link_list'),
+    path('affiliate/<int:affiliate_link_id>', AffiliateLinkDetailView.as_view(), name='affiliate_link_detail'),
     # search
     path('topbarsearch', TopBarSearchView.as_view(), name='top_bar_search_list'),
 ]

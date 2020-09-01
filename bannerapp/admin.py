@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class AdminBannerapp(admin.ModelAdmin):
-    list_display = ('id', 'title', 'description', 'active', 'created_at')
+    list_display = ('id', 'title', 'description', 'is_active', 'created_at')
     fieldsets = (
             (_("Basic info"), {
                 'fields':(
@@ -16,7 +16,7 @@ class AdminBannerapp(admin.ModelAdmin):
                     )
                 }
             ),
-            (_("Active"), {'fields':('active',)}),)
+            (_("Active"), {'fields':('is_active',)}),)
 
 
 admin.site.register(Banner, AdminBannerapp)

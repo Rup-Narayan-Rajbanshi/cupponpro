@@ -7,7 +7,7 @@ class Banner(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to='banner_image/')
     url = models.TextField(null=True, blank=True)
-    active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

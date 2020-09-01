@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
+from commonapp.models.affiliate import AffiliateLink
 from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Company, CompanyUser, FavouriteCompany
 from commonapp.models.coupon import Coupon, Voucher
@@ -66,6 +67,7 @@ class AdminRatingapp(admin.ModelAdmin):
         ),
     )
 
+admin.site.register(AffiliateLink)
 admin.site.register(Category, AdminCategoryapp)
 admin.site.register(Company, AdminCompanyapp)
 admin.site.register(CompanyUser)
