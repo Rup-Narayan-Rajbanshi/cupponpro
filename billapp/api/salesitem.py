@@ -1,19 +1,18 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
-from billapp.serializers.salesitem import SalesitemSerializer
-from billapp.models.salesitem import Salesitem
+from billapp.serializers.salesitem import SalesItemSerializer
+from billapp.models.salesitem import SalesItem
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
-class SalesitemListView(APIView):
+class SalesItemListView(APIView):
     permission_classes = (isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, )
-    serializer_class = SalesitemSerializer
+    serializer_class = SalesItemSerializer
 
     def get(self, request, bill_id):
-        salesitem_obj = Salesitem.objects.filter(bill__id = bill_id)
+        salesitem_obj = SalesItem.objects.filter(bill__id = bill_id)
         if salesitem_obj:
-            serializer = SalesitemSerializer(salesitem_obj, many=True,\
+            serializer = SalesItemSerializer(salesItem_obj, many=True,\
                 context={'request':request})
             data = {
                 'success': 1,
@@ -29,7 +28,7 @@ class SalesitemListView(APIView):
     
     def post(self, request, bill_id):
         if int(request.data['bill']) == bill_id:
-            serializer = SalesitemSerializer(data=request.data, context={'request':request})
+            serializer = SalesItemSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {

@@ -6,6 +6,11 @@ from django.db import models
 from billapp.models.bill import Bill
 from commonapp.models.company import Company
 from commonapp.models.image import Image
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from userapp.models.user import User
 
 from userapp.models.user import User
 

@@ -1,9 +1,9 @@
-from billapp.models.salesitem import Salesitem
+from billapp.models.salesitem import SalesItem
 from rest_framework import serializers
 
-class SalesitemSerializer(serializers.ModelSerializer):
+class SalesItemSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Salesitem
-        fields = ('id', 'bill', 'product', 'amount', 'quantity', 'created_at')
+        model = SalesItem
+        fields = ('id', 'bill', 'product', 'amount', 'quantity', 'currency', 'created_at')
         read_only_fields = ('created_at',)

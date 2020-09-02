@@ -18,7 +18,7 @@ class AdminCompanyapp(admin.ModelAdmin):
     fieldsets = (
             (_("Company Info"), {
                 'fields':(
-                    'name', 'logo', 'phone_number', 'category', 'sub_category', 'author'
+                    'name', 'logo', 'phone_number', 'category', 'sub_category', 'author', 'currency'
                     )
                 }
             ),
