@@ -11,6 +11,18 @@ from commonapp.models.category import Category, SubCategory
 from userapp.models import User
 
 class Company(Address):
+    # Currency Variables
+    Null = None
+    Nepali_Rupees = 'NPR'
+    US_Dollar = 'USD'
+    Indian_Rupees = 'INR'
+    CURRENCY = [
+        (Null, ''),
+        (Nepali_Rupees, 'Nepali Rupees'),
+        (US_Dollar, 'US Dollar'),
+        (Indian_Rupees, 'Indian Rupees'),
+    ]
+
     name = models.CharField(max_length=200)
     logo = models.ImageField(upload_to='logo/', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,\
@@ -25,7 +37,7 @@ class Company(Address):
     register_number = models.CharField(_('PAN/VAT Number'), max_length=50)
     is_partner = models.BooleanField(default=False)
     key = models.CharField(max_length=8)
-    currency = models.CharField(max_length=10, null=True, blank=True)
+    currency = models.CharField(max_length=10, choices=CURRENCY ,default=Null, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

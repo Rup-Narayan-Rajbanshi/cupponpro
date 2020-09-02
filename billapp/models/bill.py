@@ -5,6 +5,18 @@ from userapp.models.user import User
 
 
 class Bill(models.Model):
+    # Currency Variables
+    Null = None
+    Nepali_Rupees = 'NPR'
+    US_Dollar = 'USD'
+    Indian_Rupees = 'INR'
+    CURRENCY = [
+        (Null, ''),
+        (Nepali_Rupees, 'Nepali Rupees'),
+        (US_Dollar, 'US Dollar'),
+        (Indian_Rupees, 'Indian Rupees'),
+    ]
+
     company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     name = models.CharField(max_length=100, null=True)
@@ -14,7 +26,7 @@ class Bill(models.Model):
     tax = models.PositiveIntegerField()
     taxed_amount = models.PositiveIntegerField()
     grand_total = models.PositiveIntegerField()
-    payment_mode = models.CharField(max_length=10, null=True, blank=True)
+    payment_mode = models.CharField(max_length=10, choices=CURRENCY, default=Null, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
