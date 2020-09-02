@@ -5,5 +5,4 @@ class SalesItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SalesItem
-        fields = ('id', 'bill', 'product', 'amount', 'quantity', 'currency', 'created_at')
-        read_only_fields = ('created_at',)
+        fields = '__all__'

@@ -6,7 +6,7 @@ from billapp.models.bill import Bill
 from permission import isCompanyOwnerAndAllowAll,isCompanyManagerAndAllowAll
 
 class BillListView(APIView):
-    permission_classes = (isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll)
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = BillSerializer
 
     def get(self, request):
@@ -41,7 +41,7 @@ class BillListView(APIView):
         return Response(data, status=403)
 
 class BillDetailView(APIView):
-    permission_classes = (isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll)
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = BillSerializer
 
     def get(self, request, bill_id):

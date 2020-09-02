@@ -1,4 +1,3 @@
-# from uuid import uuid4
 import shortuuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import RegexValidator
@@ -12,12 +11,10 @@ from userapp.models import User
 
 class Company(Address):
     # Currency Variables
-    Null = None
     NepaliRupees = 'NPR'
     USDollar = 'USD'
     IndianRupees = 'INR'
     CURRENCY = [
-        (Null, ''),
         (NepaliRupees, 'Nepali Rupees'),
         (USDollar, 'US Dollar'),
         (IndianRupees, 'Indian Rupees'),
@@ -37,7 +34,7 @@ class Company(Address):
     register_number = models.CharField(_('PAN/VAT Number'), max_length=50)
     is_partner = models.BooleanField(default=False)
     key = models.CharField(max_length=8)
-    currency = models.CharField(max_length=10, choices=CURRENCY ,default=NepaliRupees)
+    currency = models.CharField(max_length=10, choices=CURRENCY, default=NepaliRupees)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

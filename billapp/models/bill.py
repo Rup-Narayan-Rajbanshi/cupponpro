@@ -1,8 +1,8 @@
+from django.core.validators import RegexValidator
 from django.db import models
-from django.utils import timezone
 from commonapp.models.company import Company
 from userapp.models.user import User
-from django.core.validators import RegexValidator
+
 
 class Bill(models.Model):
     # Payment Modes
@@ -27,9 +27,11 @@ class Bill(models.Model):
     payment_mode = models.CharField(max_length=10, choices=PAYMENT, default=Cash)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
     class Meta:
         db_table = 'bill'
+
+    def __str__(self):
+        return "Bill " + str(self.id) + " of user " + self.name
 
     def save(self, *args, **kwargs):
         ''' Registered User's information saved, or saved from UI input '''

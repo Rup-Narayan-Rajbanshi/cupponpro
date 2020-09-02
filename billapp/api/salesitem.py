@@ -6,14 +6,13 @@ from billapp.models.salesitem import SalesItem
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
 class SalesItemListView(APIView):
-    permission_classes = (isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, )
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = SalesItemSerializer
 
     def get(self, request, bill_id):
-        salesitem_obj = SalesItem.objects.filter(bill__id = bill_id)
-        if salesitem_obj:
-            serializer = SalesItemSerializer(salesItem_obj, many=True,\
-                context={'request':request})
+        sales_item_obj = SalesItem.objects.filter(bill__id=bill_id)
+        if sales_item_obj:
+            serializer = SalesItemSerializer(sales_item_obj[0], context={'request':request})
             data = {
                 'success': 1,
                 'sales_item': serializer.data,
@@ -38,7 +37,7 @@ class SalesItemListView(APIView):
                 return Response(data, status=200)
             data = {
                 'success': 0,
-                'message': serializers.errors,
+                'message': serializer.errors,
             }
             return Response(data, status=400)
         else:
