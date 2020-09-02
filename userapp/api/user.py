@@ -252,11 +252,6 @@ class CreateUserView(APIView):
                     phone_number=serializer.validated_data['phone_number'],
                     password=serializer.validated_data['password'],
                 )
-                user_obj.country = serializer.validated_data['country']
-                user_obj.state = serializer.validated_data['state']
-                user_obj.city = serializer.validated_data['city']
-                user_obj.address = serializer.validated_data['address']
-                user_obj.zip_code = serializer.validated_data['zip_code']
                 if serializer.validated_data['is_user']:
                     group, created = Group.objects.get_or_create(name='user')
                 else:
@@ -300,11 +295,6 @@ class CreateStaffUserView(APIView):
                         phone_number=serializer.validated_data['phone_number'],
                         password=serializer.validated_data['password'],
                     )
-                    user_obj.country = serializer.validated_data['country']
-                    user_obj.state = serializer.validated_data['state']
-                    user_obj.city = serializer.validated_data['city']
-                    user_obj.address = serializer.validated_data['address']
-                    user_obj.zip_code = serializer.validated_data['zip_code']
                     if serializer.validated_data['is_manager']:
                         group, created = Group.objects.get_or_create(name='manager')
                     else:

@@ -33,9 +33,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'middle_name', 'last_name',\
-            'username', 'email', 'phone_number', 'password',\
-            'confirm_password', 'image', 'country', 'state', 'city', 'address', 'zip_code', 'is_user')
-        read_only_fields = ('image', 'active', 'admin')
+            'email', 'phone_number', 'password',\
+            'confirm_password', 'is_user')
 
 class CompanyUserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
@@ -46,9 +45,8 @@ class CompanyUserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'middle_name', 'last_name',\
-            'username', 'email', 'phone_number', 'password',\
-            'confirm_password', 'image', 'country', 'state', 'city', 'address', 'zip_code', 'is_manager')
-        read_only_fields = ('image', 'active', 'admin')
+            'email', 'phone_number', 'password',\
+            'confirm_password', 'is_manager')
 
 class ChangePasswordSerializer(serializers.Serializer):  
     """

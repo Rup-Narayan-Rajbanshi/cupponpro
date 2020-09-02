@@ -3,7 +3,7 @@ from django.urls import path
 from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView, CompanyFavouriteView, CompanyCreateView
-from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView
+from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
 from commonapp.api.rating import CompanyRatingListView, CompanyRatingDetailView
 from commonapp.api.search import TopBarSearchView
@@ -27,6 +27,7 @@ urlpatterns = [
     path('coupon', CouponListView.as_view(), name='coupon_list'),
     path('coupon/<int:coupon_id>', CouponDetailView.as_view(), name='coupon_detail'),
     path('category/<int:category_id>/coupon', CategoryCouponListView.as_view(), name='category_coupon_list'),
+    path('coupon/type', CouponTypeListView.as_view(), name='coupon_type_list'),
     # rating
     path('company/<int:company_id>/rating', CompanyRatingListView.as_view(), name='company_rating_list'),
     path('company/<int:company_id>/rating/<int:rating_id>', CompanyRatingDetailView.as_view(), name='company_rating_detail'),

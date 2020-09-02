@@ -1,11 +1,32 @@
 from django.core.paginator import Paginator
+from django.contrib.contenttypes.models import ContentType
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from permission import isAdminOrReadOnly
+from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 from commonapp.models.category import Category
 from commonapp.models.coupon import Coupon
 from commonapp.models.company import Company
 from commonapp.serializers.coupon import CouponSerializer
+
+class CouponTypeListView(APIView):
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
+
+    def get(self, request):
+        coupon_type = {
+            'category': 'On all items',
+            'productcategory': 'On item type',
+            'product': 'On specific item'
+        }
+        content_type_obj = ContentType.objects.filter(model__in=coupon_type.keys())
+        coupon_type_obj = []
+        for each_obj in content_type_obj:
+            temp = {'id': each_obj.id, 'name': coupon_type[each_obj.model]}
+            coupon_type_obj.append(temp)
+        data = {
+            'success': 1,
+            'coupon_type': coupon_type_obj
+        }
+        return Response(data, status=200)
 
 class CouponListView(APIView):
     permission_classes = (isAdminOrReadOnly, )
