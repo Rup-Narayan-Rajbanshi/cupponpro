@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from billapp.models.bill import Bill
-from billapp.models.salesitem import Salesitem
+from billapp.models.salesitem import SalesItem
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -19,17 +19,17 @@ class AdminBillapp(admin.ModelAdmin):
         ),
     )
 
-class AdminSalesitemapp(admin.ModelAdmin):
-    list_display = ('id', 'amount', 'quantity', 'currency', \
+class AdminSalesItemapp(admin.ModelAdmin):
+    list_display = ('id', 'amount', 'quantity',\
         'created_at')
     fieldsets = (
         (_("Basic info"), {
             'fields':(
-                'bill', 'product', 'amount', 'quantity', 'currency'
+                'bill', 'product', 'amount', 'quantity'
             )
         }
         ),
     )
 
 admin.site.register(Bill, AdminBillapp)
-admin.site.register(Salesitem, AdminSalesitemapp)
+admin.site.register(SalesItem, AdminSalesItemapp)

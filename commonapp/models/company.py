@@ -13,14 +13,14 @@ from userapp.models import User
 class Company(Address):
     # Currency Variables
     Null = None
-    Nepali_Rupees = 'NPR'
-    US_Dollar = 'USD'
-    Indian_Rupees = 'INR'
+    NepaliRupees = 'NPR'
+    USDollar = 'USD'
+    IndianRupees = 'INR'
     CURRENCY = [
         (Null, ''),
-        (Nepali_Rupees, 'Nepali Rupees'),
-        (US_Dollar, 'US Dollar'),
-        (Indian_Rupees, 'Indian Rupees'),
+        (NepaliRupees, 'Nepali Rupees'),
+        (USDollar, 'US Dollar'),
+        (IndianRupees, 'Indian Rupees'),
     ]
 
     name = models.CharField(max_length=200)
@@ -37,7 +37,7 @@ class Company(Address):
     register_number = models.CharField(_('PAN/VAT Number'), max_length=50)
     is_partner = models.BooleanField(default=False)
     key = models.CharField(max_length=8)
-    currency = models.CharField(max_length=10, choices=CURRENCY ,default=Null, blank=True)
+    currency = models.CharField(max_length=10, choices=CURRENCY ,default=NepaliRupees)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
