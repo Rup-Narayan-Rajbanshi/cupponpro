@@ -31,7 +31,6 @@ class Company(Address):
     status = models.BooleanField(default=True)
     phone_number = models.CharField(max_length=15, unique=True, null=True, \
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
-    register_number = models.CharField(_('PAN/VAT Number'), max_length=50)
     is_partner = models.BooleanField(default=False)
     key = models.CharField(max_length=8)
     currency = models.CharField(max_length=10, choices=CURRENCY, default=NepaliRupees)
