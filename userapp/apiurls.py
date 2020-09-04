@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 from django.urls import path
-from userapp.api.user import UserListView, UpdateUser, CreateUserView, CreateStaffUserView, ChangePasswordView, GeneratePasswordResetTokenView, GroupListView, ResetPasswordView, LoginView
+from userapp.api.user import UserListView, UpdateUser, CreateUserView,\
+	CreateStaffUserView, ChangePasswordView, GeneratePasswordResetTokenView,\
+	GroupListView, ResetPasswordView, LoginView, CompanyGroupListView
 
 # from userapp.api.staticpage import StaticPageView
 
@@ -8,6 +10,7 @@ app_name = 'userapp'
 
 urlpatterns = [
 	path('group', GroupListView.as_view(), name='group_list'),
+	path('company/group', CompanyGroupListView.as_view(), name='company_group_list'),
 	path('user', UserListView.as_view(), name='user_list'),
 	path('user/create', CreateUserView.as_view(), name='user_create'),
 	path('user/createstaff/company/<int:company_id>', CreateStaffUserView.as_view(), name='staff_user_create'),

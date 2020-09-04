@@ -8,7 +8,7 @@ from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserR
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
     ResetPasswordSerializer, GroupSerializer
 from userapp.models.user import User, PasswordResetToken
-from permission import isAdmin, isCompanyOwnerAndAllowAll
+from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
 class GroupListView(APIView):
     serializer_class = GroupSerializer
@@ -16,6 +16,20 @@ class GroupListView(APIView):
 
     def get(self, request):
         group_obj = Group.objects.all()
+        serializer = GroupSerializer(group_obj, many=True, context={'request':request})
+        data = {
+            'success': 1,
+            'group': serializer.data
+        }
+        return Response(data, status=200)
+
+class CompanyGroupListView(APIView):
+    serializer_class = GroupSerializer
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
+
+    def get(self, request):
+        company_group = ['owner', 'manager', 'sales']
+        group_obj = Group.objects.filter(name__in=company_group)
         serializer = GroupSerializer(group_obj, many=True, context={'request':request})
         data = {
             'success': 1,

@@ -2,6 +2,12 @@ from rest_framework import serializers
 from django.contrib.auth.models import Group
 from userapp.models.user import User, PasswordResetToken
 
+class UserGroupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'group')
+
 class UserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
