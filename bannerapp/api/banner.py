@@ -80,14 +80,22 @@ class BannerUpdateView(APIView):
     def delete(self, request, banner_id):
         banner_obj = Banner.objects.filter(id=banner_id)
         if banner_obj:
-            banner_obj[0].delete()
+            try:
+                banner_obj[0].delete()
+                data = {
+                    'success': 1,
+                    'banner': "Banner deleted successfully."
+                }
+                return Response(data, status=200)
+            except:
+                data = {
+                    'success': 0,
+                    'banner': 'Banner cannot be found.'
+                }
+                return Response(data, status=400)
+        else:
             data = {
-                'success': 1,
-                'banner': "Banner deleted successfully."
+                'success': 0,
+                'message': "Banner doesn't exist."
             }
-            return Response(data, status=200)
-        data = {
-            'success': 0,
-            'message': "Banner doesn't exist."
-        }
-        return Response(data, status=404)
+            return Response(data, status=404)

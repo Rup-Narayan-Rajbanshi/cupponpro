@@ -117,17 +117,26 @@ class CouponDetailView(APIView):
         if request.user.admin:
             if Coupon.objects.filter(id=coupon_id):
                 coupon_obj = Coupon.objects.get(id=coupon_id)
-                coupon_obj.delete()
-                data = {
-                    'success': 1,
-                    'coupon': "Coupon deleted successfully."
-                }
-                return Response(data, status=200)
-            data = {
-                'success': 0,
-                'message': "Coupon doesn't exist."
-            }
-            return Response(data, status=404)
+                if coupon_obj:
+                    try:
+                        coupon_obj.delete()
+                        data = {
+                            'success': 1,
+                            'coupon': "Coupon deleted successfully."
+                        }
+                        return Response(data, status=200)
+                    except:
+                        data = {
+                            'success': 0,
+                            'coupon': "Coupon cannot be found."
+                        }
+                        return Response(data, status=400)
+                else:
+                    data = {
+                        'success': 0,
+                        'message': "Coupon doesn't exist."
+                    }
+                    return Response(data, status=404)
         data = {
             'success': 0,
             'message': "You do not have permission to delete Coupon."
