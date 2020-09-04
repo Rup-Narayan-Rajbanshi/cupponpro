@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
-    ResetPasswordSerializer, GroupSerializer
+    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer
 from userapp.models.user import User, PasswordResetToken
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
@@ -36,6 +36,61 @@ class CompanyGroupListView(APIView):
             'group': serializer.data
         }
         return Response(data, status=200)
+
+class UserGroupDetailView(APIView):
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
+    serializer_class = UserGroupSerializer
+
+    def get(self, request, company_id, user_id):
+        company_user_obj = CompanyUser.objects.filter(user=user_id, company=company_id)
+        if company_user_obj:
+            user_obj = User.objects.filter(id=user_id)
+            serializer = UserGroupSerializer(user_obj[0], context={'request':request})
+            data = {
+                'success': 1,
+                'group': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 1,
+                'message': "User doesn't exist."
+            }
+            return Response(data, status=404)
+    
+    def put(self, request, company_id, user_id):
+        group_modify_access = {'owner': ['manager', 'sales'], 'manager': ['sales']}
+        group_name = Group.objects.get(id=request.data['group']).name
+        if group_name in group_modify_access[request.user.group.name]:
+            company_user_obj = CompanyUser.objects.filter(user=user_id, company=company_id)
+            if company_user_obj:
+                user_obj = User.objects.filter(id=user_id)
+                serializer = UserGroupSerializer(instance=user_obj[0], data=request.data, context={'request':request})
+                if serializer.is_valid():
+                    serializer.save()
+                    data = {
+                        'success': 1,
+                        'group': serializer.data
+                    }
+                    return Response(data, status=200)
+                else:
+                    data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+            else:
+                data = {
+                    'success': 0,
+                    'message': "User doesn't exist."
+                }
+                return Response(data, status=404)
+        else:
+            data = {
+                'success': 0,
+                'message': "Group change failed."
+            }
+            return Response(data, status=400)     
 
 class UserListView(APIView):
     """
