@@ -91,7 +91,7 @@ class CategoryDetailView(APIView):
             except:
                 data = {
                     'success': 0,
-                    'category': 'Category cannot be found.'
+                    'message': 'Category cannot be deleted.'
                 }
                 return Response(data, status=400)
         else:

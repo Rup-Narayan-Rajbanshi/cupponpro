@@ -56,7 +56,7 @@ class BillDetailView(APIView):
         else:
             data = {
                 'success': 1,
-                'bill': "Bill doesn't exist.",
+                'message': "Bill doesn't exist.",
             }
             return Response(data, status=404)
 
@@ -68,13 +68,13 @@ class BillDetailView(APIView):
                 bill_obj[0].delete()
                 data = {
                     'success': 1,
-                    'bill': 'Bill deleted successfully'
+                    'bill': 'Bill deleted successfully.'
                 }
                 return Response(data, status=200)
             except:
                 data = {
                     'success': 0,
-                    'bill': 'Bill cannot be found.'
+                    'message': 'Bill cannot be deleted.'
                 }
                 return Response(data, status=400)
         else:

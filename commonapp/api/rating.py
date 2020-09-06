@@ -108,7 +108,7 @@ class CompanyRatingDetailView(APIView):
             except:
                 data = {
                     'success': 0,
-                    'rating': 'Rating cannot be found'
+                    'message': 'Rating cannot be deleted.'
                 }
                 return Response(data, status=400)
         data = {

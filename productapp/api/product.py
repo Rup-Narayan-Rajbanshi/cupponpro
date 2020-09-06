@@ -307,7 +307,7 @@ class CompanyProductDetailView(APIView):
         else:
             data = {
                 'success': 0,
-                'message': "COmpany doesn't exist."
+                'message': "Company doesn't exist."
             }
             return Response(data, status=404)
 

@@ -94,7 +94,7 @@ class NewsArticleDetailView(APIView):
             except:
                 data = {
                     'success': 0,
-                    'news_article': 'News article cannot be found.'
+                    'message': 'News article cannot be deleted.'
                 }
                 return Response(data, status=400)
         else:

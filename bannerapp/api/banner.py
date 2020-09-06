@@ -90,7 +90,7 @@ class BannerUpdateView(APIView):
             except:
                 data = {
                     'success': 0,
-                    'banner': 'Banner cannot be found.'
+                    'message': 'Banner cannot be deleted.'
                 }
                 return Response(data, status=400)
         else:

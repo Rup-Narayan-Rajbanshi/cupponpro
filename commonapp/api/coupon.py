@@ -128,7 +128,7 @@ class CouponDetailView(APIView):
                     except:
                         data = {
                             'success': 0,
-                            'coupon': "Coupon cannot be found."
+                            'message': "Coupon cannot be deleted."
                         }
                         return Response(data, status=400)
                 else:
@@ -170,6 +170,6 @@ class CategoryCouponListView(APIView):
         else:
             data = {
                 'success': 0,
-                'coupon': "Coupon doesn't exist."
+                'message': "Coupon doesn't exist."
             }
             return Response(data, status=404)
