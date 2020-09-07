@@ -81,12 +81,19 @@ class CategoryDetailView(APIView):
     def delete(self, request, category_id):
         category_obj = Category.objects.filter(id=category_id)
         if category_obj:
-            category_obj[0].delete()
-            data = {
-                'success': 1,
-                'category': 'Category deleted successfully.'
-            }
-            return Response(data, status=200)
+            try:
+                category_obj[0].delete()
+                data = {
+                    'success': 1,
+                    'category': 'Category deleted successfully.'
+                }
+                return Response(data, status=200)
+            except:
+                data = {
+                    'success': 0,
+                    'message': 'Category cannot be deleted.'
+                }
+                return Response(data, status=400)
         else:
             data = {
                 'success': 0,

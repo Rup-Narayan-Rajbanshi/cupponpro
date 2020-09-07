@@ -84,12 +84,19 @@ class NewsArticleDetailView(APIView):
     def delete(self, request, news_id):
         news_obj = NewsArticle.objects.filter(id=news_id)
         if news_obj:
-            news_obj[0].delete()
-            data = {
-                'success': 1,
-                'news_article': 'News article deleted successfully.'
-            }
-            return Response(data, status=200)
+            try:
+                news_obj[0].delete()
+                data = {
+                    'success': 1,
+                    'news_article': 'News article deleted successfully.'
+                }
+                return Response(data, status=200)
+            except:
+                data = {
+                    'success': 0,
+                    'message': 'News article cannot be deleted.'
+                }
+                return Response(data, status=400)
         else:
             data = {
                 'success': 0,

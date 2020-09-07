@@ -10,15 +10,6 @@ from commonapp.models.category import Category, SubCategory
 from userapp.models import User
 
 class Company(Address):
-    # Currency Variables
-    NepaliRupees = 'NPR'
-    USDollar = 'USD'
-    IndianRupees = 'INR'
-    CURRENCY = [
-        (NepaliRupees, 'Nepali Rupees'),
-        (USDollar, 'US Dollar'),
-        (IndianRupees, 'Indian Rupees'),
-    ]
 
     name = models.CharField(max_length=200)
     logo = models.ImageField(upload_to='logo/', null=True, blank=True)
@@ -33,7 +24,7 @@ class Company(Address):
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
     is_partner = models.BooleanField(default=False)
     key = models.CharField(max_length=8)
-    currency = models.CharField(max_length=10, choices=CURRENCY, default=NepaliRupees)
+    currency = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

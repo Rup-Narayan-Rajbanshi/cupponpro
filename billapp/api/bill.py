@@ -6,7 +6,7 @@ from billapp.models.bill import Bill
 from permission import isCompanyOwnerAndAllowAll,isCompanyManagerAndAllowAll
 
 class BillListView(APIView):
-    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
+    # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = BillSerializer
 
     def get(self, request):
@@ -41,7 +41,7 @@ class BillListView(APIView):
         return Response(data, status=403)
 
 class BillDetailView(APIView):
-    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
+    # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = BillSerializer
 
     def get(self, request, bill_id):
@@ -56,6 +56,30 @@ class BillDetailView(APIView):
         else:
             data = {
                 'success': 1,
-                'bill': "Bill doesn't exist.",
+                'message': "Bill doesn't exist.",
+            }
+            return Response(data, status=404)
+
+
+    def delete(self, request, bill_id):
+        bill_obj = Bill.objects.filter(id=bill_id)
+        if bill_obj:
+            try:
+                bill_obj[0].delete()
+                data = {
+                    'success': 1,
+                    'bill': 'Bill deleted successfully.'
+                }
+                return Response(data, status=200)
+            except:
+                data = {
+                    'success': 0,
+                    'message': 'Bill cannot be deleted.'
+                }
+                return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': "Bill doesn't exist."
             }
             return Response(data, status=404)

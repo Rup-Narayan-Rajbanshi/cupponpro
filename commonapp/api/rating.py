@@ -98,12 +98,19 @@ class CompanyRatingDetailView(APIView):
     def delete(self, request, company_id, rating_id):
         rating_obj = Rating.objects.filter(id=rating_id, company=company_id)
         if rating_obj:
-            rating_obj[0].delete()
-            data = {
-                'success': 1,
-                'rating': "Rating deleted successfully."
-            }
-            return Response(data, status=200)
+            try:
+                rating_obj[0].delete()
+                data = {
+                    'success': 1,
+                    'rating': "Rating deleted successfully."
+                }
+                return Response(data, status=200)
+            except:
+                data = {
+                    'success': 0,
+                    'message': 'Rating cannot be deleted.'
+                }
+                return Response(data, status=400)
         data = {
             'success': 0,
             'message': "Rating doesn't exist."
