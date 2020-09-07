@@ -14,7 +14,7 @@ class AdminCategoryapp(admin.ModelAdmin):
     list_display = ('id', 'name', 'created_at')
 
 class AdminCompanyapp(admin.ModelAdmin):
-    list_display = ('id', 'name')
+    list_display = ('id', 'name', 'key')
     fieldsets = (
             (_("Company Info"), {
                 'fields':(

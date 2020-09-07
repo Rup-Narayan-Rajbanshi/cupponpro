@@ -6,12 +6,11 @@ from django.db import models
 from billapp.models.bill import Bill
 from commonapp.models.company import Company
 from commonapp.models.image import Image
+from commonapp.encrypt import encrypt, decrypt
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from userapp.models.user import User
-
 from userapp.models.user import User
 
 class Coupon(models.Model):
@@ -42,7 +41,7 @@ class Coupon(models.Model):
 class Voucher(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    token = models.CharField(max_length=20, null=True, editable=False)
+    token = models.CharField(max_length=20, editable=False)
     is_redeem = models.BooleanField(default=False)
     watch_later = models.BooleanField(default=False)
     bill = models.ForeignKey(Bill, on_delete=models.PROTECT, null=True, blank=True)
@@ -55,3 +54,13 @@ class Voucher(models.Model):
     
     def __str__(self):
         return self.user.full_name + "-" + str(self.id)
+
+    def save(self, *args, **kwargs):
+        ''' on save, update token '''
+        if not self.id:
+            uuid4 = shortuuid.ShortUUID().random(length=4)
+            coupon_token = self.coupon.token
+            key = self.coupon.company.key
+            voucher_token = coupon_token + '-' + uuid4
+            self.token = encrypt(voucher_token, key)
+        super(Voucher, self).save(*args, **kwargs)  

@@ -130,7 +130,7 @@ class CompanyDocumentDetailView(APIView):
             except:
                 data = {
                     'success': 0,
-                    'document': "Document cannot be deleted."
+                    'message': "Document cannot be deleted."
                 }
                 return Response(data, status=400)
         else:
