@@ -103,3 +103,23 @@ class AffiliateLinkDetailView(APIView):
                 'message': "Affiliate link doesn't exist."
             }
             return Response(data, status=404)
+
+class AffiliateLinkCountView(APIView):
+    serializer_class = AffiliateLinkSerializer
+
+    def get(self, request, affiliate_link_id):
+        affiliate_link_obj = AffiliateLink.objects.filter(id=affiliate_link_id)
+        if affiliate_link_obj:
+            affiliate_link_obj[0].add_count()
+            serializer = AffiliateLinkSerializer(affiliate_link_obj[0], context={'request':request})
+            data = {
+                'success': 1,
+                'affiliate_link': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 1,
+                'message': "Affiliate link doesn't exist."
+            }
+            return Response(data, status=404)
