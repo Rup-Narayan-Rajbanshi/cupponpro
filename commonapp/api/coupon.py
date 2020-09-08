@@ -2,11 +2,12 @@ from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 from commonapp.models.category import Category
-from commonapp.models.coupon import Coupon
+from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.company import Company
-from commonapp.serializers.coupon import CouponSerializer
+from commonapp.serializers.coupon import CouponSerializer, VoucherSerializer
 
 class CouponTypeListView(APIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
@@ -29,7 +30,7 @@ class CouponTypeListView(APIView):
         return Response(data, status=200)
 
 class CouponListView(APIView):
-    permission_classes = (isAdminOrReadOnly, )
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isAdminOrReadOnly]
     serializer_class = CouponSerializer
 
     def get(self, request):
@@ -43,28 +44,22 @@ class CouponListView(APIView):
         return Response(data, status=200)
 
     def post(self, request):
-        if request.user.admin:
-            serializer = CouponSerializer(data=request.data, context={'request':request})
-            if serializer.is_valid():
-                serializer.save()
-                data = {
-                    'success': 1,
-                    'coupon': serializer.data,
-                }
-                return Response(data, status=200)
+        serializer = CouponSerializer(data=request.data, context={'request':request})
+        if serializer.is_valid():
+            serializer.save()
             data = {
-                'success': 0,
-                'message': serializer.errors,
+                'success': 1,
+                'coupon': serializer.data,
             }
-            return Response(data, status=400)
+            return Response(data, status=200)
         data = {
             'success': 0,
-            'message': "You do not have permission to add a coupon."
+            'message': serializer.errors,
         }
-        return Response(data, status=403)
+        return Response(data, status=400)
 
 class CouponDetailView(APIView):
-    permission_classes = (isAdminOrReadOnly, )
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isAdminOrReadOnly]
     serializer_class = CouponSerializer
 
     def get(self, request, coupon_id):
@@ -85,63 +80,52 @@ class CouponDetailView(APIView):
             return Response(data, status=404)
 
     def put(self, request, coupon_id):
-        if request.user.admin:
-            if Coupon.objects.filter(id=coupon_id):
-                coupon_obj = Coupon.objects.get(id=coupon_id)
-                serializer = CouponSerializer(instance=coupon_obj,\
-                    data=request.data, context={'request':request})
-                if serializer.is_valid():
-                    serializer.save()
-                    data = {
-                        'success': 1,
-                        'coupon': serializer.data
-                    }
-                    return Response(data, status=200)
+        coupon_obj = Coupon.objects.filter(id=coupon_id)
+        if coupon_obj:   
+            serializer = CouponSerializer(instance=coupon_obj[0],\
+                data=request.data, context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'coupon': serializer.data
+                }
+                return Response(data, status=200)
+            else:
                 data = {
                     'success': 0,
                     'message': serializer.errors
                 }
                 return Response(data, status=400)
+        else:
             data = {
                 'success': 0,
                 'message': "Coupon doesn't exist."
             }
             return Response(data, status=404)
-        data = {
-            'success': 0,
-            'message': "You do not have permission to update coupon."
-        }
-        return Response(data, status=403)
 
     def delete(self, request, coupon_id):
-        if request.user.admin:
-            if Coupon.objects.filter(id=coupon_id):
-                coupon_obj = Coupon.objects.get(id=coupon_id)
-                if coupon_obj:
-                    try:
-                        coupon_obj.delete()
-                        data = {
-                            'success': 1,
-                            'coupon': "Coupon deleted successfully."
-                        }
-                        return Response(data, status=200)
-                    except:
-                        data = {
-                            'success': 0,
-                            'message': "Coupon cannot be deleted."
-                        }
-                        return Response(data, status=400)
-                else:
-                    data = {
-                        'success': 0,
-                        'message': "Coupon doesn't exist."
-                    }
-                    return Response(data, status=404)
-        data = {
-            'success': 0,
-            'message': "You do not have permission to delete Coupon."
-        }
-        return Response(data, status=403)
+        coupon_obj = Coupon.objects.filter(id=coupon_id)            
+        if coupon_obj:
+            try:
+                coupon_obj[0].delete()
+                data = {
+                    'success': 1,
+                    'coupon': "Coupon deleted successfully."
+                }
+                return Response(data, status=200)
+            except:
+                data = {
+                    'success': 0,
+                    'message': "Coupon cannot be deleted."
+                }
+                return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': "Coupon doesn't exist."
+            }
+            return Response(data, status=404)
 
 class CategoryCouponListView(APIView):
     permission_classes = (isAdminOrReadOnly, )
@@ -173,3 +157,47 @@ class CategoryCouponListView(APIView):
                 'message': "Coupon doesn't exist."
             }
             return Response(data, status=404)
+
+class VoucherListView(APIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = VoucherSerializer
+
+    def get(self, request):
+        voucher_obj = Voucher.objects.filter(user=request.user.id).order_by('-id')
+        serializer = VoucherSerializer(voucher_obj, many=True, context={'request':request})
+        data = {
+            'success': 1,
+            'voucher': serializer.data
+        }
+        return Response(data, status=200)
+
+    def post(self, request):
+        if request.user.id == int(request.data['user']):
+            voucher_obj = Voucher.objects.filter(user=request.user.id, coupon=request.data['coupon'])
+            if not voucher_obj:
+                serializer = VoucherSerializer(data=request.data, context={'request':request}, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    data = {
+                        'success': 1,
+                        'voucher': serializer.data
+                    }
+                    return Response(data, status=200)
+                else:
+                    data = {
+                        'success': 0,
+                        'message': serializer.errors
+                    }
+                    return Response(data, status=400)
+            else:
+                data = {
+                    'success': 0,
+                    'message': "Voucher already exists."
+                }
+                return Response(data, status=302)
+        else:
+            data = {
+                'success': 0,
+                'message': "You do not have permission to generate voucher."
+            }
+            return Response(data, status=403)

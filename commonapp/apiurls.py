@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
 from django.urls import path
-from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView
+from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView, CompanyFavouriteView, CompanyCreateView
-from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView
+from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView, VoucherListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
 from commonapp.api.rating import CompanyRatingListView, CompanyRatingDetailView
@@ -32,6 +32,8 @@ urlpatterns = [
     path('coupon/<int:coupon_id>', CouponDetailView.as_view(), name='coupon_detail'),
     path('category/<int:category_id>/coupon', CategoryCouponListView.as_view(), name='category_coupon_list'),
     path('coupon/type', CouponTypeListView.as_view(), name='coupon_type_list'),
+    # voucher
+    path('voucher', VoucherListView.as_view(), name='voucher_list'),
     # rating
     path('company/<int:company_id>/rating', CompanyRatingListView.as_view(), name='company_rating_list'),
     path('company/<int:company_id>/rating/<int:rating_id>', CompanyRatingDetailView.as_view(), name='company_rating_detail'),
@@ -41,6 +43,7 @@ urlpatterns = [
     # affiliate
     path('affiliate', AffiliateLinkListView.as_view(), name='affiliate_link_list'),
     path('affiliate/<int:affiliate_link_id>', AffiliateLinkDetailView.as_view(), name='affiliate_link_detail'),
+    path('affiliate/<int:affiliate_link_id>/addcount', AffiliateLinkCountView.as_view(), name='affiliate_link_add_count'),
     # search
     path('topbarsearch', TopBarSearchView.as_view(), name='top_bar_search_list'),
 ]

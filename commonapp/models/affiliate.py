@@ -12,6 +12,7 @@ class AffiliateLink(models.Model):
     is_active = models.BooleanField(default=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     sub_category = models.ForeignKey(SubCategory, on_delete=models.PROTECT, null=True, blank=True)
+    count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -19,3 +20,7 @@ class AffiliateLink(models.Model):
 
     def __str__(self):
         return self.description
+
+    def add_count(self):
+        self.count += 1
+        self.save()

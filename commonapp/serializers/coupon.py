@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from commonapp.models.coupon import Coupon
+from commonapp.models.coupon import Coupon, Voucher
 from commonapp.serializers.image import ImageSerializer
 
 class CouponSerializer(serializers.ModelSerializer):
@@ -16,5 +16,5 @@ class CouponSerializer(serializers.ModelSerializer):
 class VoucherSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Coupon
+        model = Voucher
         exclude = ('token', )
