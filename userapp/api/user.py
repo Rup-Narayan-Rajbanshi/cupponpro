@@ -141,6 +141,8 @@ class UpdateUser(APIView):
             user_obj = User.objects.get(id=user_id)
             serializer = UserSerializer(instance=user_obj,\
                 data=request.data, partial=True, context={'request':request})
+            if 'image' in request.data and not request.data['image']:
+                serializer.exclude_fields(['image'])
             if serializer.is_valid():
                 serializer.save()
                 data = {
