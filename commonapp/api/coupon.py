@@ -89,9 +89,7 @@ class CouponDetailView(APIView):
             if Coupon.objects.filter(id=coupon_id):
                 coupon_obj = Coupon.objects.get(id=coupon_id)
                 serializer = CouponSerializer(instance=coupon_obj,\
-                    data=request.data, partial=True, context={'request':request})
-                if 'image' in request.data and not request.data['image']:
-                    serializer.exclude_fields(['image'])
+                    data=request.data, context={'request':request})
                 if serializer.is_valid():
                     serializer.save()
                     data = {

@@ -250,9 +250,7 @@ class CompanyProductDetailView(APIView):
                 product_obj = Product.objects.filter(id=product_id, company=company_obj[0])
                 if product_obj:
                     serializer = ProductSerializer(instance=product_obj[0],\
-                        data=request.data, partial=True, context={'request':request})
-                    if 'image' in request.data and not request.data['image']:
-                        serializer.exclude_fields(['image'])
+                        data=request.data, context={'request':request})
                     if serializer.is_valid():
                         serializer.save()
                         data = {

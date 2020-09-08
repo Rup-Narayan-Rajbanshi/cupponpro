@@ -46,8 +46,8 @@ class CompanyDetailView(APIView):
         if company_obj:
             serializer = CompanySerializer(instance=company_obj[0], data=request.data,\
                 partial=True, context={'request':request})
-            if 'image' in request.data and not request.data['image']:
-                serializer.exclude_fields(['image'])
+            if 'logo' in request.data and not request.data['logo']:
+                serializer.exclude_fields(['logo'])
             if serializer.is_valid():
                 serializer.save()
                 data = {
