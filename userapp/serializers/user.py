@@ -30,6 +30,12 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code')
         read_only_fields = ('image', 'active', 'admin')
 
+    def exclude_fields(self, fields_to_exclude=None):
+        if isinstance(fields_to_exclude, list):
+            for f in fields_to_exclude:
+                f in self.fields.fields and self.fields.fields.pop(f) or next()
+
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
@@ -42,6 +48,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'email', 'phone_number', 'password',\
             'confirm_password', 'is_user')
 
+
 class CompanyUserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
@@ -53,6 +60,7 @@ class CompanyUserRegistrationSerializer(serializers.ModelSerializer):
         fields = ('id', 'first_name', 'middle_name', 'last_name',\
             'email', 'phone_number', 'password',\
             'confirm_password', 'is_manager')
+
 
 class ChangePasswordSerializer(serializers.Serializer):  
     """

@@ -6,7 +6,7 @@ class AffiliateLink(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     url = models.TextField(null=True, blank=True)
     discount_code = models.CharField(max_length=50, null=True, blank=True)
-    image = models.ImageField(upload_to='affiliate/')
+    image = models.ImageField(upload_to='affiliate/', null=True, blank=True)
     description = models.TextField()
     discount = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)

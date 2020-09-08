@@ -44,8 +44,10 @@ class CompanyDetailView(APIView):
     def put(self, request, company_id):
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            serializer = CompanySerializer(company_obj[0], data=request.data,\
-                context={'request':request})
+            serializer = CompanySerializer(instance=company_obj[0], data=request.data,\
+                partial=True, context={'request':request})
+            if 'logo' in request.data and not request.data['logo']:
+                serializer.exclude_fields(['logo'])
             if serializer.is_valid():
                 serializer.save()
                 data = {

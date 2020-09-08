@@ -29,6 +29,12 @@ class CompanySerializer(serializers.ModelSerializer):
     def get_rating_count(self, obj):
         return Rating.objects.filter(company=obj.id).count()
 
+    def exclude_fields(self, fields_to_exclude=None):
+        if isinstance(fields_to_exclude, list):
+            for f in fields_to_exclude:
+                f in self.fields.fields and self.fields.fields.pop(f) or next()
+
+
 class FavouriteCompanySerializer(serializers.ModelSerializer):
 
     class Meta:

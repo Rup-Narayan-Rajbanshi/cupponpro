@@ -60,7 +60,10 @@ class NewsArticleDetailView(APIView):
     def put(self, request, news_id):
         news_obj = NewsArticle.objects.filter(id=news_id)
         if news_obj:
-            serializer = NewsArticleSerializer(instance=news_obj[0], data=request.data, context={'request':request})
+            serializer = NewsArticleSerializer(instance=news_obj[0], data=request.data,\
+                partial=True, context={'request':request})
+            if 'image' in request.data and not request.data['image']:
+                serializer.exclude_fields(['image'])
             if serializer.is_valid():
                 serializer.save()
                 data = {
