@@ -127,6 +127,37 @@ class User(AbstractBaseUser, Address):
     def is_active(self):
         return self.active
 
+@receiver(models.signals.post_delete, sender=User)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes file from filesystem
+    when corresponding `MediaFile` object is deleted.
+    """
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+
+@receiver(models.signals.pre_save, sender=User)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """
+    Deletes old file from filesystem
+    when corresponding `MediaFile` object is updated
+    with new file.
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = sender.objects.get(pk=instance.pk).image
+    except sender.DoesNotExist:
+        return False
+
+    new_file = instance.image
+    if old_file:
+        if not old_file == new_file:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
+
 class PasswordResetToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     token = models.CharField(max_length=6)
@@ -138,7 +169,7 @@ class PasswordResetToken(models.Model):
         verbose_name_plural = "password reset tokens"
 
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
+        ''' On save, generate token '''
         if not self.id:
             self.token = shortuuid.ShortUUID().random(length=6)
         return super(PasswordResetToken, self).save(*args, **kwargs)
@@ -179,33 +210,56 @@ def auto_send_token_email(sender, instance, **kwargs):
     except sender.DoesNotExist:
         return False
 
-@receiver(models.signals.post_delete, sender=User)
-def auto_delete_file_on_delete(sender, instance, **kwargs):
-    """
-    Deletes file from filesystem
-    when corresponding `MediaFile` object is deleted.
-    """
-    if instance.image:
-        if os.path.isfile(instance.image.path):
-            os.remove(instance.image.path)
+class LoginToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    token = models.CharField(max_length=4)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
 
-@receiver(models.signals.pre_save, sender=User)
-def auto_delete_file_on_change(sender, instance, **kwargs):
+    class Meta:
+        db_table = 'login_token'
+
+    def __str__(self):
+        return self.token
+
+    def save(self, *args, **kwargs):
+        ''' On save, generate token '''
+        if not self.id:
+            self.token = shortuuid.ShortUUID().random(length=4)
+        return super(LoginToken, self).save(*args, **kwargs)
+
+@receiver(models.signals.post_save, sender=LoginToken)
+def auto_send_token_email(sender, instance, **kwargs):
     """
-    Deletes old file from filesystem
-    when corresponding `MediaFile` object is updated
-    with new file.
+    Send email with the login token
     """
     if not instance.pk:
         return False
 
     try:
-        old_file = sender.objects.get(pk=instance.pk).image
+        if not instance.is_used:
+            user = User.objects.get(id=instance.user.id)
+            token = LoginToken.objects.get(id=instance.pk).token
+            user_name = user.full_name
+            user_email = user.email
+            subject = 'Login Token'
+
+            text_template = get_template('email/loginTokenEmail.txt')
+            html_template = get_template('email/loginTokenEmail.html')
+            context = {
+                'subject': subject,
+                'user_name': user_name,
+                'user_email': user_email,
+                'token': token,
+                'domain_name': 'http://127.0.0.1:8000'
+            }
+            text_content = text_template.render(context)
+            html_content = html_template.render(context)
+            email_from = EMAIL_HOST_USER
+
+            mail = EmailMultiAlternatives(subject, text_content, email_from, [user_email])
+            mail.attach_alternative(html_content, "text/html")
+            mail.send()
+
     except sender.DoesNotExist:
         return False
-
-    new_file = instance.image
-    if old_file:
-        if not old_file == new_file:
-            if os.path.isfile(old_file.path):
-                os.remove(old_file.path)

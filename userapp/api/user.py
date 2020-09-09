@@ -1,13 +1,13 @@
 from django.contrib.auth.models import Group
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
-    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer
-from userapp.models.user import User, PasswordResetToken
+    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, LoginTokenSerializer, LoginSerializer
+from userapp.models.user import User, PasswordResetToken, LoginToken
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
 class GroupListView(APIView):
@@ -245,19 +245,21 @@ class GeneratePasswordResetTokenView(APIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'passwordresettoken': request.data['email']
+                    'password_reset_token': "Password reset token sent."
                 }
                 return Response(data, status=200)
+            else:
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+        else:
             data = {
                 'success': 0,
-                'message': serializer.errors
+                'message': "Email doesn't exist."
             }
-            return Response(data, status=400)
-        data = {
-            'success': 0,
-            'message': "Email doesn't exist."
-        }
-        return Response(data, status=404)
+            return Response(data, status=404)
 
 class ResetPasswordView(generics.UpdateAPIView):
     """
@@ -271,7 +273,7 @@ class ResetPasswordView(generics.UpdateAPIView):
         serializer = self.get_serializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             # Check token exist
-            token_obj = PasswordResetToken.objects.filter(token=serializer.data.get("token"), is_used=False)
+            token_obj = PasswordResetToken.objects.filter(token=serializer.data.get("token"), user=request.user.id, is_used=False)
             if not token_obj:
                 data = {
                     'success': 0,
@@ -294,18 +296,6 @@ class ResetPasswordView(generics.UpdateAPIView):
             'message': serializer.errors,
         }
         return Response(data, status=400)
-
-class LoginView(APIView):
-
-    def get(self, request):
-        user_type = request.user.group.name
-        serializer = UserDetailSerializer(request.user, context={'request':request})
-        data = {
-            'success': 1,
-            'user_type': user_type,
-            'user': serializer.data
-        }
-        return Response(data, status=200)
 
 class CreateUserView(APIView):
     permission_classes = (AllowAny, )
@@ -397,3 +387,68 @@ class CreateStaffUserView(APIView):
                 'message': "Company doesn't exist."
             }
             return Response(data, status=404)
+
+class GenerateLoginTokenView(APIView):
+    """
+    An endpoint for generating login token.
+    """
+    serializer_class = LoginTokenSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        if 'email' in request.data:
+            user = User.objects.filter(email=request.data['email'])
+        else:
+            data = {
+                'success': 0,
+                'message': 'Enter email field.'
+            }
+            return Response(data, status=400)
+        if user:
+            login_token_obj = LoginToken.objects.filter(user=user[0].id, is_used=False)
+            for obj in login_token_obj:
+                obj.is_used = True
+                obj.save()
+            serializer = LoginTokenSerializer(data=request.data, context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'login_token': "Login token sent."
+                }
+                return Response(data, status=200)
+            data = {
+                'success': 0,
+                'message': serializer.errors
+            }
+            return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': "Email doesn't exist."
+            }
+            return Response(data, status=404)
+
+class LoginView(APIView):
+    serializer_class = LoginSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        token = request.data['token']
+        login_token_obj = LoginToken.objects.filter(token=token, user=request.user.id, is_used=False)
+        if login_token_obj:
+            login_token_obj[0].is_used = True
+            login_token_obj[0].save()
+            serializer = UserDetailSerializer(request.user, context={'request':request})
+            data = {
+                'success': 1,
+                'user_type': request.user.group.name,
+                'user': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': "Invalid login token."
+            }
+            return Response(data, status=400)

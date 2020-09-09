@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import Group
-from userapp.models.user import User, PasswordResetToken
+from userapp.models.user import User, PasswordResetToken, LoginToken
 
 class UserGroupSerializer(serializers.ModelSerializer):
 
@@ -74,7 +74,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class PasswordResetTokenSerializer(serializers.Serializer):
     """
-    Serializer for password change endpoint.
+    Serializer for password change token generation endpoint.
     """
     model = PasswordResetToken
 
@@ -82,7 +82,19 @@ class PasswordResetTokenSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = User.objects.get(email=validated_data.get('email'))
-        return PasswordResetToken.objects.create(user=user)    
+        return PasswordResetToken.objects.create(user=user)
+
+class LoginTokenSerializer(serializers.Serializer):
+    """
+    Serializer for login token generation endpoint.
+    """
+    model = LoginToken
+
+    email = serializers.CharField(required=True)
+
+    def create(self, validated_data):
+        user = User.objects.get(email=validated_data.get('email'))
+        return LoginToken.objects.create(user=user)
 
 class ResetPasswordSerializer(serializers.Serializer):  
     """
@@ -93,6 +105,13 @@ class ResetPasswordSerializer(serializers.Serializer):
     token = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 
+class LoginSerializer(serializers.Serializer):  
+    """
+    Serializer for password change endpoint.
+    """
+    model = LoginToken
+
+    token = serializers.CharField(required=True)
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
