@@ -1,9 +1,10 @@
 import shortuuid
 from django.db import models
+from django.core.validators import FileExtensionValidator
 
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True)
-    icon = models.CharField(max_length=20, null=True, blank=True)
+    icon = models.FileField(upload_to='icons/', validators=[FileExtensionValidator(allowed_extensions=['svg'])])
     image = models.ImageField(upload_to='category/', null=True, blank=True)
     token = models.CharField(max_length=8, editable=False, null=False, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

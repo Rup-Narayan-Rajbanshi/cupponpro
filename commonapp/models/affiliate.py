@@ -22,5 +22,6 @@ class AffiliateLink(models.Model):
         return self.description
 
     def add_count(self):
+        ''' function to add count by 1 when user visit the link. '''
         self.count += 1
         self.save()

@@ -58,8 +58,13 @@ class CategoryDetailView(APIView):
         if category_obj:
             serializer = CategorySerializer(instance=category_obj[0], data=request.data,\
                 partial=True, context={'request':request})
+            exclude_fields = []
             if 'image' in request.data and not request.data['image']:
-                serializer.exclude_fields(['image'])
+                exclude_fields.append('image')
+            if 'icon' in request.data and not request.data['icon']:
+                exclude_fields.append('icon')
+            if exclude_fields:
+                serializer.exclude_fields(exclude_fields)
             if serializer.is_valid():
                 serializer.save()
                 data = {
