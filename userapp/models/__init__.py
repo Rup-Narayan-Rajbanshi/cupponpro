@@ -1,1 +1,1 @@
-from .user import User, PasswordResetToken, LoginToken
+from .user import User, PasswordResetToken, LoginToken, SignupToken

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
-from userapp.models import User, PasswordResetToken, LoginToken
+from userapp.models import User, PasswordResetToken, LoginToken, SignupToken
 
 class AdminUserapp(admin.ModelAdmin):
     list_display = ('id', 'username', 'email', 'active', 'admin')
@@ -34,6 +34,7 @@ class AdminPasswordResetTokenapp(admin.ModelAdmin):
 
 admin.site.register(LoginToken)
 admin.site.register(PasswordResetToken, AdminPasswordResetTokenapp)
+admin.site.register(SignupToken)
 admin.site.register(User, AdminUserapp)
 
 admin.site.unregister(Token)

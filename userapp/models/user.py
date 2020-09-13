@@ -160,13 +160,16 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
 class PasswordResetToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    token = models.CharField(max_length=6)
+    token = models.CharField(max_length=6, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'password_reset_token'
         verbose_name_plural = "password reset tokens"
+
+    def __str__(self):
+        return self.token
 
     def save(self, *args, **kwargs):
         ''' On save, generate token '''
@@ -175,7 +178,7 @@ class PasswordResetToken(models.Model):
         return super(PasswordResetToken, self).save(*args, **kwargs)
 
 @receiver(models.signals.post_save, sender=PasswordResetToken)
-def auto_send_token_email(sender, instance, **kwargs):
+def auto_send_passoword_reset_token_email(sender, instance, **kwargs):
     """
     Send email with the password reset token
     """
@@ -212,7 +215,7 @@ def auto_send_token_email(sender, instance, **kwargs):
 
 class LoginToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    token = models.CharField(max_length=4)
+    token = models.CharField(max_length=4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
 
@@ -229,7 +232,7 @@ class LoginToken(models.Model):
         return super(LoginToken, self).save(*args, **kwargs)
 
 @receiver(models.signals.post_save, sender=LoginToken)
-def auto_send_token_email(sender, instance, **kwargs):
+def auto_send_login_token_email(sender, instance, **kwargs):
     """
     Send email with the login token
     """
@@ -249,6 +252,60 @@ def auto_send_token_email(sender, instance, **kwargs):
             context = {
                 'subject': subject,
                 'user_name': user_name,
+                'user_email': user_email,
+                'token': token,
+                'domain_name': 'http://127.0.0.1:8000'
+            }
+            text_content = text_template.render(context)
+            html_content = html_template.render(context)
+            email_from = EMAIL_HOST_USER
+
+            mail = EmailMultiAlternatives(subject, text_content, email_from, [user_email])
+            mail.attach_alternative(html_content, "text/html")
+            mail.send()
+
+    except sender.DoesNotExist:
+        return False
+
+class SignupToken(models.Model):
+    email = models.EmailField(max_length=50)
+    phone_number = models.CharField(max_length=15,\
+        validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
+    token = models.CharField(max_length=4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'signup_token'
+
+    def __str__(self):
+        return self.token
+
+    def save(self, *args, **kwargs):
+        ''' On save, generate token '''
+        if not self.id:
+            self.token = shortuuid.ShortUUID().random(length=4)
+        return super(SignupToken, self).save(*args, **kwargs)
+
+@receiver(models.signals.post_save, sender=SignupToken)
+def auto_send_signup_token_email(sender, instance, **kwargs):
+    """
+    Send email with the signup token
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        if not instance.is_used:
+            token_obj = SignupToken.objects.get(id=instance.pk)
+            token = token_obj.token
+            user_email = token_obj.email
+            subject = 'Signup Token'
+
+            text_template = get_template('email/signupTokenEmail.txt')
+            html_template = get_template('email/signupTokenEmail.html')
+            context = {
+                'subject': subject,
                 'user_email': user_email,
                 'token': token,
                 'domain_name': 'http://127.0.0.1:8000'

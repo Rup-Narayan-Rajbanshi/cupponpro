@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import Group
-from userapp.models.user import User, PasswordResetToken, LoginToken
+from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 
 class UserGroupSerializer(serializers.ModelSerializer):
 
@@ -112,6 +112,15 @@ class LoginSerializer(serializers.Serializer):
     model = LoginToken
 
     token = serializers.CharField(required=True)
+
+class SignupTokenSerializer(serializers.ModelSerializer):  
+    """
+    Serializer for signup token endpoint.
+    """
+    class Meta:
+        model = SignupToken
+        fields = '__all__'
+        read_only_fields = ('is_used', )
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:

@@ -6,8 +6,9 @@ from rest_framework.views import APIView
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
-    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, LoginTokenSerializer, LoginSerializer
-from userapp.models.user import User, PasswordResetToken, LoginToken
+    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, LoginTokenSerializer, LoginSerializer,\
+    SignupTokenSerializer
+from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
 class GroupListView(APIView):
@@ -450,5 +451,59 @@ class LoginView(APIView):
             data = {
                 'success': 0,
                 'message': "Invalid login token."
+            }
+            return Response(data, status=400)
+
+class SignupTokenView(APIView):
+    permission_classes = (AllowAny, )
+    serializer_class = SignupTokenSerializer
+
+    def get(self, request):
+        email = request.GET.get('email', None)
+        phone_number = request.GET.get('phone_number', None)
+        if email and phone_number:
+            token_obj = SignupToken.objects.filter(email=email, phone_number=phone_number, is_used=False)
+            if token_obj:
+                token_obj[0].is_used = True
+                token_obj[0].save()
+                serializer = SignupTokenSerializer(token_obj[0], context={'request':request})
+                data = {
+                    'success': 1,
+                    'signup_token': serializer.data
+                }
+                return Response(data, status=200)
+            else:
+                data = {
+                    'success': 0,
+                    'message': "Signup token doesn't exist."
+                }
+                return Response(data, status=404)
+        else:
+            data = {
+                'success': 0,
+                'message': "Please pass email and phone number as get request"
+            }
+            return Response(data, status=400)
+
+
+
+    def post(self, request):
+        token_obj = SignupToken.objects.filter(email=request.data['email'], phone_number=request.data['phone_number'])
+        if token_obj:
+            for obj in token_obj:
+                obj.is_used = True
+                obj.save()
+        serializer = SignupTokenSerializer(data=request.data, context={'request':request})
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                'success': 1,
+                'signup_token': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': serializer.errors
             }
             return Response(data, status=400)
