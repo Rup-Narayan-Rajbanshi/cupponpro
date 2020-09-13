@@ -58,9 +58,18 @@ class Voucher(models.Model):
     def save(self, *args, **kwargs):
         ''' on save, update token '''
         if not self.id:
+            coupon_type = {
+                'category': 'CC',
+                'productcategory': 'PC',
+                'product': 'SP'
+            }
             uuid4 = shortuuid.ShortUUID().random(length=4)
-            coupon_token = self.coupon.token
+            coupon_content_type = self.coupon.content_type.model
+            coupon_type_token = self.coupon.content_object.token
+            discount = self.coupon.discount
+            discount = "0" + str(discount)
+            discount = discount[-2:]
             key = self.coupon.company.key
-            voucher_token = coupon_token + '-' + uuid4
+            voucher_token = coupon_type[coupon_content_type] + coupon_type_token + discount + uuid4
             self.token = encrypt(voucher_token, key)
         super(Voucher, self).save(*args, **kwargs)  
