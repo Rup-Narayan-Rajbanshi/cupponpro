@@ -1,4 +1,4 @@
-from billapp.models.bill import Bill
+from commonapp.models.bill import Bill
 from rest_framework import serializers
 
 class BillSerializer(serializers.ModelSerializer):

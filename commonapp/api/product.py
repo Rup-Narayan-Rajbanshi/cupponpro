@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from commonapp.models.company import Company, CompanyUser
-from productapp.models.product import BulkQuantity, Product, ProductCategory
-from productapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
+from commonapp.models.product import BulkQuantity, Product, ProductCategory
+from commonapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
 class CompanyBulkQuantityListView(APIView):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from productapp.models.product import BulkQuantity, Product, ProductCategory
+from commonapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.serializers.image import ImageSerializer
 
 class BulkQuantitySerializer(serializers.ModelSerializer):

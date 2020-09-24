@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
-from billapp.serializers.bill import BillSerializer
-from billapp.models.bill import Bill
+from commonapp.serializers.bill import BillSerializer
+from commonapp.models.bill import Bill
 from permission import isCompanyOwnerAndAllowAll,isCompanyManagerAndAllowAll
 
 class BillListView(APIView):

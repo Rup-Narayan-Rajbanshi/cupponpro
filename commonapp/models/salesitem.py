@@ -1,8 +1,8 @@
 from django.utils import timezone
 from django.db import models
 from django.dispatch import receiver
-from .bill import Bill
-from productapp.models.product import Product
+from commonapp.models.bill import Bill
+from commonapp.models.product import Product
 
 
 class SalesItem(models.Model):

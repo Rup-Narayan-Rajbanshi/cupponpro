@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
-from billapp.serializers.salesitem import SalesItemSerializer
-from billapp.models.salesitem import SalesItem
+from commonapp.serializers.salesitem import SalesItemSerializer
+from commonapp.models.salesitem import SalesItem
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
 class SalesItemListView(APIView):

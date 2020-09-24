@@ -30,7 +30,7 @@ class UserManager(BaseUserManager):
             raise ValueError(_("User must have a password."))
 
         user_obj = self.model(
-            email=email
+            email=email.lower()
         )
         user_obj.username = email.split('@')[0]
         user_obj.first_name = first_name
