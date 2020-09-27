@@ -25,7 +25,7 @@ urlpatterns = [
 	path('user/resetpassword', ResetPasswordView.as_view(), name='reset_password'),
 	# login
 	path('logintoken', GenerateLoginTokenView.as_view(), name='user_login_token'),
-	path('login', LoginView.as_view(), name='user_login'),
+	path('userinfo', LoginView.as_view(), name='user_info'),
 	# signup
 	path('signuptoken', SignupTokenView.as_view(), name='signup_token'),
 ]

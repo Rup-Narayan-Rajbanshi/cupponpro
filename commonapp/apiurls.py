@@ -7,6 +7,7 @@ from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUse
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView, VoucherListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
+from commonapp.api.links import SocialLinkListView, SocialLinkDetailView
 from commonapp.api.product import (
     CompanyBulkQuantityListView,
     CompanyBulkQuantityDetailView,
@@ -64,7 +65,10 @@ urlpatterns = [
     path('productcategory', ProductCategoryListView.as_view(), name='product_category_list'),
     path('company/<int:company_id>/productcategory', CompanyProductCategoryListView.as_view(), name='company_product_category_list'),
     # bill
-    path('bill/', BillListView.as_view(), name='bill_list'),
-    path('bill/<int:bill_id>/', BillDetailView.as_view(), name='bill_detail'),
-    path('bill/<int:bill_id>/salesitem/', SalesItemListView.as_view(), name='sales_item_list'),
+    path('bill', BillListView.as_view(), name='bill_list'),
+    path('bill/<int:bill_id>', BillDetailView.as_view(), name='bill_detail'),
+    path('bill/<int:bill_id>/salesitem', SalesItemListView.as_view(), name='sales_item_list'),
+    # social links
+    path('company/<int:company_id>/link', SocialLinkListView.as_view(), name='company_link_list'),
+    path('company/<int:company_id>/link/<int:link_id>', SocialLinkDetailView.as_view(), name='company_link_detail'),
 ]
