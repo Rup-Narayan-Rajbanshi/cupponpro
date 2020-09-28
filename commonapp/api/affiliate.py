@@ -1,10 +1,10 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.models.affiliate import AffiliateLink
 from commonapp.serializers.affiliate import AffiliateLinkSerializer
 from permission import isAdminOrReadOnly
 
-class AffiliateLinkListView(APIView):
+class AffiliateLinkListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
     serializer_class = AffiliateLinkSerializer
 
@@ -34,7 +34,7 @@ class AffiliateLinkListView(APIView):
             }
             return Response(data, status=400)
 
-class AffiliateLinkDetailView(APIView):
+class AffiliateLinkDetailView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
     serializer_class = AffiliateLinkSerializer
 
@@ -49,7 +49,7 @@ class AffiliateLinkDetailView(APIView):
             return Response(data, status=200)
         else:
             data = {
-                'success': 1,
+                'success': 0,
                 'message': "Affiliate link doesn't exist."
             }
             return Response(data, status=404)
@@ -76,7 +76,7 @@ class AffiliateLinkDetailView(APIView):
                 return Response(data, status=400)
         else:
             data = {
-                'success': 1,
+                'success': 0,
                 'message': "Affiliate link doesn't exist."
             }
             return Response(data, status=404)
@@ -104,7 +104,7 @@ class AffiliateLinkDetailView(APIView):
             }
             return Response(data, status=404)
 
-class AffiliateLinkCountView(APIView):
+class AffiliateLinkCountView(generics.GenericAPIView):
     serializer_class = AffiliateLinkSerializer
 
     def get(self, request, affiliate_link_id):

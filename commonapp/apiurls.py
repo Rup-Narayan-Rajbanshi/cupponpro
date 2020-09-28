@@ -1,12 +1,23 @@
 # -*- coding:utf-8 -*-
 from django.urls import path
 from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView
+from commonapp.api.bill import BillListView, BillDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView, CompanyFavouriteView, CompanyCreateView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView, VoucherListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
+from commonapp.api.links import SocialLinkListView, SocialLinkDetailView
+from commonapp.api.product import (
+    CompanyBulkQuantityListView,
+    CompanyBulkQuantityDetailView,
+    CompanyProductListView,
+    CompanyProductDetailView,
+    ProductCategoryListView,
+    CompanyProductCategoryListView,
+)
 from commonapp.api.rating import CompanyRatingListView, CompanyRatingDetailView
+from commonapp.api.salesitem import SalesItemListView
 from commonapp.api.search import TopBarSearchView
 
 app_name = 'commonapp'
@@ -46,4 +57,18 @@ urlpatterns = [
     path('affiliate/<int:affiliate_link_id>/addcount', AffiliateLinkCountView.as_view(), name='affiliate_link_add_count'),
     # search
     path('topbarsearch', TopBarSearchView.as_view(), name='top_bar_search_list'),
+    # product
+    path('company/<int:company_id>/bulkquantity', CompanyBulkQuantityListView.as_view(), name='company_bulkquantity_list'),
+    path('company/<int:company_id>/bulkquantity/<int:bulk_quantity_id>', CompanyBulkQuantityDetailView.as_view(), name='company_bulkquantity_update'),
+    path('company/<int:company_id>/product', CompanyProductListView.as_view(), name='company_product_list'),
+    path('company/<int:company_id>/product/<int:product_id>', CompanyProductDetailView.as_view(), name='company_product_update'),
+    path('productcategory', ProductCategoryListView.as_view(), name='product_category_list'),
+    path('company/<int:company_id>/productcategory', CompanyProductCategoryListView.as_view(), name='company_product_category_list'),
+    # bill
+    path('bill', BillListView.as_view(), name='bill_list'),
+    path('bill/<int:bill_id>', BillDetailView.as_view(), name='bill_detail'),
+    path('bill/<int:bill_id>/salesitem', SalesItemListView.as_view(), name='sales_item_list'),
+    # social links
+    path('company/<int:company_id>/link', SocialLinkListView.as_view(), name='company_link_list'),
+    path('company/<int:company_id>/link/<int:link_id>', SocialLinkDetailView.as_view(), name='company_link_detail'),
 ]

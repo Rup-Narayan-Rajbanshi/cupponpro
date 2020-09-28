@@ -1,10 +1,10 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from bannerapp.serializers.banner import BannerSerializer
 from bannerapp.models.banner import Banner
 from permission import isAdminOrReadOnly
 
-class BannerListView(APIView):
+class BannerListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
     serializer_class = BannerSerializer
 
@@ -34,7 +34,7 @@ class BannerListView(APIView):
         return Response(data, status=400)
 
 
-class BannerUpdateView(APIView):
+class BannerUpdateView(generics.GenericAPIView):
     serializer_class = BannerSerializer
     permission_classes = (isAdminOrReadOnly, )
 

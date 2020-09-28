@@ -1,4 +1,4 @@
-from billapp.models.salesitem import SalesItem
+from commonapp.models.salesitem import SalesItem
 from rest_framework import serializers
 
 class SalesItemSerializer(serializers.ModelSerializer):

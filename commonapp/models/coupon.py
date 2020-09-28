@@ -4,7 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from billapp.models.bill import Bill
+from commonapp.models.bill import Bill
 from commonapp.models.company import Company
 from commonapp.models.image import Image
 from commonapp.encrypt import encrypt, decrypt

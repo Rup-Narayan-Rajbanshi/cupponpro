@@ -1,10 +1,10 @@
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import generics
 from commonapp.models.company import Company
 from commonapp.models.facility import Facility
 from commonapp.serializers.facility import FacilitySerializer
 
-class CompanyFacilityListView(APIView):
+class CompanyFacilityListView(generics.GenericAPIView):
     # permission_classes = []
     serializer_class = FacilitySerializer
 
@@ -55,7 +55,7 @@ class CompanyFacilityListView(APIView):
             }
             return Response(data, status=403)
 
-class CompanyFacilityDetailView(APIView):
+class CompanyFacilityDetailView(generics.GenericAPIView):
     # permission_classes = 
     serializer_class = FacilitySerializer
 

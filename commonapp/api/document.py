@@ -1,11 +1,11 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.models.company import Company
 from commonapp.models.document import Document
 from commonapp.serializers.document import DocumentSerializer
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
-class CompanyDocumentListView(APIView):
+class CompanyDocumentListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = DocumentSerializer
 
@@ -49,7 +49,7 @@ class CompanyDocumentListView(APIView):
             }
             return Response(data, status=403)
 
-class CompanyDocumentDetailView(APIView):
+class CompanyDocumentDetailView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = DocumentSerializer
 
