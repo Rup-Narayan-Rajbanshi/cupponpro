@@ -1,11 +1,11 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import permissions
 from commonapp.serializers.salesitem import SalesItemSerializer
 from commonapp.models.salesitem import SalesItem
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
-class SalesItemListView(APIView):
+class SalesItemListView(generics.GenericAPIView):
     # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = SalesItemSerializer
 
@@ -47,7 +47,7 @@ class SalesItemListView(APIView):
             }
             return Response(data, status=400)
 
-class SalesItemDetailView(APIView):
+class SalesItemDetailView(generics.GenericAPIView):
     # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = SalesItemSerializer
 

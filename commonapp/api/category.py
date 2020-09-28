@@ -1,10 +1,10 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.models.category import Category, SubCategory
 from commonapp.serializers.category import CategorySerializer, SubCategorySerializer
 from permission import isAdminOrReadOnly
 
-class CategoryListView(APIView):
+class CategoryListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
     serializer_class = CategorySerializer
 
@@ -33,7 +33,7 @@ class CategoryListView(APIView):
         }
         return Response(data, status=400)
 
-class CategoryDetailView(APIView):
+class CategoryDetailView(generics.GenericAPIView):
     serializer_class = CategorySerializer
     permission_classes = (isAdminOrReadOnly, )
 
@@ -108,7 +108,7 @@ class CategoryDetailView(APIView):
             }
             return Response(data, status=404)
 
-class SubCategoryListView(APIView):
+class SubCategoryListView(generics.GenericAPIView):
     serializer_class = SubCategorySerializer
     permission_classes = (isAdminOrReadOnly, )
 
@@ -137,7 +137,7 @@ class SubCategoryListView(APIView):
         }
         return Response(data, status=400)
 
-class SubCategoryDetailView(APIView):
+class SubCategoryDetailView(generics.GenericAPIView):
     serializer_class = SubCategorySerializer
     permission_classes = (isAdminOrReadOnly, )
 

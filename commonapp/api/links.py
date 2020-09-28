@@ -1,11 +1,11 @@
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import generics
 from commonapp.models.company import Company, CompanyUser
 from commonapp.models.links import SocialLink
 from commonapp.serializers.links import SocialLinkSerializer
 from permission import isCompanyOwnerAndAllowAll
 
-class SocialLinkListView(APIView):
+class SocialLinkListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll]
     serializer_class = SocialLinkSerializer
 
@@ -75,7 +75,7 @@ class SocialLinkListView(APIView):
             }
             return Response(data, status=404)
 
-class SocialLinkDetailView(APIView):
+class SocialLinkDetailView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll]
     serializer_class = SocialLinkSerializer
 

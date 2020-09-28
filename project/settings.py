@@ -41,20 +41,20 @@ INTERNAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'rest_framework',
-    'rest_framework.authtoken',
+    'corsheaders',
     'debug_toolbar',
     'django_extensions',
-    'corsheaders',
     'django_filters',
+    'rest_framework',
+    'rest_framework.authtoken',
     ]
 
 # All apps developed at GreenGrowth goes here
 DEV_APPS = [
     'articleapp',
-    'userapp',
     'bannerapp',
     'commonapp',
+    'userapp',
 ]
 
 

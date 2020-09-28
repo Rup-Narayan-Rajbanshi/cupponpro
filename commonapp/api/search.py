@@ -1,10 +1,10 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.serializers.company import Company, CompanySerializer
 from commonapp.serializers.coupon import Coupon, CouponSerializer
 from commonapp.serializers.search import TopBarSearchSerializer
 
-class TopBarSearchView(APIView):
+class TopBarSearchView(generics.GenericAPIView):
     serializer_class = TopBarSearchSerializer
 
     def post(self, request):

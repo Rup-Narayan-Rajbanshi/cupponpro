@@ -2,7 +2,6 @@ from django.contrib.auth.models import Group
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
@@ -11,7 +10,7 @@ from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserR
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
-class GroupListView(APIView):
+class GroupListView(generics.GenericAPIView):
     serializer_class = GroupSerializer
     permission_classes = (isAdmin, )
 
@@ -24,7 +23,7 @@ class GroupListView(APIView):
         }
         return Response(data, status=200)
 
-class CompanyGroupListView(APIView):
+class CompanyGroupListView(generics.GenericAPIView):
     serializer_class = GroupSerializer
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
 
@@ -38,7 +37,7 @@ class CompanyGroupListView(APIView):
         }
         return Response(data, status=200)
 
-class UserGroupDetailView(APIView):
+class UserGroupDetailView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = UserGroupSerializer
 
@@ -93,7 +92,7 @@ class UserGroupDetailView(APIView):
             }
             return Response(data, status=400)     
 
-class UserListView(APIView):
+class UserListView(generics.GenericAPIView):
     """
     An endpoint for getting all user or create new user.
     """
@@ -115,7 +114,7 @@ class UserListView(APIView):
         }
         return Response(data, status=403)
 
-class UpdateUser(APIView):
+class UpdateUser(generics.GenericAPIView):
     """
     An endpoint for get, update or delete user info.
     """
@@ -194,7 +193,7 @@ class ChangePasswordView(generics.UpdateAPIView):
         obj = self.request.user
         return obj
 
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         self.object = self.get_object()
         serializer = self.get_serializer(data=request.data, context={'request':request})
 
@@ -220,7 +219,7 @@ class ChangePasswordView(generics.UpdateAPIView):
         }
         return Response(data, status=400)
 
-class GeneratePasswordResetTokenView(APIView):
+class GeneratePasswordResetTokenView(generics.GenericAPIView):
     """
     An endpoint for generating password reset token.
     """
@@ -298,7 +297,7 @@ class ResetPasswordView(generics.UpdateAPIView):
         }
         return Response(data, status=400)
 
-class CreateUserView(APIView):
+class CreateUserView(generics.GenericAPIView):
     permission_classes = (AllowAny, )
     serializer_class = UserRegistrationSerializer
 
@@ -339,7 +338,7 @@ class CreateUserView(APIView):
             }
             return Response(data, status=400)
 
-class CreateStaffUserView(APIView):
+class CreateStaffUserView(generics.GenericAPIView):
     permission_classes = (isCompanyOwnerAndAllowAll, )
     serializer_class = CompanyUserRegistrationSerializer
 
@@ -389,7 +388,7 @@ class CreateStaffUserView(APIView):
             }
             return Response(data, status=404)
 
-class GenerateLoginTokenView(APIView):
+class GenerateLoginTokenView(generics.GenericAPIView):
     """
     An endpoint for generating login token.
     """
@@ -430,7 +429,7 @@ class GenerateLoginTokenView(APIView):
             }
             return Response(data, status=404)
 
-class LoginView(APIView):
+class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = (IsAuthenticated, )
 
@@ -454,7 +453,7 @@ class LoginView(APIView):
             }
             return Response(data, status=400)
 
-class SignupTokenView(APIView):
+class SignupTokenView(generics.GenericAPIView):
     permission_classes = (AllowAny, )
     serializer_class = SignupTokenSerializer
 

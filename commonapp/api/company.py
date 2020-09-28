@@ -1,13 +1,13 @@
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
+from rest_framework import generics
 from commonapp.models.company import Company, CompanyUser, FavouriteCompany
 from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer
 from userapp.models.user import User
 from userapp.serializers.user import UserDetailSerializer
 from permission import isCompanyOwnerAndAllowAll
 
-class CompanyListView(APIView):
+class CompanyListView(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = CompanySerializer
 
@@ -21,7 +21,7 @@ class CompanyListView(APIView):
         }
         return Response(data, status=200)
 
-class CompanyDetailView(APIView):
+class CompanyDetailView(generics.GenericAPIView):
     serializer_class = CompanySerializer
     permission_classes = (AllowAny, )
 
@@ -68,7 +68,7 @@ class CompanyDetailView(APIView):
             }
             return Response(data, status=404)
 
-class CompanyCreateView(APIView):
+class CompanyCreateView(generics.GenericAPIView):
     serializer_class = CompanySerializer
     permission_classes = (isCompanyOwnerAndAllowAll, )
 
@@ -97,7 +97,7 @@ class CompanyCreateView(APIView):
             return Response(data, status=403)
 
 
-class CompanyFavouriteView(APIView):
+class CompanyFavouriteView(generics.GenericAPIView):
     serializer_class = FavouriteCompanySerializer
 
     def get(self, request, company_id):
@@ -142,7 +142,7 @@ class CompanyFavouriteView(APIView):
         }
         return Response(data, status=400)
 
-class CompanyUserListView(APIView):
+class CompanyUserListView(generics.GenericAPIView):
     # permission_classes = () set only company owner and manager to see detail and to admin as well
 
     def get(self, request, company_id):
@@ -168,7 +168,7 @@ class CompanyUserListView(APIView):
             }
             return Response(data, status=404)
 
-class PartnerListView(APIView):
+class PartnerListView(generics.GenericAPIView):
     permission_classes = (AllowAny, )
     serializer_class = CompanySerializer
 

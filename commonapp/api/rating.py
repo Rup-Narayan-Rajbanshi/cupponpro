@@ -1,10 +1,10 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.serializers.rating import RatingSerializer
 from commonapp.models.rating import Rating
 from permission import isUser
 
-class CompanyRatingListView(APIView):
+class CompanyRatingListView(generics.GenericAPIView):
     permission_classes = (isUser, )
     serializer_class = RatingSerializer
 
@@ -46,7 +46,7 @@ class CompanyRatingListView(APIView):
             }
             return Response(data, status=400)
 
-class CompanyRatingDetailView(APIView):
+class CompanyRatingDetailView(generics.GenericAPIView):
     permission_classes = (isUser, )
     serializer_class = RatingSerializer
 

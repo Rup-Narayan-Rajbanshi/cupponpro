@@ -1,11 +1,11 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.models.company import Company, CompanyUser
 from commonapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
-class CompanyBulkQuantityListView(APIView):
+class CompanyBulkQuantityListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = BulkQuantitySerializer
 
@@ -62,7 +62,7 @@ class CompanyBulkQuantityListView(APIView):
             }
             return Response(data, status=403)
 
-class CompanyBulkQuantityDetailView(APIView):
+class CompanyBulkQuantityDetailView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = BulkQuantitySerializer
 
@@ -180,7 +180,7 @@ class CompanyBulkQuantityDetailView(APIView):
             }
             return Response(data, status=404)
 
-class CompanyProductListView(APIView):
+class CompanyProductListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = ProductSerializer
 
@@ -215,7 +215,7 @@ class CompanyProductListView(APIView):
         }
         return Response(data, status=403)
 
-class CompanyProductDetailView(APIView):
+class CompanyProductDetailView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = ProductSerializer
 
@@ -311,7 +311,7 @@ class CompanyProductDetailView(APIView):
             }
             return Response(data, status=404)
 
-class ProductCategoryListView(APIView):
+class ProductCategoryListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
     serializer_class = ProductCategorySerializer
 
@@ -325,7 +325,7 @@ class ProductCategoryListView(APIView):
         }
         return Response(data, status=200)
 
-class CompanyProductCategoryListView(APIView):
+class CompanyProductCategoryListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
     serializer_class = ProductCategorySerializer
 

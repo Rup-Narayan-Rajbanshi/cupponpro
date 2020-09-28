@@ -1,11 +1,11 @@
 from django.core.paginator import Paginator
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from articleapp.serializers.news import NewsArticleSerializer
 from articleapp.models.news import NewsArticle
 from permission import isAdminOrReadOnly
 
-class NewsArticleListView(APIView):
+class NewsArticleListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
     serializer_class = NewsArticleSerializer
 
@@ -37,7 +37,7 @@ class NewsArticleListView(APIView):
             }
             return Response(data, status=400)
 
-class NewsArticleDetailView(APIView):
+class NewsArticleDetailView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
     serializer_class = NewsArticleSerializer
 

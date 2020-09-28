@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
@@ -9,7 +9,7 @@ from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.company import Company
 from commonapp.serializers.coupon import CouponSerializer, VoucherSerializer
 
-class CouponTypeListView(APIView):
+class CouponTypeListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
 
     def get(self, request):
@@ -29,7 +29,7 @@ class CouponTypeListView(APIView):
         }
         return Response(data, status=200)
 
-class CouponListView(APIView):
+class CouponListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isAdminOrReadOnly]
     serializer_class = CouponSerializer
 
@@ -58,7 +58,7 @@ class CouponListView(APIView):
         }
         return Response(data, status=400)
 
-class CouponDetailView(APIView):
+class CouponDetailView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isAdminOrReadOnly]
     serializer_class = CouponSerializer
 
@@ -127,7 +127,7 @@ class CouponDetailView(APIView):
             }
             return Response(data, status=404)
 
-class CategoryCouponListView(APIView):
+class CategoryCouponListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
     serializer_class = CouponSerializer
 
@@ -158,7 +158,7 @@ class CategoryCouponListView(APIView):
             }
             return Response(data, status=404)
 
-class VoucherListView(APIView):
+class VoucherListView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = VoucherSerializer
 
