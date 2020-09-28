@@ -1,3 +1,4 @@
+import os
 import shortuuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import RegexValidator
@@ -6,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from commonapp.models.address import Address
 from commonapp.models.image import Image
 from commonapp.models.category import Category, SubCategory
+from django.dispatch import receiver
 
 from userapp.models import User
 
@@ -39,6 +41,37 @@ class Company(Address):
         if not self.id:
             self.key = shortuuid.ShortUUID().random(length=8)
         return super(Company, self).save(*args, **kwargs)
+
+@receiver(models.signals.post_delete, sender=Company)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes file from filesystem
+    when corresponding `MediaFile` object is deleted.
+    """
+    if instance.logo:
+        if os.path.isfile(instance.logo.path):
+            os.remove(instance.logo.path)
+
+@receiver(models.signals.pre_save, sender=User)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """
+    Deletes old file from filesystem
+    when corresponding `MediaFile` object is updated
+    with new file.
+    """
+    if not instance.pk:
+        return False
+    
+    try:
+        old_file = sender.objects.get(pk=instance.pk).logo
+    except sender.DoesNotExist:
+        return False
+    
+    new_file = instance.logo
+    if old_file:
+        if not old_file == new_file:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
 class CompanyUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)

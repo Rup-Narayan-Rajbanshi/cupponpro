@@ -1,6 +1,8 @@
+import os
 import shortuuid
 from django.db import models
 from django.core.validators import FileExtensionValidator
+from django.dispatch import receiver
 
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -21,6 +23,73 @@ class Category(models.Model):
         if not self.id:
             self.token = shortuuid.ShortUUID().random(length=8)
         return super(Category, self).save(*args, **kwargs)
+
+
+@receiver(models.signals.post_delete, sender=Category)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes file from filesystem
+    when corresponding `MediaFile` object is defined.
+    """
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+    elif instance.icon:
+        if os.path.isfile(instance.icon.path):
+            os.remove(instance.icon.path)
+
+@receiver(models.signals.post_delete, sender=Category)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Delete file from filesystem
+    when corresponding `MediaFile` object is defined.
+    """    
+    if instance.icon:
+        if os.path.isfile(instance.icon.path):
+            os.remove(instance.icon.path)
+
+
+@receiver(models.signals.pre_save, sender=Category)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """
+    Deletes old file from filesystem
+    when corresponding `MediaFile` object is updated
+    with new file.
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = sender.objects.get(pk=instance.pk).image
+    except sender.DoesNotExist:
+        return False
+    
+    new_file = instance.image
+    if old_file:
+        if not old_file == new_file:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
+
+@receiver(models.signals.pre_save, sender=Category)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """
+    Deletes old file from filesystem
+    when corresponding `MediaFile` object is updated
+    with new file.
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = sender.objects.get(pk=instance.pk).icon
+    except sender.DoesNotExist:
+        return False
+    
+    new_file = instance.icon
+    if old_file:
+        if not old_file == new_file:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=15, unique=True)

@@ -1,7 +1,9 @@
+import os
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from commonapp.models.company import Company
 from commonapp.models.image import Image
+from django.dispatch import receiver
 
 class Document(models.Model):
     name = models.CharField(max_length=50)
@@ -15,3 +17,34 @@ class Document(models.Model):
 
     def __str__(self):
         return self.name
+
+@receiver(models.signals.post_delete, sender=Document)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes file from filesystem
+    when corresponding `MediaFile` object is deleted.
+    """
+    if instance.document:
+        if os.path.isfile(instance.document.path):
+            os.remove(instance.document.path)
+
+@receiver(models.signals.pre_save, sender=Document)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """
+    Deletes old file from filesystem
+    when corresponding `MediaFile` object is updated
+    with new file.
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = sender.objects.get(pk=instance.pk).document
+    except sender.DoesNotExist:
+        return False
+    
+    new_file = instance.document
+    if old_file:
+        if not old_file == new_file:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
