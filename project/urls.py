@@ -13,7 +13,7 @@ admin.site.index_title = "Welcome to WOMCS Admin Portal"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('api/v1/auth', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/v1/auth', include('rest_framework.urls', namespace='rest_framework')),
     path('api/v1/auth/login', obtain_jwt_token),
     path('api/v1/auth/token/refresh', refresh_jwt_token),
     path('api/v1/auth/token/verify', verify_jwt_token),
