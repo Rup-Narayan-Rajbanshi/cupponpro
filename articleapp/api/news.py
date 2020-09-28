@@ -10,9 +10,10 @@ class NewsArticleListView(generics.GenericAPIView):
     serializer_class = NewsArticleSerializer
 
     def get(self, request):
-        news_obj = NewsArticle.objects.all().order_by('-id')
-        paginator = Paginator(news_obj, 5)
+        page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
+        news_obj = NewsArticle.objects.all().order_by('-id')
+        paginator = Paginator(news_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = NewsArticleSerializer(page_obj, many=True, context={'request':request})
         data = {

@@ -135,8 +135,9 @@ class CategoryCouponListView(generics.GenericAPIView):
         company_obj = Company.objects.filter(category=category_id)
         if company_obj:
             coupon_obj = Coupon.objects.filter(company__id__in=company_obj).order_by('-id')
-            paginator = Paginator(coupon_obj, 15)
+            page_size = request.GET.get('size', 10)
             page_number = request.GET.get('page')
+            paginator = Paginator(coupon_obj, page_size)
             page_obj = paginator.get_page(page_number)
             if coupon_obj:
                 serializer = CouponSerializer(page_obj, many=True, context={"request":request})
