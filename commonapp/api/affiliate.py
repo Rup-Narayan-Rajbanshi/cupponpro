@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.models.affiliate import AffiliateLink
@@ -9,9 +10,17 @@ class AffiliateLinkListView(generics.GenericAPIView):
     serializer_class = AffiliateLinkSerializer
 
     def get(self, request):
+        """
+        An endpoint for listing all the affiliate links. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
         affiliate_link_obj = AffiliateLink.objects.all().order_by('-id')
-        serializer = AffiliateLinkSerializer(affiliate_link_obj, many=True,\
-        context={"request": request})
+        paginator = Paginator(affiliate_link_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = AffiliateLinkSerializer(page_obj, many=True,\
+            context={"request": request})
         data = {
             'success': 1,
             'affiliate_link': serializer.data
@@ -19,6 +28,9 @@ class AffiliateLinkListView(generics.GenericAPIView):
         return Response(data, status=200)
 
     def post(self, request):
+        """
+        An endpoint for creating affiliate link.
+        """
         serializer = AffiliateLinkSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
@@ -39,6 +51,9 @@ class AffiliateLinkDetailView(generics.GenericAPIView):
     serializer_class = AffiliateLinkSerializer
 
     def get(self, request, affiliate_link_id):
+        """
+        An endpoint for getting affiliate link detail.
+        """
         affiliate_link_obj = AffiliateLink.objects.filter(id=affiliate_link_id)
         if affiliate_link_obj:
             serializer = AffiliateLinkSerializer(affiliate_link_obj[0], context={"request": request})
@@ -55,6 +70,9 @@ class AffiliateLinkDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def put(self, request, affiliate_link_id):
+        """
+        An endpoint for updating affiliate link detail.
+        """
         affiliate_link_obj = AffiliateLink.objects.filter(id=affiliate_link_id)
         if affiliate_link_obj:
             serializer = AffiliateLinkSerializer(instance=affiliate_link_obj[0], data=request.data,\
@@ -82,6 +100,9 @@ class AffiliateLinkDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def delete(self, request, affiliate_link_id):
+        """
+        An endpoint for deleting affiliate link.
+        """
         affiliate_link_obj = AffiliateLink.objects.filter(id=affiliate_link_id)
         if affiliate_link_obj:
             try:
@@ -108,6 +129,9 @@ class AffiliateLinkCountView(generics.GenericAPIView):
     serializer_class = AffiliateLinkSerializer
 
     def get(self, request, affiliate_link_id):
+        """
+        An endpoint for making increment in affiliate link click count.
+        """
         affiliate_link_obj = AffiliateLink.objects.filter(id=affiliate_link_id)
         if affiliate_link_obj:
             affiliate_link_obj[0].add_count()

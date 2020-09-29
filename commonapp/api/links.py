@@ -10,6 +10,9 @@ class SocialLinkListView(generics.GenericAPIView):
     serializer_class = SocialLinkSerializer
 
     def get(self, request, company_id):
+        """
+        An endpoint for listing all the vendor's social links.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             # check if requesting user belongs to company
@@ -40,6 +43,9 @@ class SocialLinkListView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def post(self, request, company_id):
+        """
+        An endpoint for creating vendor's social link.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             # check if requesting user belongs to company
@@ -80,6 +86,9 @@ class SocialLinkDetailView(generics.GenericAPIView):
     serializer_class = SocialLinkSerializer
 
     def get(self, request, company_id, link_id):
+        """
+        An endpoint for getting vendor's social link detail.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             social_link_obj = SocialLink.objects.filter(id=link_id, company=company_obj[0])
@@ -104,6 +113,9 @@ class SocialLinkDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def put(self, request, company_id, link_id):
+        """
+        An endpoint for updating vendor's social link detail.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             social_link_obj = SocialLink.objects.filter(id=link_id, company=company_obj[0])

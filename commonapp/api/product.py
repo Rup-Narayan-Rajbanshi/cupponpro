@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.models.company import Company, CompanyUser
@@ -10,6 +11,10 @@ class CompanyBulkQuantityListView(generics.GenericAPIView):
     serializer_class = BulkQuantitySerializer
 
     def get(self, request, company_id):
+        """
+        An endpoint for listing all the vendor's bulk quantities. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             # check if requesting user belongs to company
@@ -18,8 +23,12 @@ class CompanyBulkQuantityListView(generics.GenericAPIView):
             else:
                 company_user_obj = False
             if company_user_obj:
+                page_size = request.GET.get('size', 10)
+                page_number = request.GET.get('page')
                 bulk_quantity_obj = BulkQuantity.objects.filter(company=company_obj[0]).order_by('-id')
-                serializer = BulkQuantitySerializer(bulk_quantity_obj, many=True,\
+                paginator = Paginator(bulk_quantity_obj, page_size)
+                page_obj = paginator.get_page(page_number)
+                serializer = BulkQuantitySerializer(page_obj, many=True,\
                     context={"request":request})
                 data = {
                     'success' : 1,
@@ -40,6 +49,9 @@ class CompanyBulkQuantityListView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def post(self, request, company_id):
+        """
+        An endpoint for creating vendor's bulk quantity.
+        """
         if company_id == int(request.data['company']):
             serializer = BulkQuantitySerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
@@ -67,6 +79,9 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
     serializer_class = BulkQuantitySerializer
 
     def get(self, request, company_id, bulk_quantity_id):
+        """
+        An endpoint for getting vendor's bulk quantity detail.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             if request.user and request.user.is_authenticated:
@@ -103,6 +118,9 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def put(self, request, company_id, bulk_quantity_id):
+        """
+        An endpoint for updating vendor's bulk quantity detail.
+        """
         if company_id == int(request.data['company']):
             company_obj = Company.objects.filter(id=company_id)
             if company_obj:
@@ -140,6 +158,9 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
         return Response(data, status=403)
 
     def delete(self, request, company_id, bulk_quantity_id):
+        """
+        An endpoint for deleting vendor's bulk quantity.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             if request.user and request.user.is_authenticated:
@@ -185,8 +206,16 @@ class CompanyProductListView(generics.GenericAPIView):
     serializer_class = ProductSerializer
 
     def get(self, request, company_id):
+        """
+        An endpoint for listing all the vendor's product. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
         product_obj = Product.objects.filter(company=company_id).order_by('-id')
-        serializer = ProductSerializer(product_obj, many=True,\
+        paginator = Paginator(product_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = ProductSerializer(page_obj, many=True,\
             context={"request":request})
         data = {
             'success' : 1,
@@ -195,6 +224,9 @@ class CompanyProductListView(generics.GenericAPIView):
         return Response(data, status=200)
 
     def post(self, request, company_id):
+        """
+        An endpoint for creating vendor's product.
+        """
         if company_id == int(request.data['company']):
             serializer = ProductSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
@@ -220,6 +252,9 @@ class CompanyProductDetailView(generics.GenericAPIView):
     serializer_class = ProductSerializer
 
     def get(self, request, company_id, product_id):
+        """
+        An endpoint for getting vendor's product detail.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             product_obj = Product.objects.filter(id=product_id, company=company_obj[0]).order_by('-id')
@@ -244,6 +279,9 @@ class CompanyProductDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def put(self, request, company_id, product_id):
+        """
+        An endpoint for updating vendor's product detail.
+        """
         if company_id == int(request.data['company']):
             company_obj = Company.objects.filter(id=company_id)
             if company_obj:
@@ -281,6 +319,9 @@ class CompanyProductDetailView(generics.GenericAPIView):
         return Response(data, status=403)
 
     def delete(self, request, company_id, product_id):
+        """
+        An endpoint for deleting vendor's product.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             product_obj = Product.objects.filter(id=product_id, company=company_obj[0])
@@ -316,8 +357,16 @@ class ProductCategoryListView(generics.GenericAPIView):
     serializer_class = ProductCategorySerializer
 
     def get(self, request):
+        """
+        An endpoint for listing all the product categories. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
         product_category_obj = ProductCategory.objects.all()
-        serializer = ProductCategorySerializer(product_category_obj, many=True,\
+        paginator = Paginator(product_category_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = ProductCategorySerializer(page_obj, many=True,\
         context={"request": request})
         data = {
             'success': 1,
@@ -330,10 +379,18 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
     serializer_class = ProductCategorySerializer
 
     def get(self, request, company_id):
+        """
+        An endpoint for listing all the vendor's product categories. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
+            page_size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
             product_category_obj = ProductCategory.objects.filter(company=company_obj[0]).order_by('-id')
-            serializer = ProductCategorySerializer(product_category_obj, many=True,\
+            paginator = Paginator(product_category_obj, page_size)
+            page_obj = paginator.get_page(page_number)
+            serializer = ProductCategorySerializer(page_obj, many=True,\
             context={"request": request})
             data = {
                 'success': 1,
@@ -349,6 +406,9 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
 
 
     def post(self, request):
+        """
+        An endpoint for creating vendor's product category.
+        """
         serializer = ProductCategorySerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()

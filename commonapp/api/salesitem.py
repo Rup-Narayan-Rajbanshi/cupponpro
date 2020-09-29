@@ -10,6 +10,9 @@ class SalesItemListView(generics.GenericAPIView):
     serializer_class = SalesItemSerializer
 
     def get(self, request, bill_id):
+        """
+        An endpoint for listing all the salesitem of the bill.
+        """
         sales_item_obj = SalesItem.objects.filter(bill__id=bill_id)
         if sales_item_obj:
             serializer = SalesItemSerializer(sales_item_obj[0], context={'request':request})
@@ -26,6 +29,9 @@ class SalesItemListView(generics.GenericAPIView):
             return Response(data, status=400)
     
     def post(self, request, bill_id):
+        """
+        An endpoint for creating salesitem of the bill.
+        """
         if int(request.data['bill']) == bill_id:
             serializer = SalesItemSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
@@ -52,6 +58,9 @@ class SalesItemDetailView(generics.GenericAPIView):
     serializer_class = SalesItemSerializer
 
     def get(self, request, item_id):
+        """
+        An endpoint for getting salesitem detail.
+        """
         item_obj = SalesItem.objects.filter(id=item_id)
         if item_obj:
             serializer = Serializer(item_obj[0], context={'request':request})
@@ -68,6 +77,9 @@ class SalesItemDetailView(generics.GenericAPIView):
             return Response(data, status=404)
     
     def delete(self, request, item_id):
+        """
+        An endpoint for deleting salesitem.
+        """
         item_obj = SalesItem.objects.filter(id=item_id)
         if item_obj:
             try:

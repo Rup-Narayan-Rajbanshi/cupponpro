@@ -10,6 +10,9 @@ class CompanyDocumentListView(generics.GenericAPIView):
     serializer_class = DocumentSerializer
 
     def get(self, request, company_id):
+        """
+        An endpoint for listing all the vendor's documents.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             document_obj = Document.objects.filter(company=company_id).order_by('-id')
@@ -27,6 +30,9 @@ class CompanyDocumentListView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def post(self, request, company_id):
+        """
+        An endpoint for creating vendor's document.
+        """
         if company_id == int(request.data['company']):
             serializer = DocumentSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
@@ -54,6 +60,9 @@ class CompanyDocumentDetailView(generics.GenericAPIView):
     serializer_class = DocumentSerializer
 
     def get(self, request, company_id, document_id):
+        """
+        An endpoint for getting vendor's document detail.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             document_obj = Document.objects.filter(id=document_id, company=company_id)
@@ -77,6 +86,9 @@ class CompanyDocumentDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def put(self, request, company_id, document_id):
+        """
+        An endpoint for updating vendor's document detail.
+        """
         if company_id == int(request.data['company']):
             company_obj = Company.objects.filter(id=company_id)
             if company_obj:
@@ -118,6 +130,9 @@ class CompanyDocumentDetailView(generics.GenericAPIView):
             return Response(data, status=403)
 
     def delete(self, request, company_id, document_id):
+        """
+        An endpoint for deleting vendor's document.
+        """
         document_obj = Document.objects.filter(id=document_id, company=company_id)
         if document_obj:
             try:

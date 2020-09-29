@@ -13,6 +13,9 @@ class CouponTypeListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
 
     def get(self, request):
+        """
+        An endpoint for listing all coupon types.
+        """
         coupon_type = {
             'category': 'On all items',
             'productcategory': 'On item type',
@@ -34,8 +37,16 @@ class CouponListView(generics.GenericAPIView):
     serializer_class = CouponSerializer
 
     def get(self, request):
+        """
+        An endpoint for listing all the coupons. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
         coupon_obj = Coupon.objects.all().order_by('-id')
-        serializer = CouponSerializer(coupon_obj, many=True,\
+        paginator = Paginator(coupon_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = CouponSerializer(page_obj, many=True,\
             context={"request":request})
         data = {
             'success' : 1,
@@ -44,6 +55,9 @@ class CouponListView(generics.GenericAPIView):
         return Response(data, status=200)
 
     def post(self, request):
+        """
+        An endpoint for creating coupon.
+        """
         serializer = CouponSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
@@ -63,6 +77,9 @@ class CouponDetailView(generics.GenericAPIView):
     serializer_class = CouponSerializer
 
     def get(self, request, coupon_id):
+        """
+        An endpoint for getting coupon detail.
+        """
         if Coupon.objects.filter(id=coupon_id):
             coupon_obj = Coupon.objects.get(id=coupon_id)
             serializer = CouponSerializer(coupon_obj,\
@@ -80,6 +97,9 @@ class CouponDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def put(self, request, coupon_id):
+        """
+        An endpoint for updating coupon detail.
+        """
         coupon_obj = Coupon.objects.filter(id=coupon_id)
         if coupon_obj:   
             serializer = CouponSerializer(instance=coupon_obj[0],\
@@ -105,6 +125,9 @@ class CouponDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def delete(self, request, coupon_id):
+        """
+        An endpoint for deleting coupon.
+        """
         coupon_obj = Coupon.objects.filter(id=coupon_id)            
         if coupon_obj:
             try:
@@ -132,6 +155,10 @@ class CategoryCouponListView(generics.GenericAPIView):
     serializer_class = CouponSerializer
 
     def get(self, request, category_id):
+        """
+        An endpoint for listing all the coupons according to category. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
         company_obj = Company.objects.filter(category=category_id)
         if company_obj:
             coupon_obj = Coupon.objects.filter(company__id__in=company_obj).order_by('-id')
@@ -164,8 +191,16 @@ class VoucherListView(generics.GenericAPIView):
     serializer_class = VoucherSerializer
 
     def get(self, request):
+        """
+        An endpoint for listing all the user's vouchers. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
         voucher_obj = Voucher.objects.filter(user=request.user.id).order_by('-id')
-        serializer = VoucherSerializer(voucher_obj, many=True, context={'request':request})
+        paginator = Paginator(voucher_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = VoucherSerializer(page_obj, many=True, context={'request':request})
         data = {
             'success': 1,
             'voucher': serializer.data
@@ -173,6 +208,9 @@ class VoucherListView(generics.GenericAPIView):
         return Response(data, status=200)
 
     def post(self, request):
+        """
+        An endpoint for creating user's voucher.
+        """
         if request.user.id == int(request.data['user']):
             voucher_obj = Voucher.objects.filter(user=request.user.id, coupon=request.data['coupon'])
             if not voucher_obj:
@@ -202,3 +240,4 @@ class VoucherListView(generics.GenericAPIView):
                 'message': "You do not have permission to generate voucher."
             }
             return Response(data, status=403)
+            

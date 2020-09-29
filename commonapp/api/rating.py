@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.serializers.rating import RatingSerializer
@@ -9,9 +10,17 @@ class CompanyRatingListView(generics.GenericAPIView):
     serializer_class = RatingSerializer
 
     def get(self, request, company_id):
+        """
+        An endpoint for listing all the vendor's ratings. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
         rating_obj = Rating.objects.filter(company=company_id).order_by('-id')
         if rating_obj:
-            serializer = RatingSerializer(rating_obj, many=True,\
+            page_size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(rating_obj, page_size)
+            page_obj = paginator.get_page(page_number)
+            serializer = RatingSerializer(page_obj, many=True,\
                 context={'request':request})
             data = {
                 'success' : 1,
@@ -25,6 +34,9 @@ class CompanyRatingListView(generics.GenericAPIView):
         return Response(data, status=400)
 
     def post(self, request, company_id):
+        """
+        An endpoint for creating vendor's rating.
+        """
         if int(request.data['company']) == company_id:
             serializer = RatingSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
@@ -51,6 +63,9 @@ class CompanyRatingDetailView(generics.GenericAPIView):
     serializer_class = RatingSerializer
 
     def get(self, request, company_id, rating_id):
+        """
+        An endpoint for getting vendor's rating detail.
+        """
         rating_obj = Rating.objects.filter(id=rating_id, company=company_id)
         if rating_obj:
             serializer = RatingSerializer(rating_obj[0], context={'request':request})
@@ -66,6 +81,9 @@ class CompanyRatingDetailView(generics.GenericAPIView):
         return Response(data, status=404)
 
     def put(self, request, company_id, rating_id):
+        """
+        An endpoint for updating vendor's rating detail.
+        """
         if int(request.data['company']) == company_id:
             rating_obj = Rating.objects.filter(id=rating_id, company=company_id)
             if rating_obj:
@@ -96,6 +114,9 @@ class CompanyRatingDetailView(generics.GenericAPIView):
             return Response(data, status=400)
 
     def delete(self, request, company_id, rating_id):
+        """
+        An endpoint for deleting vendor's rating.
+        """
         rating_obj = Rating.objects.filter(id=rating_id, company=company_id)
         if rating_obj:
             try:

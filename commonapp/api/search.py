@@ -8,6 +8,9 @@ class TopBarSearchView(generics.GenericAPIView):
     serializer_class = TopBarSearchSerializer
 
     def post(self, request):
+        """
+        An endpoint for topbar searching.
+        """
         # get data
         company_obj_by_name = Company.objects.filter(name__icontains=request.data['search_text'])
         company_obj_by_location = Company.objects.filter(address__icontains=request.data['search_text'])

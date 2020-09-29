@@ -9,6 +9,9 @@ class CompanyFacilityListView(generics.GenericAPIView):
     serializer_class = FacilitySerializer
 
     def get(self, request, company_id):
+        """
+        An endpoint for listing all the vendor's facility.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             facility_obj = Facility.objects.filter(company=company_obj[0]).order_by('-id')
@@ -33,6 +36,9 @@ class CompanyFacilityListView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def post(self, request, company_id):
+        """
+        An endpoint for creating vendor's facility.
+        """
         if company_id == int(request.data['company']):
             serializer = FacilitySerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
@@ -60,6 +66,9 @@ class CompanyFacilityDetailView(generics.GenericAPIView):
     serializer_class = FacilitySerializer
 
     def get(self, request, company_id, facility_id):
+        """
+        An endpoint for getting vendor's facility detail.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             facility_obj = Facility.objects.filter(id=facility_id, company=company_obj[0])
@@ -84,6 +93,9 @@ class CompanyFacilityDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
     def put(self, request, company_id, facility_id):
+        """
+        An endpoint for updating vendor's facility detail.
+        """
         if company_id == int(request.data['company']):
             company_obj = Company.objects.filter(id=company_id)
             if company_obj:
@@ -123,6 +135,9 @@ class CompanyFacilityDetailView(generics.GenericAPIView):
             return Response(data, status=403)
 
     def delete(self, request, company_id, facility_id):
+        """
+        An endpoint for deleting vendor's facility.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             facility_obj = Facility.objects.filter(id=facility_id, company=company_obj[0])
