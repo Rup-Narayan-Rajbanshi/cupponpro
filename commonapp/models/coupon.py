@@ -1,3 +1,4 @@
+import os
 import shortuuid
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -12,6 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from userapp.models.user import User
+from django.dispatch import receiver
 
 class Coupon(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
@@ -37,6 +39,7 @@ class Coupon(models.Model):
         if not self.token:
             self.token = shortuuid.ShortUUID().random(length=8)
         super(Coupon, self).save(*args, **kwargs)
+
 
 class Voucher(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.PROTECT)
