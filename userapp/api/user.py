@@ -418,7 +418,7 @@ class CreateStaffUserView(generics.GenericAPIView):
             }
             return Response(data, status=404)
 
-class LoginView(generics.GenericAPIView):
+class LoginUserDetailView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = (IsAuthenticated, )
 
@@ -437,6 +437,9 @@ class LoginView(generics.GenericAPIView):
                 'user_type': request.user.group.name,
                 'user': serializer.data
             }
+            company_user_obj = CompanyUser.objects.filter(user=request.user.id)
+            if company_user_obj:
+                data['company'] = company_user_obj[0].company.id
             return Response(data, status=200)
         else:
             data = {

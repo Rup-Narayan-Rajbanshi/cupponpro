@@ -2,7 +2,7 @@
 from django.urls import path
 from userapp.api.user import UserListView, UpdateUser, CreateUserView,\
 	CreateStaffUserView, ChangePasswordView, GeneratePasswordResetTokenView,\
-	GroupListView, ResetPasswordView, LoginView, CompanyGroupListView,\
+	GroupListView, ResetPasswordView, LoginUserDetailView, CompanyGroupListView,\
 	UserGroupDetailView, SignupTokenView
 from userapp.api.login import LoginJWTToken
 
@@ -25,7 +25,7 @@ urlpatterns = [
 	path('user/forgotpassword', GeneratePasswordResetTokenView.as_view(), name='forgot_password'),
 	path('user/resetpassword', ResetPasswordView.as_view(), name='reset_password'),
 	# login
-	path('userinfo', LoginView.as_view(), name='user_info'),
+	path('userinfo', LoginUserDetailView.as_view(), name='user_info'),
 	# signup
 	path('signuptoken', SignupTokenView.as_view(), name='signup_token'),
 ]
