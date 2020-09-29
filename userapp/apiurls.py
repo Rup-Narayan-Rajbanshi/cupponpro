@@ -3,7 +3,7 @@ from django.urls import path
 from userapp.api.user import UserListView, UpdateUser, CreateUserView,\
 	CreateStaffUserView, ChangePasswordView, GeneratePasswordResetTokenView,\
 	GroupListView, ResetPasswordView, LoginView, CompanyGroupListView,\
-	UserGroupDetailView, GenerateLoginTokenView, SignupTokenView
+	UserGroupDetailView, SignupTokenView
 from userapp.api.login import LoginJWTToken
 
 # from userapp.api.staticpage import StaticPageView
@@ -25,7 +25,6 @@ urlpatterns = [
 	path('user/forgotpassword', GeneratePasswordResetTokenView.as_view(), name='forgot_password'),
 	path('user/resetpassword', ResetPasswordView.as_view(), name='reset_password'),
 	# login
-	path('logintoken', GenerateLoginTokenView.as_view(), name='user_login_token'),
 	path('userinfo', LoginView.as_view(), name='user_info'),
 	# signup
 	path('signuptoken', SignupTokenView.as_view(), name='signup_token'),

@@ -84,18 +84,6 @@ class PasswordResetTokenSerializer(serializers.Serializer):
         user = User.objects.get(email=validated_data.get('email'))
         return PasswordResetToken.objects.create(user=user)
 
-class LoginTokenSerializer(serializers.Serializer):
-    """
-    Serializer for login token generation endpoint.
-    """
-    model = LoginToken
-
-    email = serializers.CharField(required=True)
-
-    def create(self, validated_data):
-        user = User.objects.get(email=validated_data.get('email'))
-        return LoginToken.objects.create(user=user)
-
 class ResetPasswordSerializer(serializers.Serializer):  
     """
     Serializer for password change endpoint.

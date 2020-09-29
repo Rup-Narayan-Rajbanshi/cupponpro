@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
-    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, LoginTokenSerializer, LoginSerializer,\
+    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, LoginSerializer,\
     SignupTokenSerializer
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
@@ -415,47 +415,6 @@ class CreateStaffUserView(generics.GenericAPIView):
             data = {
                 'success': 0,
                 'message': "Company doesn't exist."
-            }
-            return Response(data, status=404)
-
-class GenerateLoginTokenView(generics.GenericAPIView):
-    serializer_class = LoginTokenSerializer
-    permission_classes = (IsAuthenticated, )
-
-    def post(self, request):
-        """
-        An endpoint for generating login token.
-        """
-        if 'email' in request.data:
-            user = User.objects.filter(email=request.data['email'])
-        else:
-            data = {
-                'success': 0,
-                'message': 'Enter email field.'
-            }
-            return Response(data, status=400)
-        if user:
-            login_token_obj = LoginToken.objects.filter(user=user[0].id, is_used=False)
-            for obj in login_token_obj:
-                obj.is_used = True
-                obj.save()
-            serializer = LoginTokenSerializer(data=request.data, context={'request':request})
-            if serializer.is_valid():
-                serializer.save()
-                data = {
-                    'success': 1,
-                    'login_token': "Login token sent."
-                }
-                return Response(data, status=200)
-            data = {
-                'success': 0,
-                'message': serializer.errors
-            }
-            return Response(data, status=400)
-        else:
-            data = {
-                'success': 0,
-                'message': "Email doesn't exist."
             }
             return Response(data, status=404)
 
