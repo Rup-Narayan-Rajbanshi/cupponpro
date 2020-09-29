@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.contrib.auth.models import Group
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -15,6 +16,9 @@ class GroupListView(generics.GenericAPIView):
     permission_classes = (isAdmin, )
 
     def get(self, request):
+        """
+        An endpoint for listing all the groups.
+        """
         group_obj = Group.objects.all()
         serializer = GroupSerializer(group_obj, many=True, context={'request':request})
         data = {
@@ -28,6 +32,9 @@ class CompanyGroupListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
 
     def get(self, request):
+        """
+        An endpoint for listing all the groups associated with vendor.
+        """
         company_group = ['owner', 'manager', 'sales']
         group_obj = Group.objects.filter(name__in=company_group)
         serializer = GroupSerializer(group_obj, many=True, context={'request':request})
@@ -42,6 +49,9 @@ class UserGroupDetailView(generics.GenericAPIView):
     serializer_class = UserGroupSerializer
 
     def get(self, request, company_id, user_id):
+        """
+        An endpoint for getting vendor user's group.
+        """
         company_user_obj = CompanyUser.objects.filter(user=user_id, company=company_id)
         if company_user_obj:
             user_obj = User.objects.filter(id=user_id)
@@ -59,6 +69,9 @@ class UserGroupDetailView(generics.GenericAPIView):
             return Response(data, status=404)
     
     def put(self, request, company_id, user_id):
+        """
+        An endpoint for changing vendor user's group.
+        """
         group_modify_access = {'owner': ['manager', 'sales'], 'manager': ['sales']}
         group_name = Group.objects.get(id=request.data['group']).name
         if group_name in group_modify_access[request.user.group.name]:
@@ -93,15 +106,20 @@ class UserGroupDetailView(generics.GenericAPIView):
             return Response(data, status=400)     
 
 class UserListView(generics.GenericAPIView):
-    """
-    An endpoint for getting all user or create new user.
-    """
     serializer_class = UserSerializer
 
     def get(self, request):
+        """
+        An endpoint for listing all the users. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
         if request.user.admin:
+            page_size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
             user_obj = User.objects.all().order_by('-id')
-            serializer = UserSerializer(user_obj, many=True,\
+            paginator = Paginator(user_obj, page_size)
+            page_obj = paginator.get_page(page_number)
+            serializer = UserSerializer(page_obj, many=True,\
                 context={"request": request})
             data = {
                 'success': 1,
@@ -115,12 +133,12 @@ class UserListView(generics.GenericAPIView):
         return Response(data, status=403)
 
 class UpdateUser(generics.GenericAPIView):
-    """
-    An endpoint for get, update or delete user info.
-    """
     serializer_class = UserDetailSerializer
 
     def get(self, request, user_id):
+        """
+        An endpoint for getting user detail.
+        """
         if User.objects.filter(id=user_id):
             user_obj = User.objects.get(id=user_id)
             serializer = UserSerializer(user_obj,\
@@ -137,6 +155,9 @@ class UpdateUser(generics.GenericAPIView):
         return Response(data, status=404)
 
     def put(self, request, user_id):
+        """
+        An endpoint for updating detail.
+        """
         if User.objects.filter(id=user_id):
             user_obj = User.objects.get(id=user_id)
             serializer = UserSerializer(instance=user_obj,\
@@ -162,6 +183,9 @@ class UpdateUser(generics.GenericAPIView):
         return Response(data, status=404)
 
     def delete(self, request, user_id):
+        """
+        An endpoint for deleting user.
+        """
         if request.user.admin:
             if User.objects.filter(id=user_id):
                 user_obj = User.objects.get(id=user_id)
@@ -183,9 +207,6 @@ class UpdateUser(generics.GenericAPIView):
         return Response(data, status=403)
 
 class ChangePasswordView(generics.UpdateAPIView):
-    """
-    An endpoint for changing password.
-    """
     serializer_class = ChangePasswordSerializer
     model = User
 
@@ -194,6 +215,9 @@ class ChangePasswordView(generics.UpdateAPIView):
         return obj
 
     def put(self, request, *args, **kwargs):
+        """
+        An endpoint for changing user's password.
+        """
         self.object = self.get_object()
         serializer = self.get_serializer(data=request.data, context={'request':request})
 
@@ -205,7 +229,7 @@ class ChangePasswordView(generics.UpdateAPIView):
                     'message': "Old password is not correct.",
                 }
                 return Response(data, status=400)
-            # set_password also hashes the password that the user will get
+            # set_password also hashes the password that the user entered
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()
             data = {
@@ -220,13 +244,13 @@ class ChangePasswordView(generics.UpdateAPIView):
         return Response(data, status=400)
 
 class GeneratePasswordResetTokenView(generics.GenericAPIView):
-    """
-    An endpoint for generating password reset token.
-    """
     serializer_class = PasswordResetTokenSerializer
     permission_classes = (AllowAny, )
 
     def post(self, request):
+        """
+        An endpoint for generating password reset token.
+        """
         if 'email' in request.data:
             user = User.objects.filter(email=request.data['email'])
         else:
@@ -262,14 +286,14 @@ class GeneratePasswordResetTokenView(generics.GenericAPIView):
             return Response(data, status=404)
 
 class ResetPasswordView(generics.UpdateAPIView):
-    """
-    An endpoint for resetting password.
-    """
     serializer_class = ResetPasswordSerializer
     model = User
     permission_classes = (AllowAny, )
 
     def update(self, request, *args, **kwargs):
+        """
+        An endpoint for resetting user's password.
+        """
         serializer = self.get_serializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             # Check token exist
@@ -280,7 +304,7 @@ class ResetPasswordView(generics.UpdateAPIView):
                     'message': "Invalid token.",
                 }
                 return Response(data, status=400)
-            # set_password also hashes the password that the user will get
+            # set_password also hashes the password that the user entered
             user = User.objects.get(id=token_obj[0].user.id)
             user.set_password(serializer.data.get("new_password"))
             user.save()
@@ -302,6 +326,9 @@ class CreateUserView(generics.GenericAPIView):
     serializer_class = UserRegistrationSerializer
 
     def post(self, request):
+        """
+        An endpoint for user registration as normal user or vendor.
+        """
         serializer = UserRegistrationSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             if serializer.validated_data['password'] == serializer.validated_data['confirm_password']:
@@ -314,9 +341,9 @@ class CreateUserView(generics.GenericAPIView):
                     password=serializer.validated_data['password'],
                 )
                 if serializer.validated_data['is_user']:
-                    group, created = Group.objects.get_or_create(name='user')
+                    group, _ = Group.objects.get_or_create(name='user')
                 else:
-                    group, created = Group.objects.get_or_create(name='owner')
+                    group, _ = Group.objects.get_or_create(name='owner')
 
                 user_obj.group = group
                 user_obj.save()
@@ -343,6 +370,9 @@ class CreateStaffUserView(generics.GenericAPIView):
     serializer_class = CompanyUserRegistrationSerializer
 
     def post(self, request, company_id):
+        """
+        An endpoint for user registration as vendor's staff.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             serializer = CompanyUserRegistrationSerializer(data=request.data, context={'request':request})
@@ -357,9 +387,9 @@ class CreateStaffUserView(generics.GenericAPIView):
                         password=serializer.validated_data['password'],
                     )
                     if serializer.validated_data['is_manager']:
-                        group, created = Group.objects.get_or_create(name='manager')
+                        group, _ = Group.objects.get_or_create(name='manager')
                     else:
-                        group, created = Group.objects.get_or_create(name='sales')
+                        group, _ = Group.objects.get_or_create(name='sales')
 
                     user_obj.group = group
                     user_obj.save()
@@ -389,13 +419,13 @@ class CreateStaffUserView(generics.GenericAPIView):
             return Response(data, status=404)
 
 class GenerateLoginTokenView(generics.GenericAPIView):
-    """
-    An endpoint for generating login token.
-    """
     serializer_class = LoginTokenSerializer
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
+        """
+        An endpoint for generating login token.
+        """
         if 'email' in request.data:
             user = User.objects.filter(email=request.data['email'])
         else:
@@ -434,6 +464,9 @@ class LoginView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
+        """
+        An endpoint for getting user's detail after login.
+        """
         token = request.data['token']
         login_token_obj = LoginToken.objects.filter(token=token, user=request.user.id, is_used=False)
         if login_token_obj:
@@ -458,6 +491,9 @@ class SignupTokenView(generics.GenericAPIView):
     serializer_class = SignupTokenSerializer
 
     def get(self, request):
+        """
+        An endpoint for verifying signup token. Pass 'email' and 'phone_number' as query.
+        """
         email = request.GET.get('email', None)
         phone_number = request.GET.get('phone_number', None)
         if email and phone_number:
@@ -484,9 +520,17 @@ class SignupTokenView(generics.GenericAPIView):
             }
             return Response(data, status=400)
 
-
-
     def post(self, request):
+        """
+        An endpoint for generating signup token.
+        """
+        user_obj = User.objects.filter(email=request.data['email'], phone_number=request.data['phone_number'])
+        if user_obj:
+            data = {
+                'success': 0,
+                'message': "User already exists."
+            }
+            return Response(data, status=400)
         token_obj = SignupToken.objects.filter(email=request.data['email'], phone_number=request.data['phone_number'])
         if token_obj:
             for obj in token_obj:
