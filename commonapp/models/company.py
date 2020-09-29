@@ -52,7 +52,7 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         if os.path.isfile(instance.logo.path):
             os.remove(instance.logo.path)
 
-@receiver(models.signals.pre_save, sender=User)
+@receiver(models.signals.pre_save, sender=Company)
 def auto_delete_file_on_change(sender, instance, **kwargs):
     """
     Deletes old file from filesystem

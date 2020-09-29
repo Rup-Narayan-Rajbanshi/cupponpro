@@ -34,16 +34,6 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     if instance.image:
         if os.path.isfile(instance.image.path):
             os.remove(instance.image.path)
-    elif instance.icon:
-        if os.path.isfile(instance.icon.path):
-            os.remove(instance.icon.path)
-
-@receiver(models.signals.post_delete, sender=Category)
-def auto_delete_file_on_delete(sender, instance, **kwargs):
-    """
-    Delete file from filesystem
-    when corresponding `MediaFile` object is defined.
-    """    
     if instance.icon:
         if os.path.isfile(instance.icon.path):
             os.remove(instance.icon.path)
@@ -60,36 +50,27 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         return False
 
     try:
-        old_file = sender.objects.get(pk=instance.pk).image
+        old_image_file = sender.objects.get(pk=instance.pk).image
     except sender.DoesNotExist:
-        return False
-    
-    new_file = instance.image
-    if old_file:
-        if not old_file == new_file:
-            if os.path.isfile(old_file.path):
-                os.remove(old_file.path)
-
-@receiver(models.signals.pre_save, sender=Category)
-def auto_delete_file_on_change(sender, instance, **kwargs):
-    """
-    Deletes old file from filesystem
-    when corresponding `MediaFile` object is updated
-    with new file.
-    """
-    if not instance.pk:
         return False
 
     try:
-        old_file = sender.objects.get(pk=instance.pk).icon
+        old_icon_file = sender.objects.get(pk=instance.pk).icon
     except sender.DoesNotExist:
         return False
     
-    new_file = instance.icon
-    if old_file:
-        if not old_file == new_file:
-            if os.path.isfile(old_file.path):
-                os.remove(old_file.path)
+    new_image_file = instance.image
+    new_icon_file = instance.icon
+
+    if old_image_file:
+        if not old_image_file == new_image_file:
+            if os.path.isfile(old_image_file.path):
+                os.remove(old_image_file.path)
+
+    if old_icon_file:
+        if not old_icon_file == new_icon_file:
+            if os.path.isfile(old_icon_file.path):
+                os.remove(old_icon_file.path)
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=15, unique=True)
