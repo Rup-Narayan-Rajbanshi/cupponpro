@@ -10,6 +10,10 @@ class BannerListView(generics.GenericAPIView):
     serializer_class = BannerSerializer
 
     def get(self, request):
+        """
+        An endpoint for listing all the banners. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         banner_obj = Banner.objects.all().order_by('-id')
@@ -24,6 +28,9 @@ class BannerListView(generics.GenericAPIView):
         return Response(data, status=200)
 
     def post(self, request):
+        """
+        An endpoint for creating banner.
+        """
         serializer = BannerSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
@@ -44,6 +51,9 @@ class BannerUpdateView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
 
     def get(self, request, banner_id):
+        """
+        An endpoint for getting banner detail.
+        """
         banner_obj = Banner.objects.filter(id=banner_id)
         if banner_obj:
             serializer = BannerSerializer(banner_obj[0],\
@@ -60,6 +70,9 @@ class BannerUpdateView(generics.GenericAPIView):
         return Response(data, status=404)
 
     def put(self, request, banner_id):
+        """
+        An endpoint for updating banner detail.
+        """
         banner_obj = Banner.objects.filter(id=banner_id)
         if banner_obj:
             serializer = BannerSerializer(instance=banner_obj[0],\
@@ -85,6 +98,9 @@ class BannerUpdateView(generics.GenericAPIView):
         return Response(data, status=404)
 
     def delete(self, request, banner_id):
+        """
+        An endpoint for deleting banner.
+        """
         banner_obj = Banner.objects.filter(id=banner_id)
         if banner_obj:
             try:
