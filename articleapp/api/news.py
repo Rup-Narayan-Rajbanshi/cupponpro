@@ -10,6 +10,10 @@ class NewsArticleListView(generics.GenericAPIView):
     serializer_class = NewsArticleSerializer
 
     def get(self, request):
+        """
+        An endpoint for listing all the news. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         news_obj = NewsArticle.objects.all().order_by('-id')
@@ -23,6 +27,9 @@ class NewsArticleListView(generics.GenericAPIView):
         return Response(data, status=200)
 
     def post(self, request):
+        """
+        An endpoint for creating news.
+        """
         serializer = NewsArticleSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
@@ -43,6 +50,9 @@ class NewsArticleDetailView(generics.GenericAPIView):
     serializer_class = NewsArticleSerializer
 
     def get(self, request, news_id):
+        """
+        An endpoint for getting news detail.
+        """
         news_obj = NewsArticle.objects.filter(id=news_id)
         if news_obj:
             serializer = NewsArticleSerializer(news_obj[0], context={'request':request})
@@ -59,6 +69,9 @@ class NewsArticleDetailView(generics.GenericAPIView):
             return Response(data, status=400)
 
     def put(self, request, news_id):
+        """
+        An endpoint for updating news detail.
+        """
         news_obj = NewsArticle.objects.filter(id=news_id)
         if news_obj:
             serializer = NewsArticleSerializer(instance=news_obj[0], data=request.data,\
@@ -86,6 +99,9 @@ class NewsArticleDetailView(generics.GenericAPIView):
             return Response(data, status=400)
 
     def delete(self, request, news_id):
+        """
+        An endpoint for deleting news.
+        """
         news_obj = NewsArticle.objects.filter(id=news_id)
         if news_obj:
             try:
