@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from rest_framework import generics
 from rest_framework.response import Response
 from bannerapp.serializers.banner import BannerSerializer
@@ -9,8 +10,12 @@ class BannerListView(generics.GenericAPIView):
     serializer_class = BannerSerializer
 
     def get(self, request):
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
         banner_obj = Banner.objects.all().order_by('-id')
-        serializer = BannerSerializer(banner_obj, many=True,\
+        paginator = Paginator(banner_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = BannerSerializer(page_obj, many=True,\
             context={"request":request})
         data = {
             'success': 1,
