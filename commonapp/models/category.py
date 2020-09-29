@@ -51,26 +51,23 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
     try:
         old_image_file = sender.objects.get(pk=instance.pk).image
+        new_image_file = instance.image
+        if old_image_file:
+            if not old_image_file == new_image_file:
+                if os.path.isfile(old_image_file.path):
+                    os.remove(old_image_file.path)
     except sender.DoesNotExist:
-        return False
+        pass
 
     try:
         old_icon_file = sender.objects.get(pk=instance.pk).icon
+        new_icon_file = instance.icon
+        if old_icon_file:
+            if not old_icon_file == new_icon_file:
+                if os.path.isfile(old_icon_file.path):
+                    os.remove(old_icon_file.path)
     except sender.DoesNotExist:
-        return False
-    
-    new_image_file = instance.image
-    new_icon_file = instance.icon
-
-    if old_image_file:
-        if not old_image_file == new_image_file:
-            if os.path.isfile(old_image_file.path):
-                os.remove(old_image_file.path)
-
-    if old_icon_file:
-        if not old_icon_file == new_icon_file:
-            if os.path.isfile(old_icon_file.path):
-                os.remove(old_icon_file.path)
+        pass
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=15, unique=True)
