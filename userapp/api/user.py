@@ -207,6 +207,9 @@ class UpdateUser(generics.GenericAPIView):
         return Response(data, status=403)
 
 class ChangePasswordView(generics.UpdateAPIView):
+    """
+    An endpoint for changing user's password.
+    """
     serializer_class = ChangePasswordSerializer
     model = User
 
@@ -215,9 +218,6 @@ class ChangePasswordView(generics.UpdateAPIView):
         return obj
 
     def put(self, request, *args, **kwargs):
-        """
-        An endpoint for changing user's password.
-        """
         self.object = self.get_object()
         serializer = self.get_serializer(data=request.data, context={'request':request})
 
@@ -286,14 +286,14 @@ class GeneratePasswordResetTokenView(generics.GenericAPIView):
             return Response(data, status=404)
 
 class ResetPasswordView(generics.UpdateAPIView):
+    """
+    An endpoint for resetting user's password.
+    """
     serializer_class = ResetPasswordSerializer
     model = User
     permission_classes = (AllowAny, )
 
     def update(self, request, *args, **kwargs):
-        """
-        An endpoint for resetting user's password.
-        """
         serializer = self.get_serializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             # Check token exist
