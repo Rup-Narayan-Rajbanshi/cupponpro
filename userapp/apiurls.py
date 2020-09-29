@@ -4,6 +4,7 @@ from userapp.api.user import UserListView, UpdateUser, CreateUserView,\
 	CreateStaffUserView, ChangePasswordView, GeneratePasswordResetTokenView,\
 	GroupListView, ResetPasswordView, LoginView, CompanyGroupListView,\
 	UserGroupDetailView, GenerateLoginTokenView, SignupTokenView
+from userapp.api.login import LoginJWTToken
 
 # from userapp.api.staticpage import StaticPageView
 
