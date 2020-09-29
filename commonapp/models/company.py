@@ -64,7 +64,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
     
     try:
         old_file = sender.objects.get(pk=instance.pk).logo
-    except sender.DoesNotExist:
+    except:
         return False
     
     new_file = instance.logo

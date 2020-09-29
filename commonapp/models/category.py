@@ -56,7 +56,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
             if not old_image_file == new_image_file:
                 if os.path.isfile(old_image_file.path):
                     os.remove(old_image_file.path)
-    except sender.DoesNotExist:
+    except:
         pass
 
     try:
@@ -66,7 +66,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
             if not old_icon_file == new_icon_file:
                 if os.path.isfile(old_icon_file.path):
                     os.remove(old_icon_file.path)
-    except sender.DoesNotExist:
+    except:
         pass
 
 class SubCategory(models.Model):
