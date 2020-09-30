@@ -146,3 +146,37 @@ class SocialLinkDetailView(generics.GenericAPIView):
                 'message' : "Company doesn't exist.",
             }
             return Response(data, status=404)
+
+
+    def delete(self, request, company_id, link_id):
+        """
+        An endpoint for deleting vendor's social link.
+        """
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            social_link_obj = SocialLink.objects.filter(id=link_id, company=company_obj[0])
+            if social_link_obj:
+                try:
+                    social_link_obj[0].delete()
+                    data = {
+                        'success': 1,
+                        'social_link': 'Social link deleted successfully.'
+                    }
+                    return Response(data, status=200)
+                except:
+                    data = {
+                        'success': 0,
+                        'message': 'Social link cannot be deleted.'
+                    }
+                    return Response(data, status=400)
+            data = {
+                'success': 0,
+                'message': "Social link doesn't exist."
+            }
+            return Response(data, status=404)
+        else:
+            data = {
+                'success': 0,
+                'message': "Company doesn't exist.",
+            }
+            return Response(data, status=404)
