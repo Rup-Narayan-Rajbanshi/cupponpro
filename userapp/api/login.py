@@ -9,16 +9,21 @@ class LoginJWTToken(generics.GenericAPIView):
     serializer_class = LoginJWTTokenSerializer
     permission_classes = (AllowAny, )
 
-    def post(self, request):
+    def post(self, request, group):
         """
-        An endpoint for login using JWT.
+        An endpoint for login using JWT. Send user, vendor and admin as path parameter for respective login.
         """
+        group_name = {
+            'admin': ['admin'],
+            'vendor': ['owner', 'manager', 'sales'],
+            'user': ['user']
+        }
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-        user_obj = User.objects.filter(email=request.POST['email'])
+        user_obj = User.objects.filter(email=request.POST.get('email', None))
         if user_obj:
-            if user_obj[0].check_password(request.POST['password']):
-                if user_obj[0].group.name == request.POST['group']:
+            if user_obj[0].check_password(request.POST.get('password', None)):
+                if user_obj[0].group.name in group_name[group]:
                     payload = jwt_payload_handler(user_obj[0])
                     token = jwt_encode_handler(payload)
                     login_token_obj = LoginToken.objects.filter(user=user_obj[0].id, is_used=False)
