@@ -20,9 +20,9 @@ class LoginJWTToken(generics.GenericAPIView):
         }
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-        user_obj = User.objects.filter(email=request.POST.get('email', None))
+        user_obj = User.objects.filter(email=request.data['email'])
         if user_obj:
-            if user_obj[0].check_password(request.POST.get('password', None)):
+            if user_obj[0].check_password(request.data['password']):
                 if user_obj[0].group.name in group_name[group]:
                     payload = jwt_payload_handler(user_obj[0])
                     token = jwt_encode_handler(payload)
