@@ -28,7 +28,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'first_name', 'middle_name', 'last_name',\
             'username', 'email', 'phone_number', 'active', 'admin',\
             'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code')
-        read_only_fields = ('image', 'active', 'admin')
+        read_only_fields = ('image', 'active', 'admin', 'email')
 
     def exclude_fields(self, fields_to_exclude=None):
         if isinstance(fields_to_exclude, list):
