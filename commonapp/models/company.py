@@ -84,7 +84,7 @@ class CompanyUser(models.Model):
         verbose_name_plural = 'company users'
 
     def __str__(self):
-        return self.user.username
+        return self.user.full_name
 
 class FavouriteCompany(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -100,4 +100,4 @@ class FavouriteCompany(models.Model):
         favourite = ' loves '
         if not self.is_favourite:
             favourite = ' hates '
-        return self.user.username + favourite + self.company.name
+        return self.user.full_name + favourite + self.company.name

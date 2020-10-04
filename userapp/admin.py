@@ -4,7 +4,7 @@ from rest_framework.authtoken.models import Token
 from userapp.models import User, PasswordResetToken, LoginToken, SignupToken
 
 class AdminUserapp(admin.ModelAdmin):
-    list_display = ('id', 'username', 'email', 'active', 'admin')
+    list_display = ('id', 'full_name', 'email', 'active', 'admin')
     readonly_fields = ('password',)
     fieldsets = (
             (_("Personal info"), {

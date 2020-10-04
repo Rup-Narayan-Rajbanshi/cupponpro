@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'middle_name', 'last_name',\
-            'username', 'email', 'phone_number', 'active', 'admin', 'password',\
+            'email', 'phone_number', 'active', 'admin', 'password',\
             'confirm_password', 'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code')
         read_only_fields = ('image', 'active', 'admin')
 
@@ -26,7 +26,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'middle_name', 'last_name',\
-            'username', 'email', 'phone_number', 'active', 'admin',\
+            'email', 'phone_number', 'active', 'admin',\
             'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code')
         read_only_fields = ('image', 'active', 'admin', 'email')
 

@@ -32,7 +32,6 @@ class UserManager(BaseUserManager):
         user_obj = self.model(
             email=email.lower()
         )
-        user_obj.username = email.split('@')[0]
         user_obj.first_name = first_name
         user_obj.middle_name = middle_name
         user_obj.last_name = last_name
@@ -61,7 +60,6 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, Address):
-    username = models.CharField(max_length=30, unique=True, editable=False)
     first_name = models.CharField(max_length=50,\
         validators=[RegexValidator(
             regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
@@ -93,11 +91,9 @@ class User(AbstractBaseUser, Address):
         db_table = 'user'
 
     def __str__(self):
-        return self.username
+        return self.full_name
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            self.username = self.email.split('@')[0]
         return super(User, self).save(*args, **kwargs)
 
     def has_perm(self, perm, obj=None):
