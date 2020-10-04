@@ -154,3 +154,51 @@ class CompanyDocumentDetailView(generics.GenericAPIView):
                 'message': "Document doesn't exist."
             }
             return Response(data, status=404)
+
+class CompanyDocumentMassUpdateView(generics.GenericAPIView):
+    serializer_class = DocumentSerializer
+
+    # def post(self, request, company_id):
+    #     """
+    #     An endpoint for creating vendor's document.
+    #     """
+    #     serializer = DocumentSerializer(data=request.data, many=True, context={'request':request})
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         data = {
+    #             'success': 1,
+    #             'document': serializer.data
+    #         }
+    #         return Response(data, status=200)
+    #     else:
+    #         data = {
+    #             'success': 0,
+    #             'message': serializer.errors
+    #         }
+    #         return Response(data, status=400)
+
+    def put(self, request, company_id):
+        """
+        An endpoint for updating vendor's document in mass.
+        """
+        ids = [x['id'] for x in request.data]
+        data = {
+            'success': 1,
+            'document': [],
+            'message': []
+        }
+        document_obj = Document.objects.filter(id__in=ids)
+        # mapping document obj with key, so that during loop, correct data may be accessed even if multiple data are not in sequential order by id
+        document_obj_dict = dict()
+        for obj in document_obj:
+            document_obj_dict[obj.id] = obj
+        for r_data in request.data:
+            serializer = DocumentSerializer(instance=document_obj_dict[r_data['id']], data=r_data, context={'request':request})
+            if 'document' in request.data and not request.data['document']:
+                serializer.exclude_fields(['document'])
+            if serializer.is_valid():
+                # serializer.save()
+                data['document'].append(serializer.data)
+            else:
+                data['message'].append({'id': serializer.instance.id, 'error': serializer.errors})
+        return Response(data, status=200)

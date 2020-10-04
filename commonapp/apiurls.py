@@ -5,7 +5,7 @@ from commonapp.api.bill import BillListView, BillDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView, CompanyFavouriteView, CompanyCreateView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView, VoucherListView
-from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView
+from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView, CompanyDocumentMassUpdateView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
 from commonapp.api.links import SocialLinkListView, SocialLinkDetailView
 from commonapp.api.product import (
@@ -38,6 +38,7 @@ urlpatterns = [
     # document
     path('company/<int:company_id>/document', CompanyDocumentListView.as_view(), name='company_document_list'),
     path('company/<int:company_id>/document/<int:document_id>', CompanyDocumentDetailView.as_view(), name='company_document_detail'),
+    path('company/<int:company_id>/document/update', CompanyDocumentMassUpdateView.as_view(), name='company_document_mass_update'),
     # coupon
     path('coupon', CouponListView.as_view(), name='coupon_list'),
     path('coupon/<int:coupon_id>', CouponDetailView.as_view(), name='coupon_detail'),

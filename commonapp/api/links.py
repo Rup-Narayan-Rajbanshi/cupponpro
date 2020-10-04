@@ -147,7 +147,6 @@ class SocialLinkDetailView(generics.GenericAPIView):
             }
             return Response(data, status=404)
 
-
     def delete(self, request, company_id, link_id):
         """
         An endpoint for deleting vendor's social link.
