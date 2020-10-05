@@ -7,7 +7,7 @@ from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUse
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView, VoucherListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView, CompanyDocumentMassUpdateView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
-from commonapp.api.links import SocialLinkListView, SocialLinkDetailView
+from commonapp.api.links import SocialLinkListView, SocialLinkDetailView, SocialLinkMassUpdateView
 from commonapp.api.product import (
     CompanyBulkQuantityListView,
     CompanyBulkQuantityDetailView,
@@ -72,4 +72,5 @@ urlpatterns = [
     # social links
     path('company/<int:company_id>/link', SocialLinkListView.as_view(), name='company_link_list'),
     path('company/<int:company_id>/link/<int:link_id>', SocialLinkDetailView.as_view(), name='company_link_detail'),
+    path('company/<int:company_id>/link/update', SocialLinkMassUpdateView.as_view(), name='company_link_mass_update'),
 ]

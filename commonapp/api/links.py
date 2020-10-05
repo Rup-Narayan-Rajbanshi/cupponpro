@@ -179,3 +179,30 @@ class SocialLinkDetailView(generics.GenericAPIView):
                 'message': "Company doesn't exist.",
             }
             return Response(data, status=404)
+
+class SocialLinkMassUpdateView(generics.GenericAPIView):
+    serializer_class = SocialLinkSerializer
+
+    def put(self, request, company_id):
+        """
+        An endpoint for updating vendor's social link in mass.
+        """
+        ids = [x['id'] for x in request.data]
+        data = {
+            'success': 1,
+            'link': [],
+            'message': []
+        }
+        social_link_obj = SocialLink.objects.filter(id__in=ids)
+        # mapping social link obj with key, so that during loop, correct data may be accessed even if multiple data are not in sequential order by id
+        social_link_obj_dict = dict()
+        for obj in social_link_obj:
+            social_link_obj_dict[obj.id] = obj
+        for r_data in request.data:
+            serializer = SocialLinkSerializer(instance=social_link_obj_dict[r_data['id']], data=r_data, context={'request':request})
+            if serializer.is_valid():
+                # serializer.save()
+                data['link'].append(serializer.data)
+            else:
+                data['message'].append({'id': serializer.instance.id, 'error': serializer.errors})
+        return Response(data, status=200)
