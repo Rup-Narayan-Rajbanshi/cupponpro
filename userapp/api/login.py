@@ -76,9 +76,8 @@ class LoginJWTObtainView(generics.GenericAPIView):
             token = jwt_encode_handler(payload)
             data = {
                 'success': 1,
-                'group': request.user.group.name,
-                'user': serializer.data,
-                'token': token
+                'token': token,
+                'user': serializer.data                
             }
             company_user_obj = CompanyUser.objects.filter(user=request.user.id)
             if company_user_obj:
