@@ -1,8 +1,11 @@
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework_jwt.settings import api_settings
+from commonapp.models.company import CompanyUser
 from userapp.models.user import User, LoginToken
 from userapp.serializers.login import LoginTokenSerializer, LoginJWTObtainSerializer
+from userapp.serializers.user import UserDetailSerializer
 
 class LoginTokenView(generics.GenericAPIView):
     serializer_class = LoginTokenSerializer
@@ -73,7 +76,7 @@ class LoginJWTObtainView(generics.GenericAPIView):
             token = jwt_encode_handler(payload)
             data = {
                 'success': 1,
-                'user_type': request.user.group.name,
+                'group': request.user.group.name,
                 'user': serializer.data,
                 'token': token
             }

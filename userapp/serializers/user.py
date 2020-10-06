@@ -22,13 +22,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
+    group = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('id', 'first_name', 'middle_name', 'last_name',\
             'email', 'phone_number', 'active', 'admin',\
-            'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code')
+            'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code', 'group')
         read_only_fields = ('image', 'active', 'admin', 'email')
+
+    def get_group(self, obj):
+        return obj.group.name
 
     def exclude_fields(self, fields_to_exclude=None):
         if isinstance(fields_to_exclude, list):

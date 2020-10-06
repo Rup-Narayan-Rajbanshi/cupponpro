@@ -3,7 +3,6 @@ from django.contrib.auth.models import Group
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_jwt.settings import api_settings
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
