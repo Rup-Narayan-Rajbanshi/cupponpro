@@ -45,6 +45,7 @@ THIRD_PARTY_APPS = [
     'debug_toolbar',
     'django_extensions',
     'django_filters',
+    'rest_framework_swagger',
     'rest_framework',
     'rest_framework.authtoken',
     ]
