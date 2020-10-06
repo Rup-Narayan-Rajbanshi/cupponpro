@@ -3,10 +3,11 @@ from django.contrib.auth.models import Group
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_jwt.settings import api_settings
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
-    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, LoginSerializer,\
+    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, LoginTokenSerializer,\
     SignupTokenSerializer
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
@@ -419,23 +420,29 @@ class CreateStaffUserView(generics.GenericAPIView):
             return Response(data, status=404)
 
 class LoginUserDetailView(generics.GenericAPIView):
-    serializer_class = LoginSerializer
-    permission_classes = (IsAuthenticated, )
+    serializer_class = LoginTokenSerializer
+    permission_classes = (AllowAny, )
 
     def post(self, request):
         """
-        An endpoint for getting user's detail after login.
+        An endpoint for getting user's detail and JWT token.
         """
         token = request.data['token']
-        login_token_obj = LoginToken.objects.filter(token=token, user=request.user.id, is_used=False)
+        login_token_obj = LoginToken.objects.filter(token=token, is_used=False)
         if login_token_obj:
             login_token_obj[0].is_used = True
             login_token_obj[0].save()
-            serializer = UserDetailSerializer(request.user, context={'request':request})
+            serializer = UserDetailSerializer(login_token_obj[0].user, context={'request':request})
+            # create JWT token
+            jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+            jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+            payload = jwt_payload_handler(login_token_obj[0].user)
+            token = jwt_encode_handler(payload)
             data = {
                 'success': 1,
                 'user_type': request.user.group.name,
-                'user': serializer.data
+                'user': serializer.data,
+                'token': token
             }
             company_user_obj = CompanyUser.objects.filter(user=request.user.id)
             if company_user_obj:

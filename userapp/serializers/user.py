@@ -93,7 +93,7 @@ class ResetPasswordSerializer(serializers.Serializer):
     token = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 
-class LoginSerializer(serializers.Serializer):  
+class LoginTokenSerializer(serializers.Serializer):  
     """
     Serializer for password change endpoint.
     """

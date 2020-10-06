@@ -3,10 +3,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
 from userapp.models.user import User, LoginToken
-from userapp.serializers.login import LoginJWTTokenSerializer
+from userapp.serializers.login import LoginSerializer
 
-class LoginJWTToken(generics.GenericAPIView):
-    serializer_class = LoginJWTTokenSerializer
+class LoginTokenView(generics.GenericAPIView):
+    serializer_class = LoginSerializer
     permission_classes = (AllowAny, )
 
     def post(self, request, group):
@@ -35,7 +35,7 @@ class LoginJWTToken(generics.GenericAPIView):
                     login_token_obj = LoginToken.objects.create(user=user_obj[0])
                     data = {
                         'success': 1,
-                        'token': token,
+                        'token': 'Token has been sent.',
                     }
                     return Response(data, status=200)
                 else:

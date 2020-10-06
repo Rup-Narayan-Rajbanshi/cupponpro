@@ -4,7 +4,6 @@ from userapp.api.user import UserListView, UpdateUser, CreateUserView,\
 	CreateStaffUserView, ChangePasswordView, GeneratePasswordResetTokenView,\
 	GroupListView, ResetPasswordView, LoginUserDetailView, CompanyGroupListView,\
 	UserGroupDetailView, SignupTokenView
-from userapp.api.login import LoginJWTToken
 
 # from userapp.api.staticpage import StaticPageView
 
@@ -25,7 +24,7 @@ urlpatterns = [
 	path('user/forgotpassword', GeneratePasswordResetTokenView.as_view(), name='forgot_password'),
 	path('user/resetpassword', ResetPasswordView.as_view(), name='reset_password'),
 	# login
-	path('userinfo', LoginUserDetailView.as_view(), name='user_info'),
+	path('userinfo', LoginUserDetailView.as_view(), name='user_info_and_jwt_token'),
 	# signup
 	path('signuptoken', SignupTokenView.as_view(), name='signup_token'),
 ]
