@@ -6,7 +6,7 @@ from rest_framework_jwt.views import (
     obtain_jwt_token, refresh_jwt_token, verify_jwt_token
     )
 from rest_framework.documentation import include_docs_urls
-from userapp.api.login import LoginTokenView
+from userapp.api.login import LoginTokenView, LoginJWTObtainView
 
 admin.site.site_header = "Admin  @WOMCS"
 admin.site.site_title = "WOMCS Admin Portal"
@@ -16,6 +16,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/auth', include('rest_framework.urls', namespace='rest_framework')),
     path('api/v1/auth/login/<str:group>', LoginTokenView.as_view(), name='login_token'),
+	path('api/v1/auth/token/obtain', LoginJWTObtainView.as_view(), name='jwt_token'),
     # path('api/v1/auth/login', obtain_jwt_token),
     path('api/v1/auth/token/refresh', refresh_jwt_token),
     path('api/v1/auth/token/verify', verify_jwt_token),

@@ -2,10 +2,10 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from userapp.models.user import User, LoginToken
-from userapp.serializers.login import LoginSerializer
+from userapp.serializers.login import LoginTokenSerializer, LoginJWTObtainSerializer
 
 class LoginTokenView(generics.GenericAPIView):
-    serializer_class = LoginSerializer
+    serializer_class = LoginTokenSerializer
     permission_classes = (AllowAny, )
 
     def post(self, request, group):
@@ -51,3 +51,39 @@ class LoginTokenView(generics.GenericAPIView):
                     'message': "User doesn't exist."
                 }
             return Response(data, status=404)
+
+class LoginJWTObtainView(generics.GenericAPIView):
+    serializer_class = LoginJWTObtainSerializer
+    permission_classes = (AllowAny, )
+
+    def post(self, request):
+        """
+        An endpoint for getting user's detail and JWT token.
+        """
+        token = request.data['token']
+        login_token_obj = LoginToken.objects.filter(token=token, is_used=False)
+        if login_token_obj:
+            login_token_obj[0].is_used = True
+            login_token_obj[0].save()
+            serializer = UserDetailSerializer(login_token_obj[0].user, context={'request':request})
+            # create JWT token
+            jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+            jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+            payload = jwt_payload_handler(login_token_obj[0].user)
+            token = jwt_encode_handler(payload)
+            data = {
+                'success': 1,
+                'user_type': request.user.group.name,
+                'user': serializer.data,
+                'token': token
+            }
+            company_user_obj = CompanyUser.objects.filter(user=request.user.id)
+            if company_user_obj:
+                data['company'] = company_user_obj[0].company.id
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': "Invalid login token."
+            }
+            return Response(data, status=400)
