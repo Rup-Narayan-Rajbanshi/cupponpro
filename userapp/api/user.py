@@ -3,6 +3,7 @@ from django.contrib.auth.models import Group
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_jwt.settings import api_settings
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
@@ -347,9 +348,15 @@ class CreateUserView(generics.GenericAPIView):
 
                 user_obj.group = group
                 user_obj.save()
+                # generate JWT token for immediate login
+                jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+                jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+                payload = jwt_payload_handler(user_obj)
+                token = jwt_encode_handler(payload)
                 data = {
                     'success': 1,
-                    'user': serializer.data
+                    'user': serializer.data,
+                    'token': token
                 }
                 return Response(data, status=200)
             else:
@@ -394,9 +401,15 @@ class CreateStaffUserView(generics.GenericAPIView):
                     user_obj.group = group
                     user_obj.save()
                     CompanyUser.objects.create(user=user_obj, company=company_obj[0], is_staff=True)
+                    # generate JWT token for immediate login
+                    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+                    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+                    payload = jwt_payload_handler(user_obj)
+                    token = jwt_encode_handler(payload)
                     data = {
                         'success': 1,
-                        'user': serializer.data
+                        'user': serializer.data,
+                        'token': token
                     }
                     return Response(data, status=200)
                 else:
