@@ -17,6 +17,7 @@ class Company(Address):
     logo = models.ImageField(upload_to='logo/', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,\
         related_name="company_category")
+    email = models.EmailField(max_length=50, unique=True, blank=True, null=True)
     sub_category = models.ForeignKey(SubCategory, on_delete=models.PROTECT, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.PROTECT,\
         related_name="company_author", null=True)

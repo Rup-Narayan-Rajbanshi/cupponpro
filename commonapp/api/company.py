@@ -3,10 +3,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from commonapp.models.company import Company, CompanyUser, FavouriteCompany
-from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer
+from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer, ChangeCompanyEmailSerializer
 from userapp.models.user import User
 from userapp.serializers.user import UserDetailSerializer
 from permission import isCompanyOwnerAndAllowAll
+from helper import isCompanyUser
 
 class CompanyListView(generics.GenericAPIView):
     permission_classes = (AllowAny,)
@@ -114,6 +115,66 @@ class CompanyCreateView(generics.GenericAPIView):
             }
             return Response(data, status=403)
 
+class ChangeCompanyEmailView(generics.GenericAPIView):
+    serializer_class = ChangeCompanyEmailSerializer
+    permission_classes = (isCompanyOwnerAndAllowAll, )
+
+    def put(self, request, company_id):
+        """
+        An endpoint for changing companies email.
+        """
+        if isCompanyUser(request.user.id, company_id):
+            serializer = ChangeCompanyEmailSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                user = request.user
+                if user.check_password(serializer.data.get('password')):
+                    company_obj = Company.objects.filter(id=company_id)
+                    if company_obj:
+                        if company_obj[0].email != serializer.data.get('email'):
+                            if not Company.objects.filter(email=serializer.data.get('email')):
+                                company_obj[0].email = serializer.data.get('email')
+                                company_obj[0].save()
+                                data = {
+                                    'success': 1,
+                                    'email': serializer.data.get('email')
+                                }
+                                return Response(data, status=200)
+                            else:
+                                data = {
+                                    'success': 0,
+                                    'message': 'Email is already taken.'
+                                }
+                                return Response(data, response=400)
+                        else:
+                            data = {
+                                'success': 0,
+                                'message': 'Please enter new email.'
+                            }
+                            return Response(data, status=400)
+                    else:
+                        data = {
+                            'success': 0,
+                            'message': 'Company not found.'
+                        }
+                        return Response(data, status=404)
+                else:
+                    data = {
+                        'success': 0,
+                        'message': 'User not verified.'
+                    }
+                    return Response(data, status=403)
+            else:
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': "You don't have permission to update email."
+            }
+            return Response(data, status=403)
 
 class CompanyFavouriteView(generics.GenericAPIView):
     serializer_class = FavouriteCompanySerializer
