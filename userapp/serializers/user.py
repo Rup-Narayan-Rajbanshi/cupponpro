@@ -127,3 +127,11 @@ class ChangeUserEmailSerializer(serializers.Serializer):
 
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
+
+class ChangeUserProfilePictureSerializer(serializers.ModelSerializer):  
+    """
+    Serializer for user's profile picture change endpoint.
+    """
+    class Meta:
+        model = User
+        fields = ('image',)

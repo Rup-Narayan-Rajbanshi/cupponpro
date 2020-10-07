@@ -4,7 +4,7 @@ from userapp.api.user import UserListView, UpdateUser, CreateUserView,\
 	CreateStaffUserView, ChangePasswordView, GeneratePasswordResetTokenView,\
 	GroupListView, ResetPasswordView, CompanyGroupListView,\
 	UserGroupDetailView, SignupTokenView, VerifyUserPasswordView,\
-	ChangeUserEmailView
+	ChangeUserEmailView, ChangeUserProfilePictureView
 
 # from userapp.api.staticpage import StaticPageView
 
@@ -20,8 +20,9 @@ urlpatterns = [
 	path('user/create', CreateUserView.as_view(), name='user_create'),
 	path('user/createstaff/company/<int:company_id>', CreateStaffUserView.as_view(), name='staff_user_create'),
 	path('user/<int:user_id>', UpdateUser.as_view(), name='user_update'),
+	path('user/<int:user_id>/profile-pic', ChangeUserProfilePictureView.as_view(), name='user_profile_pic_update'),
 	# email
-	path('user/email/update', ChangeUserEmailView.as_view(), name='update_user_email'),
+	path('user/<int:user_id>/email', ChangeUserEmailView.as_view(), name='update_user_email'),
 	# password
 	path('user/changepassword', ChangePasswordView.as_view(), name='change_password'),
 	path('user/forgotpassword', GeneratePasswordResetTokenView.as_view(), name='forgot_password'),

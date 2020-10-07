@@ -7,7 +7,7 @@ from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
     ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, SignupTokenSerializer, VerifyPasswordSerializer,\
-    ChangeUserEmailSerializer
+    ChangeUserEmailSerializer, ChangeUserProfilePictureSerializer
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
@@ -509,30 +509,67 @@ class ChangeUserEmailView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = ChangeUserEmailSerializer
 
-    def put(self, request):
+    def put(self, request, user_id):
         """
         An endpoint for changing user's email.
         """
-        serializer = ChangeUserEmailSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            user = request.user
-            if user.check_password(serializer.data.get("password")):
-                user.email = serializer.data.get('email')
-                user.save()
+        if request.user.id == user_id:
+            serializer = ChangeUserEmailSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                user = request.user
+                if user.check_password(serializer.data.get("password")):
+                    user.email = serializer.data.get('email')
+                    user.save()
+                    data = {
+                        'success': 1,
+                        'email': serializer.data.get('email')
+                    }
+                    return Response(data, status=200)
+                else:
+                    data = {
+                        'success': 0,
+                        'message': 'User not verified.'
+                    }
+                    return Response(data, status=403)
+            else:
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': "You don't have permission to update email."
+            }
+            return Response(data, status=403)
+
+class ChangeUserProfilePictureView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ChangeUserProfilePictureSerializer
+
+    def put(self, request, user_id):
+        """
+        An endpoint for changing user's profile picture.
+        """
+        if request.user.id == user_id:
+            serializer = ChangeUserProfilePictureSerializer(instance=request.user, data=request.data, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
                 data = {
                     'success': 1,
-                    'email': serializer.data.get('email')
+                    'image': serializer.data
                 }
                 return Response(data, status=200)
             else:
                 data = {
                     'success': 0,
-                    'message': 'User not verified.'
+                    'message': serializer.errors
                 }
-                return Response(data, status=403)
+                return Response(data, status=400)
         else:
             data = {
                 'success': 0,
-                'message': serializer.errors
+                'message': "You don't have permission to update profile."
             }
-            return Response(data, status=400)
+            return Response(data, status=403)
