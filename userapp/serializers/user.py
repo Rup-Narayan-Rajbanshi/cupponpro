@@ -118,3 +118,12 @@ class VerifyPasswordSerializer(serializers.Serializer):
     model = User
 
     password = serializers.CharField(required=True)
+
+class ChangeUserEmailSerializer(serializers.Serializer):  
+    """
+    Serializer for user's email change endpoint.
+    """
+    model = User
+
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True)

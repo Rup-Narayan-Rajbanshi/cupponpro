@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
-    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, SignupTokenSerializer, VerifyPasswordSerializer
+    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, SignupTokenSerializer, VerifyPasswordSerializer,\
+    ChangeUserEmailSerializer
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
@@ -501,5 +502,37 @@ class VerifyUserPasswordView(generics.GenericAPIView):
             data = {
                 'success': 0,
                 'message': 'User password not verified.'
+            }
+            return Response(data, status=400)
+
+class ChangeUserEmailView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ChangeUserEmailSerializer
+
+    def put(self, request):
+        """
+        An endpoint for changing user's email.
+        """
+        serializer = ChangeUserEmailSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = request.user
+            if user.check_password(serializer.data.get("password")):
+                user.email = serializer.data.get('email')
+                user.save()
+                data = {
+                    'success': 1,
+                    'email': serializer.data.get('email')
+                }
+                return Response(data, status=200)
+            else:
+                data = {
+                    'success': 0,
+                    'message': 'User not verified.'
+                }
+                return Response(data, status=403)
+        else:
+            data = {
+                'success': 0,
+                'message': serializer.errors
             }
             return Response(data, status=400)
