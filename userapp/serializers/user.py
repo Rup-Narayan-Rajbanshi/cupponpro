@@ -110,3 +110,11 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'name')
+
+class VerifyPasswordSerializer(serializers.Serializer):  
+    """
+    Serializer for password verification endpoint.
+    """
+    model = User
+
+    password = serializers.CharField(required=True)

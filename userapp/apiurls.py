@@ -3,7 +3,7 @@ from django.urls import path
 from userapp.api.user import UserListView, UpdateUser, CreateUserView,\
 	CreateStaffUserView, ChangePasswordView, GeneratePasswordResetTokenView,\
 	GroupListView, ResetPasswordView, CompanyGroupListView,\
-	UserGroupDetailView, SignupTokenView
+	UserGroupDetailView, SignupTokenView, VerifyUserPasswordView
 
 # from userapp.api.staticpage import StaticPageView
 
@@ -25,4 +25,6 @@ urlpatterns = [
 	path('user/resetpassword', ResetPasswordView.as_view(), name='reset_password'),
 	# signup
 	path('signuptoken', SignupTokenView.as_view(), name='signup_token'),
+	# verify password
+	path('user/password/verify', VerifyUserPasswordView.as_view(), name='verify_user_password'),
 ]

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from commonapp.models.company import Company, CompanyUser
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
-    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, SignupTokenSerializer
+    ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, SignupTokenSerializer, VerifyPasswordSerializer
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
@@ -479,5 +479,27 @@ class SignupTokenView(generics.GenericAPIView):
             data = {
                 'success': 0,
                 'message': serializer.errors
+            }
+            return Response(data, status=400)
+
+class VerifyUserPasswordView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = VerifyPasswordSerializer
+
+    def post(self, request):
+        """
+        An endpoint for verifying user's password.
+        """
+        serializer = VerifyPasswordSerializer(request.data, context={'request': request})
+        if request.user.check_password(serializer.data.get("password")):
+            data = {
+                'success': 1,
+                'message': 'User password verified.'
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': 'User password not verified.'
             }
             return Response(data, status=400)
