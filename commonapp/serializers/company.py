@@ -2,12 +2,12 @@ from rest_framework import serializers
 from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Company, FavouriteCompany
 from commonapp.models.rating import Rating
-from commonapp.serializers.image import ImageSerializer
+from commonapp.serializers.image import ImageDetailSerializer
 from userapp.models.user import User
 
 class CompanySerializer(serializers.ModelSerializer):
 
-    images = ImageSerializer(many=True, read_only=True)
+    images = ImageDetailSerializer(many=True, read_only=True)
     rating = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
     

@@ -3,10 +3,12 @@ from django.urls import path
 from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView
 from commonapp.api.bill import BillListView, BillDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
-from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView, CompanyFavouriteView, CompanyCreateView, ChangeCompanyEmailView
+from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
+    CompanyFavouriteView, CompanyCreateView, ChangeCompanyEmailView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView, VoucherListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView, CompanyDocumentMassUpdateView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
+from commonapp.api.image import CompanyImageListView, CompanyImageDetailView
 from commonapp.api.links import SocialLinkListView, SocialLinkDetailView, SocialLinkMassUpdateView
 from commonapp.api.product import (
     CompanyBulkQuantityListView,
@@ -36,6 +38,9 @@ urlpatterns = [
     path('company/<int:company_id>/user', CompanyUserListView.as_view(), name='company_user_list'),
     path('company/<int:company_id>/favourite', CompanyFavouriteView.as_view(), name='company_favourite_list'),
     path('company/<int:company_id>/email', ChangeCompanyEmailView.as_view(), name='update_company_email'),
+    # company image
+    path('company/<int:company_id>/image', CompanyImageListView.as_view(), name='company_image_list'),
+    path('company/<int:company_id>/image/<int:image_id>', CompanyImageDetailView.as_view(), name='company_image_detail'),
     # document
     path('company/<int:company_id>/document', CompanyDocumentListView.as_view(), name='company_document_list'),
     path('company/<int:company_id>/document/<int:document_id>', CompanyDocumentDetailView.as_view(), name='company_document_detail'),

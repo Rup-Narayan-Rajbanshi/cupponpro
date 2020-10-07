@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from commonapp.models.coupon import Coupon, Voucher
-from commonapp.serializers.image import ImageSerializer
+from commonapp.serializers.image import ImageDetailSerializer
 
 class CouponSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True, read_only=True)
+    images = ImageDetailSerializer(many=True, read_only=True)
     coupon_relation = serializers.SerializerMethodField()
     is_redeemed = serializers.SerializerMethodField()
 
