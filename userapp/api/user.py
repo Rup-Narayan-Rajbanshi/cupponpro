@@ -518,13 +518,27 @@ class ChangeUserEmailView(generics.GenericAPIView):
             if serializer.is_valid():
                 user = request.user
                 if user.check_password(serializer.data.get("password")):
-                    user.email = serializer.data.get('email')
-                    user.save()
-                    data = {
-                        'success': 1,
-                        'email': serializer.data.get('email')
-                    }
-                    return Response(data, status=200)
+                    if user.email != serializer.data.get('email'):
+                        if not User.objects.filter(email=serializer.data.get('email')):
+                            user.email = serializer.data.get('email')
+                            user.save()
+                            data = {
+                                'success': 1,
+                                'email': serializer.data.get('email')
+                            }
+                            return Response(data, status=200)
+                        else:
+                            data = {
+                                'success': 0,
+                                'message': 'Email is already taken.'
+                            }
+                            return Response(data, status=400)
+                    else:
+                        data = {
+                            'success': 0,
+                            'message': 'Please enter new email.'
+                        }
+                        return Response(data, status=400)
                 else:
                     data = {
                         'success': 0,

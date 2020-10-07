@@ -34,6 +34,14 @@ class CompanySerializer(serializers.ModelSerializer):
             for f in fields_to_exclude:
                 f in self.fields.fields and self.fields.fields.pop(f) or next()
 
+class ChangeCompanyEmailSerializer(serializers.Serializer):
+    """
+    Serializer for user's email change endpoint.
+    """
+    model = Company
+
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True)
 
 class FavouriteCompanySerializer(serializers.ModelSerializer):
 
