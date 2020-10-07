@@ -121,7 +121,7 @@ class ChangeCompanyEmailView(generics.GenericAPIView):
 
     def put(self, request, company_id):
         """
-        An endpoint for changing companies email.
+        An endpoint for changing company's email.
         """
         if isCompanyUser(request.user.id, company_id):
             serializer = ChangeCompanyEmailSerializer(data=request.data, context={'request': request})

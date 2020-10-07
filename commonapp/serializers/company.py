@@ -36,7 +36,7 @@ class CompanySerializer(serializers.ModelSerializer):
 
 class ChangeCompanyEmailSerializer(serializers.Serializer):
     """
-    Serializer for user's email change endpoint.
+    Serializer for company's email change endpoint.
     """
     model = Company
 

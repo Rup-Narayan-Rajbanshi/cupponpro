@@ -43,7 +43,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
-    middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
+    middle_name = serializers.CharField(max_length=50, required=False)
     is_user = serializers.BooleanField()
 
     class Meta:
@@ -56,7 +56,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class CompanyUserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
-    middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
+    middle_name = serializers.CharField(max_length=50, required=False)
     is_manager = serializers.BooleanField()
 
     class Meta:

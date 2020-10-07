@@ -26,7 +26,7 @@ urlpatterns = [
     path('api/v1/auth/token/verify', verify_jwt_token),
     path('api/v1/', include('project.apiurls')),
     path('', include_docs_urls(title='Cupponpro API')),
-    path('swagger', schema_view)
+    # path('swagger', schema_view)
 ]
 
 urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
