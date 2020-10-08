@@ -60,6 +60,17 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, Address):
+    # Gender Choices Variables
+    Null = None
+    Male = 'M'
+    Female = 'F'
+    Other = 'O'
+    GENDER = [
+        (Male, 'Male'),
+        (Female, 'Female'),
+        (Other, 'Other'),
+    ]
+
     first_name = models.CharField(max_length=50,\
         validators=[RegexValidator(
             regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
@@ -69,6 +80,7 @@ class User(AbstractBaseUser, Address):
         validators=[RegexValidator(
             regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
             )],)
+    gender = models.CharField(max_length=6, choices=GENDER, default=Null, blank=True)
     email = models.EmailField(max_length=50, unique=True)
     phone_number = models.CharField(max_length=15, unique=True,\
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
@@ -83,7 +95,7 @@ class User(AbstractBaseUser, Address):
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['first_name', 'middle_name',\
-        'last_name', 'phone_number']
+        'last_name', 'gender', 'phone_number']
 
     objects = UserManager()
 

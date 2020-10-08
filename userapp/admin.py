@@ -10,7 +10,7 @@ class AdminUserapp(admin.ModelAdmin):
             (_("Personal info"), {
                 'fields':(
                     'email', 'first_name', 'middle_name',\
-                    'last_name', 'phone_number', 'image'
+                    'last_name', 'gender', 'phone_number', 'image'
                     )
                 }
             ),

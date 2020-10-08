@@ -20,7 +20,7 @@ class AdminBillapp(admin.ModelAdmin):
     fieldsets = (
         (_("Basic info"), {
             'fields':(
-                'company', 'user', 'name', 'phone_number', 'total', 'total_discount', 'tax', \
+                'company', 'user', 'name', 'phone_number', 'longitude', 'latitude', 'is_verified' 'total', 'total_discount', 'tax', \
                 'taxed_amount', 'grand_total', 'payment_mode'
             )
         }
@@ -47,14 +47,14 @@ class AdminCompanyapp(admin.ModelAdmin):
     fieldsets = (
             (_("Company Info"), {
                 'fields':(
-                    'name', 'logo', 'phone_number', 'email', 'category', 'sub_category', 'author', 'currency'
+                    'name', 'logo', 'phone_number', 'email', 'category', 'sub_category', 'author', 'currency', 'is_verified'
                     )
                 }
             ),
 
             (_("Company Address"), {
                 'fields':(
-                    'country', 'state', 'city', 'address', 'zip_code'
+                    'country', 'state', 'city', 'address', 'longitude', 'latitude', 'zip_code'
                     )
                 }
             ),
