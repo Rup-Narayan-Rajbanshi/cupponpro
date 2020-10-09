@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'middle_name', 'last_name',\
+        fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'active', 'admin', 'password',\
             'confirm_password', 'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code')
         read_only_fields = ('image', 'active', 'admin')
@@ -26,7 +26,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'middle_name', 'last_name',\
+        fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'active', 'admin',\
             'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code', 'group')
         read_only_fields = ('image', 'active', 'admin', 'email')
@@ -48,7 +48,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'middle_name', 'last_name',\
+        fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'password',\
             'confirm_password', 'is_user')
 
@@ -61,7 +61,7 @@ class CompanyUserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'middle_name', 'last_name',\
+        fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'password',\
             'confirm_password', 'is_manager')
 
