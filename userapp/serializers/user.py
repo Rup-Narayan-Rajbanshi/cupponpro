@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import Group
+from commonapp.models.company import CompanyUser
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 
 class UserGroupSerializer(serializers.ModelSerializer):
@@ -12,23 +13,39 @@ class UserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
+    group = serializers.SerializerMethodField()
+    company = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'active', 'admin', 'password',\
-            'confirm_password', 'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code')
+            'confirm_password', 'image', 'full_name', 'country', 'state',\
+            'city', 'address', 'zip_code', 'group', 'company')
         read_only_fields = ('image', 'active', 'admin')
+
+    def get_group(self, obj):
+        return obj.group.name
+    
+    def get_company(self, obj):
+        company_user_obj = CompanyUser.objects.filter(user=obj.id)
+        if company_user_obj:
+            company_ids = [company_obj.id for company_obj in company_user_obj]
+            return company_ids
+        else:
+            return None
 
 class UserDetailSerializer(serializers.ModelSerializer):
     middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
     group = serializers.SerializerMethodField()
+    company = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'active', 'admin',\
-            'image', 'full_name', 'country', 'state', 'city', 'address', 'zip_code', 'group')
+            'image', 'full_name', 'country', 'state', 'city', 'address',\
+            'zip_code', 'group', 'company')
         read_only_fields = ('image', 'active', 'admin', 'email')
 
     def get_group(self, obj):
@@ -39,6 +56,13 @@ class UserDetailSerializer(serializers.ModelSerializer):
             for f in fields_to_exclude:
                 f in self.fields.fields and self.fields.fields.pop(f) or next()
 
+    def get_company(self, obj):
+        company_user_obj = CompanyUser.objects.filter(user=obj.id)
+        if company_user_obj:
+            company_ids = [company_obj.id for company_obj in company_user_obj]
+            return company_ids
+        else:
+            return None
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)

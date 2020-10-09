@@ -335,9 +335,8 @@ class CreateUserView(generics.GenericAPIView):
             if serializer.validated_data['password'] == serializer.validated_data['confirm_password']:
                 user_obj = User.objects.create_user(
                     first_name=serializer.validated_data['first_name'],
-                    middle_name=serializer.validated_data['middle_name'],
+                    middle_name=serializer.data.get('middle_name', ''),
                     last_name=serializer.validated_data['last_name'],
-                    gender=serializer.validated_data['gender'],
                     email=serializer.validated_data['email'],
                     phone_number=serializer.validated_data['phone_number'],
                     password=serializer.validated_data['password'],
@@ -347,6 +346,7 @@ class CreateUserView(generics.GenericAPIView):
                 else:
                     group, _ = Group.objects.get_or_create(name='owner')
 
+                user_obj.gender = serializer.validated_data['gender'],
                 user_obj.group = group
                 user_obj.save()
                 # generate JWT token for immediate login

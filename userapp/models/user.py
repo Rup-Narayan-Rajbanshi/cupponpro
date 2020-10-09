@@ -13,7 +13,7 @@ from commonapp.models.address import Address
 
 class UserManager(BaseUserManager):
     def _create_user(self, first_name, middle_name, last_name, email, phone_number,\
-        password, is_active, is_staff, is_admin):
+        password, is_active=True, is_staff=False, is_admin=False):
         if not first_name:
             raise ValueError(_("User must have a First name."))
 
@@ -46,14 +46,14 @@ class UserManager(BaseUserManager):
     def create_user(self, first_name, middle_name, last_name, email,\
         phone_number, password=None):
         return self._create_user(first_name, middle_name, last_name,\
-            email, phone_number, password, is_staff=False, is_admin=False, is_active=True)
+            email, phone_number, password)
 
     def create_superuser(self, first_name, middle_name, last_name, email,\
         phone_number, password=None):
         user = self._create_user(first_name, middle_name, last_name,\
-            email, phone_number, password, is_staff=True, is_admin=True, is_active=True)
+            email, phone_number, password, is_staff=True, is_admin=True)
         # assign admin as group
-        group, created = Group.objects.get_or_create(name='admin')
+        group, _ = Group.objects.get_or_create(name='admin')
         user.group = group
         user.save()
         return user
@@ -61,7 +61,6 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, Address):
     # Gender Choices Variables
-    Null = None
     Male = 'M'
     Female = 'F'
     Other = 'O'
@@ -80,7 +79,7 @@ class User(AbstractBaseUser, Address):
         validators=[RegexValidator(
             regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
             )],)
-    gender = models.CharField(max_length=6, choices=GENDER, default=Null, blank=True)
+    gender = models.CharField(max_length=6, choices=GENDER, default=Male, blank=True, null=True)
     email = models.EmailField(max_length=50, unique=True)
     phone_number = models.CharField(max_length=15, unique=True,\
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])

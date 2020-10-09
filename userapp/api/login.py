@@ -79,9 +79,6 @@ class LoginJWTObtainView(generics.GenericAPIView):
                 'token': token,
                 'user': serializer.data                
             }
-            company_user_obj = CompanyUser.objects.filter(user=request.user.id)
-            if company_user_obj:
-                data['company'] = company_user_obj[0].company.id
             return Response(data, status=200)
         else:
             data = {
