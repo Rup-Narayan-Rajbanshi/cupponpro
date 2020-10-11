@@ -8,6 +8,8 @@ from userapp.models.user import User
 from userapp.serializers.user import UserDetailSerializer
 from permission import isCompanyOwnerAndAllowAll, isUserReadOnly
 from helper import isCompanyUser
+from commonapp.models.coupon import Coupon
+from commonapp.serializers.coupon import CouponSerializer
 
 class CompanyListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isUserReadOnly]
@@ -299,3 +301,35 @@ class CategoryCompanyListView(generics.GenericAPIView):
             'company': serializer.data
         }
         return Response(data, status=200)
+
+
+class CompanyCouponListView(generics.GenericAPIView):
+    permission_classes = (isUserReadOnly, )
+    serializer_class = CouponSerializer
+
+    def get(self, request, company_id):
+        """
+        An endpoint for listing all the company's coupon.
+        """
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            company_coupon_obj = Coupon.objects.filter(company=company_obj[0])
+            # get coupon data from related company data
+            coupon_ids = [x.id for x in company_coupon_obj]
+            coupon_obj = Coupon.objects.filter(id__in=coupon_ids).order_by('-id')
+            page_size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(coupon_obj, page_size)
+            page_obj = paginator.get_page(page_number)
+            serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+            data = {
+                'success': 1,
+                'coupon': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': "Company doesn't exist."
+            }
+            return Response(data, status=404)

@@ -5,7 +5,7 @@ from userapp.api.user import UserListView, UpdateUser, CreateUserView,\
 	GroupListView, ResetPasswordView, CompanyGroupListView,\
 	UserGroupDetailView, SignupTokenView, VerifyUserPasswordView,\
 	ChangeUserEmailView, ChangeUserProfilePictureView
-
+from userapp.api.subscription import CreateSubscription, UpdateSubscription
 # from userapp.api.staticpage import StaticPageView
 
 app_name = 'userapp'
@@ -31,4 +31,7 @@ urlpatterns = [
 	path('signuptoken', SignupTokenView.as_view(), name='signup_token'),
 	# verify password
 	path('user/password/verify', VerifyUserPasswordView.as_view(), name='verify_user_password'),
+	# subscription
+	path('subscription', CreateSubscription.as_view(), name='create_subscription'),
+	path('subscription/<int:subscription_id>', UpdateSubscription.as_view(), name='update_subscription'),
 ]

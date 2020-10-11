@@ -20,7 +20,7 @@ class Company(Address):
     email = models.EmailField(max_length=50, unique=True, blank=True, null=True)
     sub_category = models.ForeignKey(SubCategory, on_delete=models.PROTECT, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.PROTECT,\
-        related_name="company_author", null=True)
+        related_name="company_author", blank=True, null=True)
     images = GenericRelation(Image)
     status = models.BooleanField(default=True)
     phone_number = models.CharField(max_length=15, unique=True, null=True, \
@@ -29,6 +29,7 @@ class Company(Address):
     latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     is_partner = models.BooleanField(default=False)
+    is_affiliate = models.BooleanField(default=False)
     key = models.CharField(max_length=8)
     currency = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
