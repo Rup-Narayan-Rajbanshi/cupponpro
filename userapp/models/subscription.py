@@ -11,4 +11,4 @@ class Subscription(models.Model):
         verbose_name_plural = 'subscribers'
     
     def __str__(self):
-        return self.user.full_name
+        return self.email

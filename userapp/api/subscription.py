@@ -15,13 +15,17 @@ class CreateSubscription(generics.GenericAPIView):
         """
         An endpoint for subscription registration.
         """
-        if not Subscription.objects.filter(email=request.cleaned_data['email']):
+        if not Subscription.objects.filter(email=request.data['email']):
             serializer = SubscriptionSerializer(data=request.data, context={'request': request})
             if serializer.is_valid():
-                serializer.save()
+                user_obj = User.objects.filter(email=request.data['email'])
+                if user_obj:
+                    serializer.save(user=user_obj[0], email=request.data['email'], promotion=request.data['promotion'])
+                else:
+                    serializer.save()
                 data = {
                     'success': 1,
-                    'subscription': 'You have been subscribed.'
+                    'subscription': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -44,9 +48,9 @@ class UpdateSubscription(generics.GenericAPIView):
         """
         An endpoint for getting subscription detail.
         """
-        if Subscription.objects.filter(id=subscription_id):
-            subscription_obj = Subscription.objects.get(id=subscription_id)
-            serializer = SubscriptionSerializer(subscription_obj,\
+        subscription_obj = Subscription.objects.filter(id=subscription_id)
+        if subscription_obj:
+            serializer = SubscriptionSerializer(subscription_obj[0],\
                 context={'request': request})
             data = {
                 'success': 1,
@@ -63,9 +67,9 @@ class UpdateSubscription(generics.GenericAPIView):
         """
         An endpoint for updating subscription detail.
         """
-        if Subscription.objects.filter(id=subscription_id):
-            subscription_obj = Subscription.objects.get(id=subscription_id)
-            serializer = SubscriptionSerializer(instance=subscription_obj,\
+        subscription_obj = Subscription.objects.filter(id=subscription_id)
+        if subscription_obj:
+            serializer = SubscriptionSerializer(instance=subscription_obj[0],\
                 data=request.data, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
@@ -89,9 +93,9 @@ class UpdateSubscription(generics.GenericAPIView):
         """
         An endpoint for deleting subscription.
         """
-        if Subscription.objects.filter(id=subscription_id):
-            subscription_obj = Subscription.objects.get(id=subscription_id)
-            subscription_obj.delete()
+        subscription_obj = Subscription.objects.filter(id=subscription_id)
+        if subscription_obj:
+            subscription_obj[0].delete()
             data = {
                 'success': 1,
                 'subscription': 'Subscription deleted successfully.'
