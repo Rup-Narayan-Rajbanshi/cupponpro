@@ -41,3 +41,11 @@ class isUser(permissions.BasePermission):
         if request.user.is_authenticated and request.user.group.name == 'user':
             return True
         return False
+
+class isUserReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method=='GET':
+            return True
+        # if request.user.is_authenticated and request.user.group.name == 'user':
+        #     return True
+        # return False

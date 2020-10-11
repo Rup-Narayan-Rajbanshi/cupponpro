@@ -6,11 +6,11 @@ from commonapp.models.company import Company, CompanyUser, FavouriteCompany
 from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer, ChangeCompanyEmailSerializer
 from userapp.models.user import User
 from userapp.serializers.user import UserDetailSerializer
-from permission import isCompanyOwnerAndAllowAll
+from permission import isCompanyOwnerAndAllowAll, isUserReadOnly
 from helper import isCompanyUser
 
 class CompanyListView(generics.GenericAPIView):
-    permission_classes = (AllowAny,)
+    permission_classes = [isCompanyOwnerAndAllowAll | isUserReadOnly]
     serializer_class = CompanySerializer
 
     def get(self, request):
@@ -30,6 +30,33 @@ class CompanyListView(generics.GenericAPIView):
             'company' : serializer.data,
         }
         return Response(data, status=200)
+
+    def post(self, request):
+        """
+        An endpoint for creating vendor.
+        """
+        if request.user.id == int(request.data['author']):
+            serializer = CompanySerializer(data=request.data, context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
+                company_obj = Company.objects.get(id=serializer.data['id'])
+                CompanyUser.objects.create(user=request.user, company=company_obj, is_staff=False)
+                data = {
+                    'success': 1,
+                    'company': serializer.data
+                }
+                return Response(data, status=200)
+            data = {
+                'success': 0,
+                'message': serializer.errors
+            }
+            return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': "You don't have permission to create company."
+            }
+            return Response(data, status=403)
 
 class CompanyDetailView(generics.GenericAPIView):
     serializer_class = CompanySerializer
@@ -83,37 +110,6 @@ class CompanyDetailView(generics.GenericAPIView):
                 'Message': "Company doesn't exist."
             }
             return Response(data, status=404)
-
-class CompanyCreateView(generics.GenericAPIView):
-    serializer_class = CompanySerializer
-    permission_classes = (isCompanyOwnerAndAllowAll, )
-
-    def post(self, request):
-        """
-        An endpoint for creating vendor.
-        """
-        if request.user.id == int(request.data['author']):
-            serializer = CompanySerializer(data=request.data, context={'request':request})
-            if serializer.is_valid():
-                serializer.save()
-                company_obj = Company.objects.get(id=serializer.data['id'])
-                CompanyUser.objects.create(user=request.user, company=company_obj, is_staff=False)
-                data = {
-                    'success': 1,
-                    'company': serializer.data
-                }
-                return Response(data, status=200)
-            data = {
-                'success': 0,
-                'message': serializer.errors
-            }
-            return Response(data, status=400)
-        else:
-            data = {
-                'success': 0,
-                'message': "You don't have permission to create company."
-            }
-            return Response(data, status=403)
 
 class ChangeCompanyEmailView(generics.GenericAPIView):
     serializer_class = ChangeCompanyEmailSerializer
@@ -280,5 +276,26 @@ class PartnerListView(generics.GenericAPIView):
         data = {
             'success' : 1,
             'company' : serializer.data,
+        }
+        return Response(data, status=200)
+
+class CategoryCompanyListView(generics.GenericAPIView):
+    permission_classes = (isUserReadOnly, )
+    serializer_class = CompanySerializer
+
+    def get(self, request, category_id):
+        """
+        An endpoint for listing all the company according to category. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        company_obj = Company.objects.filter(category=category_id).order_by('-id')
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
+        paginator = Paginator(company_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = CompanySerializer(page_obj, many=True, context={"request":request})
+        data = {
+            'success': 1,
+            'company': serializer.data
         }
         return Response(data, status=200)

@@ -147,3 +147,27 @@ class AffiliateLinkCountView(generics.GenericAPIView):
                 'message': "Affiliate link doesn't exist."
             }
             return Response(data, status=404)
+
+class TopDiscountAffiliateListView(generics.GenericAPIView):
+    serializer_class = AffiliateLinkSerializer
+    permission_classes = (isAdminOrReadOnly, )
+
+    def get(self, request):
+        """
+        An endpoint for listing all the affiliate link sorted by discount in descending order.\
+        Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
+        affiliate_link_obj = AffiliateLink.objects.filter(is_active=True).order_by('-discount')
+        paginator = Paginator(affiliate_link_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = AffiliateLinkSerializer(page_obj, many=True,\
+            context={"request": request})
+        data = {
+            'success': 1,
+            'affiliate_link': serializer.data
+        }
+        return Response(data, status=200)
+

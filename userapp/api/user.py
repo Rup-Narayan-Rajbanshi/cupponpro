@@ -346,7 +346,7 @@ class CreateUserView(generics.GenericAPIView):
                 else:
                     group, _ = Group.objects.get_or_create(name='owner')
 
-                user_obj.gender = serializer.validated_data['gender'],
+                user_obj.gender = serializer.validated_data['gender']
                 user_obj.group = group
                 user_obj.save()
                 # generate JWT token for immediate login
@@ -400,6 +400,7 @@ class CreateStaffUserView(generics.GenericAPIView):
                     else:
                         group, _ = Group.objects.get_or_create(name='sales')
 
+                    user_obj.gender = serializer.validated_data['gender']
                     user_obj.group = group
                     user_obj.save()
                     CompanyUser.objects.create(user=user_obj, company=company_obj[0], is_staff=True)

@@ -3,11 +3,12 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 from commonapp.models.category import Category
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.company import Company
 from commonapp.serializers.coupon import CouponSerializer, VoucherSerializer
+from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
+from datetime import datetime
 
 class CouponTypeListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
@@ -240,4 +241,33 @@ class VoucherListView(generics.GenericAPIView):
                 'message': "You do not have permission to generate voucher."
             }
             return Response(data, status=403)
-            
+
+class TrendingCouponListView(generics.GenericAPIView):
+    permission_classes = (isAdminOrReadOnly, )
+    serializer_class = CouponSerializer
+
+    def get(self, request):
+        """
+        An endpoint for listing all the trending coupons. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        coupon_obj = Coupon.objects.filter(expiry_date__gte=datetime.date(datetime.now())).order_by('-id')
+        coupon_count_list = list()
+        # counting coupon redeemed
+        for coupon in coupon_obj:
+            coupon_redeemed_count = Voucher.objects.filter(coupon=coupon).count()
+            coupon_count_list.append([coupon_redeemed_count, coupon])
+        # sort coupon
+        coupon_count_list.sort(key = lambda x: x[0], reverse=True)
+        # create coupon obj from sorted data
+        coupon_obj = [x[1] for x in coupon_count_list]
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
+        paginator = Paginator(coupon_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+        data = {
+            'success': 1,
+            'coupon': serializer.data
+        }
+        return Response(data, status=200)
