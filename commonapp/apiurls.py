@@ -5,7 +5,7 @@ from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailVi
 from commonapp.api.bill import BillListView, BillDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
-    CompanyFavouriteView, CompanyCreateView, ChangeCompanyEmailView
+    CompanyFavouriteView, ChangeCompanyEmailView, CategoryCompanyListView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView,\
     VoucherListView, TrendingCouponListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView, CompanyDocumentMassUpdateView
@@ -34,12 +34,12 @@ urlpatterns = [
     path('subcategory/<int:sub_category_id>', SubCategoryDetailView.as_view(), name='subcategory_detail'),
     # company
 	path('company', CompanyListView.as_view(), name='company_list'),
-    path('company/create', CompanyCreateView.as_view(), name='company_create'),
     path('company/<int:company_id>', CompanyDetailView.as_view(), name='company_detail'),
     path('partner', PartnerListView.as_view(), name='partner_company_list'),
     path('company/<int:company_id>/user', CompanyUserListView.as_view(), name='company_user_list'),
     path('company/<int:company_id>/favourite', CompanyFavouriteView.as_view(), name='company_favourite_list'),
     path('company/<int:company_id>/email', ChangeCompanyEmailView.as_view(), name='update_company_email'),
+    path('category/<int:category_id>/company', CategoryCompanyListView.as_view(), name='category_company_list'),
     # company image
     path('company/<int:company_id>/image', CompanyImageListView.as_view(), name='company_image_list'),
     path('company/<int:company_id>/image/<int:image_id>', CompanyImageDetailView.as_view(), name='company_image_detail'),
