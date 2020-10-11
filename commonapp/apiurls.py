@@ -7,7 +7,7 @@ from commonapp.api.category import CategoryListView, CategoryDetailView, SubCate
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
     CompanyFavouriteView, ChangeCompanyEmailView, CategoryCompanyListView, CompanyCouponListView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView,\
-    VoucherListView, TrendingCouponListView
+    VoucherListView, TrendingCouponListView, DealOfTheDayCouponListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView, CompanyDocumentMassUpdateView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
 from commonapp.api.image import CompanyImageListView, CompanyImageDetailView
@@ -54,6 +54,7 @@ urlpatterns = [
     path('category/<int:category_id>/coupon', CategoryCouponListView.as_view(), name='category_coupon_list'),
     path('coupon/type', CouponTypeListView.as_view(), name='coupon_type_list'),
     path('coupon/trending', TrendingCouponListView.as_view(), name='trending_coupon_list'),
+    path('coupon/deal-of-the-day', DealOfTheDayCouponListView.as_view(), name='deal_of_the_day_coupon_list'),
     # voucher
     path('voucher', VoucherListView.as_view(), name='voucher_list'),
     # rating

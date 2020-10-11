@@ -271,3 +271,24 @@ class TrendingCouponListView(generics.GenericAPIView):
             'coupon': serializer.data
         }
         return Response(data, status=200)
+
+class DealOfTheDayCouponListView(generics.GenericAPIView):
+    permission_classes = (isAdminOrReadOnly, )
+    serializer_class = CouponSerializer
+
+    def get(self, request):
+        """
+        An endpoint for listing all the deals of the day coupons. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        coupon_obj = Coupon.objects.filter(expiry_date__gte=datetime.date(datetime.now()), deal_of_the_day=True).order_by('-id')
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
+        paginator = Paginator(coupon_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+        data = {
+            'success': 1,
+            'coupon': serializer.data
+        }
+        return Response(data, status=200)

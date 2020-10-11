@@ -68,7 +68,7 @@ class AdminCouponapp(admin.ModelAdmin):
     fieldsets = (
             (_("Coupon Info"), {
                 'fields':(
-                    'company', 'description', 'expiry_date', 'discount', 'content_type', 'object_id'
+                    'company', 'description', 'expiry_date', 'discount', 'content_type', 'object_id', 'deal_of_the_day'
                 )
             }
         ),

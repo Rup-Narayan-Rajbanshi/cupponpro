@@ -26,6 +26,7 @@ class Coupon(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     is_premium = models.BooleanField(default=False)
     images = GenericRelation(Image)
+    deal_of_the_day = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
