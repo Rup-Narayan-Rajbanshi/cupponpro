@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 from django.urls import path
-from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView
+from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView,\
+    TopDiscountAffiliateListView
 from commonapp.api.bill import BillListView, BillDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
@@ -62,6 +63,7 @@ urlpatterns = [
     path('affiliate', AffiliateLinkListView.as_view(), name='affiliate_link_list'),
     path('affiliate/<int:affiliate_link_id>', AffiliateLinkDetailView.as_view(), name='affiliate_link_detail'),
     path('affiliate/<int:affiliate_link_id>/addcount', AffiliateLinkCountView.as_view(), name='affiliate_link_add_count'),
+    path('affiliate/top-discount', TopDiscountAffiliateListView.as_view(), name='top_discount_affiliate_link'),
     # search
     path('topbarsearch', TopBarSearchView.as_view(), name='top_bar_search_list'),
     # product
