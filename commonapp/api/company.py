@@ -315,25 +315,18 @@ class CompanyCouponListView(generics.GenericAPIView):
         if company_obj:
             company_coupon_obj = Coupon.objects.filter(company=company_obj[0])
             # get coupon data from related company data
-            if company_coupon_obj:
-                coupon_ids = [x.id for x in company_coupon_obj]
-                coupon_obj = Coupon.objects.filter(id__in=coupon_ids).order_by('-id')
-                page_size = request.GET.get('size', 10)
-                page_number = request.GET.get('page')
-                paginator = Paginator(coupon_obj, page_size)
-                page_obj = paginator.get_page(page_number)
-                serializer = CouponSerializer(page_obj, many=True, context={"request":request})
-                data = {
-                    'success': 1,
-                    'coupon': serializer.data
-                }
-                return Response(data, status=200)
-            else:
-                data = {
-                    'success': 0,
-                    'message': "Company hasn't issued coupon."
-                }
-                return Response(data, status=400)
+            coupon_ids = [x.id for x in company_coupon_obj]
+            coupon_obj = Coupon.objects.filter(id__in=coupon_ids).order_by('-id')
+            page_size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(coupon_obj, page_size)
+            page_obj = paginator.get_page(page_number)
+            serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+            data = {
+                'success': 1,
+                'coupon': serializer.data
+            }
+            return Response(data, status=200)
         else:
             data = {
                 'success': 0,
