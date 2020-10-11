@@ -94,7 +94,7 @@ class User(AbstractBaseUser, Address):
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['first_name', 'middle_name',\
-        'last_name', 'gender', 'phone_number']
+        'last_name', 'phone_number']
 
     objects = UserManager()
 

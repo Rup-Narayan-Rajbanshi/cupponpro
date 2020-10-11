@@ -298,7 +298,7 @@ class ResetPasswordView(generics.UpdateAPIView):
         serializer = self.get_serializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             # Check token exist
-            token_obj = PasswordResetToken.objects.filter(token=serializer.data.get("token"), user=request.user.id, is_used=False)
+            token_obj = PasswordResetToken.objects.filter(token=serializer.data.get("token"), is_used=False)
             if not token_obj:
                 data = {
                     'success': 0,
