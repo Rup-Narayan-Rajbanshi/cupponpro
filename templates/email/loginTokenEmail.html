@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>CupponPro's e-mail</title>
+
+	<!-- <link rel="stylesheet" href="style.css"> -->
+</head>
+<body style = "padding: 20px 20%">
+	<div class="logo">
+		<img src="{{domain_name}}{% static 'img/cp.png' %}" alt="cupponpro logo">
+	</div>
+	<div class="topic">
+		<h1>{{ subject }}</h1>
+	</div>
+	<div class="description">	
+		<p>Dear {{ user_name }}, <br> 
+		Your login token is <strong>{{ token }}</strong>.</p>
+
+		<div class="cp-btn">
+			<button style= "padding: 16px 100px; background-color: #a62a22; color: #fff; cursor: pointer;"> Click here </button>
+
+		</div>
+
+		<p>	If you need additional assistance, or you did not make this change, please contact <a href="#" style = color: #a62a22; >help@cupponpro.com.</a> </p>
+	
+	</div>
+
+	<div class="closing">	
+		cheers, <br>	
+		CupponPro Team
+	</div>
+
+	<div class="footer" style = "margin: 30px; background-color:#a62a22; color: gray; padding: 18px;">	
+		This email was sent to {{ user_email }} which is associated with a CupponPro account. 
+		<br>
+		<div class="footer-text">
+			© 2020 CupponPro Inc., All Rights Reserved 
+		<br>
+		CupponPro Ltd., 55 2nd Street San Kha Mul, Ktm.
+		</div> 
+
+		<div class="logo">
+			<img src="{{domain_name}}{% static 'img/cp.png' %}" alt="">
+		</div>
+
+	</div>
+<style>	
+.logo, .topic, .cp-btn, .footer-text{
+	display:  flex;
+	justify-content: center;
+}
+.footer-text{
+	padding-top: 24px;
+}
+</style>
+</body>
+</html>

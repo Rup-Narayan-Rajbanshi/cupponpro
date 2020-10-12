@@ -1,4 +1,4 @@
-from bannerapp.models import Banner
+from bannerapp.models.banner import Banner
 from rest_framework import serializers
 
 
@@ -6,15 +6,9 @@ class BannerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Banner
-        fields = ('id', 'title', 'description', 'banner_image',\
-            'status', 'created_at',)
-        read_only_fields = ('created_at',)
+        fields = '__all__'
 
-
-# class UpdateUserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ('id', 'username', 'first_name', 'middle_name', 'last_name',\
-#             'phone_number', 'email', 'group', 'active', 'admin', 'password',\
-#             'confirm_password', 'image')
-#         read_only_fields = ('image', 'active')
+    def exclude_fields(self, fields_to_exclude=None):
+        if isinstance(fields_to_exclude, list):
+            for f in fields_to_exclude:
+                f in self.fields.fields and self.fields.fields.pop(f) or next()

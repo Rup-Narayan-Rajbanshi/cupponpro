@@ -1,33 +1,21 @@
-from uuid import uuid4
-import datetime
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.dispatch import receiver
 import os
-from django.utils import timezone
-
-
-
-
-
+from django.db import models
+from django.dispatch import receiver
 
 class Banner(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    banner_image = models.ImageField(upload_to='banner_image/')
-    created_at = models.DateTimeField(editable=False)
-    status = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='banner_image/')
+    url = models.TextField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expire_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'banner'
 
-
-    def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.id:
-            self.created_at = timezone.now()
-        return super(Banner, self).save(*args, **kwargs)
-
+    def __str__(self):
+        return self.title
 
 @receiver(models.signals.pre_save, sender=Banner)
 def auto_delete_file_on_change(sender, instance, **kwargs):
@@ -40,11 +28,11 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         return False
 
     try:
-        old_file = sender.objects.get(pk=instance.pk).banner_image
-    except sender.DoesNotExist:
+        old_file = sender.objects.get(pk=instance.pk).image
+    except:
         return False
 
-    new_file = instance.banner_image
+    new_file = instance.image
     if not old_file == new_file:
         if os.path.isfile(old_file.path):
             os.remove(old_file.path)

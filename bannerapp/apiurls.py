@@ -7,7 +7,7 @@ from bannerapp.api.banner import BannerListView, BannerUpdateView
 app_name = 'bannerapp'
 
 urlpatterns = [
-	path('banners', BannerListView.as_view(), name='banner_list'),
-	path('banners/<banner_id>', BannerUpdateView.as_view(), name='banner_update'),
+	path('banner', BannerListView.as_view(), name='banner_list'),
+	path('banner/<banner_id>', BannerUpdateView.as_view(), name='banner_update'),
 
     ]

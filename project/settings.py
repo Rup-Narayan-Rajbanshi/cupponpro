@@ -41,20 +41,21 @@ INTERNAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'rest_framework',
-    'rest_framework.authtoken',
+    'corsheaders',
     'debug_toolbar',
     'django_extensions',
-    'corsheaders',
     'django_filters',
+    'rest_framework_swagger',
+    'rest_framework',
+    'rest_framework.authtoken',
     ]
 
 # All apps developed at GreenGrowth goes here
 DEV_APPS = [
-    'userapp',
+    'articleapp',
     'bannerapp',
-    'categoryapp',
     'commonapp',
+    'userapp',
 ]
 
 
@@ -100,23 +101,23 @@ CORS_ALLOW_CREDENTIALS = True
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
 DATABASES = {
-    'default':{
-        'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.mysql'),
-        'NAME': os.environ.get('DATABASE_NAME', 'womcs_db'),
-        'USER': os.environ.get('DATABASE_USER', 'womcs'),
-        'HOST': os.environ.get('DATABASE_HOST', 'db'),
-        'PORT': os.environ.get('DATABASE_PORT', 3306),
-        'PASSWORD':os.environ.get('DATABASES_PASSWORD', 'womcs_password'),
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# DATABASES = {
+#     'default':{
+#         'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.mysql'),
+#         'NAME': os.environ.get('DATABASE_NAME', 'womcs_db'),
+#         'USER': os.environ.get('DATABASE_USER', 'womcs'),
+#         'HOST': os.environ.get('DATABASE_HOST', 'db'),
+#         'PORT': os.environ.get('DATABASE_PORT', 3306),
+#         'PASSWORD':os.environ.get('DATABASES_PASSWORD', 'womcs_password'),
+#     }
+# }
 
 
 # Password validation
@@ -150,13 +151,15 @@ REST_FRAMEWORK = {
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
 
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
     'JWT_VERIFY_EXPIRATION': False,
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'userapp.api.JWT.jwt_response_payload_handler',
     }
 
 
@@ -190,6 +193,16 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 
 MEDIA_ROOT = os.path.join((BASE_DIR), "media")
+
+# remove this section during production
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'test@gmail.com'
+SERVER_EMAIL = 'test@gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'cupponpro.rashik@gmail.com'
+EMAIL_HOST_PASSWORD = 'iqowaxefmpmdhzrk'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

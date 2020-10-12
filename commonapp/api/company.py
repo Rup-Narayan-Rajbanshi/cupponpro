@@ -1,17 +1,31 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
+from django.core.paginator import Paginator
 from rest_framework.response import Response
-from commonapp.serializers.company import CompanySerializer, CompanyInfoSerializer
-from commonapp.models.company import Company, CompanyInfo
-from permission import Permission
+from rest_framework.permissions import AllowAny
+from rest_framework import generics
+from commonapp.models.company import Company, CompanyUser, FavouriteCompany
+from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer, ChangeCompanyEmailSerializer
+from userapp.models.user import User
+from userapp.serializers.user import UserDetailSerializer
+from permission import isCompanyOwnerAndAllowAll, isUserReadOnly
+from helper import isCompanyUser
+from commonapp.models.coupon import Coupon
+from commonapp.serializers.coupon import CouponSerializer
 
-class CompanyListView(APIView):
-    permission_classes = (Permission ,)
+class CompanyListView(generics.GenericAPIView):
+    permission_classes = [isCompanyOwnerAndAllowAll | isUserReadOnly]
     serializer_class = CompanySerializer
 
     def get(self, request):
-        company_obj = Company.objects.all()
-        serializer = CompanySerializer(company_obj, many=True,\
+        """
+        An endpoint for listing all the vendors. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
+        company_obj = Company.objects.all().order_by('-id')
+        paginator = Paginator(company_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = CompanySerializer(page_obj, many=True,\
             context={"request":request})
         data = {
             'success' : 1,
@@ -19,108 +33,303 @@ class CompanyListView(APIView):
         }
         return Response(data, status=200)
 
-class CompanyInfoListView(APIView):
-    permission_classes = (Permission ,)
-    serializer_class = CompanyInfoSerializer
-
-    def get(self, request):
-        company_info_obj = CompanyInfo.objects.all()
-        serializer = CompanyInfoSerializer(company_info_obj, many=True,\
-            context={"request":request})
-        data = {
-            'success' : 1,
-            'companyinfo' : serializer.data
-        }
-        return Response(data, status=200)
-
     def post(self, request):
-        if request.user.admin:
-            serializer = CompanyInfoSerializer(data=request.data)
+        """
+        An endpoint for creating vendor.
+        """
+        if request.user.id == int(request.data['author']):
+            serializer = CompanySerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
+                company_obj = Company.objects.get(id=serializer.data['id'])
+                CompanyUser.objects.create(user=request.user, company=company_obj, is_staff=False)
                 data = {
                     'success': 1,
-                    'companyinfo': serializer.data,
+                    'company': serializer.data
                 }
                 return Response(data, status=200)
             data = {
                 'success': 0,
-                'message': serializer.errors,
+                'message': serializer.errors
             }
             return Response(data, status=400)
-        data = {
-            'success': 0,
-            'message': "You do not have permission to add a companyinfo."
-        }
-        return Response(data, status=403)
-
-class  CompanyInfoDetailView(APIView):
-    permission_classes = (Permission, )
-    serializer_class = CompanyInfoSerializer
-
-    def get(self, request, companyinfo_id):
-        if CompanyInfo.objects.filter(id=companyinfo_id):
-            company_info_obj = CompanyInfo.objects.get(id=companyinfo_id)
-            serializer = CompanyInfoSerializer(company_info_obj,\
-                context={"request":request})
+        else:
             data = {
-                'success' : 1,
-                'companyinfo' : serializer.data
+                'success': 0,
+                'message': "You don't have permission to create company."
+            }
+            return Response(data, status=403)
+
+class CompanyDetailView(generics.GenericAPIView):
+    serializer_class = CompanySerializer
+    permission_classes = (AllowAny, )
+
+    def get(self, request, company_id):
+        """
+        An endpoint for getting vendor detail.
+        """
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            serializer = CompanySerializer(company_obj[0], context={'request':request})
+            data = {
+                'success': 1,
+                'company': serializer.data
             }
             return Response(data, status=200)
         else:
             data = {
-                'success' : 0,
-                "message" : "Companyinfo id not found."
+                'success': 0,
+                'Message': "Company doesn't exist."
             }
             return Response(data, status=404)
 
-    def put(self, request, companyinfo_id):
-        if request.user.admin:
-            if CompanyInfo.objects.filter(id=companyinfo_id):
-                company_info_obj = CompanyInfo.objects.get(id=companyinfo_id)
-                serializer = CompanyInfoSerializer(instance=company_info_obj,\
-                    data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
+    def put(self, request, company_id):
+        """
+        An endpoint for updating vendor detail.
+        """
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            serializer = CompanySerializer(instance=company_obj[0], data=request.data,\
+                partial=True, context={'request':request})
+            if 'logo' in request.data and not request.data['logo']:
+                serializer.exclude_fields(['logo'])
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'company': serializer.data
+                }
+                return Response(data, status=200)
+            else:
+                data = {
+                    'success': 1,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'Message': "Company doesn't exist."
+            }
+            return Response(data, status=404)
+
+class ChangeCompanyEmailView(generics.GenericAPIView):
+    serializer_class = ChangeCompanyEmailSerializer
+    permission_classes = (isCompanyOwnerAndAllowAll, )
+
+    def put(self, request, company_id):
+        """
+        An endpoint for changing company's email.
+        """
+        if isCompanyUser(request.user.id, company_id):
+            serializer = ChangeCompanyEmailSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                user = request.user
+                if user.check_password(serializer.data.get('password')):
+                    company_obj = Company.objects.filter(id=company_id)
+                    if company_obj:
+                        if company_obj[0].email != serializer.data.get('email'):
+                            if not Company.objects.filter(email=serializer.data.get('email')):
+                                company_obj[0].email = serializer.data.get('email')
+                                company_obj[0].save()
+                                data = {
+                                    'success': 1,
+                                    'email': serializer.data.get('email')
+                                }
+                                return Response(data, status=200)
+                            else:
+                                data = {
+                                    'success': 0,
+                                    'message': 'Email is already taken.'
+                                }
+                                return Response(data, response=400)
+                        else:
+                            data = {
+                                'success': 0,
+                                'message': 'Please enter new email.'
+                            }
+                            return Response(data, status=400)
+                    else:
+                        data = {
+                            'success': 0,
+                            'message': 'Company not found.'
+                        }
+                        return Response(data, status=404)
+                else:
                     data = {
-                        'success': 1,
-                        'companyinfo': serializer.data
+                        'success': 0,
+                        'message': 'User not verified.'
                     }
-                    return Response(data, status=200)
+                    return Response(data, status=403)
+            else:
                 data = {
                     'success': 0,
                     'message': serializer.errors
                 }
                 return Response(data, status=400)
+        else:
             data = {
                 'success': 0,
-                'message': "Companyinfo id not found."
+                'message': "You don't have permission to update email."
             }
-            return Response(data, status=400)
-        data = {
-            'success': 0,
-            'message': "You do not have permission to update companyinfo."
-        }
-        return Response(data, status=403)
+            return Response(data, status=403)
 
-    def delete(self, request, companyinfo_id):
-        if request.user.admin:
-            if CompanyInfo.objects.filter(id=companyinfo_id):
-                company_info_obj = CompanyInfo.objects.get(id=companyinfo_id)
-                company_info_obj.delete()
-                data = {
-                    'success': 1,
-                    'banner': "Companyinfo deleted successfully."
-                }
-                return Response(data, status=200)
+class CompanyFavouriteView(generics.GenericAPIView):
+    serializer_class = FavouriteCompanySerializer
+
+    def get(self, request, company_id):
+        """
+        An endpoint for marking vendor as favourite.
+        """
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            favourite_company_obj, _ = FavouriteCompany.objects.get_or_create(user=request.user, company=company_obj[0])
+            serializer = FavouriteCompanySerializer(favourite_company_obj, context={'request':request})
+            data = {
+                'success': 1,
+                'favourtie_company': serializer.data
+            }
+            return Response(data, status=200)
+        else:
             data = {
                 'success': 0,
-                'message': "Companyinfo id not found."
+                'message': "Company doesn't exist."
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
+
+    def put(self, request, company_id):
+        """
+        An endpoint for updating vendor as favourite.
+        """
+        if (int(request.data['user']) == request.user.id) and (int(request.data['company']) == company_id):
+            favourite_company_obj = FavouriteCompany.objects.filter(user=request.user, company=company_id)
+            if favourite_company_obj:
+                serializer = FavouriteCompanySerializer(favourite_company_obj[0], data=request.data,\
+                    context={'request':request})
+                if serializer.is_valid():
+                    serializer.save()
+                    data = {
+                        'success': 1,
+                        'favourtie_company': serializer.data
+                    }
+                    return Response(data, status=200)
+                else:
+                    data = {
+                        'success': 0,
+                        'message': serializer.errors
+                    }
+                    return Response(data, status=400)
         data = {
             'success': 0,
-            'message': "You do not have permission to delete companyinfo."
+            'message': 'Favourite company data not found.'
         }
-        return Response(data, status=403)
+        return Response(data, status=400)
+
+class CompanyUserListView(generics.GenericAPIView):
+    # permission_classes = () set only company owner and manager to see detail and to admin as well
+
+    def get(self, request, company_id):
+        """
+        An endpoint for listing all the vendor's users. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            company_user_obj = CompanyUser.objects.filter(company=company_obj[0])
+            # get user data from related company user data
+            user_ids = [x.user.id for x in company_user_obj]
+            user_obj = User.objects.filter(id__in=user_ids).order_by('-id')
+            page_size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(user_obj, page_size)
+            page_obj = paginator.get_page(page_number)
+            serializer = UserDetailSerializer(page_obj, many=True, context={"request":request})
+            for each_serializer in serializer.data:
+                del each_serializer['admin']
+                each_serializer['staff'] = company_user_obj.get(user__id=each_serializer['id']).is_staff
+            data = {
+                'success': 1,
+                'user': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': "Company doesn't exist."
+            }
+            return Response(data, status=404)
+
+class PartnerListView(generics.GenericAPIView):
+    permission_classes = (AllowAny, )
+    serializer_class = CompanySerializer
+
+    def get(self, request):
+        """
+        An endpoint for listing all the vendor's that are partners. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        company_obj = Company.objects.filter(is_partner=True).order_by('-id')
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
+        paginator = Paginator(company_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = CompanySerializer(page_obj, many=True,\
+            context={"request":request})
+        data = {
+            'success' : 1,
+            'company' : serializer.data,
+        }
+        return Response(data, status=200)
+
+class CategoryCompanyListView(generics.GenericAPIView):
+    permission_classes = (isUserReadOnly, )
+    serializer_class = CompanySerializer
+
+    def get(self, request, category_id):
+        """
+        An endpoint for listing all the company according to category. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        company_obj = Company.objects.filter(category=category_id).order_by('-id')
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
+        paginator = Paginator(company_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = CompanySerializer(page_obj, many=True, context={"request":request})
+        data = {
+            'success': 1,
+            'company': serializer.data
+        }
+        return Response(data, status=200)
+
+
+class CompanyCouponListView(generics.GenericAPIView):
+    permission_classes = (isUserReadOnly, )
+    serializer_class = CouponSerializer
+
+    def get(self, request, company_id):
+        """
+        An endpoint for listing all the company's coupon.
+        """
+        company_obj = Company.objects.filter(id=company_id)
+        if company_obj:
+            company_coupon_obj = Coupon.objects.filter(company=company_obj[0])
+            # get coupon data from related company data
+            coupon_ids = [x.id for x in company_coupon_obj]
+            coupon_obj = Coupon.objects.filter(id__in=coupon_ids).order_by('-id')
+            page_size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(coupon_obj, page_size)
+            page_obj = paginator.get_page(page_number)
+            serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+            data = {
+                'success': 1,
+                'coupon': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 0,
+                'message': "Company doesn't exist."
+            }
+            return Response(data, status=404)
