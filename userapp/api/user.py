@@ -390,7 +390,6 @@ class CreateStaffUserView(generics.GenericAPIView):
                         first_name=serializer.validated_data['first_name'],
                         middle_name=serializer.data.get('middle_name', ''),
                         last_name=serializer.validated_data['last_name'],
-                        gender=serializer.validated_data['gender'],
                         email=serializer.validated_data['email'],
                         phone_number=serializer.validated_data['phone_number'],
                         password=serializer.validated_data['password'],
