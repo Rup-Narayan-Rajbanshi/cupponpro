@@ -388,7 +388,7 @@ class CreateStaffUserView(generics.GenericAPIView):
                 if serializer.validated_data['password'] == serializer.validated_data['confirm_password']:
                     user_obj = User.objects.create_user(
                         first_name=serializer.validated_data['first_name'],
-                        middle_name=serializer.validated_data['middle_name'],
+                        middle_name=serializer.data.get('middle_name', ''),
                         last_name=serializer.validated_data['last_name'],
                         gender=serializer.validated_data['gender'],
                         email=serializer.validated_data['email'],
