@@ -74,14 +74,20 @@ class UserGroupDetailView(generics.GenericAPIView):
         An endpoint for changing vendor user's group.
         """
         group_modify_access = {'owner': ['manager', 'sales'], 'manager': ['sales']}
-        group_name = Group.objects.get(id=request.data['group']).name
-        if group_name in group_modify_access[request.user.group.name]:
+        group_name = Group.objects.get(id=request.data['new_group']).name
+        user_group_queryset = request.user.group.exclude(name__in=['user','admin'])
+        if group_name in group_modify_access[user_group_queryset[0].name]:
             company_user_obj = CompanyUser.objects.filter(user=user_id, company=company_id)
             if company_user_obj:
                 user_obj = User.objects.filter(id=user_id)
                 serializer = UserGroupSerializer(instance=user_obj[0], data=request.data, context={'request':request})
                 if serializer.is_valid():
-                    serializer.save()
+                    print('serializer is valid')
+                    manager_group = Group.objects.get(name='manager')
+                    sales_group = Group.objects.get(name='sales')
+                    user_obj[0].group.remove(manager_group, sales_group)
+                    new_group = Group.objects.get(id=request.data['new_group'])
+                    user_obj[0].group.add(new_group)
                     data = {
                         'success': 1,
                         'group': serializer.data

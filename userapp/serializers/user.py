@@ -4,10 +4,11 @@ from commonapp.models.company import CompanyUser
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 
 class UserGroupSerializer(serializers.ModelSerializer):
-
+    new_group = serializers.IntegerField(default=None)
     class Meta:
         model = User
-        fields = ('id', 'group')
+        fields = ('id', 'group', 'new_group')
+        read_only_fields = ('group', )
 
 class UserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
