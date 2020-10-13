@@ -22,7 +22,7 @@ class CompanyImageListView(generics.GenericAPIView):
             serializer = ImageDetailSerializer(image_obj, many=True, context={'request':request})
             data = {
                 'success': 1,
-                'image': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -45,7 +45,7 @@ class CompanyImageListView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'image': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -74,7 +74,7 @@ class CompanyImageDetailView(generics.GenericAPIView):
             serializer = ImageDetailSerializer(image_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'image': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -96,7 +96,7 @@ class CompanyImageDetailView(generics.GenericAPIView):
                     serializer.save()
                     data = {
                         'success': 1,
-                        'image': serializer.data
+                        'data': serializer.data
                     }
                     return Response(data, status=200)
                 else:
@@ -130,7 +130,7 @@ class CompanyImageDetailView(generics.GenericAPIView):
                     image_obj[0].delete()
                     data = {
                         'success': 1,
-                        'image': "Image deleted successfully."
+                        'data': None
                     }
                     return Response(data, status=200)
                 except:

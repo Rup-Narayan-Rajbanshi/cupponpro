@@ -24,7 +24,7 @@ class BillListView(generics.GenericAPIView):
             context={'request':request})
         data = {
             'success': 1,
-            'bill': serializer.data,
+            'data': serializer.data
         }
         return Response(data, status=200)
     
@@ -37,7 +37,7 @@ class BillListView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'bill': serializer.data,
+                'data': serializer.data
             }
             return Response(data, status=200)
         data = {
@@ -59,7 +59,7 @@ class BillDetailView(generics.GenericAPIView):
             serializer = BillSerializer(bill_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'bill': serializer.data,
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -80,7 +80,7 @@ class BillDetailView(generics.GenericAPIView):
                 bill_obj[0].delete()
                 data = {
                     'success': 1,
-                    'bill': 'Bill deleted successfully.'
+                    'data': None
                 }
                 return Response(data, status=200)
             except:

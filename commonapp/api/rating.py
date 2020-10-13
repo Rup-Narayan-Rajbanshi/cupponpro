@@ -23,13 +23,13 @@ class CompanyRatingListView(generics.GenericAPIView):
             serializer = RatingSerializer(page_obj, many=True,\
                 context={'request':request})
             data = {
-                'success' : 1,
-                'rating' : serializer.data,
+                'success': 1,
+                'data': serializer.data,
             }
             return Response(data, status=200)
         data = {
-            'success' : 0,
-            'message' : "Rating doesn't exist.",
+            'success': 0,
+            'message': "Rating doesn't exist.",
         }
         return Response(data, status=400)
 
@@ -43,7 +43,7 @@ class CompanyRatingListView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'rating': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             data = {
@@ -70,8 +70,8 @@ class CompanyRatingDetailView(generics.GenericAPIView):
         if rating_obj:
             serializer = RatingSerializer(rating_obj[0], context={'request':request})
             data = {
-                'success' : 1,
-                'rating' : serializer.data,
+                'success': 1,
+                'data': serializer.data,
             }
             return Response(data, status=200)
         data = {
@@ -93,7 +93,7 @@ class CompanyRatingDetailView(generics.GenericAPIView):
                     serializer.save()
                     data = {
                         'success': 1,
-                        'rating': serializer.data
+                        'data': serializer.data
                     }
                     return Response(data, status=200)
                 data = {
@@ -123,7 +123,7 @@ class CompanyRatingDetailView(generics.GenericAPIView):
                 rating_obj[0].delete()
                 data = {
                     'success': 1,
-                    'rating': "Rating deleted successfully."
+                    'data': None
                 }
                 return Response(data, status=200)
             except:

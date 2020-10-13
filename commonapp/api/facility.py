@@ -19,7 +19,7 @@ class CompanyFacilityListView(generics.GenericAPIView):
                 serializer = FacilitySerializer(facility_obj, many=True, context={'request':request})
                 data = {
                     'success': 1,
-                    'facility': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -45,7 +45,7 @@ class CompanyFacilityListView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'facility': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -76,7 +76,7 @@ class CompanyFacilityDetailView(generics.GenericAPIView):
                 serializer = FacilitySerializer(facility_obj[0], context={'request':request})
                 data = {
                     'success': 1,
-                    'facility': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -106,7 +106,7 @@ class CompanyFacilityDetailView(generics.GenericAPIView):
                         serializer.save()
                         data = {
                             'success': 1,
-                            'facility': serializer.data
+                            'data': serializer.data
                         }
                         return Response(data, status=200)
                     else:
@@ -146,7 +146,7 @@ class CompanyFacilityDetailView(generics.GenericAPIView):
                     facility_obj[0].delete()
                     data = {
                         'success': 1,
-                        'facility': "Facility deleted successfully."
+                        'data': None
                     }
                     return Response(data, status=200)
                 except:

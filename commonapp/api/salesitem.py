@@ -18,7 +18,7 @@ class SalesItemListView(generics.GenericAPIView):
             serializer = SalesItemSerializer(sales_item_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'sales_item': serializer.data,
+                'data': serializer.data,
             }
             return Response(data, status=200)
         else:
@@ -38,7 +38,7 @@ class SalesItemListView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'salesitem': serializer.data,
+                    'data': serializer.data,
                 }
                 return Response(data, status=200)
             data = {
@@ -63,10 +63,10 @@ class SalesItemDetailView(generics.GenericAPIView):
         """
         item_obj = SalesItem.objects.filter(id=item_id)
         if item_obj:
-            serializer = Serializer(item_obj[0], context={'request':request})
+            serializer = SalesItemSerializer(item_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'sales_item': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -86,7 +86,7 @@ class SalesItemDetailView(generics.GenericAPIView):
                 item_obj[0].delete()
                 data = {
                     'success': 1,
-                    'sales_item': 'Sales item deleted successfully.'
+                    'data': None
                 }
                 return Response(data, status=200)
             except:

@@ -28,8 +28,8 @@ class CompanyListView(generics.GenericAPIView):
         serializer = CompanySerializer(page_obj, many=True,\
             context={"request":request})
         data = {
-            'success' : 1,
-            'company' : serializer.data,
+            'success': 1,
+            'data': serializer.data,
         }
         return Response(data, status=200)
 
@@ -45,7 +45,7 @@ class CompanyListView(generics.GenericAPIView):
                 CompanyUser.objects.create(user=request.user, company=company_obj, is_staff=False)
                 data = {
                     'success': 1,
-                    'company': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             data = {
@@ -73,7 +73,7 @@ class CompanyDetailView(generics.GenericAPIView):
             serializer = CompanySerializer(company_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'company': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -97,7 +97,7 @@ class CompanyDetailView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'company': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -134,7 +134,7 @@ class ChangeCompanyEmailView(generics.GenericAPIView):
                                 company_obj[0].save()
                                 data = {
                                     'success': 1,
-                                    'email': serializer.data.get('email')
+                                    'data': None
                                 }
                                 return Response(data, status=200)
                             else:
@@ -142,7 +142,7 @@ class ChangeCompanyEmailView(generics.GenericAPIView):
                                     'success': 0,
                                     'message': 'Email is already taken.'
                                 }
-                                return Response(data, response=400)
+                                return Response(data, status=400)
                         else:
                             data = {
                                 'success': 0,
@@ -187,7 +187,7 @@ class CompanyFavouriteView(generics.GenericAPIView):
             serializer = FavouriteCompanySerializer(favourite_company_obj, context={'request':request})
             data = {
                 'success': 1,
-                'favourtie_company': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -210,7 +210,7 @@ class CompanyFavouriteView(generics.GenericAPIView):
                     serializer.save()
                     data = {
                         'success': 1,
-                        'favourtie_company': serializer.data
+                        'data': serializer.data
                     }
                     return Response(data, status=200)
                 else:
@@ -223,7 +223,7 @@ class CompanyFavouriteView(generics.GenericAPIView):
             'success': 0,
             'message': 'Favourite company data not found.'
         }
-        return Response(data, status=400)
+        return Response(data, status=404)
 
 class CompanyUserListView(generics.GenericAPIView):
     # permission_classes = () set only company owner and manager to see detail and to admin as well
@@ -249,7 +249,7 @@ class CompanyUserListView(generics.GenericAPIView):
                 each_serializer['staff'] = company_user_obj.get(user__id=each_serializer['id']).is_staff
             data = {
                 'success': 1,
-                'user': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -276,8 +276,8 @@ class PartnerListView(generics.GenericAPIView):
         serializer = CompanySerializer(page_obj, many=True,\
             context={"request":request})
         data = {
-            'success' : 1,
-            'company' : serializer.data,
+            'success': 1,
+            'data': serializer.data,
         }
         return Response(data, status=200)
 
@@ -298,7 +298,7 @@ class CategoryCompanyListView(generics.GenericAPIView):
         serializer = CompanySerializer(page_obj, many=True, context={"request":request})
         data = {
             'success': 1,
-            'company': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -324,7 +324,7 @@ class CompanyCouponListView(generics.GenericAPIView):
             serializer = CouponSerializer(page_obj, many=True, context={"request":request})
             data = {
                 'success': 1,
-                'coupon': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:

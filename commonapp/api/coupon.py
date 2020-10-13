@@ -29,7 +29,7 @@ class CouponTypeListView(generics.GenericAPIView):
             coupon_type_obj.append(temp)
         data = {
             'success': 1,
-            'coupon_type': coupon_type_obj
+            'data': coupon_type_obj
         }
         return Response(data, status=200)
 
@@ -50,8 +50,8 @@ class CouponListView(generics.GenericAPIView):
         serializer = CouponSerializer(page_obj, many=True,\
             context={"request":request})
         data = {
-            'success' : 1,
-            'coupon' : serializer.data
+            'success': 1,
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -64,7 +64,7 @@ class CouponListView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'coupon': serializer.data,
+                'data': serializer.data,
             }
             return Response(data, status=200)
         data = {
@@ -86,14 +86,14 @@ class CouponDetailView(generics.GenericAPIView):
             serializer = CouponSerializer(coupon_obj,\
                 context={"request":request})
             data = {
-                'success' : 1,
-                'coupon' : serializer.data
+                'success': 1,
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
             data = {
-                'success' : 0,
-                "message" : "Coupon doesn't exist."
+                'success': 0,
+                "message": "Coupon doesn't exist."
             }
             return Response(data, status=404)
 
@@ -109,7 +109,7 @@ class CouponDetailView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'coupon': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -135,7 +135,7 @@ class CouponDetailView(generics.GenericAPIView):
                 coupon_obj[0].delete()
                 data = {
                     'success': 1,
-                    'coupon': "Coupon deleted successfully."
+                    'data': None
                 }
                 return Response(data, status=200)
             except:
@@ -171,8 +171,7 @@ class CategoryCouponListView(generics.GenericAPIView):
                 serializer = CouponSerializer(page_obj, many=True, context={"request":request})
                 data = {
                     'success': 1,
-                    'category': Category.objects.get(id=category_id).name,
-                    'coupon': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             data = {
@@ -204,7 +203,7 @@ class VoucherListView(generics.GenericAPIView):
         serializer = VoucherSerializer(page_obj, many=True, context={'request':request})
         data = {
             'success': 1,
-            'voucher': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -220,7 +219,7 @@ class VoucherListView(generics.GenericAPIView):
                     serializer.save()
                     data = {
                         'success': 1,
-                        'voucher': serializer.data
+                        'data': serializer.data
                     }
                     return Response(data, status=200)
                 else:
@@ -268,7 +267,7 @@ class TrendingCouponListView(generics.GenericAPIView):
         serializer = CouponSerializer(page_obj, many=True, context={"request":request})
         data = {
             'success': 1,
-            'coupon': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -289,6 +288,6 @@ class DealOfTheDayCouponListView(generics.GenericAPIView):
         serializer = CouponSerializer(page_obj, many=True, context={"request":request})
         data = {
             'success': 1,
-            'coupon': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
