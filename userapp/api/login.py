@@ -33,7 +33,7 @@ class LoginTokenView(generics.GenericAPIView):
                     login_token_obj = LoginToken.objects.create(user=user_obj[0])
                     data = {
                         'success': 1,
-                        'token': 'Token has been sent.',
+                        'data': None
                     }
                     return Response(data, status=200)
                 else:

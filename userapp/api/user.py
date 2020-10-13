@@ -24,7 +24,7 @@ class GroupListView(generics.GenericAPIView):
         serializer = GroupSerializer(group_obj, many=True, context={'request':request})
         data = {
             'success': 1,
-            'group': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -41,7 +41,7 @@ class CompanyGroupListView(generics.GenericAPIView):
         serializer = GroupSerializer(group_obj, many=True, context={'request':request})
         data = {
             'success': 1,
-            'group': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -59,7 +59,7 @@ class UserGroupDetailView(generics.GenericAPIView):
             serializer = UserGroupSerializer(user_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'group': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -90,7 +90,7 @@ class UserGroupDetailView(generics.GenericAPIView):
                     user_obj[0].group.add(new_group)
                     data = {
                         'success': 1,
-                        'group': serializer.data
+                        'data': serializer.data
                     }
                     return Response(data, status=200)
                 else:
@@ -130,7 +130,7 @@ class UserListView(generics.GenericAPIView):
                 context={"request": request})
             data = {
                 'success': 1,
-                'user': serializer.data,
+                'data': serializer.data,
             }
             return Response(data, status=200)
         data = {
@@ -152,7 +152,7 @@ class UpdateUser(generics.GenericAPIView):
                 context={'request': request})
             data = {
                 'success': 1,
-                'user': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         data = {
@@ -175,7 +175,7 @@ class UpdateUser(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'user': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             data = {
@@ -199,7 +199,7 @@ class UpdateUser(generics.GenericAPIView):
                 user_obj.delete()
                 data = {
                     'success': 1,
-                    'user': 'User deleted successfully.'
+                    'data': None
                 }
                 return Response(data, status=200)
             data = {
@@ -241,7 +241,7 @@ class ChangePasswordView(generics.UpdateAPIView):
             self.object.save()
             data = {
                 'success': 1,
-                'message': "Password changed successfully.",
+                'data': None
             }
             return Response(data, status=200)
         data = {
@@ -276,7 +276,7 @@ class GeneratePasswordResetTokenView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'password_reset_token': "Password reset token sent."
+                    'data': None
                 }
                 return Response(data, status=200)
             else:
@@ -319,7 +319,7 @@ class ResetPasswordView(generics.UpdateAPIView):
             token_obj[0].save()
             data = {
                 'success': 1,
-                'message': "Password reset successfully.",
+                'data': None
             }
             return Response(data, status=200)
         data = {
@@ -361,7 +361,7 @@ class CreateUserView(generics.GenericAPIView):
                 token = jwt_encode_handler(payload)
                 data = {
                     'success': 1,
-                    'user': serializer.data,
+                    'data': serializer.data,
                     'token': token
                 }
                 return Response(data, status=200)
@@ -417,7 +417,7 @@ class CreateStaffUserView(generics.GenericAPIView):
                     token = jwt_encode_handler(payload)
                     data = {
                         'success': 1,
-                        'user': serializer.data,
+                        'data': serializer.data,
                         'token': token
                     }
                     return Response(data, status=200)
@@ -458,7 +458,7 @@ class SignupTokenView(generics.GenericAPIView):
                 serializer = SignupTokenSerializer(token_obj[0], context={'request':request})
                 data = {
                     'success': 1,
-                    'signup_token': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -495,7 +495,7 @@ class SignupTokenView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'signup_token': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -517,7 +517,7 @@ class VerifyUserPasswordView(generics.GenericAPIView):
         if request.user.check_password(serializer.data.get("password")):
             data = {
                 'success': 1,
-                'message': 'User password verified.'
+                'data': None
             }
             return Response(data, status=200)
         else:
@@ -546,7 +546,7 @@ class ChangeUserEmailView(generics.GenericAPIView):
                             user.save()
                             data = {
                                 'success': 1,
-                                'email': serializer.data.get('email')
+                                'data': None
                             }
                             return Response(data, status=200)
                         else:
@@ -594,7 +594,7 @@ class ChangeUserProfilePictureView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'image': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
