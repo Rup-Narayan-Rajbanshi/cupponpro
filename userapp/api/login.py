@@ -23,7 +23,7 @@ class LoginTokenView(generics.GenericAPIView):
         user_obj = User.objects.filter(email=request.data['email'])
         if user_obj:
             if user_obj[0].check_password(request.data['password']):
-                if user_obj[0].group.name in group_name[group]:
+                if user_obj[0].group.filter(name__in=group_name[group]).exists():
                     login_token_obj = LoginToken.objects.filter(user=user_obj[0].id, is_used=False)
                     # disable all login token of requesting user
                     for obj in login_token_obj:

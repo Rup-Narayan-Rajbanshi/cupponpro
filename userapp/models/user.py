@@ -53,8 +53,9 @@ class UserManager(BaseUserManager):
         user = self._create_user(first_name, middle_name, last_name,\
             email, phone_number, password, is_staff=True, is_admin=True)
         # assign admin as group
-        group, _ = Group.objects.get_or_create(name='admin')
-        user.group = group
+        user_group, _ = Group.objects.get_or_create(name='user')
+        admin_group, _ = Group.objects.get_or_create(name='admin')
+        user.group.add(user_group, admin_group)
         user.save()
         return user
 

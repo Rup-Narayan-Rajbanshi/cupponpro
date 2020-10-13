@@ -341,13 +341,12 @@ class CreateUserView(generics.GenericAPIView):
                     phone_number=serializer.validated_data['phone_number'],
                     password=serializer.validated_data['password'],
                 )
-                if serializer.validated_data['is_user']:
-                    group, _ = Group.objects.get_or_create(name='user')
-                else:
-                    group, _ = Group.objects.get_or_create(name='owner')
-
+                user_group, _ = Group.objects.get_or_create(name='user')
+                user_obj.group.add(user_group)
+                if not serializer.validated_data['is_user']:
+                    owner_group, _ = Group.objects.get_or_create(name='owner')
+                    user_obj.group.add(owner_group)
                 user_obj.gender = serializer.validated_data['gender']
-                user_obj.group = group
                 user_obj.save()
                 # generate JWT token for immediate login
                 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -394,13 +393,15 @@ class CreateStaffUserView(generics.GenericAPIView):
                         phone_number=serializer.validated_data['phone_number'],
                         password=serializer.validated_data['password'],
                     )
+                    user_group, _ = Group.objects.get_or_create(name='user')
+                    user_obj.group.add(user_group)
                     if serializer.validated_data['is_manager']:
-                        group, _ = Group.objects.get_or_create(name='manager')
+                        manager_group, _ = Group.objects.get_or_create(name='manager')
+                        user_obj.group.add(manager_group)
                     else:
-                        group, _ = Group.objects.get_or_create(name='sales')
-
+                        sales_group, _ = Group.objects.get_or_create(name='sales')
+                        user_obj.group.add(sales_group)
                     user_obj.gender = serializer.validated_data['gender']
-                    user_obj.group = group
                     user_obj.save()
                     CompanyUser.objects.create(user=user_obj, company=company_obj[0], is_staff=True)
                     # generate JWT token for immediate login

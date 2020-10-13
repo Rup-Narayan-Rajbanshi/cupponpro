@@ -25,7 +25,9 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('image', 'active', 'admin')
 
     def get_group(self, obj):
-        return obj.group.name
+        group = obj.group.all()
+        group_list = [x.name for x in group]
+        return group_list
     
     def get_company(self, obj):
         company_user_obj = CompanyUser.objects.filter(user=obj.id)
@@ -49,7 +51,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ('image', 'active', 'admin', 'email')
 
     def get_group(self, obj):
-        return obj.group.name
+        group = obj.group.all()
+        group_list = [x.name for x in group]
+        return group_list
 
     def exclude_fields(self, fields_to_exclude=None):
         if isinstance(fields_to_exclude, list):
