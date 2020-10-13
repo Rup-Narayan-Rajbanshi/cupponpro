@@ -90,7 +90,7 @@ class User(AbstractBaseUser, Address):
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     dob = models.DateField(null=True, blank=True)
-    group = models.ForeignKey(Group, on_delete=models.PROTECT, null=True, blank=True)
+    group = models.ManyToManyField(Group)
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['first_name', 'middle_name',\
