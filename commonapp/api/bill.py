@@ -2,9 +2,10 @@ from django.core.paginator import Paginator
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import permissions
-from commonapp.serializers.bill import BillSerializer
+from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.bill import Bill
-from permission import isCompanyOwnerAndAllowAll,isCompanyManagerAndAllowAll
+from commonapp.serializers.bill import BillSerializer
+from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll
 
 class BillListView(generics.GenericAPIView):
     # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
@@ -95,3 +96,23 @@ class BillDetailView(generics.GenericAPIView):
                 'message': "Bill doesn't exist."
             }
             return Response(data, status=404)
+
+class BillVerifyView(generics.GenericAPIView):
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll]
+    serializer_class = BillSerializer
+
+    def post(self, request):
+        """
+        An endpoint for bill verification.
+        """
+        company_id = request.data['company']
+        user_id = request.data['user']
+        coupon_obj = Coupon.objects.filter(company=company_id).order_by('-created_at')
+        voucher_obj = Voucher.objects.filter(coupon__in=coupon_obj, user=user_id)
+        print(voucher_obj)
+        data = {
+            'success': 1,
+            'data': None
+        }
+        return Response(data, status=200)
+

@@ -20,7 +20,7 @@ class AdminBillapp(admin.ModelAdmin):
     fieldsets = (
         (_("Basic info"), {
             'fields':(
-                'company', 'user', 'name', 'phone_number', 'longitude', 'latitude', 'is_verified' 'total', 'total_discount', 'tax', \
+                'company', 'user', 'name', 'phone_number', 'total', 'total_discount', 'tax', \
                 'taxed_amount', 'grand_total', 'payment_mode'
             )
         }

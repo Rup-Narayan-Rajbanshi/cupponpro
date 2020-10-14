@@ -25,11 +25,8 @@ class isCompanyManagerAndAllowAll(permissions.BasePermission):
             return True
         return False
 
-class isCompanySalePerson(permissions.BasePermission):
+class isCompanySalePersonAndAllowAll(permissions.BasePermission):
     def has_permission(self, request, view):
-        # if request.method=='GET':
-        #     return True
-        # else:
         if request.user.is_authenticated and request.user.group.filter(name='sales').exists():
             return True
         return False
