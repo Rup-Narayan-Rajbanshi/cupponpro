@@ -143,7 +143,8 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     if instance.image:
         if os.path.isfile(instance.image.path):
-            os.remove(instance.image.path)
+            if not 'default.png' in str(instance.image.path):
+                os.remove(instance.image.path)
 
 @receiver(models.signals.pre_save, sender=User)
 def auto_delete_file_on_change(sender, instance, **kwargs):
@@ -164,7 +165,8 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
     if old_file:
         if not old_file == new_file:
             if os.path.isfile(old_file.path):
-                os.remove(old_file.path)
+                if not 'default.png' in str(old_file.path):
+                    os.remove(old_file.path)
 
 class PasswordResetToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
