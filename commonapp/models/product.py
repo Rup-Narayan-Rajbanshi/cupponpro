@@ -48,6 +48,7 @@ class Product(models.Model):
         (Unisex, 'Unisex'),
     ]
 
+    product_code = models.CharField(max_length=10)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=30)
     product_category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT)
@@ -63,6 +64,7 @@ class Product(models.Model):
 
     class Meta:
         db_table = 'product'
+        unique_together = ('product_code', 'company',)
 
     def __str__(self):
         return self.name

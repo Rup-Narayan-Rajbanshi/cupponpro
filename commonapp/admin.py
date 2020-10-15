@@ -89,7 +89,7 @@ class AdminBulkQuantityapp(admin.ModelAdmin):
     list_display = ('id', 'name', 'created_at')
 
 class AdminProductapp(admin.ModelAdmin):
-    list_display = ('id', 'name', 'total_price', 'created_at')
+    list_display = ('id', 'product_code', 'name', 'total_price', 'created_at')
 
 class AdminProductCategoryapp(admin.ModelAdmin):
     list_display = ('id', 'name', 'created_at')
