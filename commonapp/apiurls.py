@@ -2,7 +2,7 @@
 from django.urls import path
 from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView,\
     TopDiscountAffiliateListView
-from commonapp.api.bill import BillListView, BillDetailView
+from commonapp.api.bill import BillListView, BillDetailView, BillVerifyView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
     CompanyFavouriteView, ChangeCompanyEmailView, CategoryCompanyListView, CompanyCouponListView
@@ -10,7 +10,8 @@ from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCoupo
     VoucherListView, TrendingCouponListView, DealOfTheDayCouponListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView, CompanyDocumentMassUpdateView
 from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetailView
-from commonapp.api.image import CompanyImageListView, CompanyImageDetailView
+from commonapp.api.image import CompanyImageListView, CompanyImageDetailView, CouponImageListView, CouponImageDetailView,\
+    ProductImageListView, ProductImageDetailView
 from commonapp.api.links import SocialLinkListView, SocialLinkDetailView, SocialLinkMassUpdateView
 from commonapp.api.product import (
     CompanyBulkQuantityListView,
@@ -55,6 +56,9 @@ urlpatterns = [
     path('coupon/type', CouponTypeListView.as_view(), name='coupon_type_list'),
     path('coupon/trending', TrendingCouponListView.as_view(), name='trending_coupon_list'),
     path('coupon/deal-of-the-day', DealOfTheDayCouponListView.as_view(), name='deal_of_the_day_coupon_list'),
+    # coupon image
+    path('coupon/<int:coupon_id>/image', CouponImageListView.as_view(), name='coupon_image_list'),
+    path('coupon/<int:coupon_id>/image/<int:image_id>', CouponImageDetailView.as_view(), name='coupon_image_detail'),
     # voucher
     path('voucher', VoucherListView.as_view(), name='voucher_list'),
     # rating
@@ -77,10 +81,14 @@ urlpatterns = [
     path('company/<int:company_id>/product/<int:product_id>', CompanyProductDetailView.as_view(), name='company_product_update'),
     path('productcategory', ProductCategoryListView.as_view(), name='product_category_list'),
     path('company/<int:company_id>/productcategory', CompanyProductCategoryListView.as_view(), name='company_product_category_list'),
+    # product image
+    path('product/<int:product_id>/image', ProductImageListView.as_view(), name='product_image_list'),
+    path('product/<int:product_id>/image/<int:image_id>', ProductImageDetailView.as_view(), name='product_image_detail'),
     # bill
     path('bill', BillListView.as_view(), name='bill_list'),
     path('bill/<int:bill_id>', BillDetailView.as_view(), name='bill_detail'),
     path('bill/<int:bill_id>/salesitem', SalesItemListView.as_view(), name='sales_item_list'),
+    path('bill/verify', BillVerifyView.as_view(), name='bill_verify'),
     # social links
     path('company/<int:company_id>/link', SocialLinkListView.as_view(), name='company_link_list'),
     path('company/<int:company_id>/link/<int:link_id>', SocialLinkDetailView.as_view(), name='company_link_detail'),

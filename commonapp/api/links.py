@@ -25,8 +25,8 @@ class SocialLinkListView(generics.GenericAPIView):
                 serializer = SocialLinkSerializer(social_link_obj, many=True,\
                     context={"request":request})
                 data = {
-                    'success' : 1,
-                    'social_link' : serializer.data,
+                    'success': 1,
+                    'data': serializer.data,
                 }
                 return Response(data, status=200)
             else:
@@ -37,8 +37,8 @@ class SocialLinkListView(generics.GenericAPIView):
                 return Response(data, status=403)
         else:
             data = {
-                'success' : 0,
-                'message' : "Company doesn't exist.",
+                'success': 0,
+                'message': "Company doesn't exist.",
             }
             return Response(data, status=404)
 
@@ -58,16 +58,16 @@ class SocialLinkListView(generics.GenericAPIView):
                 if serializer.is_valid():
                     serializer.save()
                     data = {
-                        'success' : 1,
-                        'social_link' : serializer.data,
+                        'success': 1,
+                        'data': serializer.data,
                     }
                     return Response(data, status=200)
                 else:
                     data = {
-                        'success' : 0,
-                        'social_link' : serializer.errors,
+                        'success': 0,
+                        'message': serializer.errors,
                     }
-                    return Response(data, status=200)
+                    return Response(data, status=400)
             else:
                 data = {
                     'success': 0,
@@ -95,20 +95,20 @@ class SocialLinkDetailView(generics.GenericAPIView):
             if social_link_obj:
                 serializer = SocialLinkSerializer(social_link_obj[0], context={"request":request})
                 data = {
-                    'success' : 1,
-                    'social_link' : serializer.data,
+                    'success': 1,
+                    'data': serializer.data,
                 }
                 return Response(data, status=200)
             else:
                 data = {
-                    'success' : 0,
-                    'message' : 'No such social link found for the company',
+                    'success': 0,
+                    'message': 'No such social link found for the company',
                 }
                 return Response(data, status=404)
         else:
             data = {
-                'success' : 0,
-                'message' : "Company doesn't exist.",
+                'success': 0,
+                'message': "Company doesn't exist.",
             }
             return Response(data, status=404)
 
@@ -124,26 +124,26 @@ class SocialLinkDetailView(generics.GenericAPIView):
                 if serializer.is_valid():
                     serializer.save()
                     data = {
-                        'success' : 1,
-                        'social_link' : serializer.data,
+                        'success': 1,
+                        'data': serializer.data,
                     }
                     return Response(data, status=200)
                 else:
                     data = {
-                    'success' : 0,
-                    'message' : serializer.errors,
+                    'success': 0,
+                    'message': serializer.errors,
                 }
                 return Response(data, status=400)
             else:
                 data = {
-                    'success' : 0,
-                    'message' : 'No such social link found for the company',
+                    'success': 0,
+                    'message': 'No such social link found for the company',
                 }
                 return Response(data, status=404)
         else:
             data = {
-                'success' : 0,
-                'message' : "Company doesn't exist.",
+                'success': 0,
+                'message': "Company doesn't exist.",
             }
             return Response(data, status=404)
 
@@ -159,7 +159,7 @@ class SocialLinkDetailView(generics.GenericAPIView):
                     social_link_obj[0].delete()
                     data = {
                         'success': 1,
-                        'social_link': 'Social link deleted successfully.'
+                        'data': None
                     }
                     return Response(data, status=200)
                 except:
@@ -190,7 +190,7 @@ class SocialLinkMassUpdateView(generics.GenericAPIView):
         ids = [x['id'] for x in request.data]
         data = {
             'success': 1,
-            'link': [],
+            'data': [],
             'message': []
         }
         social_link_obj = SocialLink.objects.filter(id__in=ids)
@@ -202,7 +202,7 @@ class SocialLinkMassUpdateView(generics.GenericAPIView):
             serializer = SocialLinkSerializer(instance=social_link_obj_dict[r_data['id']], data=r_data, context={'request':request})
             if serializer.is_valid():
                 # serializer.save()
-                data['link'].append(serializer.data)
+                data['data'].append(serializer.data)
             else:
                 data['message'].append({'id': serializer.instance.id, 'error': serializer.errors})
         return Response(data, status=200)

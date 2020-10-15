@@ -23,7 +23,7 @@ class BannerListView(generics.GenericAPIView):
             context={"request":request})
         data = {
             'success': 1,
-            'banner': serializer.data,
+            'data': serializer.data,
         }
         return Response(data, status=200)
 
@@ -36,7 +36,7 @@ class BannerListView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'banner': serializer.data,
+                'data': serializer.data,
             }
             return Response(data, status=200)
         data = {
@@ -60,7 +60,7 @@ class BannerUpdateView(generics.GenericAPIView):
                 context={'request': request})
             data = {
                 'success': 1,
-                'banner': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         data = {
@@ -83,7 +83,7 @@ class BannerUpdateView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'banner': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             data = {
@@ -107,7 +107,7 @@ class BannerUpdateView(generics.GenericAPIView):
                 banner_obj[0].delete()
                 data = {
                     'success': 1,
-                    'banner': "Banner deleted successfully."
+                    'data': None
                 }
                 return Response(data, status=200)
             except:

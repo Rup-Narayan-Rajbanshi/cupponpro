@@ -25,13 +25,13 @@ class CreateSubscription(generics.GenericAPIView):
                     serializer.save()
                 data = {
                     'success': 1,
-                    'subscription': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
                 data = {
                     'success': 0,
-                    'message': serializers.error
+                    'message': serializer.error
                 }
                 return Response(data, status=400)
         else:
@@ -39,7 +39,7 @@ class CreateSubscription(generics.GenericAPIView):
                 'success': 0,
                 'message': 'User already subscribed.'
             }
-            return Response(data, status=409)
+            return Response(data, status=400)
 
 class UpdateSubscription(generics.GenericAPIView):
     serializer_class = SubscriptionSerializer
@@ -54,7 +54,7 @@ class UpdateSubscription(generics.GenericAPIView):
                 context={'request': request})
             data = {
                 'success': 1,
-                'subscription': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         data = {
@@ -75,7 +75,7 @@ class UpdateSubscription(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'subscription': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             data = {
@@ -95,12 +95,19 @@ class UpdateSubscription(generics.GenericAPIView):
         """
         subscription_obj = Subscription.objects.filter(id=subscription_id)
         if subscription_obj:
-            subscription_obj[0].delete()
-            data = {
-                'success': 1,
-                'subscription': 'Subscription deleted successfully.'
-            }
-            return Response(data, status=200)
+            try:
+                subscription_obj[0].delete()
+                data = {
+                    'success': 1,
+                    'data': None
+                }
+                return Response(data, status=200)
+            except:
+                data = {
+                    'success': 0,
+                    'message': 'Subscription cannot be deleted.'
+                }
+                return Response(data, status=400)
         data = {
             'success': 0,
             'message': "Subscription doesn't exist."

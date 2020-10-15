@@ -53,8 +53,9 @@ class UserManager(BaseUserManager):
         user = self._create_user(first_name, middle_name, last_name,\
             email, phone_number, password, is_staff=True, is_admin=True)
         # assign admin as group
-        group, _ = Group.objects.get_or_create(name='admin')
-        user.group = group
+        user_group, _ = Group.objects.get_or_create(name='user')
+        admin_group, _ = Group.objects.get_or_create(name='admin')
+        user.group.add(user_group, admin_group)
         user.save()
         return user
 
@@ -90,7 +91,7 @@ class User(AbstractBaseUser, Address):
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     dob = models.DateField(null=True, blank=True)
-    group = models.ForeignKey(Group, on_delete=models.PROTECT, null=True, blank=True)
+    group = models.ManyToManyField(Group)
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['first_name', 'middle_name',\
@@ -142,7 +143,8 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     if instance.image:
         if os.path.isfile(instance.image.path):
-            os.remove(instance.image.path)
+            if not 'default.png' in str(instance.image.path):
+                os.remove(instance.image.path)
 
 @receiver(models.signals.pre_save, sender=User)
 def auto_delete_file_on_change(sender, instance, **kwargs):
@@ -163,7 +165,8 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
     if old_file:
         if not old_file == new_file:
             if os.path.isfile(old_file.path):
-                os.remove(old_file.path)
+                if not 'default.png' in str(old_file.path):
+                    os.remove(old_file.path)
 
 class PasswordResetToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)

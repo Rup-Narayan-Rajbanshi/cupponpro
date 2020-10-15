@@ -23,7 +23,7 @@ class AffiliateLinkListView(generics.GenericAPIView):
             context={"request": request})
         data = {
             'success': 1,
-            'affiliate_link': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -36,7 +36,7 @@ class AffiliateLinkListView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'affiliate_link': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -59,7 +59,7 @@ class AffiliateLinkDetailView(generics.GenericAPIView):
             serializer = AffiliateLinkSerializer(affiliate_link_obj[0], context={"request": request})
             data = {
                 'success': 1,
-                'affiliate_link': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -83,7 +83,7 @@ class AffiliateLinkDetailView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'affiliate_link': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -109,7 +109,7 @@ class AffiliateLinkDetailView(generics.GenericAPIView):
                 affiliate_link_obj[0].delete()
                 data = {
                     'success': 1,
-                    'affiliate_link': "Affiliate link deleted successfully."
+                    'data': None
                 }
                 return Response(data, status=200)
             except:
@@ -138,7 +138,7 @@ class AffiliateLinkCountView(generics.GenericAPIView):
             serializer = AffiliateLinkSerializer(affiliate_link_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'affiliate_link': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -167,7 +167,6 @@ class TopDiscountAffiliateListView(generics.GenericAPIView):
             context={"request": request})
         data = {
             'success': 1,
-            'affiliate_link': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
-

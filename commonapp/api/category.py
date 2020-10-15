@@ -17,7 +17,7 @@ class CategoryListView(generics.GenericAPIView):
         context={"request": request})
         data = {
             'success': 1,
-            'category': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -30,7 +30,7 @@ class CategoryListView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'category': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         data = {
@@ -52,7 +52,7 @@ class CategoryDetailView(generics.GenericAPIView):
             serializer = CategorySerializer(category_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'category': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -81,7 +81,7 @@ class CategoryDetailView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'category': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -107,7 +107,7 @@ class CategoryDetailView(generics.GenericAPIView):
                 category_obj[0].delete()
                 data = {
                     'success': 1,
-                    'category': 'Category deleted successfully.'
+                    'data': None
                 }
                 return Response(data, status=200)
             except:
@@ -136,7 +136,7 @@ class SubCategoryListView(generics.GenericAPIView):
         context={"request": request})
         data = {
             'success': 1,
-            'sub_category': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -149,7 +149,7 @@ class SubCategoryListView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'sub_category': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         data = {
@@ -171,7 +171,7 @@ class SubCategoryDetailView(generics.GenericAPIView):
             serializer = SubCategorySerializer(sub_category_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'sub_category': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -193,7 +193,7 @@ class SubCategoryDetailView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'sub_category': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -213,14 +213,21 @@ class SubCategoryDetailView(generics.GenericAPIView):
         """
         An endpoint for deleting sub-category.
         """
-        sub_category_objj = SubCategory.objects.filter(id=sub_category_id)
-        if sub_category_objj:
-            sub_category_objj[0].delete()
-            data = {
-                'success': 1,
-                'category': 'Sub-category deleted successfully.'
-            }
-            return Response(data, status=200)
+        sub_category_obj = SubCategory.objects.filter(id=sub_category_id)
+        if sub_category_obj:
+            try:
+                sub_category_obj[0].delete()
+                data = {
+                    'success': 1,
+                    'data': None
+                }
+                return Response(data, status=200)
+            except:
+                data = {
+                    'success': 0,
+                    'message': 'Sub-Category cannot be deleted.'
+                }
+                return Response(data, status=400)
         else:
             data = {
                 'success': 0,

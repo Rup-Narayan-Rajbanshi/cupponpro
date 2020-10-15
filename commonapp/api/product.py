@@ -31,8 +31,8 @@ class CompanyBulkQuantityListView(generics.GenericAPIView):
                 serializer = BulkQuantitySerializer(page_obj, many=True,\
                     context={"request":request})
                 data = {
-                    'success' : 1,
-                    'bulk_quantity' : serializer.data,
+                    'success': 1,
+                    'data': serializer.data,
                 }
                 return Response(data, status=200)
             else:
@@ -43,8 +43,8 @@ class CompanyBulkQuantityListView(generics.GenericAPIView):
                 return Response(data, status=403)
         else:
             data = {
-                'success' : 0,
-                'message' : "Company doesn't exist.",
+                'success': 0,
+                'message': "Company doesn't exist.",
             }
             return Response(data, status=404)
 
@@ -58,7 +58,7 @@ class CompanyBulkQuantityListView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'bulk_quantity': serializer.data,
+                    'data': serializer.data,
                 }
                 return Response(data, status=200)
             else:
@@ -94,14 +94,14 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
                     serializer = BulkQuantitySerializer(bulk_quantity_obj[0], \
                         context={"request":request})
                     data = {
-                        'success' : 1,
-                        'bulk_quantity' : serializer.data,
+                        'success': 1,
+                        'data': serializer.data,
                     }
                     return Response(data, status=200)
                 else:
                     data = {
-                        'success' : 0,
-                        "message" : "Bulk quantity doesn't exist."
+                        'success': 0,
+                        "message": "Bulk quantity doesn't exist."
                     }
                     return Response(data, status=404)
             else:
@@ -132,7 +132,7 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
                         serializer.save()
                         data = {
                             'success': 1,
-                            'bulk_quantity': serializer.data
+                            'data': serializer.data
                         }
                         return Response(data, status=200)
                     data = {
@@ -174,7 +174,7 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
                         bulk_quantity_obj[0].delete()
                         data = {
                             'success': 1,
-                            'bulk_quantity': "Bulk quantity deleted successfully."
+                            'data': None
                         }
                         return Response(data, status=200)
                     except:
@@ -218,8 +218,8 @@ class CompanyProductListView(generics.GenericAPIView):
         serializer = ProductSerializer(page_obj, many=True,\
             context={"request":request})
         data = {
-            'success' : 1,
-            'product' : serializer.data,
+            'success': 1,
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -233,7 +233,7 @@ class CompanyProductListView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'product': serializer.data,
+                    'data': serializer.data,
                 }
                 return Response(data, status=200)
             data = {
@@ -261,14 +261,14 @@ class CompanyProductDetailView(generics.GenericAPIView):
             if product_obj:
                 serializer = ProductSerializer(product_obj[0], context={"request":request})
                 data = {
-                    'success' : 1,
-                    'product' : serializer.data,
+                    'success': 1,
+                    'data': serializer.data,
                 }
                 return Response(data, status=200)
             else:
                 data = {
-                    'success' : 0,
-                    "message" : "Product doesn't exist."
+                    'success': 0,
+                    "message": "Product doesn't exist."
                 }
                 return Response(data, status=404)
         else:
@@ -293,7 +293,7 @@ class CompanyProductDetailView(generics.GenericAPIView):
                         serializer.save()
                         data = {
                             'success': 1,
-                            'product': serializer.data
+                            'data': serializer.data
                         }
                         return Response(data, status=200)
                     data = {
@@ -330,7 +330,7 @@ class CompanyProductDetailView(generics.GenericAPIView):
                     product_obj[0].delete()
                     data = {
                         'success': 1,
-                        'product': "Product deleted successfully."
+                        'data': None
                     }
                     return Response(data, status=200)
                 except:
@@ -370,7 +370,7 @@ class ProductCategoryListView(generics.GenericAPIView):
         context={"request": request})
         data = {
             'success': 1,
-            'product_category': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -394,7 +394,7 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
             context={"request": request})
             data = {
                 'success': 1,
-                'product_category': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -414,7 +414,7 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'product_category': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:

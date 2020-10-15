@@ -22,7 +22,7 @@ class NewsArticleListView(generics.GenericAPIView):
         serializer = NewsArticleSerializer(page_obj, many=True, context={'request':request})
         data = {
             'success': 1,
-            'news_article': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -35,7 +35,7 @@ class NewsArticleListView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'news_article': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -58,7 +58,7 @@ class NewsArticleDetailView(generics.GenericAPIView):
             serializer = NewsArticleSerializer(news_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'news_article': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -66,7 +66,7 @@ class NewsArticleDetailView(generics.GenericAPIView):
                 'success': 0,
                 'message': 'News article not found.'
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
 
     def put(self, request, news_id):
         """
@@ -82,7 +82,7 @@ class NewsArticleDetailView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'news_article': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -96,7 +96,7 @@ class NewsArticleDetailView(generics.GenericAPIView):
                 'success': 0,
                 'message': 'News article not found.'
             }
-            return Response(data, status=400)
+            return Response(data, status=404)
 
     def delete(self, request, news_id):
         """
@@ -108,7 +108,7 @@ class NewsArticleDetailView(generics.GenericAPIView):
                 news_obj[0].delete()
                 data = {
                     'success': 1,
-                    'news_article': 'News article deleted successfully.'
+                    'data': None
                 }
                 return Response(data, status=200)
             except:
@@ -122,4 +122,4 @@ class NewsArticleDetailView(generics.GenericAPIView):
                 'success': 0,
                 'message': 'News article not found.'
             }
-            return Response(data, status=400)
+            return Response(data, status=404)

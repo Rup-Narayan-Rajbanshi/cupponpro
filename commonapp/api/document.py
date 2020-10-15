@@ -19,7 +19,7 @@ class CompanyDocumentListView(generics.GenericAPIView):
             serializer = DocumentSerializer(document_obj, many=True, context={'request':request})
             data = {
                 'success': 1,
-                'document': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -39,7 +39,7 @@ class CompanyDocumentListView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'document': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -70,7 +70,7 @@ class CompanyDocumentDetailView(generics.GenericAPIView):
                 serializer = DocumentSerializer(document_obj[0], context={'request':request})
                 data = {
                     'success': 1,
-                    'document': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:data = {
@@ -101,7 +101,7 @@ class CompanyDocumentDetailView(generics.GenericAPIView):
                         serializer.save()
                         data = {
                             'success': 1,
-                            'document': serializer.data
+                            'data': serializer.data
                         }
                         return Response(data, status=200)
                     else:
@@ -139,7 +139,7 @@ class CompanyDocumentDetailView(generics.GenericAPIView):
                 document_obj[0].delete()
                 data = {
                     'success': 1,
-                    'document': "Document deleted successfully."
+                    'data': None
                 }
                 return Response(data, status=200)
             except:
@@ -167,7 +167,7 @@ class CompanyDocumentMassUpdateView(generics.GenericAPIView):
     #         serializer.save()
     #         data = {
     #             'success': 1,
-    #             'document': serializer.data
+    #             'data': serializer.data
     #         }
     #         return Response(data, status=200)
     #     else:
@@ -184,7 +184,7 @@ class CompanyDocumentMassUpdateView(generics.GenericAPIView):
         ids = [x['id'] for x in request.data]
         data = {
             'success': 1,
-            'document': [],
+            'data': [],
             'message': []
         }
         document_obj = Document.objects.filter(id__in=ids)
@@ -197,8 +197,8 @@ class CompanyDocumentMassUpdateView(generics.GenericAPIView):
             if 'document' in request.data and not request.data['document']:
                 serializer.exclude_fields(['document'])
             if serializer.is_valid():
-                # serializer.save()
-                data['document'].append(serializer.data)
+                serializer.save()
+                data['data'].append(serializer.data)
             else:
                 data['message'].append({'id': serializer.instance.id, 'error': serializer.errors})
         return Response(data, status=200)

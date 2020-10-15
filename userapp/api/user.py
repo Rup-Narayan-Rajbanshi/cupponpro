@@ -24,7 +24,7 @@ class GroupListView(generics.GenericAPIView):
         serializer = GroupSerializer(group_obj, many=True, context={'request':request})
         data = {
             'success': 1,
-            'group': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -41,7 +41,7 @@ class CompanyGroupListView(generics.GenericAPIView):
         serializer = GroupSerializer(group_obj, many=True, context={'request':request})
         data = {
             'success': 1,
-            'group': serializer.data
+            'data': serializer.data
         }
         return Response(data, status=200)
 
@@ -59,7 +59,7 @@ class UserGroupDetailView(generics.GenericAPIView):
             serializer = UserGroupSerializer(user_obj[0], context={'request':request})
             data = {
                 'success': 1,
-                'group': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -74,17 +74,23 @@ class UserGroupDetailView(generics.GenericAPIView):
         An endpoint for changing vendor user's group.
         """
         group_modify_access = {'owner': ['manager', 'sales'], 'manager': ['sales']}
-        group_name = Group.objects.get(id=request.data['group']).name
-        if group_name in group_modify_access[request.user.group.name]:
+        group_name = Group.objects.get(id=request.data['new_group']).name
+        user_group_queryset = request.user.group.exclude(name__in=['user','admin'])
+        if group_name in group_modify_access[user_group_queryset[0].name]:
             company_user_obj = CompanyUser.objects.filter(user=user_id, company=company_id)
             if company_user_obj:
                 user_obj = User.objects.filter(id=user_id)
                 serializer = UserGroupSerializer(instance=user_obj[0], data=request.data, context={'request':request})
                 if serializer.is_valid():
-                    serializer.save()
+                    print('serializer is valid')
+                    manager_group = Group.objects.get(name='manager')
+                    sales_group = Group.objects.get(name='sales')
+                    user_obj[0].group.remove(manager_group, sales_group)
+                    new_group = Group.objects.get(id=request.data['new_group'])
+                    user_obj[0].group.add(new_group)
                     data = {
                         'success': 1,
-                        'group': serializer.data
+                        'data': serializer.data
                     }
                     return Response(data, status=200)
                 else:
@@ -124,7 +130,7 @@ class UserListView(generics.GenericAPIView):
                 context={"request": request})
             data = {
                 'success': 1,
-                'user': serializer.data,
+                'data': serializer.data,
             }
             return Response(data, status=200)
         data = {
@@ -146,7 +152,7 @@ class UpdateUser(generics.GenericAPIView):
                 context={'request': request})
             data = {
                 'success': 1,
-                'user': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         data = {
@@ -169,7 +175,7 @@ class UpdateUser(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'user': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             data = {
@@ -193,7 +199,7 @@ class UpdateUser(generics.GenericAPIView):
                 user_obj.delete()
                 data = {
                     'success': 1,
-                    'user': 'User deleted successfully.'
+                    'data': None
                 }
                 return Response(data, status=200)
             data = {
@@ -235,7 +241,7 @@ class ChangePasswordView(generics.UpdateAPIView):
             self.object.save()
             data = {
                 'success': 1,
-                'message': "Password changed successfully.",
+                'data': None
             }
             return Response(data, status=200)
         data = {
@@ -270,7 +276,7 @@ class GeneratePasswordResetTokenView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'password_reset_token': "Password reset token sent."
+                    'data': None
                 }
                 return Response(data, status=200)
             else:
@@ -313,7 +319,7 @@ class ResetPasswordView(generics.UpdateAPIView):
             token_obj[0].save()
             data = {
                 'success': 1,
-                'message': "Password reset successfully.",
+                'data': None
             }
             return Response(data, status=200)
         data = {
@@ -341,13 +347,12 @@ class CreateUserView(generics.GenericAPIView):
                     phone_number=serializer.validated_data['phone_number'],
                     password=serializer.validated_data['password'],
                 )
-                if serializer.validated_data['is_user']:
-                    group, _ = Group.objects.get_or_create(name='user')
-                else:
-                    group, _ = Group.objects.get_or_create(name='owner')
-
+                user_group, _ = Group.objects.get_or_create(name='user')
+                user_obj.group.add(user_group)
+                if not serializer.validated_data['is_user']:
+                    owner_group, _ = Group.objects.get_or_create(name='owner')
+                    user_obj.group.add(owner_group)
                 user_obj.gender = serializer.validated_data['gender']
-                user_obj.group = group
                 user_obj.save()
                 # generate JWT token for immediate login
                 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -356,7 +361,7 @@ class CreateUserView(generics.GenericAPIView):
                 token = jwt_encode_handler(payload)
                 data = {
                     'success': 1,
-                    'user': serializer.data,
+                    'data': serializer.data,
                     'token': token
                 }
                 return Response(data, status=200)
@@ -394,13 +399,15 @@ class CreateStaffUserView(generics.GenericAPIView):
                         phone_number=serializer.validated_data['phone_number'],
                         password=serializer.validated_data['password'],
                     )
+                    user_group, _ = Group.objects.get_or_create(name='user')
+                    user_obj.group.add(user_group)
                     if serializer.validated_data['is_manager']:
-                        group, _ = Group.objects.get_or_create(name='manager')
+                        manager_group, _ = Group.objects.get_or_create(name='manager')
+                        user_obj.group.add(manager_group)
                     else:
-                        group, _ = Group.objects.get_or_create(name='sales')
-
+                        sales_group, _ = Group.objects.get_or_create(name='sales')
+                        user_obj.group.add(sales_group)
                     user_obj.gender = serializer.validated_data['gender']
-                    user_obj.group = group
                     user_obj.save()
                     CompanyUser.objects.create(user=user_obj, company=company_obj[0], is_staff=True)
                     # generate JWT token for immediate login
@@ -410,7 +417,7 @@ class CreateStaffUserView(generics.GenericAPIView):
                     token = jwt_encode_handler(payload)
                     data = {
                         'success': 1,
-                        'user': serializer.data,
+                        'data': serializer.data,
                         'token': token
                     }
                     return Response(data, status=200)
@@ -451,7 +458,7 @@ class SignupTokenView(generics.GenericAPIView):
                 serializer = SignupTokenSerializer(token_obj[0], context={'request':request})
                 data = {
                     'success': 1,
-                    'signup_token': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:
@@ -488,7 +495,7 @@ class SignupTokenView(generics.GenericAPIView):
             serializer.save()
             data = {
                 'success': 1,
-                'signup_token': serializer.data
+                'data': serializer.data
             }
             return Response(data, status=200)
         else:
@@ -510,7 +517,7 @@ class VerifyUserPasswordView(generics.GenericAPIView):
         if request.user.check_password(serializer.data.get("password")):
             data = {
                 'success': 1,
-                'message': 'User password verified.'
+                'data': None
             }
             return Response(data, status=200)
         else:
@@ -539,7 +546,7 @@ class ChangeUserEmailView(generics.GenericAPIView):
                             user.save()
                             data = {
                                 'success': 1,
-                                'email': serializer.data.get('email')
+                                'data': None
                             }
                             return Response(data, status=200)
                         else:
@@ -587,7 +594,7 @@ class ChangeUserProfilePictureView(generics.GenericAPIView):
                 serializer.save()
                 data = {
                     'success': 1,
-                    'image': serializer.data
+                    'data': serializer.data
                 }
                 return Response(data, status=200)
             else:

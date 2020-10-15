@@ -20,7 +20,7 @@ class AdminBillapp(admin.ModelAdmin):
     fieldsets = (
         (_("Basic info"), {
             'fields':(
-                'company', 'user', 'name', 'phone_number', 'longitude', 'latitude', 'is_verified' 'total', 'total_discount', 'tax', \
+                'company', 'user', 'name', 'phone_number', 'total', 'total_discount', 'tax', \
                 'taxed_amount', 'grand_total', 'payment_mode'
             )
         }
@@ -89,7 +89,7 @@ class AdminBulkQuantityapp(admin.ModelAdmin):
     list_display = ('id', 'name', 'created_at')
 
 class AdminProductapp(admin.ModelAdmin):
-    list_display = ('id', 'name', 'total_price', 'created_at')
+    list_display = ('id', 'product_code', 'name', 'total_price', 'created_at')
 
 class AdminProductCategoryapp(admin.ModelAdmin):
     list_display = ('id', 'name', 'created_at')
