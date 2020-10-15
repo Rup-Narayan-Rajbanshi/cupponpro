@@ -11,3 +11,5 @@ ngrok
 media
 assets
 env
+migrations
+migrations1/
