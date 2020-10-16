@@ -437,6 +437,6 @@ class ProductImageDetailView(generics.GenericAPIView):
         else:
             data = {
                 'success' : 0,
-                'message' : "Coupon doesn't exist.",
+                'message' : "Product doesn't exist.",
             }
             return Response(data, status=404)

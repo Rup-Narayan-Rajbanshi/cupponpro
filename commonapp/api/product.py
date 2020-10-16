@@ -404,8 +404,7 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
             }
             return Response(data, status=200)
 
-
-    def post(self, request):
+    def post(self, request, company_id):
         """
         An endpoint for creating vendor's product category.
         """

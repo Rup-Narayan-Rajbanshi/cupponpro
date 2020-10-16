@@ -37,7 +37,7 @@ INTERNAL_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'django.contrib.sites',
 ]
 
 THIRD_PARTY_APPS = [
@@ -60,6 +60,8 @@ DEV_APPS = [
 
 
 INSTALLED_APPS = INTERNAL_APPS + THIRD_PARTY_APPS + DEV_APPS
+
+SITE_ID = 1
 
 AUTH_USER_MODEL = 'userapp.User'
 
