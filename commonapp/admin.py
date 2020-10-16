@@ -33,7 +33,7 @@ class AdminSalesItemapp(admin.ModelAdmin):
     fieldsets = (
         (_("Basic info"), {
             'fields':(
-                'bill', 'product', 'amount', 'quantity'
+                'bill', 'product', 'amount', 'voucher', 'discount_amount', 'discount', 'quantity'
             )
         }
         ),
