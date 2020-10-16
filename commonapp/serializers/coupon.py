@@ -18,14 +18,23 @@ class CouponSerializer(serializers.ModelSerializer):
         coupon_type = obj.content_type.name
         current_site = Site.objects.get_current()
         if coupon_type == 'category':
-            images = [current_site.domain + obj.company.logo.url]
+            try:
+                logo = current_site.domain + obj.company.logo.url
+                logo = [logo]
+            except:
+                logo = None
+            images = logo
         if coupon_type == 'product':
             content_type_obj = ContentType.objects.get(model='product')
             image_obj = Image.objects.filter(content_type=content_type_obj, object_id=obj.id)
             images = [current_site.domain + x.image.url for x in image_obj]
-            print(images)
         if coupon_type == 'product category':
-            images = [current_site.domain + obj.content_object.image.url]
+            try:
+                image = current_site.domain + obj.company.logo.url
+                image = [image]
+            except:
+                image = None
+            images = image
         return images
 
     def get_coupon_relation(self, obj):
