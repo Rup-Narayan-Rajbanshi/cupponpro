@@ -8,25 +8,21 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(os.path.join(__file__, os.pardir))))
 
+SECRET_KEY = config('SECRET_KEY')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '@xbpk&2#$3ag%(-@76lrj=+c(9&y*)rud%zk_3)2i1by63cx*n'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-# ALLOWED_HOSTS = []
-
-
-ALLOWED_HOSTS = ["*"]
-
+EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+SERVER_EMAIL = config('SERVER_EMAIL')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND = config('EMAIL_BACKEND')
 
 # Application definition
 
@@ -37,7 +33,7 @@ INTERNAL_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'django.contrib.sites',
 ]
 
 THIRD_PARTY_APPS = [
@@ -60,6 +56,8 @@ DEV_APPS = [
 
 
 INSTALLED_APPS = INTERNAL_APPS + THIRD_PARTY_APPS + DEV_APPS
+
+SITE_ID = 1
 
 AUTH_USER_MODEL = 'userapp.User'
 
@@ -96,29 +94,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-
-
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-# DATABASES = {
-#     'default':{
-#         'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.mysql'),
-#         'NAME': os.environ.get('DATABASE_NAME', 'womcs_db'),
-#         'USER': os.environ.get('DATABASE_USER', 'womcs'),
-#         'HOST': os.environ.get('DATABASE_HOST', 'db'),
-#         'PORT': os.environ.get('DATABASE_PORT', 3306),
-#         'PASSWORD':os.environ.get('DATABASES_PASSWORD', 'womcs_password'),
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -196,13 +171,3 @@ STATICFILES_DIRS = (
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 
 MEDIA_ROOT = os.path.join((BASE_DIR), "media")
-
-# remove this section during production
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'test@gmail.com'
-SERVER_EMAIL = 'test@gmail.com'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'cupponpro.rashik@gmail.com'
-EMAIL_HOST_PASSWORD = 'iqowaxefmpmdhzrk'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

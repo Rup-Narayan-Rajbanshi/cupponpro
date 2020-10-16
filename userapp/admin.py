@@ -42,5 +42,4 @@ admin.site.register(PasswordResetToken, AdminPasswordResetTokenapp)
 admin.site.register(SignupToken)
 admin.site.register(User, AdminUserapp)
 admin.site.register(Subscription, AdminSubscription)
-
 admin.site.unregister(Token)

@@ -15,7 +15,7 @@ class SalesItemListView(generics.GenericAPIView):
         """
         sales_item_obj = SalesItem.objects.filter(bill__id=bill_id)
         if sales_item_obj:
-            serializer = SalesItemSerializer(sales_item_obj[0], context={'request':request})
+            serializer = SalesItemSerializer(sales_item_obj, many=True, context={'request':request})
             data = {
                 'success': 1,
                 'data': serializer.data,

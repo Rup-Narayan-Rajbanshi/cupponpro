@@ -13,6 +13,7 @@ class AffiliateLink(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     sub_category = models.ForeignKey(SubCategory, on_delete=models.PROTECT, null=True, blank=True)
     count = models.PositiveIntegerField(default=0)
+    deal_of_the_day = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

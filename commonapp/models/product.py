@@ -20,6 +20,7 @@ class BulkQuantity(models.Model):
 class ProductCategory(models.Model):
     name = models.CharField(max_length=30, unique=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='product_category/')
     token = models.CharField(max_length=8, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

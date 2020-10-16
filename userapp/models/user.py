@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group
 from django.dispatch import receiver
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
-from project.settings import EMAIL_HOST_USER
+from project.settings.base import EMAIL_HOST_USER
 from commonapp.models.address import Address
 
 class UserManager(BaseUserManager):

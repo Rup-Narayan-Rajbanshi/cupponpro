@@ -165,29 +165,36 @@ class UpdateUser(generics.GenericAPIView):
         """
         An endpoint for updating detail.
         """
-        if User.objects.filter(id=user_id):
-            user_obj = User.objects.get(id=user_id)
-            serializer = UserSerializer(instance=user_obj,\
-                data=request.data, partial=True, context={'request':request})
-            if 'image' in request.data and not request.data['image']:
-                serializer.exclude_fields(['image'])
-            if serializer.is_valid():
-                serializer.save()
+        if request.user.id == user_id:
+            if User.objects.filter(id=user_id):
+                user_obj = User.objects.get(id=user_id)
+                serializer = UserSerializer(instance=user_obj,\
+                    data=request.data, partial=True, context={'request':request})
+                if 'image' in request.data and not request.data['image']:
+                    serializer.exclude_fields(['image'])
+                if serializer.is_valid():
+                    serializer.save()
+                    data = {
+                        'success': 1,
+                        'data': serializer.data
+                    }
+                    return Response(data, status=200)
                 data = {
-                    'success': 1,
-                    'data': serializer.data
+                    'success': 0,
+                    'message': serializer.errors
                 }
-                return Response(data, status=200)
+                return Response(data, status=400)
             data = {
                 'success': 0,
-                'message': serializer.errors
+                'message': "User doesn't exist."
             }
-            return Response(data, status=400)
-        data = {
-            'success': 0,
-            'message': "User doesn't exist."
-        }
-        return Response(data, status=404)
+            return Response(data, status=404)
+        else:
+            data = {
+                'success': 0,
+                'message': "You do not have permission to edit user."
+            }
+            return Response(data, status=403)
 
     def delete(self, request, user_id):
         """

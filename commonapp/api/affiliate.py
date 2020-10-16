@@ -170,3 +170,24 @@ class TopDiscountAffiliateListView(generics.GenericAPIView):
             'data': serializer.data
         }
         return Response(data, status=200)
+
+class DealOfTheDayAffiliateListView(generics.GenericAPIView):
+    serializer_class = AffiliateLinkSerializer
+    permission_classes = (isAdminOrReadOnly, )
+
+    def get(self, request):
+        """
+        An endpoint for listing all the deals of the day affiliate links. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively.
+        """
+        affiliate_link_obj = AffiliateLink.objects.filter(is_active=True, deal_of_the_day=True).order_by('-discount')
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
+        paginator = Paginator(affiliate_link_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = AffiliateLinkSerializer(page_obj, many=True, context={"request":request})
+        data = {
+            'success': 1,
+            'data': serializer.data
+        }
+        return Response(data, status=200)
