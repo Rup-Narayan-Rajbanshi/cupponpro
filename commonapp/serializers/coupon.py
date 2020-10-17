@@ -5,6 +5,11 @@ from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.image import Image
 
 class CouponSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coupon
+        fields = "__all__"
+
+class CouponDetailSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     coupon_relation = serializers.SerializerMethodField()
     is_redeemed = serializers.SerializerMethodField()
