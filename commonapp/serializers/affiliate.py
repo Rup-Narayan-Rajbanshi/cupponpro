@@ -16,6 +16,7 @@ class AffiliateLinkSerializer(serializers.ModelSerializer):
         except:
             logo = None
         data = {
+            'id': obj.company.id,
             'name': obj.company.name,
             'logo': logo
         }

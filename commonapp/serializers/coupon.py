@@ -55,8 +55,10 @@ class CouponSerializer(serializers.ModelSerializer):
         except:
             logo = None
         data = {
+            'id': obj.company.id,
             'name': obj.company.name,
             'logo': logo,
+            'owner_id': obj.company.author.id,
             'owner_name': obj.company.author.full_name,
             'profile_image': current_site.domain + obj.company.author.image.url
         }
