@@ -26,7 +26,7 @@ class CouponSerializer(serializers.ModelSerializer):
             images = logo
         if coupon_type == 'product':
             content_type_obj = ContentType.objects.get(model='product')
-            image_obj = Image.objects.filter(content_type=content_type_obj, object_id=obj.id)
+            image_obj = Image.objects.filter(content_type=content_type_obj, object_id=obj.object_id)
             images = [current_site.domain + x.image.url for x in image_obj]
         if coupon_type == 'product category':
             try:
