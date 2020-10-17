@@ -264,7 +264,7 @@ class TrendingCouponListView(generics.GenericAPIView):
         page_number = request.GET.get('page')
         paginator = Paginator(coupon_obj, page_size)
         page_obj = paginator.get_page(page_number)
-        serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+        serializer = CouponDetailSerializer(page_obj, many=True, context={"request":request})
         data = {
             'success': 1,
             'data': serializer.data
@@ -285,7 +285,7 @@ class DealOfTheDayCouponListView(generics.GenericAPIView):
         page_number = request.GET.get('page')
         paginator = Paginator(coupon_obj, page_size)
         page_obj = paginator.get_page(page_number)
-        serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+        serializer = CouponDetailSerializer(page_obj, many=True, context={"request":request})
         data = {
             'success': 1,
             'data': serializer.data
