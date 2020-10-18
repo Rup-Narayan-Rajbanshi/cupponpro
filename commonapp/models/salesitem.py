@@ -1,3 +1,4 @@
+import uuid
 from django.utils import timezone
 from django.db import models
 from django.dispatch import receiver
@@ -7,6 +8,7 @@ from commonapp.models.coupon import Voucher
 
 
 class SalesItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     bill = models.ForeignKey(Bill, on_delete=models.PROTECT, null=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
     amount = models.PositiveIntegerField()

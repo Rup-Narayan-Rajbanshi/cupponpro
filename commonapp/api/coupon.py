@@ -211,7 +211,7 @@ class VoucherListView(generics.GenericAPIView):
         """
         An endpoint for creating user's voucher.
         """
-        if request.user.id == int(request.data['user']):
+        if str(request.user.id) == str(request.data('user', None)):
             voucher_obj = Voucher.objects.filter(user=request.user.id, coupon=request.data['coupon'])
             if not voucher_obj:
                 serializer = VoucherSerializer(data=request.data, context={'request':request}, partial=True)

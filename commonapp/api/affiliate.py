@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.models.affiliate import AffiliateLink
-from commonapp.serializers.affiliate import AffiliateLinkSerializer
+from commonapp.serializers.affiliate import AffiliateLinkSerializer, AffiliateLinkDetailSerializer
 from permission import isAdminOrReadOnly
 
 class AffiliateLinkListView(generics.GenericAPIView):
@@ -19,7 +19,7 @@ class AffiliateLinkListView(generics.GenericAPIView):
         affiliate_link_obj = AffiliateLink.objects.all().order_by('-id')
         paginator = Paginator(affiliate_link_obj, page_size)
         page_obj = paginator.get_page(page_number)
-        serializer = AffiliateLinkSerializer(page_obj, many=True,\
+        serializer = AffiliateLinkDetailSerializer(page_obj, many=True,\
             context={"request": request})
         data = {
             'success': 1,
@@ -56,7 +56,7 @@ class AffiliateLinkDetailView(generics.GenericAPIView):
         """
         affiliate_link_obj = AffiliateLink.objects.filter(id=affiliate_link_id)
         if affiliate_link_obj:
-            serializer = AffiliateLinkSerializer(affiliate_link_obj[0], context={"request": request})
+            serializer = AffiliateLinkDetailSerializer(affiliate_link_obj[0], context={"request": request})
             data = {
                 'success': 1,
                 'data': serializer.data

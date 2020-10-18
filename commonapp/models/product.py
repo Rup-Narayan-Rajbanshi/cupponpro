@@ -1,10 +1,14 @@
+import os
 import shortuuid
+import uuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.dispatch import receiver
 from commonapp.models.image import Image
 from commonapp.models.company import Company
 
 class BulkQuantity(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=30, unique=True)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
@@ -18,6 +22,7 @@ class BulkQuantity(models.Model):
         return self.name
 
 class ProductCategory(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=30, unique=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_category/')
@@ -37,6 +42,37 @@ class ProductCategory(models.Model):
             self.token = shortuuid.ShortUUID().random(length=8)
         return super(ProductCategory, self).save(*args, **kwargs)
 
+@receiver(models.signals.post_delete, sender=ProductCategory)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes file from filesystem
+    when corresponding `MediaFile` object is deleted.
+    """
+    if instance.logo:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+
+@receiver(models.signals.pre_save, sender=ProductCategory)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """
+    Deletes old file from filesystem
+    when corresponding `MediaFile` object is updated
+    with new file.
+    """
+    if not instance.pk:
+        return False
+    
+    try:
+        old_file = sender.objects.get(pk=instance.pk).image
+    except:
+        return False
+    
+    new_file = instance.image
+    if old_file:
+        if not old_file == new_file:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
+
 class Product(models.Model):
     Null = None
     Male = "M"
@@ -49,6 +85,7 @@ class Product(models.Model):
         (Unisex, 'Unisex'),
     ]
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     product_code = models.CharField(max_length=10)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=30)

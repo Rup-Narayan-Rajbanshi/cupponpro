@@ -1,5 +1,6 @@
 import os
 import shortuuid
+import uuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import RegexValidator
 from django.db import models
@@ -8,11 +9,10 @@ from commonapp.models.address import Address
 from commonapp.models.image import Image
 from commonapp.models.category import Category, SubCategory
 from django.dispatch import receiver
-
 from userapp.models import User
 
 class Company(Address):
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=200)
     logo = models.ImageField(upload_to='logo/', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,\
@@ -33,7 +33,6 @@ class Company(Address):
     key = models.CharField(max_length=8)
     currency = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
-
 
     class Meta:
         db_table = 'company'
@@ -80,6 +79,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                 os.remove(old_file.path)
 
 class CompanyUser(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     is_staff = models.BooleanField(default=True)
@@ -93,6 +93,7 @@ class CompanyUser(models.Model):
         return self.user.full_name
 
 class FavouriteCompany(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     is_favourite = models.BooleanField(default=False)

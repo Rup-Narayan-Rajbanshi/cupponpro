@@ -1,8 +1,10 @@
+import uuid
 from django.db import models
 from commonapp.models.company import Company
 from userapp.models.user import User
 
 class Rating(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     description = models.TextField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)

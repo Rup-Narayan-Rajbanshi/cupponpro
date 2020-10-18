@@ -1,5 +1,6 @@
 import os
 import shortuuid
+import uuid
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -16,6 +17,7 @@ from userapp.models.user import User
 from django.dispatch import receiver
 
 class Coupon(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
     description = models.CharField(max_length=250)
     expiry_date = models.DateField()
@@ -43,6 +45,7 @@ class Coupon(models.Model):
 
 
 class Voucher(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     coupon = models.ForeignKey(Coupon, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     token = models.CharField(max_length=20, editable=False)
