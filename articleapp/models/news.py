@@ -1,8 +1,10 @@
 import os
+import uuid
 from django.db import models
 from django.dispatch import receiver
 
 class NewsArticle(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     news_partner = models.CharField(max_length=50)
     url = models.TextField()
     headline = models.CharField(max_length=255)
