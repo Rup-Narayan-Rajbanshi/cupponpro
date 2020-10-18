@@ -14,15 +14,15 @@ urlpatterns = [
 	# group
 	path('group', GroupListView.as_view(), name='group_list'),
 	path('company/group', CompanyGroupListView.as_view(), name='company_group_list'),
-	path('company/<int:company_id>/user/<int:user_id>/group', UserGroupDetailView.as_view(), name="company_user_group_change"),
+	path('company/<str:company_id>/user/<str:user_id>/group', UserGroupDetailView.as_view(), name="company_user_group_change"),
 	# user
 	path('user', UserListView.as_view(), name='user_list'),
 	path('user/create', CreateUserView.as_view(), name='user_create'),
-	path('user/createstaff/company/<int:company_id>', CreateStaffUserView.as_view(), name='staff_user_create'),
-	path('user/<int:user_id>', UpdateUser.as_view(), name='user_update'),
-	path('user/<int:user_id>/profile-pic', ChangeUserProfilePictureView.as_view(), name='user_profile_pic_update'),
+	path('user/createstaff/company/<str:company_id>', CreateStaffUserView.as_view(), name='staff_user_create'),
+	path('user/<str:user_id>', UpdateUser.as_view(), name='user_update'),
+	path('user/<str:user_id>/profile-pic', ChangeUserProfilePictureView.as_view(), name='user_profile_pic_update'),
 	# email
-	path('user/<int:user_id>/email', ChangeUserEmailView.as_view(), name='update_user_email'),
+	path('user/<str:user_id>/email', ChangeUserEmailView.as_view(), name='update_user_email'),
 	# password
 	path('user/changepassword', ChangePasswordView.as_view(), name='change_password'),
 	path('user/forgotpassword', GeneratePasswordResetTokenView.as_view(), name='forgot_password'),
@@ -33,5 +33,5 @@ urlpatterns = [
 	path('user/password/verify', VerifyUserPasswordView.as_view(), name='verify_user_password'),
 	# subscription
 	path('subscription', CreateSubscription.as_view(), name='create_subscription'),
-	path('subscription/<int:subscription_id>', UpdateSubscription.as_view(), name='update_subscription'),
+	path('subscription/<str:subscription_id>', UpdateSubscription.as_view(), name='update_subscription'),
 ]

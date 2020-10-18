@@ -1,5 +1,6 @@
 import os
 import shortuuid
+import uuid
 from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -71,6 +72,7 @@ class User(AbstractBaseUser, Address):
         (Other, 'Other'),
     ]
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     first_name = models.CharField(max_length=50,\
         validators=[RegexValidator(
             regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
@@ -169,6 +171,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                     os.remove(old_file.path)
 
 class PasswordResetToken(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     token = models.CharField(max_length=6, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -224,6 +227,7 @@ def auto_send_passoword_reset_token_email(sender, instance, **kwargs):
         return False
 
 class LoginToken(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     token = models.CharField(max_length=4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -278,6 +282,7 @@ def auto_send_login_token_email(sender, instance, **kwargs):
         return False
 
 class SignupToken(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     email = models.EmailField(max_length=50)
     phone_number = models.CharField(max_length=15,\
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])

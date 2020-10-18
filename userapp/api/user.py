@@ -82,7 +82,6 @@ class UserGroupDetailView(generics.GenericAPIView):
                 user_obj = User.objects.filter(id=user_id)
                 serializer = UserGroupSerializer(instance=user_obj[0], data=request.data, context={'request':request})
                 if serializer.is_valid():
-                    print('serializer is valid')
                     manager_group = Group.objects.get(name='manager')
                     sales_group = Group.objects.get(name='sales')
                     user_obj[0].group.remove(manager_group, sales_group)
@@ -165,7 +164,7 @@ class UpdateUser(generics.GenericAPIView):
         """
         An endpoint for updating detail.
         """
-        if request.user.id == user_id:
+        if str(request.user.id) == user_id:
             if User.objects.filter(id=user_id):
                 user_obj = User.objects.get(id=user_id)
                 serializer = UserSerializer(instance=user_obj,\
@@ -542,7 +541,7 @@ class ChangeUserEmailView(generics.GenericAPIView):
         """
         An endpoint for changing user's email.
         """
-        if request.user.id == user_id:
+        if str(request.user.id) == user_id:
             serializer = ChangeUserEmailSerializer(data=request.data, context={'request': request})
             if serializer.is_valid():
                 user = request.user
@@ -595,7 +594,7 @@ class ChangeUserProfilePictureView(generics.GenericAPIView):
         """
         An endpoint for changing user's profile picture.
         """
-        if request.user.id == user_id:
+        if str(request.user.id) == user_id:
             serializer = ChangeUserProfilePictureSerializer(instance=request.user, data=request.data, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
