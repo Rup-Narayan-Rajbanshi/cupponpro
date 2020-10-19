@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from commonapp.models.category import Category
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.company import Company
-from commonapp.serializers.coupon import CouponSerializer, VoucherSerializer
+from commonapp.serializers.coupon import CouponSerializer, VoucherSerializer, CouponDetailSerializer
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 from datetime import datetime
 
@@ -47,7 +47,7 @@ class CouponListView(generics.GenericAPIView):
         coupon_obj = Coupon.objects.all().order_by('-id')
         paginator = Paginator(coupon_obj, page_size)
         page_obj = paginator.get_page(page_number)
-        serializer = CouponSerializer(page_obj, many=True,\
+        serializer = CouponDetailSerializer(page_obj, many=True,\
             context={"request":request})
         data = {
             'success': 1,
@@ -168,7 +168,7 @@ class CategoryCouponListView(generics.GenericAPIView):
             paginator = Paginator(coupon_obj, page_size)
             page_obj = paginator.get_page(page_number)
             if coupon_obj:
-                serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+                serializer = CouponDetailSerializer(page_obj, many=True, context={"request":request})
                 data = {
                     'success': 1,
                     'data': serializer.data
@@ -211,7 +211,7 @@ class VoucherListView(generics.GenericAPIView):
         """
         An endpoint for creating user's voucher.
         """
-        if request.user.id == int(request.data['user']):
+        if str(request.user.id) == str(request.data('user', None)):
             voucher_obj = Voucher.objects.filter(user=request.user.id, coupon=request.data['coupon'])
             if not voucher_obj:
                 serializer = VoucherSerializer(data=request.data, context={'request':request}, partial=True)
@@ -264,7 +264,7 @@ class TrendingCouponListView(generics.GenericAPIView):
         page_number = request.GET.get('page')
         paginator = Paginator(coupon_obj, page_size)
         page_obj = paginator.get_page(page_number)
-        serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+        serializer = CouponDetailSerializer(page_obj, many=True, context={"request":request})
         data = {
             'success': 1,
             'data': serializer.data
@@ -285,7 +285,7 @@ class DealOfTheDayCouponListView(generics.GenericAPIView):
         page_number = request.GET.get('page')
         paginator = Paginator(coupon_obj, page_size)
         page_obj = paginator.get_page(page_number)
-        serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+        serializer = CouponDetailSerializer(page_obj, many=True, context={"request":request})
         data = {
             'success': 1,
             'data': serializer.data

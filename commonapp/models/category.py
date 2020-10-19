@@ -1,10 +1,12 @@
 import os
 import shortuuid
+import uuid
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.dispatch import receiver
 
 class Category(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=30, unique=True)
     icon = models.FileField(upload_to='icons/', validators=[FileExtensionValidator(allowed_extensions=['svg'])])
     image = models.ImageField(upload_to='category/', null=True, blank=True)
@@ -14,13 +16,14 @@ class Category(models.Model):
     class Meta:
         db_table = 'category'
         verbose_name_plural = "categories"
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
         ''' On save, create token '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=8)
         return super(Category, self).save(*args, **kwargs)
 
@@ -70,6 +73,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         pass
 
 class SubCategory(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=15, unique=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -77,6 +81,7 @@ class SubCategory(models.Model):
     class Meta:
         db_table = 'sub_category'
         verbose_name_plural = "sub categories"
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name

@@ -1,8 +1,10 @@
 from rest_framework import serializers
 from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Company, FavouriteCompany
+from commonapp.models.links import SocialLink
 from commonapp.models.rating import Rating
 from commonapp.serializers.image import ImageDetailSerializer
+from commonapp.serializers.links import SocialLinkSerializer
 from userapp.models.user import User
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -10,6 +12,7 @@ class CompanySerializer(serializers.ModelSerializer):
     images = ImageDetailSerializer(many=True, read_only=True)
     rating = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
+    links = serializers.SerializerMethodField()
     
     class Meta:
         model = Company
@@ -28,6 +31,11 @@ class CompanySerializer(serializers.ModelSerializer):
 
     def get_rating_count(self, obj):
         return Rating.objects.filter(company=obj.id).count()
+
+    def get_links(self, obj):
+        social_link_obj = SocialLink.objects.filter(company=obj.id)
+        serializer = SocialLinkSerializer(social_link_obj, many=True)
+        return serializer.data
 
     def exclude_fields(self, fields_to_exclude=None):
         if isinstance(fields_to_exclude, list):

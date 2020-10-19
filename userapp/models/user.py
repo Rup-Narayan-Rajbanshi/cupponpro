@@ -1,5 +1,6 @@
 import os
 import shortuuid
+import uuid
 from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -71,6 +72,7 @@ class User(AbstractBaseUser, Address):
         (Other, 'Other'),
     ]
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     first_name = models.CharField(max_length=50,\
         validators=[RegexValidator(
             regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
@@ -101,6 +103,7 @@ class User(AbstractBaseUser, Address):
 
     class Meta:
         db_table = 'user'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.full_name
@@ -169,6 +172,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                     os.remove(old_file.path)
 
 class PasswordResetToken(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     token = models.CharField(max_length=6, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -177,13 +181,14 @@ class PasswordResetToken(models.Model):
     class Meta:
         db_table = 'password_reset_token'
         verbose_name_plural = "password reset tokens"
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.token
 
     def save(self, *args, **kwargs):
         ''' On save, generate token '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=6)
         return super(PasswordResetToken, self).save(*args, **kwargs)
 
@@ -224,6 +229,7 @@ def auto_send_passoword_reset_token_email(sender, instance, **kwargs):
         return False
 
 class LoginToken(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     token = models.CharField(max_length=4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -231,13 +237,14 @@ class LoginToken(models.Model):
 
     class Meta:
         db_table = 'login_token'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.token
 
     def save(self, *args, **kwargs):
         ''' On save, generate token '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=4)
         return super(LoginToken, self).save(*args, **kwargs)
 
@@ -278,6 +285,7 @@ def auto_send_login_token_email(sender, instance, **kwargs):
         return False
 
 class SignupToken(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     email = models.EmailField(max_length=50)
     phone_number = models.CharField(max_length=15,\
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
@@ -287,13 +295,14 @@ class SignupToken(models.Model):
 
     class Meta:
         db_table = 'signup_token'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.token
 
     def save(self, *args, **kwargs):
         ''' On save, generate token '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=4)
         return super(SignupToken, self).save(*args, **kwargs)
 

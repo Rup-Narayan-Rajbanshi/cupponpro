@@ -15,23 +15,17 @@ class CompanyRatingListView(generics.GenericAPIView):
         number of items per page respectively.
         """
         rating_obj = Rating.objects.filter(company=company_id).order_by('-id')
-        if rating_obj:
-            page_size = request.GET.get('size', 10)
-            page_number = request.GET.get('page')
-            paginator = Paginator(rating_obj, page_size)
-            page_obj = paginator.get_page(page_number)
-            serializer = RatingSerializer(page_obj, many=True,\
-                context={'request':request})
-            data = {
-                'success': 1,
-                'data': serializer.data,
-            }
-            return Response(data, status=200)
+        page_size = request.GET.get('size', 10)
+        page_number = request.GET.get('page')
+        paginator = Paginator(rating_obj, page_size)
+        page_obj = paginator.get_page(page_number)
+        serializer = RatingSerializer(page_obj, many=True,\
+            context={'request':request})
         data = {
-            'success': 0,
-            'message': "Rating doesn't exist.",
+            'success': 1,
+            'data': serializer.data,
         }
-        return Response(data, status=400)
+        return Response(data, status=200)
 
     def post(self, request, company_id):
         """

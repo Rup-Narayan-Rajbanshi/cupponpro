@@ -5,6 +5,11 @@ from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.image import Image
 
 class CouponSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coupon
+        fields = "__all__"
+
+class CouponDetailSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     coupon_relation = serializers.SerializerMethodField()
     is_redeemed = serializers.SerializerMethodField()
@@ -26,7 +31,7 @@ class CouponSerializer(serializers.ModelSerializer):
             images = logo
         if coupon_type == 'product':
             content_type_obj = ContentType.objects.get(model='product')
-            image_obj = Image.objects.filter(content_type=content_type_obj, object_id=obj.id)
+            image_obj = Image.objects.filter(content_type=content_type_obj, object_id=obj.object_id)
             images = [current_site.domain + x.image.url for x in image_obj]
         if coupon_type == 'product category':
             try:
@@ -55,8 +60,10 @@ class CouponSerializer(serializers.ModelSerializer):
         except:
             logo = None
         data = {
+            'id': obj.company.id,
             'name': obj.company.name,
             'logo': logo,
+            'owner_id': obj.company.author.id,
             'owner_name': obj.company.author.full_name,
             'profile_image': current_site.domain + obj.company.author.image.url
         }

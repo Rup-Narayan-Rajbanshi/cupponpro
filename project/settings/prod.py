@@ -3,7 +3,7 @@ from decouple import config
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['api.cupponpro.com', '157.245.103.32', '127.0.0.1']
 
 DATABASES = {
     'default':{

@@ -37,7 +37,7 @@ class CompanyListView(generics.GenericAPIView):
         """
         An endpoint for creating vendor.
         """
-        if request.user.id == int(request.data['author']):
+        if str(request.user.id) == str(request.data.get('author', None)):
             serializer = CompanySerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
@@ -201,7 +201,7 @@ class CompanyFavouriteView(generics.GenericAPIView):
         """
         An endpoint for updating vendor as favourite.
         """
-        if (int(request.data['user']) == request.user.id) and (int(request.data['company']) == company_id):
+        if (str(request.data.get('user', None)) == str(request.user.id)) and (str(request.data('company', None)) == company_id):
             favourite_company_obj = FavouriteCompany.objects.filter(user=request.user, company=company_id)
             if favourite_company_obj:
                 serializer = FavouriteCompanySerializer(favourite_company_obj[0], data=request.data,\

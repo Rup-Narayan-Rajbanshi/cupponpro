@@ -7,6 +7,26 @@ class AffiliateLinkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AffiliateLink
+        fields = "__all__"
+
+    def get_vendor(self, obj):
+        try:
+            current_site = Site.objects.get_current()
+            logo = current_site.domain + obj.company.logo.url
+        except:
+            logo = None
+        data = {
+            'id': obj.company.id,
+            'name': obj.company.name,
+            'logo': logo
+        }
+        return data
+
+class AffiliateLinkDetailSerializer(serializers.ModelSerializer):
+    vendor = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AffiliateLink
         fields = ('id', 'url', 'discount_code', 'image', 'description', 'discount', 'vendor')
 
     def get_vendor(self, obj):
@@ -16,6 +36,7 @@ class AffiliateLinkSerializer(serializers.ModelSerializer):
         except:
             logo = None
         data = {
+            'id': obj.company.id,
             'name': obj.company.name,
             'logo': logo
         }

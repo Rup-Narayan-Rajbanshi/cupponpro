@@ -1,5 +1,6 @@
 import os
 import shortuuid
+import uuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import RegexValidator
 from django.db import models
@@ -8,11 +9,10 @@ from commonapp.models.address import Address
 from commonapp.models.image import Image
 from commonapp.models.category import Category, SubCategory
 from django.dispatch import receiver
-
 from userapp.models import User
 
 class Company(Address):
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=200)
     logo = models.ImageField(upload_to='logo/', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,\
@@ -34,17 +34,17 @@ class Company(Address):
     currency = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
     class Meta:
         db_table = 'company'
         verbose_name_plural = "companies"
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
         ''' On save, create key '''
-        if not self.id:
+        if not self.key:
             self.key = shortuuid.ShortUUID().random(length=8)
         return super(Company, self).save(*args, **kwargs)
 
@@ -80,6 +80,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                 os.remove(old_file.path)
 
 class CompanyUser(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     is_staff = models.BooleanField(default=True)
@@ -88,11 +89,13 @@ class CompanyUser(models.Model):
     class Meta:
         db_table = 'company_user'
         verbose_name_plural = 'company users'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.user.full_name
 
 class FavouriteCompany(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     is_favourite = models.BooleanField(default=False)
@@ -101,6 +104,7 @@ class FavouriteCompany(models.Model):
     class Meta:
         db_table = 'favourite_company'
         verbose_name_plural = "favourite companies"
+        ordering = ['-created_at']
 
     def __str__(self):
         favourite = ' loves '
