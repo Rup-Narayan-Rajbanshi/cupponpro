@@ -71,8 +71,8 @@ urlpatterns = [
     path('affiliate', AffiliateLinkListView.as_view(), name='affiliate_link_list'),
     path('affiliate/<str:affiliate_link_id>', AffiliateLinkDetailView.as_view(), name='affiliate_link_detail'),
     path('affiliate/<str:affiliate_link_id>/addcount', AffiliateLinkCountView.as_view(), name='affiliate_link_add_count'),
-    path('affiliate/top-discount', TopDiscountAffiliateListView.as_view(), name='top_discount_affiliate_link'),
-    path('affiliate/deal-of-the-day', DealOfTheDayAffiliateListView.as_view(), name='deal_of_the_day_coupon_list'),
+    path('affiliate/list/top-discount', TopDiscountAffiliateListView.as_view(), name='top_discount_affiliate_link'),
+    path('affiliate/list/deal-of-the-day', DealOfTheDayAffiliateListView.as_view(), name='deal_of_the_day_coupon_list'),
     # search
     path('topbarsearch', TopBarSearchView.as_view(), name='top_bar_search_list'),
     # product

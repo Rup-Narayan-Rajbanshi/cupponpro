@@ -30,6 +30,7 @@ class Bill(models.Model):
 
     class Meta:
         db_table = 'bill'
+        ordering = ['-created_at']
 
     def __str__(self):
         return "Bill " + str(self.id) + " of user " + self.name

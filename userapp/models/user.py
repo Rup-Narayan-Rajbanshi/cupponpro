@@ -103,6 +103,7 @@ class User(AbstractBaseUser, Address):
 
     class Meta:
         db_table = 'user'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.full_name
@@ -180,13 +181,14 @@ class PasswordResetToken(models.Model):
     class Meta:
         db_table = 'password_reset_token'
         verbose_name_plural = "password reset tokens"
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.token
 
     def save(self, *args, **kwargs):
         ''' On save, generate token '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=6)
         return super(PasswordResetToken, self).save(*args, **kwargs)
 
@@ -235,13 +237,14 @@ class LoginToken(models.Model):
 
     class Meta:
         db_table = 'login_token'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.token
 
     def save(self, *args, **kwargs):
         ''' On save, generate token '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=4)
         return super(LoginToken, self).save(*args, **kwargs)
 
@@ -292,13 +295,14 @@ class SignupToken(models.Model):
 
     class Meta:
         db_table = 'signup_token'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.token
 
     def save(self, *args, **kwargs):
         ''' On save, generate token '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=4)
         return super(SignupToken, self).save(*args, **kwargs)
 

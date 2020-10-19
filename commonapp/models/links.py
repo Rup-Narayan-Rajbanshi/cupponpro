@@ -11,6 +11,7 @@ class SocialLink(models.Model):
 
     class Meta:
         db_table = 'social_link'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.url

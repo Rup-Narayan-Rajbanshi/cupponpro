@@ -16,13 +16,14 @@ class Category(models.Model):
     class Meta:
         db_table = 'category'
         verbose_name_plural = "categories"
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
         ''' On save, create token '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=8)
         return super(Category, self).save(*args, **kwargs)
 
@@ -80,6 +81,7 @@ class SubCategory(models.Model):
     class Meta:
         db_table = 'sub_category'
         verbose_name_plural = "sub categories"
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name

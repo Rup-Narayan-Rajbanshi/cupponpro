@@ -15,6 +15,7 @@ class Banner(models.Model):
 
     class Meta:
         db_table = 'banner'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.title

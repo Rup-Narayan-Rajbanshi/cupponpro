@@ -20,6 +20,7 @@ class AffiliateLink(models.Model):
 
     class Meta:
         db_table = 'affiliate_link'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.description

@@ -20,6 +20,7 @@ class SalesItem(models.Model):
 
     class Meta:
         db_table = 'sales_item'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.product.name + " of bill " + str(self.bill.id)

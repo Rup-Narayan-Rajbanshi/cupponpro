@@ -14,6 +14,7 @@ class NewsArticle(models.Model):
 
     class Meta:
         db_table = 'news_article'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.headline

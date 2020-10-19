@@ -13,3 +13,4 @@ class Rating(models.Model):
 
     class Meta:
         db_table = 'rating'
+        ordering = ['-created_at']

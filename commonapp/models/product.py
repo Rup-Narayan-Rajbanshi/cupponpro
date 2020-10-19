@@ -38,7 +38,7 @@ class ProductCategory(models.Model):
 
     def save(self, *args, **kwargs):
         ''' On save, create token '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=8)
         return super(ProductCategory, self).save(*args, **kwargs)
 
@@ -103,13 +103,14 @@ class Product(models.Model):
     class Meta:
         db_table = 'product'
         unique_together = ('product_code', 'company',)
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
         ''' On save, add token, and check for bulk quantity and update price of product '''
-        if not self.id:
+        if not self.token:
             self.token = shortuuid.ShortUUID().random(length=8)
         if self.bulk_quantity:
             self.total_price = self.unit_price * self.bulk_quantity.quantity

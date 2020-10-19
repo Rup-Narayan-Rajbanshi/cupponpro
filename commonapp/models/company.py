@@ -37,13 +37,14 @@ class Company(Address):
     class Meta:
         db_table = 'company'
         verbose_name_plural = "companies"
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
         ''' On save, create key '''
-        if not self.id:
+        if not self.key:
             self.key = shortuuid.ShortUUID().random(length=8)
         return super(Company, self).save(*args, **kwargs)
 
@@ -88,6 +89,7 @@ class CompanyUser(models.Model):
     class Meta:
         db_table = 'company_user'
         verbose_name_plural = 'company users'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.user.full_name
@@ -102,6 +104,7 @@ class FavouriteCompany(models.Model):
     class Meta:
         db_table = 'favourite_company'
         verbose_name_plural = "favourite companies"
+        ordering = ['-created_at']
 
     def __str__(self):
         favourite = ' loves '

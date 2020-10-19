@@ -33,6 +33,7 @@ class Coupon(models.Model):
 
     class Meta:
         db_table = 'coupon'
+        ordering = ['-created_at']
     
     def __str__(self):
         return self.description
@@ -58,13 +59,14 @@ class Voucher(models.Model):
 
     class Meta:
         db_table = 'voucher'
+        ordering = ['-created_at']
     
     def __str__(self):
         return self.user.full_name + "-" + str(self.id)
 
     def save(self, *args, **kwargs):
         ''' on save, update token '''
-        if not self.id:
+        if not self.token:
             coupon_type = {
                 'category': 'CC',
                 'productcategory': 'PC',
