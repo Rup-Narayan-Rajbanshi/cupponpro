@@ -24,7 +24,7 @@ class Coupon(models.Model):
     token = models.CharField(max_length=8, editable=False)
     discount = models.PositiveIntegerField(validators=[MaxValueValidator(100), MinValueValidator(0)])
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    object_id = models.UUIDField(serialize=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     is_premium = models.BooleanField(default=False)
     images = GenericRelation(Image)
