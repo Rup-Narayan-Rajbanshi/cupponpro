@@ -52,7 +52,7 @@ class CompanyBulkQuantityListView(generics.GenericAPIView):
         """
         An endpoint for creating vendor's bulk quantity.
         """
-        if company_id == int(request.data['company']):
+        if str(company_id) == str(request.data['company']):
             serializer = BulkQuantitySerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
@@ -121,7 +121,7 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
         """
         An endpoint for updating vendor's bulk quantity detail.
         """
-        if company_id == int(request.data['company']):
+        if str(company_id) == str(request.data['company']):
             company_obj = Company.objects.filter(id=company_id)
             if company_obj:
                 bulk_quantity_obj = BulkQuantity.objects.filter(id=bulk_quantity_id, company=company_obj[0])
@@ -227,7 +227,7 @@ class CompanyProductListView(generics.GenericAPIView):
         """
         An endpoint for creating vendor's product.
         """
-        if company_id == int(request.data['company']):
+        if str(company_id) == str(request.data['company']):
             serializer = ProductSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
@@ -282,7 +282,7 @@ class CompanyProductDetailView(generics.GenericAPIView):
         """
         An endpoint for updating vendor's product detail.
         """
-        if company_id == int(request.data['company']):
+        if str(company_id) == str(request.data['company']):
             company_obj = Company.objects.filter(id=company_id)
             if company_obj:
                 product_obj = Product.objects.filter(id=product_id, company=company_obj[0])

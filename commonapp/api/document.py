@@ -33,7 +33,7 @@ class CompanyDocumentListView(generics.GenericAPIView):
         """
         An endpoint for creating vendor's document.
         """
-        if company_id == int(request.data['company']):
+        if str(company_id) == str(request.data['company']):
             serializer = DocumentSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
@@ -89,7 +89,7 @@ class CompanyDocumentDetailView(generics.GenericAPIView):
         """
         An endpoint for updating vendor's document detail.
         """
-        if company_id == int(request.data['company']):
+        if str(company_id) == str(request.data['company']):
             company_obj = Company.objects.filter(id=company_id)
             if company_obj:
                 document_obj = Document.objects.filter(id=document_id, company=company_id)
