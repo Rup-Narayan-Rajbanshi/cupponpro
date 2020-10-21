@@ -64,7 +64,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         company_user_obj = CompanyUser.objects.filter(user=obj.id)
         if company_user_obj:
-            company_ids = [company_obj.id for company_obj in company_user_obj]
+            company_ids = [company_obj.company.id for company_obj in company_user_obj]
             return company_ids
         else:
             return None
