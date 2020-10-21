@@ -13,6 +13,7 @@ from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetai
 from commonapp.api.image import CompanyImageListView, CompanyImageDetailView, CouponImageListView, CouponImageDetailView,\
     ProductImageListView, ProductImageDetailView
 from commonapp.api.links import SocialLinkListView, SocialLinkDetailView, SocialLinkMassUpdateView
+from commonapp.api.menu import MenuListView
 from commonapp.api.product import (
     CompanyBulkQuantityListView,
     CompanyBulkQuantityDetailView,
@@ -94,4 +95,5 @@ urlpatterns = [
     path('company/<uuid:company_id>/link', SocialLinkListView.as_view(), name='company_link_list'),
     path('company/<uuid:company_id>/link/<uuid:link_id>', SocialLinkDetailView.as_view(), name='company_link_detail'),
     path('company/<uuid:company_id>/link/update', SocialLinkMassUpdateView.as_view(), name='company_link_mass_update'),
+    path('company/<uuid:company_id>/menu', MenuListView.as_view(), name='company_menu_list'),
 ]
