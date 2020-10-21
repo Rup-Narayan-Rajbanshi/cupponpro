@@ -39,7 +39,7 @@ class CompanyFacilityListView(generics.GenericAPIView):
         """
         An endpoint for creating vendor's facility.
         """
-        if company_id == int(request.data['company']):
+        if str(company_id) == str(request.data['company']):
             serializer = FacilitySerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
@@ -96,7 +96,7 @@ class CompanyFacilityDetailView(generics.GenericAPIView):
         """
         An endpoint for updating vendor's facility detail.
         """
-        if company_id == int(request.data['company']):
+        if str(company_id) == str(request.data['company']):
             company_obj = Company.objects.filter(id=company_id)
             if company_obj:
                 facility_obj = Facility.objects.filter(id=facility_id, company=company_obj[0])

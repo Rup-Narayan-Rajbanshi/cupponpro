@@ -96,7 +96,7 @@ class Product(models.Model):
     total_price = models.PositiveIntegerField(editable=False)
     token = models.CharField(max_length=8, editable=False)
     is_veg = models.BooleanField(default=False) #only for food item
-    gender = models.CharField(max_length=6, choices=GENDER, default=Null, blank=True) # usable for clothing and similar category
+    gender = models.CharField(max_length=6, choices=GENDER, default=Null, null=True, blank=True) # usable for clothing and similar category
     images = GenericRelation(Image)
     created_at = models.DateTimeField(auto_now_add=True)
 
