@@ -21,6 +21,7 @@ class MenuSerializer(serializers.ModelSerializer):
                 product = dict()
                 product['id'] = each_product.id
                 product['name'] = each_product.name
+                product['price'] = each_product.total_price
                 products.append(product)
             menu['products'] = products
             data.append(menu)
