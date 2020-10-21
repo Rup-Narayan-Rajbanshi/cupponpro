@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from commonapp.models.company import Company, CompanyUser
 from commonapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
-from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
+from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, publicReadOnly
 
 class CompanyBulkQuantityListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
@@ -202,7 +202,7 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
 class CompanyProductListView(generics.GenericAPIView):
-    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | publicReadOnly]
     serializer_class = ProductSerializer
 
     def get(self, request, company_id):

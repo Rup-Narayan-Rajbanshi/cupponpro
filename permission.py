@@ -39,10 +39,7 @@ class isUser(permissions.BasePermission):
             return True
         return False
 
-class isUserReadOnly(permissions.BasePermission):
+class publicReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method=='GET':
             return True
-        # if request.user.is_authenticated and request.user.group.filter(name='user').exists():
-        #     return True
-        # return False

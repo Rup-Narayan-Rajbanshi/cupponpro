@@ -6,13 +6,13 @@ from commonapp.models.company import Company, CompanyUser, FavouriteCompany
 from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer, ChangeCompanyEmailSerializer
 from userapp.models.user import User
 from userapp.serializers.user import UserDetailSerializer
-from permission import isCompanyOwnerAndAllowAll, isUserReadOnly
+from permission import isCompanyOwnerAndAllowAll, publicReadOnly
 from helper import isCompanyUser
 from commonapp.models.coupon import Coupon
 from commonapp.serializers.coupon import CouponSerializer
 
 class CompanyListView(generics.GenericAPIView):
-    permission_classes = [isCompanyOwnerAndAllowAll | isUserReadOnly]
+    permission_classes = [isCompanyOwnerAndAllowAll | publicReadOnly]
     serializer_class = CompanySerializer
 
     def get(self, request):
@@ -282,7 +282,7 @@ class PartnerListView(generics.GenericAPIView):
         return Response(data, status=200)
 
 class CategoryCompanyListView(generics.GenericAPIView):
-    permission_classes = (isUserReadOnly, )
+    permission_classes = (publicReadOnly, )
     serializer_class = CompanySerializer
 
     def get(self, request, category_id):
@@ -304,7 +304,7 @@ class CategoryCompanyListView(generics.GenericAPIView):
 
 
 class CompanyCouponListView(generics.GenericAPIView):
-    permission_classes = (isUserReadOnly, )
+    permission_classes = (publicReadOnly, )
     serializer_class = CouponSerializer
 
     def get(self, request, company_id):
