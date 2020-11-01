@@ -55,7 +55,7 @@ class OrderDetailView(generics.GenericAPIView):
         """
         An endpoint for getting vendor's order detail.
         """
-        order_obj = Order.objects.filter(id=order_id, company=company_id)
+        order_obj = Order.objects.filter(id=order_id, company=company_id, asset=asset_id)
         if order_obj:
             serializer = OrderSerializer(order_obj[0], context={'request':request})
             data = {
@@ -66,7 +66,7 @@ class OrderDetailView(generics.GenericAPIView):
         else:
             data = {
                 'success': 1,
-                'message': "order doesn't exist.",
+                'message': "Order doesn't exist.",
             }
             return Response(data, status=404)
 
@@ -74,7 +74,7 @@ class OrderDetailView(generics.GenericAPIView):
         """
         An endpoint for updating vendor's order.
         """
-        order_obj = Order.objects.filter(id=order_id, company=company_id)
+        order_obj = Order.objects.filter(id=order_id, company=company_id, asset=asset_id)
         serializer = OrderSerializer(instance=order_obj[0], data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
@@ -93,7 +93,7 @@ class OrderDetailView(generics.GenericAPIView):
         """
         An endpoint for deleting vendor's order.
         """
-        order_obj = Order.objects.filter(id=order_id, company=company_id)
+        order_obj = Order.objects.filter(id=order_id, company=company_id, asset=asset_id)
         if order_obj:
             try:
                 order_obj[0].delete()
@@ -105,12 +105,12 @@ class OrderDetailView(generics.GenericAPIView):
             except:
                 data = {
                     'success': 0,
-                    'message': 'order cannot be deleted.'
+                    'message': 'Order cannot be deleted.'
                 }
                 return Response(data, status=400)
         else:
             data = {
                 'success': 0,
-                'message': "order doesn't exist."
+                'message': "Order doesn't exist."
             }
             return Response(data, status=404)
