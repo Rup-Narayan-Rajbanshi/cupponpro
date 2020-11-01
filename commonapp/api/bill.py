@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import permissions
 from commonapp.models.coupon import Coupon, Voucher
+from commonapp.models.product import Product
 from commonapp.models.bill import Bill
 from commonapp.serializers.bill import BillSerializer
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll
@@ -107,12 +108,41 @@ class BillVerifyView(generics.GenericAPIView):
         """
         company_id = request.data['company']
         user_id = request.data['user']
-        coupon_obj = Coupon.objects.filter(company=company_id).order_by('-created_at')
-        voucher_obj = Voucher.objects.filter(coupon__in=coupon_obj, user=user_id)
-        print(voucher_obj)
-        data = {
-            'success': 1,
-            'data': None
-        }
-        return Response(data, status=200)
-
+        voucher_obj = Voucher.objects.filter(id=request.data['voucher'])
+        items = request.data['items']
+        if voucher_obj:
+            coupon_type = voucher_obj[0].coupon.content_type.model
+            product_ids = [x['id'] for x in items]
+            # productcategory, category, product
+            applicable_products_ids = []
+            if coupon_type == "category":
+                applicable_products_ids = product_ids
+            elif coupon_type == "productcategory":
+                product_category_obj = voucher_obj[0].coupon.content_object
+                applicable_product_obj = Product.objects.filter(id__in=product_ids, product_category=product_category_obj)
+                applicable_products_ids = [str(x.id) for x in applicable_product_obj]
+            else:
+                applicable_products_ids = str(voucher_obj[0].coupon.object_id)
+                applicable_products_ids = [applicable_products_ids]
+            # get discount percentage from coupon
+            discount_p = voucher_obj[0].coupon.discount
+            # loop in items and apply discount
+            if applicable_products_ids:
+                for item in items:
+                    if item['id'] in applicable_products_ids:
+                        item['discount'] = discount_p
+                        item['voucher'] = str(voucher_obj[0].id)
+                        item['total'] = (item['amount'] * item['quantity']) - (discount_p / 100 * (item['amount'] * item['quantity']))
+                    else:
+                        item['total'] = item['amount']
+            data = {
+                'success': 1,
+                'data': items
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 1,
+                'data': items
+            }
+            return Response(data, status=200)

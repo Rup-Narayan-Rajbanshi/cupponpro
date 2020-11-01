@@ -28,12 +28,12 @@ class AdminBillapp(admin.ModelAdmin):
     )
 
 class AdminSalesItemapp(admin.ModelAdmin):
-    list_display = ('id', 'amount', 'quantity',\
+    list_display = ('id', 'rate', 'quantity',\
         'created_at')
     fieldsets = (
         (_("Basic info"), {
             'fields':(
-                'bill', 'product', 'amount', 'voucher', 'discount_amount', 'discount', 'quantity'
+                'bill', 'product', 'voucher', 'discount', 'quantity', 'rate', 'total'
             )
         }
         ),

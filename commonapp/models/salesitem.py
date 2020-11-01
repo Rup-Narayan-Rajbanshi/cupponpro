@@ -11,10 +11,10 @@ class SalesItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     bill = models.ForeignKey(Bill, on_delete=models.PROTECT, null=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
-    amount = models.PositiveIntegerField()
+    rate = models.PositiveIntegerField()
     quantity = models.PositiveIntegerField()
     voucher = models.ForeignKey(Voucher, on_delete=models.PROTECT)
-    discount_amount = models.PositiveIntegerField()
+    total = models.PositiveIntegerField()
     discount = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
