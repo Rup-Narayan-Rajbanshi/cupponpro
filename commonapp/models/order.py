@@ -24,6 +24,7 @@ class Order(models.Model):
     rate = models.PositiveIntegerField(blank=True)
     quantity = models.PositiveIntegerField()
     state = models.CharField(max_length=20, choices=states, default=New)
+    is_delivered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -15,6 +15,7 @@ from commonapp.api.image import CompanyImageListView, CompanyImageDetailView, Co
     ProductImageListView, ProductImageDetailView
 from commonapp.api.links import SocialLinkListView, SocialLinkDetailView, SocialLinkMassUpdateView
 from commonapp.api.menu import MenuListView
+from commonapp.api.order import OrderListView, OrderDetailView
 from commonapp.api.product import (
     CompanyBulkQuantityListView,
     CompanyBulkQuantityDetailView,
@@ -100,4 +101,7 @@ urlpatterns = [
     # asset
     path('company/<uuid:company_id>/asset', AssetListView.as_view(), name='company_asset_list'),
     path('company/<uuid:company_id>/asset/<uuid:asset_id>', AssetDetailView.as_view(), name='company_asset_detail'),
+    # asset
+    path('company/<uuid:company_id>/asset/<uuid:asset_id>/order', OrderListView.as_view(), name='company_asset__order_list'),
+    path('company/<uuid:company_id>/asset/<uuid:asset_id>/order/<uuid:order_id>', OrderDetailView.as_view(), name='company_asset_order_detail'),
 ]
