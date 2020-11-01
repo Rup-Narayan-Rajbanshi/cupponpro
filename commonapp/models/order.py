@@ -21,7 +21,7 @@ class Order(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
-    rate = models.PositiveIntegerField()
+    rate = models.PositiveIntegerField(blank=True)
     quantity = models.PositiveIntegerField()
     state = models.CharField(max_length=1, choices=states, default=New)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -31,4 +31,10 @@ class Order(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return "order " + self.id + " of " + str(self.company.name)
+        return "order " + str(self.id) + " of " + str(self.company.name)
+
+    def save(self, *args, **kwargs):
+        ''' On save, create key '''
+        if not self.rate:
+            self.rate = self.product.total_price
+        return super(Order, self).save(*args, **kwargs)
