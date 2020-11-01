@@ -2,6 +2,7 @@
 from django.urls import path
 from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView,\
     TopDiscountAffiliateListView, DealOfTheDayAffiliateListView
+from commonapp.api.asset import AssetListView, AssetDetailView
 from commonapp.api.bill import BillListView, BillDetailView, BillVerifyView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
@@ -96,4 +97,7 @@ urlpatterns = [
     path('company/<uuid:company_id>/link/<uuid:link_id>', SocialLinkDetailView.as_view(), name='company_link_detail'),
     path('company/<uuid:company_id>/link/update', SocialLinkMassUpdateView.as_view(), name='company_link_mass_update'),
     path('company/<uuid:company_id>/menu', MenuListView.as_view(), name='company_menu_list'),
+    # asset
+    path('company/<uuid:company_id>/asset', AssetListView.as_view(), name='company_asset_list'),
+    path('company/<uuid:company_id>/asset/<uuid:asset_id>', AssetDetailView.as_view(), name='company_asset_detail'),
 ]

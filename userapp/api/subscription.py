@@ -31,7 +31,7 @@ class CreateSubscription(generics.GenericAPIView):
             else:
                 data = {
                     'success': 0,
-                    'message': serializer.error
+                    'message': serializer.errors
                 }
                 return Response(data, status=400)
         else:

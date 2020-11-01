@@ -6,10 +6,10 @@ from commonapp.models.product import Product
 
 class Order(models.Model):
     # order states
-    New = 'N'
-    Progress = 'P'
-    Completed = 'C'
-    Cancelled = 'X'
+    New = 'New'
+    Progress = 'Progress'
+    Completed = 'Ccompleted'
+    Cancelled = 'Cancelled'
     states = [
         (New, 'New'),
         (Progress, 'Progress'),
@@ -23,7 +23,7 @@ class Order(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     rate = models.PositiveIntegerField(blank=True)
     quantity = models.PositiveIntegerField()
-    state = models.CharField(max_length=1, choices=states, default=New)
+    state = models.CharField(max_length=20, choices=states, default=New)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
