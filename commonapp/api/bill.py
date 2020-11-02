@@ -1,11 +1,13 @@
 from django.core.paginator import Paginator
+from django.db.models import Q
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.product import Product
 from commonapp.models.bill import Bill
-from commonapp.serializers.bill import BillSerializer, BillSaveSerializer
+from commonapp.serializers.bill import BillSerializer, BillSaveSerializer, BillUserDetailSerializer
+from userapp.models.user import User
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll
 
 class BillListView(generics.GenericAPIView):
@@ -125,3 +127,41 @@ class BillDetailView(generics.GenericAPIView):
                 'message': "Bill doesn't exist."
             }
             return Response(data, status=404)
+
+class BillUserDetailView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = BillUserDetailSerializer
+
+    def post(self, request):
+        """
+        An endpoint for getting billing user's detail. Pass 'company' as get parameter that holds company id.
+        """
+        email = request.data.get('email', None)
+        phone_number = request.data.get('phone_number', None)
+        if email and phone_number:
+            query = Q(email=email) | Q(phone_number__contains=phone_number)
+        elif email:
+            query = Q(email=email)
+        elif phone_number:
+            query = Q(phone_number__contains=phone_number)
+        else:
+            data = {
+                'success': 0,
+                'message': "Enter either phone number or email." 
+            }
+            return Response(data, status=400)
+
+        user_obj = User.objects.filter(query)
+        if user_obj:
+            serializer = BillUserDetailSerializer(user_obj[0], context={'request':request})
+            data = {
+                'success': 1,
+                'data': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 1,
+                'data': request.data
+            }
+            return Response(data, status=200)

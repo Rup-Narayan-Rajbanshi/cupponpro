@@ -3,7 +3,7 @@ from django.urls import path
 from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView,\
     TopDiscountAffiliateListView, DealOfTheDayAffiliateListView
 from commonapp.api.asset import AssetListView, AssetDetailView
-from commonapp.api.bill import BillListView, BillDetailView
+from commonapp.api.bill import BillListView, BillDetailView, BillUserDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
     CompanyFavouriteView, ChangeCompanyEmailView, CategoryCompanyListView, CompanyCouponListView
@@ -93,6 +93,7 @@ urlpatterns = [
     path('company/<uuid:company_id>/bill/<uuid:bill_id>', BillDetailView.as_view(), name='bill_detail'),
     path('company/<uuid:company_id>/bill/<uuid:bill_id>/salesitem', SalesItemListView.as_view(), name='sales_item_list'),
     path('company/<uuid:company_id>/bill/verify', SalesItemVerifyView.as_view(), name='bill_verify'),
+    path('bill-user-detail', BillUserDetailView.as_view(), name='bill_user_detail'),
     # social links
     path('company/<uuid:company_id>/link', SocialLinkListView.as_view(), name='company_link_list'),
     path('company/<uuid:company_id>/link/<uuid:link_id>', SocialLinkDetailView.as_view(), name='company_link_detail'),
