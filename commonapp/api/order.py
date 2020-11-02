@@ -13,7 +13,7 @@ class OrderListView(generics.GenericAPIView):
 
     def get(self, request, company_id, asset_id):
         """
-        An endpoint for listing all the vendor's order. Pass 'page' and 'size' as query for requesting particular page and
+        An endpoint for listing all the vendor's active order. Pass 'page' and 'size' as query for requesting particular page and
         number of items per page respectively.
         """
         page_size = request.GET.get('size', 10)
@@ -75,19 +75,27 @@ class OrderDetailView(generics.GenericAPIView):
         An endpoint for updating vendor's order.
         """
         order_obj = Order.objects.filter(id=order_id, company=company_id, asset=asset_id)
-        serializer = OrderSerializer(instance=order_obj[0], data=request.data, context={'request':request})
-        if serializer.is_valid():
-            serializer.save()
+        if order_obj:
+            serializer = OrderSerializer(instance=order_obj[0], data=request.data, context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'data': serializer.data
+                }
+                return Response(data, status=200)
+            else:
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+        else:
             data = {
                 'success': 1,
-                'data': serializer.data
+                'message': "Order doesn't exist.",
             }
-            return Response(data, status=200)
-        data = {
-            'success': 0,
-            'message': serializer.errors
-        }
-        return Response(data, status=400)
+            return Response(data, status=404)
 
     def delete(self, request, company_id, asset_id, order_id):
         """
