@@ -5,14 +5,14 @@ from rest_framework import permissions
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.product import Product
 from commonapp.models.bill import Bill
-from commonapp.serializers.bill import BillSerializer
+from commonapp.serializers.bill import BillSerializer, BillSaveSerializer
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll
 
 class BillListView(generics.GenericAPIView):
     # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = BillSerializer
 
-    def get(self, request):
+    def get(self, request, company_id):
         """
         An endpoint for listing all the bills. Pass 'page' and 'size' as query for requesting particular page and
         number of items per page respectively.
@@ -30,16 +30,19 @@ class BillListView(generics.GenericAPIView):
         }
         return Response(data, status=200)
     
-    def post(self,request):
+    def post(self,request, company_id):
         """
         An endpoint for creating bill.
         """
-        serializer = BillSerializer(data=request.data, context={'request':request})
+        serializer = BillSaveSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
+            temp_data = dict(serializer.data)
+            sales_item = temp_data.pop('sales')
+            temp_data['sales_item'] = sales_item
             data = {
                 'success': 1,
-                'data': serializer.data
+                'data': temp_data
             }
             return Response(data, status=200)
         data = {
@@ -52,11 +55,11 @@ class BillDetailView(generics.GenericAPIView):
     # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = BillSerializer
 
-    def get(self, request, bill_id):
+    def get(self, request, company_id, bill_id):
         """
         An endpoint for getting bill detail.
         """
-        bill_obj = Bill.objects.filter(id=bill_id)
+        bill_obj = Bill.objects.filter(id=bill_id, company=company_id)
         if bill_obj:
             serializer = BillSerializer(bill_obj[0], context={'request':request})
             data = {
@@ -71,12 +74,37 @@ class BillDetailView(generics.GenericAPIView):
             }
             return Response(data, status=404)
 
+    def put(self,request, company_id, bill_id):
+        """
+        An endpoint for updating bill.
+        """
+        bill_obj = Bill.objects.filter(id=bill_id, company=company_id)
+        if bill_obj:
+            serializer = BillSerializer(instance=bill_obj[0], data=request.data, context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'data': serializer.data
+                }
+                return Response(data, status=200)
+            data = {
+                'success': 0,
+                'message': serializer.errors
+            }
+            return Response(data, status=400)
+        else:
+            data = {
+                'success': 0,
+                'message': "Bill doesn't exists."
+            }
+            return Response(data, status=404)
 
-    def delete(self, request, bill_id):
+    def delete(self, request, company_id, bill_id):
         """
         An endpoint for deleting bill.
         """
-        bill_obj = Bill.objects.filter(id=bill_id)
+        bill_obj = Bill.objects.filter(id=bill_id, company=company_id)
         if bill_obj:
             try:
                 bill_obj[0].delete()
@@ -97,52 +125,3 @@ class BillDetailView(generics.GenericAPIView):
                 'message': "Bill doesn't exist."
             }
             return Response(data, status=404)
-
-class BillVerifyView(generics.GenericAPIView):
-    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll]
-    serializer_class = BillSerializer
-
-    def post(self, request):
-        """
-        An endpoint for bill verification.
-        """
-        company_id = request.data['company']
-        user_id = request.data['user']
-        voucher_obj = Voucher.objects.filter(id=request.data['voucher'])
-        items = request.data['items']
-        if voucher_obj:
-            coupon_type = voucher_obj[0].coupon.content_type.model
-            product_ids = [x['id'] for x in items]
-            # productcategory, category, product
-            applicable_products_ids = []
-            if coupon_type == "category":
-                applicable_products_ids = product_ids
-            elif coupon_type == "productcategory":
-                product_category_obj = voucher_obj[0].coupon.content_object
-                applicable_product_obj = Product.objects.filter(id__in=product_ids, product_category=product_category_obj)
-                applicable_products_ids = [str(x.id) for x in applicable_product_obj]
-            else:
-                applicable_products_ids = str(voucher_obj[0].coupon.object_id)
-                applicable_products_ids = [applicable_products_ids]
-            # get discount percentage from coupon
-            discount_p = voucher_obj[0].coupon.discount
-            # loop in items and apply discount
-            if applicable_products_ids:
-                for item in items:
-                    if item['id'] in applicable_products_ids:
-                        item['discount'] = discount_p
-                        item['voucher'] = str(voucher_obj[0].id)
-                        item['total'] = (item['amount'] * item['quantity']) - (discount_p / 100 * (item['amount'] * item['quantity']))
-                    else:
-                        item['total'] = item['amount']
-            data = {
-                'success': 1,
-                'data': items
-            }
-            return Response(data, status=200)
-        else:
-            data = {
-                'success': 1,
-                'data': items
-            }
-            return Response(data, status=200)

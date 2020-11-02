@@ -1,19 +1,21 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import permissions
-from commonapp.serializers.salesitem import SalesItemSerializer
+from commonapp.models.coupon import Voucher
+from commonapp.models.product import Product
 from commonapp.models.salesitem import SalesItem
-from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
+from commonapp.serializers.salesitem import SalesItemSerializer
+from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll
 
 class SalesItemListView(generics.GenericAPIView):
     # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = SalesItemSerializer
 
-    def get(self, request, bill_id):
+    def get(self, request, company_id, bill_id):
         """
         An endpoint for listing all the salesitem of the bill.
         """
-        sales_item_obj = SalesItem.objects.filter(bill__id=bill_id)
+        sales_item_obj = SalesItem.objects.filter(bill=bill_id)
         if sales_item_obj:
             serializer = SalesItemSerializer(sales_item_obj, many=True, context={'request':request})
             data = {
@@ -28,11 +30,11 @@ class SalesItemListView(generics.GenericAPIView):
             }
             return Response(data, status=400)
     
-    def post(self, request, bill_id):
+    def post(self, request, company_id, bill_id):
         """
         An endpoint for creating salesitem of the bill.
         """
-        if int(request.data['bill']) == bill_id:
+        if str(request.data['bill']) == str(bill_id):
             serializer = SalesItemSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
@@ -57,7 +59,7 @@ class SalesItemDetailView(generics.GenericAPIView):
     # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = SalesItemSerializer
 
-    def get(self, request, item_id):
+    def get(self, request, company_id, bill_id, item_id):
         """
         An endpoint for getting salesitem detail.
         """
@@ -76,11 +78,11 @@ class SalesItemDetailView(generics.GenericAPIView):
             }
             return Response(data, status=404)
     
-    def delete(self, request, item_id):
+    def delete(self, request, company_id, bill_id, item_id):
         """
         An endpoint for deleting salesitem.
         """
-        item_obj = SalesItem.objects.filter(id=item_id)
+        item_obj = SalesItem.objects.filter(id=item_id, bill=bill_id)
         if item_obj:
             try:
                 item_obj[0].delete()
@@ -101,3 +103,50 @@ class SalesItemDetailView(generics.GenericAPIView):
                 'message': "Sales Item doesn't exist."
             }
             return Response(data, status=404)
+
+class SalesItemVerifyView(generics.GenericAPIView):
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll]
+    serializer_class = SalesItemSerializer
+
+    def post(self, request, company_id):
+        """
+        An endpoint for sale item verification.
+        """
+        voucher_obj = Voucher.objects.filter(id=request.data['voucher'])
+        items = request.data['items']
+        if voucher_obj:
+            coupon_type = voucher_obj[0].coupon.content_type.model
+            product_ids = [x['product'] for x in items]
+            # productcategory, category, product
+            applicable_products_ids = []
+            if coupon_type == "category":
+                applicable_products_ids = product_ids
+            elif coupon_type == "productcategory":
+                product_category_obj = voucher_obj[0].coupon.content_object
+                applicable_product_obj = Product.objects.filter(id__in=product_ids, product_category=product_category_obj)
+                applicable_products_ids = [str(x.id) for x in applicable_product_obj]
+            else:
+                applicable_products_ids = str(voucher_obj[0].coupon.object_id)
+                applicable_products_ids = [applicable_products_ids]
+            # get discount percentage from coupon
+            discount_p = voucher_obj[0].coupon.discount
+            # loop in items and apply discount
+            if applicable_products_ids:
+                for item in items:
+                    if item['product'] in applicable_products_ids:
+                        item['discount'] = discount_p
+                        item['voucher'] = str(voucher_obj[0].id)
+                        item['total'] = (item['rate'] * item['quantity']) - (discount_p / 100 * (item['rate'] * item['quantity']))
+                    else:
+                        item['total'] = item['rate']
+            data = {
+                'success': 1,
+                'data': items
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 1,
+                'data': items
+            }
+            return Response(data, status=200)

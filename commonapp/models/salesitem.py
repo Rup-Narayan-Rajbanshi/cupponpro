@@ -9,13 +9,13 @@ from commonapp.models.coupon import Voucher
 
 class SalesItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
-    bill = models.ForeignKey(Bill, on_delete=models.PROTECT, null=True)
+    bill = models.ForeignKey(Bill, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
     rate = models.PositiveIntegerField()
     quantity = models.PositiveIntegerField()
-    voucher = models.ForeignKey(Voucher, on_delete=models.PROTECT)
+    voucher = models.ForeignKey(Voucher, on_delete=models.PROTECT, null=True, blank=True)
     total = models.PositiveIntegerField()
-    discount = models.PositiveIntegerField()
+    discount = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

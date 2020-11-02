@@ -3,7 +3,7 @@ from django.urls import path
 from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView,\
     TopDiscountAffiliateListView, DealOfTheDayAffiliateListView
 from commonapp.api.asset import AssetListView, AssetDetailView
-from commonapp.api.bill import BillListView, BillDetailView, BillVerifyView
+from commonapp.api.bill import BillListView, BillDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
     CompanyFavouriteView, ChangeCompanyEmailView, CategoryCompanyListView, CompanyCouponListView
@@ -25,7 +25,7 @@ from commonapp.api.product import (
     CompanyProductCategoryListView,
 )
 from commonapp.api.rating import CompanyRatingListView, CompanyRatingDetailView
-from commonapp.api.salesitem import SalesItemListView
+from commonapp.api.salesitem import SalesItemListView, SalesItemDetailView, SalesItemVerifyView
 from commonapp.api.search import TopBarSearchView
 
 app_name = 'commonapp'
@@ -89,10 +89,10 @@ urlpatterns = [
     path('product/<uuid:product_id>/image', ProductImageListView.as_view(), name='product_image_list'),
     path('product/<uuid:product_id>/image/<uuid:image_id>', ProductImageDetailView.as_view(), name='product_image_detail'),
     # bill
-    path('bill', BillListView.as_view(), name='bill_list'),
-    path('bill/<uuid:bill_id>', BillDetailView.as_view(), name='bill_detail'),
-    path('bill/<uuid:bill_id>/salesitem', SalesItemListView.as_view(), name='sales_item_list'),
-    path('bill/verify', BillVerifyView.as_view(), name='bill_verify'),
+    path('company/<uuid:company_id>/bill', BillListView.as_view(), name='bill_list'),
+    path('company/<uuid:company_id>/bill/<uuid:bill_id>', BillDetailView.as_view(), name='bill_detail'),
+    path('company/<uuid:company_id>/bill/<uuid:bill_id>/salesitem', SalesItemListView.as_view(), name='sales_item_list'),
+    path('company/<uuid:company_id>/bill/verify', SalesItemVerifyView.as_view(), name='bill_verify'),
     # social links
     path('company/<uuid:company_id>/link', SocialLinkListView.as_view(), name='company_link_list'),
     path('company/<uuid:company_id>/link/<uuid:link_id>', SocialLinkDetailView.as_view(), name='company_link_detail'),
