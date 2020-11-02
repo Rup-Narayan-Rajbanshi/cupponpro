@@ -167,18 +167,12 @@ class CategoryCouponListView(generics.GenericAPIView):
             page_number = request.GET.get('page')
             paginator = Paginator(coupon_obj, page_size)
             page_obj = paginator.get_page(page_number)
-            if coupon_obj:
-                serializer = CouponDetailSerializer(page_obj, many=True, context={"request":request})
-                data = {
-                    'success': 1,
-                    'data': serializer.data
-                }
-                return Response(data, status=200)
+            serializer = CouponDetailSerializer(page_obj, many=True, context={"request":request})
             data = {
-                'success': 0,
-                'message': "Coupon doesn't exist."
+                'success': 1,
+                'data': serializer.data
             }
-            return Response(data, status=404)
+            return Response(data, status=200)
         else:
             data = {
                 'success': 0,
