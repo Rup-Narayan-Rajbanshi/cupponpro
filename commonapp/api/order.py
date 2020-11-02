@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from commonapp.models.order import Order
 from commonapp.serializers.order import OrderSerializer
 from helper import isCompanyUser
-from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, publicReadOnly
+from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll, publicReadOnly
 
 class OrderListView(generics.GenericAPIView):
     permission_classes = (AllowAny, )
@@ -122,3 +122,33 @@ class OrderDetailView(generics.GenericAPIView):
                 'message': "Order doesn't exist."
             }
             return Response(data, status=404)
+
+class ActiveOrderListView(generics.GenericAPIView):
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll]
+    # serializer_class = 
+
+    def get(self, request, company_id):
+        """
+        An endpoint for getting vendor's active order.
+        """
+        order_obj = Order.objects.filter(company=company_id, is_delivered=False)
+        asset_names = []
+        for order in order_obj:
+            if order.asset.name not in asset_names:
+                asset_names.append(order.asset.name)
+        
+        asset_wise_order_list = []
+        for asset_name in asset_names:
+            asset_wise_order = dict()
+            asset_wise_order['asset'] = asset_name
+            asset_wise_order_obj = order_obj.filter(asset__name=asset_name)
+            serializer = OrderSerializer(asset_wise_order_obj, many=True, context={'request':request})
+            asset_wise_order['order'] = serializer.data
+            asset_wise_order_list.append(asset_wise_order)
+
+        data = {
+            'success': 1,
+            'data': asset_wise_order_list
+        }
+        return Response(data, status=200)
+        
