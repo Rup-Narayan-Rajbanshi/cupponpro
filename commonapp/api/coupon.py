@@ -178,7 +178,7 @@ class CategoryCouponListView(generics.GenericAPIView):
                 'success': 1,
                 'data': []
             }
-            return Response(data, status=404)
+            return Response(data, status=200)
 
 class VoucherListView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated, )
