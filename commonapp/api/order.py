@@ -151,4 +151,34 @@ class ActiveOrderListView(generics.GenericAPIView):
             'data': asset_wise_order_list
         }
         return Response(data, status=200)
-        
+
+class OrderToBillView(generics.GenericAPIView):
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll]
+
+    def get(self, request, company_id):
+        """
+        An endpoint for converting vendor's active order into billable sales item.
+        """
+        orders = request.data
+        sales_item = []
+
+        for order in orders:
+            if order['state'] != 'Cancelled':
+                order_obj = Order.objects.filter(id=order['id'])
+                if order_obj:
+                    order_obj[0].state = 'Completed'
+                    order_obj[0].is_delivered = True
+                    order_obj[0].save()
+                order.pop('id')
+                order.pop('state')
+                order.pop('asset')
+                order['discount'] = None
+                order['total'] = order['rate'] * order['quantity']
+                order['voucher'] = None
+                sales_item.append(order)
+
+        data = {
+            'success': 1,
+            'data': sales_item
+        }
+        return Response(data, status=200)
