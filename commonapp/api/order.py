@@ -18,7 +18,7 @@ class OrderListView(generics.GenericAPIView):
         """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        order_obj = Order.objects.filter(company=company_id, asset=asset_id, is_delivered=False)
+        order_obj = Order.objects.filter(company=company_id, asset=asset_id, is_billed=False)
         paginator = Paginator(order_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = OrderSerializer(page_obj, many=True,\
@@ -131,7 +131,7 @@ class ActiveOrderListView(generics.GenericAPIView):
         """
         An endpoint for getting vendor's active order.
         """
-        order_obj = Order.objects.filter(company=company_id, is_delivered=False)
+        order_obj = Order.objects.filter(company=company_id, is_billed=False)
         asset_names = []
         for order in order_obj:
             if order.asset.name not in asset_names:
@@ -164,14 +164,9 @@ class OrderToBillView(generics.GenericAPIView):
 
         for order in orders:
             if order['state'] != 'Cancelled':
-                order_obj = Order.objects.filter(id=order['id'])
-                if order_obj:
-                    order_obj[0].state = 'Completed'
-                    order_obj[0].is_delivered = True
-                    order_obj[0].save()
-                order.pop('id')
                 order.pop('state')
                 order.pop('asset')
+                order['order'] = order.pop('id')
                 order['discount'] = None
                 order['total'] = order['rate'] * order['quantity']
                 order['voucher'] = None

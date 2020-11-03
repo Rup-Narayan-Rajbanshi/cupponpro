@@ -2,6 +2,7 @@ from rest_framework import serializers
 from commonapp.models.bill import Bill
 from commonapp.models.coupon import Voucher
 from commonapp.models.salesitem import SalesItem
+from commonapp.models.order import Order
 from commonapp.serializers.coupon import VoucherSerializer
 from commonapp.serializers.salesitem import SalesItemSerializer
 from userapp.models.user import User
@@ -18,7 +19,13 @@ class BillSaveSerializer(serializers.ModelSerializer):
         sales_item_data = validated_data.pop('sales_item')
         bill = Bill.objects.create(**validated_data)
         for sales_item in sales_item_data:
-            SalesItem.objects.create(bill=bill, **sales_item)
+            sales_item_obj = SalesItem.objects.create(bill=bill, **sales_item)
+            if sales_item_obj.order:
+                order_obj = Order.objects.filter(id=sales_item_obj.order_id)
+                print(order_obj)
+                if order_obj:
+                    order_obj[0].is_billed = True
+                    order_obj[0].save()
         return bill
 
     def get_sales(self, obj):
