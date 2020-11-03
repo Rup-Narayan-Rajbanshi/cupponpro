@@ -65,7 +65,7 @@ class CouponDetailSerializer(serializers.ModelSerializer):
         else:
             company_id = None
             company_name = None
-        if obj.company.author:
+        if obj.company and obj.company.author:
             owner_id = obj.company.author.id
             owner_name = obj.company.author.full_name
             profile_image = current_site.domain + obj.company.author.image.url
