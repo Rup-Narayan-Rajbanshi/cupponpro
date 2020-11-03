@@ -27,8 +27,19 @@ class CompanyListView(generics.GenericAPIView):
         page_obj = paginator.get_page(page_number)
         serializer = CompanySerializer(page_obj, many=True,\
             context={"request":request})
+        if page_obj.has_previous():
+            previous_page = page_obj.previous_page_number()
+        else:
+            previous_page = None
+        if page_obj.has_next():
+            next_page = page_obj.next_page_number()
+        else:
+            next_page = None
         data = {
             'success': 1,
+            'previous_page': previous_page,
+            'next_page': next_page,
+            'page_count': paginator.num_pages,
             'data': serializer.data,
         }
         return Response(data, status=200)
@@ -247,8 +258,19 @@ class CompanyUserListView(generics.GenericAPIView):
             for each_serializer in serializer.data:
                 del each_serializer['admin']
                 each_serializer['staff'] = company_user_obj.get(user__id=each_serializer['id']).is_staff
+            if page_obj.has_previous():
+                previous_page = page_obj.previous_page_number()
+            else:
+                previous_page = None
+            if page_obj.has_next():
+                next_page = page_obj.next_page_number()
+            else:
+                next_page = None
             data = {
                 'success': 1,
+                'previous_page': previous_page,
+                'next_page': next_page,
+                'page_count': paginator.num_pages,
                 'data': serializer.data
             }
             return Response(data, status=200)
@@ -275,8 +297,19 @@ class PartnerListView(generics.GenericAPIView):
         page_obj = paginator.get_page(page_number)
         serializer = CompanySerializer(page_obj, many=True,\
             context={"request":request})
+        if page_obj.has_previous():
+            previous_page = page_obj.previous_page_number()
+        else:
+            previous_page = None
+        if page_obj.has_next():
+            next_page = page_obj.next_page_number()
+        else:
+            next_page = None
         data = {
             'success': 1,
+            'previous_page': previous_page,
+            'next_page': next_page,
+            'page_count': paginator.num_pages,
             'data': serializer.data,
         }
         return Response(data, status=200)
@@ -296,8 +329,19 @@ class CategoryCompanyListView(generics.GenericAPIView):
         paginator = Paginator(company_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = CompanySerializer(page_obj, many=True, context={"request":request})
+        if page_obj.has_previous():
+            previous_page = page_obj.previous_page_number()
+        else:
+            previous_page = None
+        if page_obj.has_next():
+            next_page = page_obj.next_page_number()
+        else:
+            next_page = None
         data = {
             'success': 1,
+            'previous_page': previous_page,
+            'next_page': next_page,
+            'page_count': paginator.num_pages,
             'data': serializer.data
         }
         return Response(data, status=200)
@@ -322,8 +366,19 @@ class CompanyCouponListView(generics.GenericAPIView):
             paginator = Paginator(coupon_obj, page_size)
             page_obj = paginator.get_page(page_number)
             serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+            if page_obj.has_previous():
+                previous_page = page_obj.previous_page_number()
+            else:
+                previous_page = None
+            if page_obj.has_next():
+                next_page = page_obj.next_page_number()
+            else:
+                next_page = None
             data = {
                 'success': 1,
+                'previous_page': previous_page,
+                'next_page': next_page,
+                'page_count': paginator.num_pages,
                 'data': serializer.data
             }
             return Response(data, status=200)

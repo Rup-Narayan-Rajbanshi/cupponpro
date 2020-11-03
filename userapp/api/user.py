@@ -127,8 +127,19 @@ class UserListView(generics.GenericAPIView):
             page_obj = paginator.get_page(page_number)
             serializer = UserSerializer(page_obj, many=True,\
                 context={"request": request})
+            if page_obj.has_previous():
+                previous_page = page_obj.previous_page_number()
+            else:
+                previous_page = None
+            if page_obj.has_next():
+                next_page = page_obj.next_page_number()
+            else:
+                next_page = None
             data = {
                 'success': 1,
+                'previous_page': previous_page,
+                'next_page': next_page,
+                'page_count': paginator.num_pages,
                 'data': serializer.data,
             }
             return Response(data, status=200)
