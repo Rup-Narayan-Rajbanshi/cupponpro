@@ -175,8 +175,8 @@ class CategoryCouponListView(generics.GenericAPIView):
             return Response(data, status=200)
         else:
             data = {
-                'success': 0,
-                'message': "Coupon doesn't exist."
+                'success': 1,
+                'data': []
             }
             return Response(data, status=404)
 
