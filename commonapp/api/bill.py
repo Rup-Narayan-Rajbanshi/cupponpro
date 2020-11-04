@@ -50,6 +50,7 @@ class BillListView(generics.GenericAPIView):
         serializer = BillSaveSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
+            # renaming sales into sales_item
             temp_data = dict(serializer.data)
             sales_item = temp_data.pop('sales')
             temp_data['sales_item'] = sales_item

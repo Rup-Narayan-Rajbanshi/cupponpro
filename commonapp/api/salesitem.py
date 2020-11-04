@@ -114,6 +114,14 @@ class SalesItemVerifyView(generics.GenericAPIView):
         """
         voucher_obj = Voucher.objects.filter(id=request.data['voucher'])
         items = request.data['items']
+        result = {
+            'tax': request.data['tax'],
+            'taxed_amount': None,
+            'total': None,
+            'grand_total': None,
+            'discount': None,
+            'sales_item': items
+        }
         if voucher_obj:
             coupon_type = voucher_obj[0].coupon.content_type.model
             product_ids = [x['product'] for x in items]
@@ -132,21 +140,38 @@ class SalesItemVerifyView(generics.GenericAPIView):
             discount_p = voucher_obj[0].coupon.discount
             # loop in items and apply discount
             if applicable_products_ids:
+                total = 0
                 for item in items:
                     if item['product'] in applicable_products_ids:
                         item['discount'] = discount_p
                         item['voucher'] = str(voucher_obj[0].id)
                         item['total'] = (item['rate'] * item['quantity']) - (discount_p / 100 * (item['rate'] * item['quantity']))
                     else:
-                        item['total'] = item['rate']
+                        item['total'] = item['rate'] * item['quantity']
+                    total += item['total']
+            result['total'] = total
+            result['grand_total'] = total
+            if result['tax']:
+                result['taxed_amount'] = result['tax']/100*result['total']
+                result['grand_total'] = result['total'] + result['taxed_amount']      
+            result['sales_item'] = items
             data = {
                 'success': 1,
-                'data': items
+                'data': result
             }
             return Response(data, status=200)
         else:
+            total = 0
+            for item in items:
+                item['total'] = item['rate'] * item['quantity']
+                total += item['total']
+            result['total'] = total
+            result['grand_total'] = total
+            if result['tax']:
+                result['taxed_amount'] = result['tax']/100*result['total']
+                result['grand_total'] = result['total'] + result['taxed_amount']
             data = {
                 'success': 1,
-                'data': items
+                'data': result
             }
             return Response(data, status=200)
