@@ -365,7 +365,7 @@ class CompanyCouponListView(generics.GenericAPIView):
             page_number = request.GET.get('page')
             paginator = Paginator(coupon_obj, page_size)
             page_obj = paginator.get_page(page_number)
-            serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+            serializer = CouponDetailSerializer(page_obj, many=True, context={"request":request})
             if page_obj.has_previous():
                 previous_page = page_obj.previous_page_number()
             else:
