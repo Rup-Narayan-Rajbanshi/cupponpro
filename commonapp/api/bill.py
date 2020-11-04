@@ -94,9 +94,11 @@ class BillDetailView(generics.GenericAPIView):
         """
         bill_obj = Bill.objects.filter(id=bill_id, company=company_id)
         if bill_obj:
-            serializer = BillSerializer(instance=bill_obj[0], data=request.data, context={'request':request})
+            serializer = BillSaveSerializer(instance=bill_obj[0], data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
+                # this step is necessary or else obj parameter in BillSaveSerializer won't get bill obj
+                serializer = BillSaveSerializer(bill_obj[0], context={'request':request})
                 data = {
                     'success': 1,
                     'data': serializer.data

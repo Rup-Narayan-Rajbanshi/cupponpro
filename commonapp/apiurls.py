@@ -25,7 +25,7 @@ from commonapp.api.product import (
     CompanyProductCategoryListView,
 )
 from commonapp.api.rating import CompanyRatingListView, CompanyRatingDetailView
-from commonapp.api.salesitem import SalesItemListView, SalesItemDetailView, SalesItemVerifyView
+from commonapp.api.salesitem import SalesItemVerifyView
 from commonapp.api.search import TopBarSearchView
 
 app_name = 'commonapp'
@@ -91,8 +91,6 @@ urlpatterns = [
     # bill
     path('company/<uuid:company_id>/bill', BillListView.as_view(), name='bill_list'),
     path('company/<uuid:company_id>/bill/<uuid:bill_id>', BillDetailView.as_view(), name='bill_detail'),
-    path('company/<uuid:company_id>/bill/<uuid:bill_id>/salesitem', SalesItemListView.as_view(), name='sales_item_list'),
-    path('company/<uuid:company_id>/bill/<uuid:bill_id>/salesitem/<uuid:item_id>', SalesItemDetailView.as_view(), name='sales_item_detail'),
     path('company/<uuid:company_id>/bill/verify', SalesItemVerifyView.as_view(), name='bill_verify'),
     path('bill-user-detail', BillUserDetailView.as_view(), name='bill_user_detail'),
     # social links
