@@ -9,7 +9,7 @@ from userapp.serializers.user import UserDetailSerializer
 from permission import isCompanyOwnerAndAllowAll, publicReadOnly
 from helper import isCompanyUser
 from commonapp.models.coupon import Coupon
-from commonapp.serializers.coupon import CouponSerializer
+from commonapp.serializers.coupon import CouponSerializer, CouponDetailSerializer
 
 class CompanyListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | publicReadOnly]
@@ -349,7 +349,7 @@ class CategoryCompanyListView(generics.GenericAPIView):
 
 class CompanyCouponListView(generics.GenericAPIView):
     permission_classes = (publicReadOnly, )
-    serializer_class = CouponSerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request, company_id):
         """
