@@ -9,7 +9,7 @@ from userapp.serializers.user import UserDetailSerializer
 from permission import isCompanyOwnerAndAllowAll, publicReadOnly
 from helper import isCompanyUser
 from commonapp.models.coupon import Coupon
-from commonapp.serializers.coupon import CouponSerializer
+from commonapp.serializers.coupon import CouponSerializer, CouponDetailSerializer
 
 class CompanyListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | publicReadOnly]
@@ -349,7 +349,7 @@ class CategoryCompanyListView(generics.GenericAPIView):
 
 class CompanyCouponListView(generics.GenericAPIView):
     permission_classes = (publicReadOnly, )
-    serializer_class = CouponSerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request, company_id):
         """
@@ -365,7 +365,7 @@ class CompanyCouponListView(generics.GenericAPIView):
             page_number = request.GET.get('page')
             paginator = Paginator(coupon_obj, page_size)
             page_obj = paginator.get_page(page_number)
-            serializer = CouponSerializer(page_obj, many=True, context={"request":request})
+            serializer = CouponDetailSerializer(page_obj, many=True, context={"request":request})
             if page_obj.has_previous():
                 previous_page = page_obj.previous_page_number()
             else:
