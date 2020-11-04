@@ -10,6 +10,9 @@ from userapp.models.user import User
 class BillSaveSerializer(serializers.ModelSerializer):
     sales = serializers.SerializerMethodField()
     sales_item = SalesItemSerializer(many=True, write_only=True)
+    total = serializers.SerializerMethodField()
+    taxed_amount = serializers.SerializerMethodField()
+    grand_total = serializers.SerializerMethodField()
 
     class Meta:
         model = Bill
@@ -33,8 +36,29 @@ class BillSaveSerializer(serializers.ModelSerializer):
         serializer = SalesItemSerializer(sales_item_obj, many=True)
         return serializer.data
 
+    def get_total(self, obj):
+        sales_item_obj = SalesItem.objects.filter(bill=obj.id)
+        total = 0
+        for sales_item in sales_item_obj:
+            total += sales_item.total
+        return total
+
+    def get_taxed_amount(self, obj):
+        if obj.tax:
+            total = self.get_total(obj)
+            taxed_amount = obj.tax / 100 * total
+        else:
+            taxed_amount = 0
+        return taxed_amount
+
+    def get_grand_total(self, obj):
+        return self.get_total(obj) + self.get_taxed_amount(obj)
+
 class BillSerializer(serializers.ModelSerializer):
     sales_item = serializers.SerializerMethodField()
+    total = serializers.SerializerMethodField()
+    taxed_amount = serializers.SerializerMethodField()
+    grand_total = serializers.SerializerMethodField()
 
     class Meta:
         model = Bill
@@ -44,6 +68,24 @@ class BillSerializer(serializers.ModelSerializer):
         sales_item_obj = SalesItem.objects.filter(bill=obj.id)
         serializer = SalesItemSerializer(sales_item_obj, many=True)
         return serializer.data
+    
+    def get_total(self, obj):
+        sales_item_obj = SalesItem.objects.filter(bill=obj.id)
+        total = 0
+        for sales_item in sales_item_obj:
+            total += sales_item.total
+        return total
+
+    def get_taxed_amount(self, obj):
+        if obj.tax:
+            total = self.get_total(obj)
+            taxed_amount = obj.tax / 100 * total
+        else:
+            taxed_amount = 0
+        return taxed_amount
+
+    def get_grand_total(self, obj):
+        return self.get_total(obj) + self.get_taxed_amount(obj)
 
 class BillUserDetailSerializer(serializers.Serializer):
     """

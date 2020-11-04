@@ -17,13 +17,12 @@ from commonapp.models.salesitem import SalesItem
 
 
 class AdminBillapp(admin.ModelAdmin):
-    list_display = ('id', 'total', 'total_discount', 'tax', 'taxed_amount',\
-        'grand_total', 'payment_mode', 'created_at')
+    list_display = ('id', 'tax', 'payment_mode', 'created_at')
     fieldsets = (
         (_("Basic info"), {
             'fields':(
-                'company', 'user', 'name', 'phone_number', 'total', 'total_discount', 'tax', \
-                'taxed_amount', 'grand_total', 'payment_mode'
+                'company', 'user', 'name', 'phone_number', 'tax', \
+                 'payment_mode'
             )
         }
         ),
