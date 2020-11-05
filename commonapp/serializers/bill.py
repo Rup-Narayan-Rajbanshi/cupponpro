@@ -21,14 +21,19 @@ class BillSaveSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         sales_item_data = validated_data.pop('sales_item')
         bill_obj = Bill.objects.create(**validated_data)
+        voucher_list = []
         for sales_item in sales_item_data:
             sales_item_obj = SalesItem.objects.create(bill=bill_obj, **sales_item)
+            if sales_item_obj.voucher:
+                if str(sales_item_obj.voucher) not in voucher_list:
+                    voucher_list.append(str(sales_item_obj.voucher))    
             if sales_item_obj.order:
                 order_obj = Order.objects.filter(id=sales_item_obj.order_id)
                 print(order_obj)
                 if order_obj:
                     order_obj[0].is_billed = True
                     order_obj[0].save()
+        Voucher.objects.filter(id__in=voucher_list).update(is_redeem=True)
         return bill_obj
 
     def update(self, instance, validated_data):
@@ -119,6 +124,6 @@ class BillUserDetailSerializer(serializers.Serializer):
 
     def get_voucher(self, obj, **kwargs):
         company_id = self.context['request'].GET.get('company', None)
-        voucher_obj = Voucher.objects.filter(user=obj.id, coupon__company__id=company_id)
+        voucher_obj = Voucher.objects.filter(user=obj.id, coupon__company__id=company_id, is_redeem=False)
         serializer = VoucherSerializer(voucher_obj, many=True)
         return serializer.data
