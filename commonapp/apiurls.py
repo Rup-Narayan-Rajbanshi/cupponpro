@@ -6,7 +6,8 @@ from commonapp.api.asset import AssetListView, AssetDetailView
 from commonapp.api.bill import BillListView, BillDetailView, BillUserDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
-    CompanyFavouriteView, ChangeCompanyEmailView, CategoryCompanyListView, CompanyCouponListView
+    CompanyFavouriteView, ChangeCompanyEmailView, CategoryCompanyListView, CompanyCouponListView,\
+    LocalRestaurantListView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView,\
     VoucherListView, TrendingCouponListView, DealOfTheDayCouponListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView, CompanyDocumentMassUpdateView
@@ -45,6 +46,7 @@ urlpatterns = [
     path('company/<uuid:company_id>/email', ChangeCompanyEmailView.as_view(), name='update_company_email'),
     path('category/<uuid:category_id>/company', CategoryCompanyListView.as_view(), name='category_company_list'),
     path('company/<uuid:company_id>/coupon', CompanyCouponListView.as_view(), name='company_coupon_list'),
+    path('company/local', LocalRestaurantListView.as_view(), name='local_company_list'),
     # company image
     path('company/<uuid:company_id>/image', CompanyImageListView.as_view(), name='company_image_list'),
     path('company/<uuid:company_id>/image/<uuid:image_id>', CompanyImageDetailView.as_view(), name='company_image_detail'),

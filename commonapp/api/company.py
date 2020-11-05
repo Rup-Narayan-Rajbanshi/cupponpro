@@ -1,3 +1,5 @@
+import math
+from django.db.models import Q
 from django.core.paginator import Paginator
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -388,3 +390,64 @@ class CompanyCouponListView(generics.GenericAPIView):
                 'message': "Company doesn't exist."
             }
             return Response(data, status=404)
+
+class LocalRestaurantListView(generics.GenericAPIView):
+    permission_classes = (AllowAny, )
+    serializer_class = CompanySerializer
+
+    def get(self, request):
+        """
+        An endpoint for listing all the local that are near to user. Pass 'page' and 'size' as query for requesting particular page and
+        number of items per page respectively. Pass 'longitude' and 'latitude' and 'distance' (distance is optional and 5 km is taken as default distance) as query.
+        Pass 'Restaurant' or 'Hotel' as value to 'category' query to get local restaurant or hotel accordingly.
+        """
+        try:
+            latitude = int(request.GET.get('latitude', None))
+            longitude = int(request.GET.get('longitude', None))
+            distance = int(request.GET.get('distance', 5))
+            category = request.GET.get('category', None)
+        except:
+            latitude = None
+            longitude = None
+            category = None
+        if latitude and longitude and category:
+            threshold_latitude = distance / 110.574
+            threshold_longitude = distance / (111.320 * math.cos(latitude / math.pi / 180))
+            latitude_p = latitude + threshold_latitude
+            latitude_m = latitude - threshold_latitude
+            longitude_p = longitude + threshold_longitude
+            longitude_m = longitude - threshold_longitude
+            category_Q = Q(category__name=category)
+            distance_Q = (Q(latitude__range=[latitude_m,latitude_p]) & Q(longitude__range=[longitude_m,longitude_p]))
+            company_obj = Company.objects.filter(category_Q & distance_Q).order_by('-id')
+            page_size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(company_obj, page_size)
+            page_obj = paginator.get_page(page_number)
+            serializer = CompanySerializer(page_obj, many=True,\
+                context={"request":request})
+            if page_obj.has_previous():
+                previous_page = page_obj.previous_page_number()
+            else:
+                previous_page = None
+            if page_obj.has_next():
+                next_page = page_obj.next_page_number()
+            else:
+                next_page = None
+            data = {
+                'success': 1,
+                'previous_page': previous_page,
+                'next_page': next_page,
+                'page_count': paginator.num_pages,
+                'data': serializer.data,
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 1,
+                'previous_page': None,
+                'next_page': None,
+                'page_count': None,
+                'data': [],
+            }
+            return Response(data, status=200)
