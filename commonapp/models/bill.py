@@ -29,7 +29,7 @@ class Bill(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return "Bill " + str(self.id) + " of user " + self.name
+        return str(self.id)
 
     def save(self, *args, **kwargs):
         ''' Registered User's information saved, or saved from UI input '''
