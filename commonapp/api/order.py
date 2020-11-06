@@ -284,7 +284,7 @@ class OrderLineVerifyView(generics.GenericAPIView):
             return Response(data, status=200)
         else:
             total = 0
-            for item in items:
+            for item in order_lines:
                 item['total'] = item['rate'] * item['quantity']
                 total += item['total']
             result['total'] = total
