@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from commonapp.models.order import Order
+from commonapp.models.order import OrderLine
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderLineSerializer(serializers.ModelSerializer):
     product_name = serializers.SerializerMethodField()
     product_code = serializers.SerializerMethodField()
 
     class Meta:
-        model = Order
+        model = OrderLine
         fields = ['id', 'product', 'product_name', 'product_code', 'asset', 'rate', 'quantity', 'state']
 
     def get_product_name(self, obj):

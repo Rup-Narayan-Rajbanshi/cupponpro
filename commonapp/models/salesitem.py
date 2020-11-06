@@ -5,12 +5,12 @@ from django.dispatch import receiver
 from commonapp.models.bill import Bill
 from commonapp.models.product import Product
 from commonapp.models.coupon import Voucher
-from commonapp.models.order import Order
+from commonapp.models.order import OrderLine
 
 class SalesItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     bill = models.ForeignKey(Bill, on_delete=models.CASCADE, null=True, blank=True)
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey(OrderLine, on_delete=models.SET_NULL, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
     rate = models.PositiveIntegerField()
     quantity = models.PositiveIntegerField()

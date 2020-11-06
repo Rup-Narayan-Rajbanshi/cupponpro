@@ -4,11 +4,13 @@ from commonapp.models.asset import Asset
 from commonapp.models.company import Company
 from commonapp.models.product import Product
 
-class Order(models.Model):
+
+
+class OrderLine(models.Model):
     # order states
     New = 'New'
     Progress = 'Progress'
-    Completed = 'Ccompleted'
+    Completed = 'Completed'
     Cancelled = 'Cancelled'
     states = [
         (New, 'New'),
@@ -28,7 +30,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'order'
+        db_table = 'order_line'
         ordering = ['-created_at']
 
     def __str__(self):

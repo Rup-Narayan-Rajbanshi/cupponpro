@@ -2,14 +2,14 @@ from django.core.paginator import Paginator
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from commonapp.models.order import Order
-from commonapp.serializers.order import OrderSerializer
+from commonapp.models.order import OrderLine
+from commonapp.serializers.order import OrderLineSerializer
 from helper import isCompanyUser
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll, publicReadOnly
 
 class OrderListView(generics.GenericAPIView):
     permission_classes = (AllowAny, )
-    serializer_class = OrderSerializer
+    serializer_class = OrderLineSerializer
 
     def get(self, request, company_id, asset_id):
         """
@@ -18,10 +18,10 @@ class OrderListView(generics.GenericAPIView):
         """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        order_obj = Order.objects.filter(company=company_id, asset=asset_id, is_billed=False)
+        order_obj = OrderLine.objects.filter(company=company_id, asset=asset_id, is_billed=False)
         paginator = Paginator(order_obj, page_size)
         page_obj = paginator.get_page(page_number)
-        serializer = OrderSerializer(page_obj, many=True,\
+        serializer = OrderLineSerializer(page_obj, many=True,\
             context={'request':request})
         if page_obj.has_previous():
             previous_page = page_obj.previous_page_number()
@@ -44,7 +44,7 @@ class OrderListView(generics.GenericAPIView):
         """
         An endpoint for creating vendor's order.
         """
-        serializer = OrderSerializer(data=request.data, many=True, context={'request':request})
+        serializer = OrderLineSerializer(data=request.data, many=True, context={'request':request})
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -60,15 +60,15 @@ class OrderListView(generics.GenericAPIView):
 
 class OrderDetailView(generics.GenericAPIView):
     permission_classes = (AllowAny, )
-    serializer_class = OrderSerializer
+    serializer_class = OrderLineSerializer
 
     def get(self, request, company_id, asset_id, order_id):
         """
         An endpoint for getting vendor's order detail.
         """
-        order_obj = Order.objects.filter(id=order_id, company=company_id, asset=asset_id)
+        order_obj = OrderLine.objects.filter(id=order_id, company=company_id, asset=asset_id)
         if order_obj:
-            serializer = OrderSerializer(order_obj[0], context={'request':request})
+            serializer = OrderLineSerializer(order_obj[0], context={'request':request})
             data = {
                 'success': 1,
                 'data': serializer.data
@@ -85,9 +85,9 @@ class OrderDetailView(generics.GenericAPIView):
         """
         An endpoint for updating vendor's order.
         """
-        order_obj = Order.objects.filter(id=order_id, company=company_id, asset=asset_id)
+        order_obj = OrderLine.objects.filter(id=order_id, company=company_id, asset=asset_id)
         if order_obj:
-            serializer = OrderSerializer(instance=order_obj[0], data=request.data, context={'request':request})
+            serializer = OrderLineSerializer(instance=order_obj[0], data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 data = {
@@ -112,7 +112,7 @@ class OrderDetailView(generics.GenericAPIView):
         """
         An endpoint for deleting vendor's order.
         """
-        order_obj = Order.objects.filter(id=order_id, company=company_id, asset=asset_id)
+        order_obj = OrderLine.objects.filter(id=order_id, company=company_id, asset=asset_id)
         if order_obj:
             try:
                 order_obj[0].delete()
@@ -142,7 +142,7 @@ class ActiveOrderListView(generics.GenericAPIView):
         """
         An endpoint for getting vendor's active order.
         """
-        order_obj = Order.objects.filter(company=company_id, is_billed=False)
+        order_obj = OrderLine.objects.filter(company=company_id, is_billed=False)
         asset_names = []
         for order in order_obj:
             if order.asset.name not in asset_names:
@@ -153,7 +153,7 @@ class ActiveOrderListView(generics.GenericAPIView):
             asset_wise_order = dict()
             asset_wise_order['asset'] = asset_name
             asset_wise_order_obj = order_obj.filter(asset__name=asset_name)
-            serializer = OrderSerializer(asset_wise_order_obj, many=True, context={'request':request})
+            serializer = OrderLineSerializer(asset_wise_order_obj, many=True, context={'request':request})
             asset_wise_order['order'] = serializer.data
             asset_wise_order_list.append(asset_wise_order)
 
