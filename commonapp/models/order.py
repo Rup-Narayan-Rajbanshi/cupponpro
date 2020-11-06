@@ -2,6 +2,7 @@ import uuid
 from django.core.validators import RegexValidator
 from django.db import models
 from commonapp.models.asset import Asset
+from commonapp.models.bill import Bill
 from commonapp.models.company import Company
 from commonapp.models.coupon import Voucher
 from commonapp.models.product import Product
@@ -9,6 +10,7 @@ from userapp.models.user import User
 
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
+    bill = models.ForeignKey(Bill, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)

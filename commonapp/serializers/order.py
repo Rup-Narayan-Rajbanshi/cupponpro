@@ -17,6 +17,7 @@ class OrderLineSerializer(serializers.ModelSerializer):
         return obj.product.product_code
 
 class OrderSaveSerializer(serializers.ModelSerializer):
+    asset_name = serializers.SerializerMethodField()
     order = serializers.SerializerMethodField()
     order_lines = OrderLineSerializer(many=True, write_only=True)
     total = serializers.SerializerMethodField()
@@ -49,6 +50,9 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         order_obj = Order.objects.filter(id=instance.id).update(**validated_data)
         return order_obj
 
+    def get_asset_name(self, obj):
+        return obj.asset.name
+
     def get_order(self, obj):
         order_lines_obj = OrderLine.objects.filter(order__id=obj.id)
         serializer = OrderLineSerializer(order_lines_obj, many=True)
@@ -73,6 +77,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         return float(self.get_total(obj) + self.get_taxed_amount(obj))
 
 class OrderSerializer(serializers.ModelSerializer):
+    asset_name = serializers.SerializerMethodField()
     order_lines = serializers.SerializerMethodField()
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
@@ -81,6 +86,9 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = "__all__"
+
+    def get_asset_name(self, obj):
+        return obj.asset.name
 
     def get_order_lines(self, obj):
         order_lines_obj = OrderLine.objects.filter(order__id=obj.id)

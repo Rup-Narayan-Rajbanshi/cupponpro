@@ -3,9 +3,10 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from commonapp.models.bill import Bill
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.product import Product
-from commonapp.models.bill import Bill
+from commonapp.models.order import Order
 from commonapp.serializers.bill import BillSerializer, BillSaveSerializer, BillUserDetailSerializer
 from userapp.models.user import User
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll
@@ -47,6 +48,7 @@ class BillListView(generics.GenericAPIView):
         """
         An endpoint for creating bill.
         """
+        order_id = request.data.get('order', None)
         serializer = BillSaveSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
@@ -54,6 +56,9 @@ class BillListView(generics.GenericAPIView):
             temp_data = dict(serializer.data)
             sales_item = temp_data.pop('sales')
             temp_data['sales_item'] = sales_item
+            # mark order as billed
+            if order_id:
+                Order.objects.filter(id=order_id).update(is_billed=True)
             data = {
                 'success': 1,
                 'data': temp_data

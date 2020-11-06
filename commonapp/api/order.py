@@ -1,9 +1,12 @@
 from django.core.paginator import Paginator
+from django.db.models import Q
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from commonapp.models.order import Order, OrderLine
+from commonapp.serializers.bill import BillUserDetailSerializer
 from commonapp.serializers.order import OrderSerializer, OrderSaveSerializer,OrderLineSerializer
+from userapp.models.user import User
 from helper import isCompanyUser
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll, publicReadOnly
 
@@ -154,27 +157,44 @@ class ActiveOrderListView(generics.GenericAPIView):
             'data': serializer.data
         }
         return Response(data, status=200)
-        # for order in order_obj:
-        #     order_lines_obj = OrderLine.objects.filter(order=order.id)
-        #     asset_names = []
-        #     for order_lines in order_lines_obj:
-        #         if order_lines.asset.name not in asset_names:
-        #             asset_names.append(order_lines.asset.name)
-            
-        #     asset_wise_order_list = []
-        #     for asset_name in asset_names:
-        #         asset_wise_order = dict()
-        #         asset_wise_order['asset'] = asset_name
-        #         asset_wise_order_lines_obj = order_lines_obj.filter(asset__name=asset_name)
-        #         serializer = OrderLineSerializer(asset_wise_order_lines_obj, many=True, context={'request':request})
-        #         asset_wise_order['order_lines'] = serializer.data
-        #         asset_wise_order_list.append(asset_wise_order)
 
-        # data = {
-        #     'success': 1,
-        #     'data': asset_wise_order_list
-        # }
-        # return Response(data, status=200)
+class OrderUserDetailView(generics.GenericAPIView):
+    permission_classes = (AllowAny, )
+    serializer_class = BillUserDetailSerializer
+
+    def post(self, request):
+        """
+        An endpoint for getting ordering user's detail. Pass 'company' as get parameter that holds company id.
+        """
+        email = request.data.get('email', None)
+        phone_number = request.data.get('phone_number', None)
+        if email and phone_number:
+            query = Q(email=email) | Q(phone_number__contains=phone_number)
+        elif email:
+            query = Q(email=email)
+        elif phone_number:
+            query = Q(phone_number__contains=phone_number)
+        else:
+            data = {
+                'success': 0,
+                'message': "Enter either phone number or email." 
+            }
+            return Response(data, status=400)
+
+        user_obj = User.objects.filter(query)
+        if user_obj:
+            serializer = BillUserDetailSerializer(user_obj[0], context={'request':request})
+            data = {
+                'success': 1,
+                'data': serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            data = {
+                'success': 1,
+                'data': request.data
+            }
+            return Response(data, status=200)
 
 class OrderToBillView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll]
@@ -183,21 +203,23 @@ class OrderToBillView(generics.GenericAPIView):
         """
         An endpoint for converting vendor's active order into billable sales item.
         """
-        orders = request.data
-        sales_item = []
+        bill = request.data
+        bill['payment_mode'] = 'Cash'
+        bill.pop('asset')
+        bill.pop('asset_name')
+        bill.pop('is_billed')
+        bill['order'] = bill.pop('id')
 
-        for order in orders:
+        for order in bill['order_lines']:
             if order['state'] != 'Cancelled':
                 order.pop('state')
-                order.pop('asset')
                 order['order'] = order.pop('id')
                 order['discount'] = None
                 order['total'] = order['rate'] * order['quantity']
                 order['voucher'] = None
-                sales_item.append(order)
-
+        bill['sales_item'] = bill.pop('order_lines')
         data = {
             'success': 1,
-            'data': sales_item
+            'data': bill
         }
         return Response(data, status=200)

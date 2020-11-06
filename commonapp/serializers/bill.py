@@ -28,11 +28,6 @@ class BillSaveSerializer(serializers.ModelSerializer):
             if sales_item_obj.voucher:
                 if str(sales_item_obj.voucher.id) not in voucher_list:
                     voucher_list.append(str(sales_item_obj.voucher.id))    
-            # if sales_item_obj.order:
-            #     order_obj = OrderLine.objects.filter(id=sales_item_obj.order_id)
-            #     if order_obj:
-            #         order_obj[0].is_billed = True
-            #         order_obj[0].save()
         Voucher.objects.filter(id__in=voucher_list).update(is_redeem=True, used_date=datetime.now())
         return bill_obj
 
@@ -60,7 +55,7 @@ class BillSaveSerializer(serializers.ModelSerializer):
         total = 0
         for sales_item in sales_item_obj:
             total += sales_item.total
-        return total
+        return float(total)
 
     def get_taxed_amount(self, obj):
         if obj.tax:
@@ -68,10 +63,10 @@ class BillSaveSerializer(serializers.ModelSerializer):
             taxed_amount = obj.tax / 100 * total
         else:
             taxed_amount = 0
-        return taxed_amount
+        return float(taxed_amount)
 
     def get_grand_total(self, obj):
-        return self.get_total(obj) + self.get_taxed_amount(obj)
+        return float(self.get_total(obj) + self.get_taxed_amount(obj))
 
 class BillSerializer(serializers.ModelSerializer):
     sales_item = serializers.SerializerMethodField()
@@ -93,7 +88,7 @@ class BillSerializer(serializers.ModelSerializer):
         total = 0
         for sales_item in sales_item_obj:
             total += sales_item.total
-        return total
+        return float(total)
 
     def get_taxed_amount(self, obj):
         if obj.tax:
@@ -101,10 +96,10 @@ class BillSerializer(serializers.ModelSerializer):
             taxed_amount = obj.tax / 100 * total
         else:
             taxed_amount = 0
-        return taxed_amount
+        return float(taxed_amount)
 
     def get_grand_total(self, obj):
-        return self.get_total(obj) + self.get_taxed_amount(obj)
+        return float(self.get_total(obj) + self.get_taxed_amount(obj))
 
 class BillUserDetailSerializer(serializers.Serializer):
     """
