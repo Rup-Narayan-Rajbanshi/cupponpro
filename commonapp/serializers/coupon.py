@@ -59,13 +59,27 @@ class CouponDetailSerializer(serializers.ModelSerializer):
             logo = current_site.domain + obj.company.logo.url
         except:
             logo = None
+        if obj.company:
+            company_id = obj.company.id
+            company_name = obj.company.name
+        else:
+            company_id = None
+            company_name = None
+        if obj.company and obj.company.author:
+            owner_id = obj.company.author.id
+            owner_name = obj.company.author.full_name
+            profile_image = current_site.domain + obj.company.author.image.url
+        else:
+            owner_id = None
+            owner_name = None
+            profile_image = None
         data = {
-            'id': obj.company.id,
-            'name': obj.company.name,
+            'id': company_id,
+            'name': company_name,
             'logo': logo,
-            'owner_id': obj.company.author.id,
-            'owner_name': obj.company.author.full_name,
-            'profile_image': current_site.domain + obj.company.author.image.url
+            'owner_id': owner_id,
+            'owner_name': owner_name,
+            'profile_image': profile_image
         }
         return data
 

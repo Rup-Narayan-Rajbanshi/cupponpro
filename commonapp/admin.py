@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from commonapp.models.affiliate import AffiliateLink
+from commonapp.models.asset import Asset
 from commonapp.models.bill import Bill
 from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Company, CompanyUser, FavouriteCompany
@@ -8,6 +9,7 @@ from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.document import Document
 from commonapp.models.facility import Facility
 from commonapp.models.image import Image
+from commonapp.models.order import Order, OrderLine
 from commonapp.models.links import SocialLink
 from commonapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.models.rating import Rating
@@ -15,25 +17,24 @@ from commonapp.models.salesitem import SalesItem
 
 
 class AdminBillapp(admin.ModelAdmin):
-    list_display = ('id', 'total', 'total_discount', 'tax', 'taxed_amount',\
-        'grand_total', 'payment_mode', 'created_at')
+    list_display = ('id', 'tax', 'payment_mode', 'created_at')
     fieldsets = (
         (_("Basic info"), {
             'fields':(
-                'company', 'user', 'name', 'phone_number', 'total', 'total_discount', 'tax', \
-                'taxed_amount', 'grand_total', 'payment_mode'
+                'company', 'user', 'name', 'phone_number', 'tax', \
+                 'payment_mode'
             )
         }
         ),
     )
 
 class AdminSalesItemapp(admin.ModelAdmin):
-    list_display = ('id', 'amount', 'quantity',\
+    list_display = ('id', 'rate', 'quantity',\
         'created_at')
     fieldsets = (
         (_("Basic info"), {
             'fields':(
-                'bill', 'product', 'amount', 'voucher', 'discount_amount', 'discount', 'quantity'
+                'bill', 'product', 'voucher', 'discount', 'quantity', 'rate', 'total'
             )
         }
         ),
@@ -106,6 +107,7 @@ class AdminRatingapp(admin.ModelAdmin):
     )
 
 admin.site.register(AffiliateLink)
+admin.site.register(Asset)
 admin.site.register(Bill, AdminBillapp)
 admin.site.register(BulkQuantity, AdminBulkQuantityapp)
 admin.site.register(Category, AdminCategoryapp)
@@ -116,6 +118,8 @@ admin.site.register(Document)
 admin.site.register(Facility)
 admin.site.register(FavouriteCompany)
 admin.site.register(Image, AdminImageapp)
+admin.site.register(Order)
+admin.site.register(OrderLine)
 admin.site.register(Product, AdminProductapp)
 admin.site.register(ProductCategory, AdminProductCategoryapp)
 admin.site.register(Rating, AdminRatingapp)

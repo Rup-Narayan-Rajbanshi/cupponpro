@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from commonapp.models.company import Company, CompanyUser
 from commonapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
-from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
+from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, publicReadOnly
 
 class CompanyBulkQuantityListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
@@ -30,8 +30,19 @@ class CompanyBulkQuantityListView(generics.GenericAPIView):
                 page_obj = paginator.get_page(page_number)
                 serializer = BulkQuantitySerializer(page_obj, many=True,\
                     context={"request":request})
+                if page_obj.has_previous():
+                    previous_page = page_obj.previous_page_number()
+                else:
+                    previous_page = None
+                if page_obj.has_next():
+                    next_page = page_obj.next_page_number()
+                else:
+                    next_page = None
                 data = {
                     'success': 1,
+                    'previous_page': previous_page,
+                    'next_page': next_page,
+                    'page_count': paginator.num_pages,
                     'data': serializer.data,
                 }
                 return Response(data, status=200)
@@ -202,7 +213,7 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
             return Response(data, status=404)
 
 class CompanyProductListView(generics.GenericAPIView):
-    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | publicReadOnly]
     serializer_class = ProductSerializer
 
     def get(self, request, company_id):
@@ -217,8 +228,19 @@ class CompanyProductListView(generics.GenericAPIView):
         page_obj = paginator.get_page(page_number)
         serializer = ProductSerializer(page_obj, many=True,\
             context={"request":request})
+        if page_obj.has_previous():
+            previous_page = page_obj.previous_page_number()
+        else:
+            previous_page = None
+        if page_obj.has_next():
+            next_page = page_obj.next_page_number()
+        else:
+            next_page = None
         data = {
             'success': 1,
+            'previous_page': previous_page,
+            'next_page': next_page,
+            'page_count': paginator.num_pages,
             'data': serializer.data
         }
         return Response(data, status=200)
@@ -367,9 +389,20 @@ class ProductCategoryListView(generics.GenericAPIView):
         paginator = Paginator(product_category_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = ProductCategorySerializer(page_obj, many=True,\
-        context={"request": request})
+            context={"request": request})
+        if page_obj.has_previous():
+            previous_page = page_obj.previous_page_number()
+        else:
+            previous_page = None
+        if page_obj.has_next():
+            next_page = page_obj.next_page_number()
+        else:
+            next_page = None
         data = {
             'success': 1,
+            'previous_page': previous_page,
+            'next_page': next_page,
+            'page_count': paginator.num_pages,
             'data': serializer.data
         }
         return Response(data, status=200)
@@ -391,9 +424,20 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
             paginator = Paginator(product_category_obj, page_size)
             page_obj = paginator.get_page(page_number)
             serializer = ProductCategorySerializer(page_obj, many=True,\
-            context={"request": request})
+                context={"request": request})
+            if page_obj.has_previous():
+                previous_page = page_obj.previous_page_number()
+            else:
+                previous_page = None
+            if page_obj.has_next():
+                next_page = page_obj.next_page_number()
+            else:
+                next_page = None
             data = {
                 'success': 1,
+                'previous_page': previous_page,
+                'next_page': next_page,
+                'page_count': paginator.num_pages,
                 'data': serializer.data
             }
             return Response(data, status=200)

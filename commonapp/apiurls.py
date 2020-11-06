@@ -2,10 +2,12 @@
 from django.urls import path
 from commonapp.api.affiliate import AffiliateLinkListView, AffiliateLinkDetailView, AffiliateLinkCountView,\
     TopDiscountAffiliateListView, DealOfTheDayAffiliateListView
-from commonapp.api.bill import BillListView, BillDetailView, BillVerifyView
+from commonapp.api.asset import AssetListView, AssetDetailView
+from commonapp.api.bill import BillListView, BillDetailView, BillUserDetailView
 from commonapp.api.category import CategoryListView, CategoryDetailView, SubCategoryListView, SubCategoryDetailView
 from commonapp.api.company import CompanyListView, CompanyDetailView, CompanyUserListView, PartnerListView,\
-    CompanyFavouriteView, ChangeCompanyEmailView, CategoryCompanyListView, CompanyCouponListView
+    CompanyFavouriteView, ChangeCompanyEmailView, CategoryCompanyListView, CompanyCouponListView,\
+    LocalRestaurantListView
 from commonapp.api.coupon import CouponListView, CouponDetailView, CategoryCouponListView, CouponTypeListView,\
     VoucherListView, TrendingCouponListView, DealOfTheDayCouponListView
 from commonapp.api.document import CompanyDocumentListView, CompanyDocumentDetailView, CompanyDocumentMassUpdateView
@@ -13,6 +15,8 @@ from commonapp.api.facility import CompanyFacilityListView, CompanyFacilityDetai
 from commonapp.api.image import CompanyImageListView, CompanyImageDetailView, CouponImageListView, CouponImageDetailView,\
     ProductImageListView, ProductImageDetailView
 from commonapp.api.links import SocialLinkListView, SocialLinkDetailView, SocialLinkMassUpdateView
+from commonapp.api.menu import MenuListView
+from commonapp.api.order import OrderListView, OrderDetailView, ActiveOrderListView, OrderToBillView, OrderUserDetailView, OrderLineVerifyView
 from commonapp.api.product import (
     CompanyBulkQuantityListView,
     CompanyBulkQuantityDetailView,
@@ -22,7 +26,7 @@ from commonapp.api.product import (
     CompanyProductCategoryListView,
 )
 from commonapp.api.rating import CompanyRatingListView, CompanyRatingDetailView
-from commonapp.api.salesitem import SalesItemListView
+from commonapp.api.salesitem import SalesItemVerifyView
 from commonapp.api.search import TopBarSearchView
 
 app_name = 'commonapp'
@@ -42,6 +46,7 @@ urlpatterns = [
     path('company/<uuid:company_id>/email', ChangeCompanyEmailView.as_view(), name='update_company_email'),
     path('category/<uuid:category_id>/company', CategoryCompanyListView.as_view(), name='category_company_list'),
     path('company/<uuid:company_id>/coupon', CompanyCouponListView.as_view(), name='company_coupon_list'),
+    path('company/local', LocalRestaurantListView.as_view(), name='local_company_list'),
     # company image
     path('company/<uuid:company_id>/image', CompanyImageListView.as_view(), name='company_image_list'),
     path('company/<uuid:company_id>/image/<uuid:image_id>', CompanyImageDetailView.as_view(), name='company_image_detail'),
@@ -86,12 +91,23 @@ urlpatterns = [
     path('product/<uuid:product_id>/image', ProductImageListView.as_view(), name='product_image_list'),
     path('product/<uuid:product_id>/image/<uuid:image_id>', ProductImageDetailView.as_view(), name='product_image_detail'),
     # bill
-    path('bill', BillListView.as_view(), name='bill_list'),
-    path('bill/<uuid:bill_id>', BillDetailView.as_view(), name='bill_detail'),
-    path('bill/<uuid:bill_id>/salesitem', SalesItemListView.as_view(), name='sales_item_list'),
-    path('bill/verify', BillVerifyView.as_view(), name='bill_verify'),
+    path('company/<uuid:company_id>/bill', BillListView.as_view(), name='bill_list'),
+    path('company/<uuid:company_id>/bill/<uuid:bill_id>', BillDetailView.as_view(), name='bill_detail'),
+    path('company/<uuid:company_id>/bill/verify', SalesItemVerifyView.as_view(), name='bill_verify'),
+    path('bill-user-detail', BillUserDetailView.as_view(), name='bill_user_detail'),
     # social links
     path('company/<uuid:company_id>/link', SocialLinkListView.as_view(), name='company_link_list'),
     path('company/<uuid:company_id>/link/<uuid:link_id>', SocialLinkDetailView.as_view(), name='company_link_detail'),
     path('company/<uuid:company_id>/link/update', SocialLinkMassUpdateView.as_view(), name='company_link_mass_update'),
+    path('company/<uuid:company_id>/menu', MenuListView.as_view(), name='company_menu_list'),
+    # asset
+    path('company/<uuid:company_id>/asset', AssetListView.as_view(), name='company_asset_list'),
+    path('company/<uuid:company_id>/asset/<uuid:asset_id>', AssetDetailView.as_view(), name='company_asset_detail'),
+    # order
+    path('company/<uuid:company_id>/order', OrderListView.as_view(), name='company_order_list'),
+    path('company/<uuid:company_id>/order/<uuid:order_id>', OrderDetailView.as_view(), name='company_order_detail'),
+    path('company/<uuid:company_id>/order/verify', OrderLineVerifyView.as_view(), name='order_verify'),
+    path('company/<uuid:company_id>/order/active-order', ActiveOrderListView.as_view(), name='company_active_order_list'),
+    path('company/<uuid:company_id>/order/convert-order-to-billable-items', OrderToBillView.as_view(), name='company_order_to_billable_items'),
+    path('order-user-detail', OrderUserDetailView.as_view(), name='order_user_detail')
 ]
