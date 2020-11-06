@@ -16,7 +16,7 @@ from commonapp.api.image import CompanyImageListView, CompanyImageDetailView, Co
     ProductImageListView, ProductImageDetailView
 from commonapp.api.links import SocialLinkListView, SocialLinkDetailView, SocialLinkMassUpdateView
 from commonapp.api.menu import MenuListView
-from commonapp.api.order import OrderListView, OrderDetailView, ActiveOrderListView, OrderToBillView, OrderUserDetailView
+from commonapp.api.order import OrderListView, OrderDetailView, ActiveOrderListView, OrderToBillView, OrderUserDetailView, OrderLineVerifyView
 from commonapp.api.product import (
     CompanyBulkQuantityListView,
     CompanyBulkQuantityDetailView,
@@ -106,6 +106,7 @@ urlpatterns = [
     # order
     path('company/<uuid:company_id>/order', OrderListView.as_view(), name='company_order_list'),
     path('company/<uuid:company_id>/order/<uuid:order_id>', OrderDetailView.as_view(), name='company_order_detail'),
+    path('company/<uuid:company_id>/order/verify', OrderLineVerifyView.as_view(), name='order_verify'),
     path('company/<uuid:company_id>/order/active-order', ActiveOrderListView.as_view(), name='company_active_order_list'),
     path('company/<uuid:company_id>/order/convert-order-to-billable-items', OrderToBillView.as_view(), name='company_order_to_billable_items'),
     path('order-user-detail', OrderUserDetailView.as_view(), name='order_user_detail')

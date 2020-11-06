@@ -3,7 +3,9 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order, OrderLine
+from commonapp.models.product import Product
 from commonapp.serializers.bill import BillUserDetailSerializer
 from commonapp.serializers.order import OrderSerializer, OrderSaveSerializer,OrderLineSerializer
 from userapp.models.user import User
@@ -223,3 +225,75 @@ class OrderToBillView(generics.GenericAPIView):
             'data': bill
         }
         return Response(data, status=200)
+
+class OrderLineVerifyView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = OrderLineSerializer
+
+    def post(self, request, company_id):
+        """
+        An endpoint for sale item verification.
+        """
+        voucher_obj = Voucher.objects.filter(id=request.data['voucher'])
+        order_lines = request.data['order_lines']
+        result = {
+            'tax': request.data['tax'],
+            'taxed_amount': None,
+            'total': None,
+            'grand_total': None,
+            'discount': None,
+            'order_lines': order_lines
+        }
+        if voucher_obj:
+            coupon_type = voucher_obj[0].coupon.content_type.model
+            product_ids = [x['product'] for x in order_lines]
+            # productcategory, category, product
+            applicable_products_ids = []
+            if coupon_type == "category":
+                applicable_products_ids = product_ids
+            elif coupon_type == "productcategory":
+                product_category_obj = voucher_obj[0].coupon.content_object
+                applicable_product_obj = Product.objects.filter(id__in=product_ids, product_category=product_category_obj)
+                applicable_products_ids = [str(x.id) for x in applicable_product_obj]
+            else:
+                applicable_products_ids = str(voucher_obj[0].coupon.object_id)
+                applicable_products_ids = [applicable_products_ids]
+            # get discount percentage from coupon
+            discount_p = voucher_obj[0].coupon.discount
+            # loop in items and apply discount
+            if applicable_products_ids:
+                total = 0
+                for item in order_lines:
+                    if item['product'] in applicable_products_ids:
+                        item['discount'] = discount_p
+                        item['voucher'] = str(voucher_obj[0].id)
+                        item['total'] = (item['rate'] * item['quantity']) - (discount_p / 100 * (item['rate'] * item['quantity']))
+                    else:
+                        item['total'] = item['rate'] * item['quantity']
+                    total += item['total']
+            result['total'] = total
+            result['grand_total'] = total
+            if result['tax']:
+                result['taxed_amount'] = result['tax']/100*result['total']
+                result['grand_total'] = result['total'] + result['taxed_amount']      
+            result['order_lines'] = order_lines
+            data = {
+                'success': 1,
+                'data': result
+            }
+            return Response(data, status=200)
+        else:
+            total = 0
+            for item in items:
+                item['total'] = item['rate'] * item['quantity']
+                total += item['total']
+            result['total'] = total
+            result['grand_total'] = total
+            if result['tax']:
+                result['taxed_amount'] = result['tax']/100*result['total']
+                result['grand_total'] = result['total'] + result['taxed_amount']
+            data = {
+                'success': 1,
+                'data': result
+            }
+            return Response(data, status=200)

@@ -18,7 +18,7 @@ class SalesItemVerifyView(generics.GenericAPIView):
         An endpoint for sale item verification.
         """
         voucher_obj = Voucher.objects.filter(id=request.data['voucher'])
-        items = request.data['items']
+        items = request.data['sales_item']
         result = {
             'tax': request.data['tax'],
             'taxed_amount': None,
