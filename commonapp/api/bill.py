@@ -66,7 +66,7 @@ class BillListView(generics.GenericAPIView):
         return Response(data, status=400)
 
 class BillDetailView(generics.GenericAPIView):
-    # permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
     serializer_class = BillSerializer
 
     def get(self, request, company_id, bill_id):

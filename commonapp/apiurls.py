@@ -104,8 +104,8 @@ urlpatterns = [
     path('company/<uuid:company_id>/asset', AssetListView.as_view(), name='company_asset_list'),
     path('company/<uuid:company_id>/asset/<uuid:asset_id>', AssetDetailView.as_view(), name='company_asset_detail'),
     # order
-    path('company/<uuid:company_id>/asset/<uuid:asset_id>/order', OrderListView.as_view(), name='company_asset__order_list'),
-    path('company/<uuid:company_id>/asset/<uuid:asset_id>/order/<uuid:order_id>', OrderDetailView.as_view(), name='company_asset_order_detail'),
+    path('company/<uuid:company_id>/order', OrderListView.as_view(), name='company_order_list'),
+    path('company/<uuid:company_id>/order/<uuid:order_id>', OrderDetailView.as_view(), name='company_order_detail'),
     path('company/<uuid:company_id>/order/active-order', ActiveOrderListView.as_view(), name='company_active_order_list'),
     path('company/<uuid:company_id>/order/convert-order-to-billable-items', OrderToBillView.as_view(), name='company_order_to_billable_items'),
 ]

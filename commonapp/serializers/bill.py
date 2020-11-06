@@ -28,11 +28,11 @@ class BillSaveSerializer(serializers.ModelSerializer):
             if sales_item_obj.voucher:
                 if str(sales_item_obj.voucher.id) not in voucher_list:
                     voucher_list.append(str(sales_item_obj.voucher.id))    
-            if sales_item_obj.order:
-                order_obj = OrderLine.objects.filter(id=sales_item_obj.order_id)
-                if order_obj:
-                    order_obj[0].is_billed = True
-                    order_obj[0].save()
+            # if sales_item_obj.order:
+            #     order_obj = OrderLine.objects.filter(id=sales_item_obj.order_id)
+            #     if order_obj:
+            #         order_obj[0].is_billed = True
+            #         order_obj[0].save()
         Voucher.objects.filter(id__in=voucher_list).update(is_redeem=True, used_date=datetime.now())
         return bill_obj
 

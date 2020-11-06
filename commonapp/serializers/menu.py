@@ -1,12 +1,14 @@
 from rest_framework import serializers
 from commonapp.models.company import Company
 from commonapp.models.product import Product, ProductCategory
+from commonapp.serializers.image import ImageDetailSerializer
 
 class MenuSerializer(serializers.ModelSerializer):
     menu = serializers.SerializerMethodField()
+    images = ImageDetailSerializer(many=True, read_only=True)
     class Meta:
         model = Company
-        fields = ('id', 'name', 'menu', )
+        fields = ('id', 'name', 'logo', 'images', 'menu')
         # read_only_fields = ('name', )
 
     def get_menu(self, obj):
