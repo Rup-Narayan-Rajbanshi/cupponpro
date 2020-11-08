@@ -30,6 +30,8 @@ class Company(Address):
     is_verified = models.BooleanField(default=False)
     is_partner = models.BooleanField(default=False)
     is_affiliate = models.BooleanField(default=False)
+    service_charge = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     key = models.CharField(max_length=8)
     currency = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)

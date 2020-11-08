@@ -16,7 +16,7 @@ class CompanySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Company
-        exclude = ('key',)
+        exclude = ('key', 'created_at')
         # fields = "__all__"
 
     def get_rating(self, obj):

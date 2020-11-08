@@ -8,8 +8,7 @@ class MenuSerializer(serializers.ModelSerializer):
     images = ImageDetailSerializer(many=True, read_only=True)
     class Meta:
         model = Company
-        fields = ('id', 'name', 'logo', 'images', 'menu')
-        # read_only_fields = ('name', )
+        fields = ('id', 'name', 'service_charge', 'tax', 'currency', 'logo', 'images', 'menu')
 
     def get_menu(self, obj):
         data = list()
