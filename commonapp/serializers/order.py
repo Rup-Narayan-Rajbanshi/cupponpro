@@ -32,7 +32,6 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         order_lines_data = validated_data.pop('order_lines')
         order_obj = Order.objects.create(**validated_data)
         for order_lines in order_lines_data:
-            print(order_lines)
             OrderLine.objects.create(order=order_obj, **order_lines)  
         return order_obj
 

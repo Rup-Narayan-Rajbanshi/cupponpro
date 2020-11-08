@@ -22,6 +22,7 @@ class Bill(models.Model):
     email = models.EmailField(max_length=50, null=False, blank=True)
     tax = models.PositiveIntegerField()
     payment_mode = models.CharField(max_length=10, choices=PAYMENT, default=Cash)
+    paid_amount = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
