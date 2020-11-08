@@ -80,6 +80,7 @@ class BillSerializer(serializers.ModelSerializer):
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
+    paid = serializers.SerializerMethodField()
 
     class Meta:
         model = Bill
@@ -107,6 +108,12 @@ class BillSerializer(serializers.ModelSerializer):
 
     def get_grand_total(self, obj):
         return float(self.get_total(obj) + self.get_taxed_amount(obj))
+
+    def get_paid(self, obj):
+        if obj.paid_amount:
+            return float(obj.paid_amount) >= self.get_grand_total(obj)
+        else:
+            return False
 
 class BillUserDetailSerializer(serializers.Serializer):
     """
