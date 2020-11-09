@@ -19,7 +19,6 @@ class Order(models.Model):
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
     email = models.EmailField(max_length=50, null=False, blank=True)
     voucher = models.ForeignKey(Voucher, on_delete=models.SET_NULL, null=True, blank=True)
-    tax = models.PositiveIntegerField()
     is_billed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

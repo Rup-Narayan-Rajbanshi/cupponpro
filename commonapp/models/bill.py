@@ -20,7 +20,6 @@ class Bill(models.Model):
     phone_number = models.CharField(max_length=15, null=False, blank=True,\
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
     email = models.EmailField(max_length=50, null=False, blank=True)
-    tax = models.PositiveIntegerField()
     payment_mode = models.CharField(max_length=10, choices=PAYMENT, default=Cash)
     paid_amount = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     invoice_number = models.CharField(max_length=8, editable=False)

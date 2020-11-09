@@ -23,6 +23,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
     order_lines = OrderLineSerializer(many=True, write_only=True)
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
+    service_charge = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
 
     class Meta:
@@ -67,21 +68,30 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         return float(total)
 
     def get_taxed_amount(self, obj):
-        if obj.tax:
+        if obj.company.tax:
             total = self.get_total(obj)
-            taxed_amount = obj.tax / 100 * total
+            taxed_amount = float(obj.company.tax) / 100 * total
         else:
             taxed_amount = 0
         return float(taxed_amount)
 
+    def get_service_charge(self, obj):
+        if obj.company.service_charge:
+            total = self.get_total(obj)
+            service_charge = float(obj.company.service_charge) / 100 * total
+        else:
+            service_charge = 0
+        return float(service_charge)
+
     def get_grand_total(self, obj):
-        return float(self.get_total(obj) + self.get_taxed_amount(obj))
+        return float(self.get_total(obj) + self.get_taxed_amount(obj) + self.get_service_charge(obj))
 
 class OrderSerializer(serializers.ModelSerializer):
     asset_name = serializers.SerializerMethodField()
     order_lines = serializers.SerializerMethodField()
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
+    service_charge = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
 
     class Meta:
@@ -104,12 +114,20 @@ class OrderSerializer(serializers.ModelSerializer):
         return float(total)
 
     def get_taxed_amount(self, obj):
-        if obj.tax:
+        if obj.company.tax:
             total = self.get_total(obj)
-            taxed_amount = obj.tax / 100 * total
+            taxed_amount = float(obj.company.tax) / 100 * total
         else:
             taxed_amount = 0
         return float(taxed_amount)
 
+    def get_service_charge(self, obj):
+        if obj.company.service_charge:
+            total = self.get_total(obj)
+            service_charge = float(obj.company.service_charge) / 100 * total
+        else:
+            service_charge = 0
+        return float(service_charge)
+
     def get_grand_total(self, obj):
-        return float(self.get_total(obj) + self.get_taxed_amount(obj))
+        return float(self.get_total(obj) + self.get_taxed_amount(obj) + self.get_service_charge(obj))
