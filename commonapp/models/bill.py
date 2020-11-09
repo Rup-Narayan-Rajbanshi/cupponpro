@@ -23,6 +23,7 @@ class Bill(models.Model):
     tax = models.PositiveIntegerField()
     payment_mode = models.CharField(max_length=10, choices=PAYMENT, default=Cash)
     paid_amount = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    invoice_number = models.CharField(max_length=8, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -38,4 +39,10 @@ class Bill(models.Model):
             self.name = self.user.full_name
             self.email = self.user.email
             self.phone_number = self.user.phone_number
+        if not self.invoice_number:
+            company_obj = Company.objects.get(id=self.company_id)
+            company_obj.invoice_counter += 1
+            company_obj.save()
+            invoice_number = str(company_obj.invoice_counter)
+            self.invoice_number = "0" * (8 - len(invoice_number)) + invoice_number
         return super(Bill, self).save(*args, **kwargs)
