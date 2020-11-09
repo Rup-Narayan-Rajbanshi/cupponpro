@@ -22,7 +22,7 @@ RUN A PROJECT
     - STAGING_DATABASE_PASSWORD
     - DATABASE_HOST
     - DATABASE_PORT
-4. Configure whether to use dev server or production server my modifying in manage.py, project/wsgi.py and project/asgi.py as either **"project.settings.dev"** or **"project.settings.prod"**
+4. Configure whether to use dev server or production server by modifying in manage.py, project/wsgi.py and project/asgi.py as either **"project.settings.dev"** or **"project.settings.prod"**
 5. run `python manage.py makemigrations`
 6. run `python manage.py migrate`
 7. run `python manage.py createsuperuser`

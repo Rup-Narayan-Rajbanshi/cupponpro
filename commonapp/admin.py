@@ -17,13 +17,10 @@ from commonapp.models.salesitem import SalesItem
 
 
 class AdminBillapp(admin.ModelAdmin):
-    list_display = ('id', 'tax', 'payment_mode', 'created_at')
+    list_display = ('id', 'payment_mode', 'invoice_number', 'created_at')
     fieldsets = (
         (_("Basic info"), {
-            'fields':(
-                'company', 'user', 'name', 'phone_number', 'tax', \
-                 'payment_mode'
-            )
+            'fields':('company', 'user', 'name', 'phone_number', 'payment_mode')
         }
         ),
     )
@@ -44,7 +41,7 @@ class AdminCategoryapp(admin.ModelAdmin):
     list_display = ('id', 'name', 'created_at')
 
 class AdminCompanyapp(admin.ModelAdmin):
-    list_display = ('id', 'name', 'key')
+    list_display = ('id', 'name', 'key', 'invoice_counter')
     fieldsets = (
             (_("Company Info"), {
                 'fields':(
@@ -59,7 +56,7 @@ class AdminCompanyapp(admin.ModelAdmin):
                     )
                 }
             ),
-
+            (_("Billing"), {'fields':('service_charge', 'tax')}),
             (_("Partner Client"), {'fields':('is_partner',)}),
 
             (_("Permission"), {'fields':('status',)}),)

@@ -3,6 +3,7 @@ from commonapp.models.order import Order, OrderLine
 
 class OrderLineSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=False, allow_null=True)
+    order = serializers.UUIDField(read_only=False, allow_null=True)
     product_name = serializers.SerializerMethodField()
     product_code = serializers.SerializerMethodField()
 
@@ -22,6 +23,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
     order_lines = OrderLineSerializer(many=True, write_only=True)
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
+    service_charge = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
 
     class Meta:
@@ -32,8 +34,8 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         order_lines_data = validated_data.pop('order_lines')
         order_obj = Order.objects.create(**validated_data)
         for order_lines in order_lines_data:
-            print(order_lines)
-            OrderLine.objects.create(order=order_obj, **order_lines)  
+            order_lines['order'] = order_obj
+            OrderLine.objects.create(**order_lines)  
         return order_obj
 
     def update(self, instance, validated_data):
@@ -66,21 +68,30 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         return float(total)
 
     def get_taxed_amount(self, obj):
-        if obj.tax:
+        if obj.company.tax:
             total = self.get_total(obj)
-            taxed_amount = obj.tax / 100 * total
+            taxed_amount = float(obj.company.tax) / 100 * total
         else:
             taxed_amount = 0
         return float(taxed_amount)
 
+    def get_service_charge(self, obj):
+        if obj.company.service_charge:
+            total = self.get_total(obj)
+            service_charge = float(obj.company.service_charge) / 100 * total
+        else:
+            service_charge = 0
+        return float(service_charge)
+
     def get_grand_total(self, obj):
-        return float(self.get_total(obj) + self.get_taxed_amount(obj))
+        return float(self.get_total(obj) + self.get_taxed_amount(obj) + self.get_service_charge(obj))
 
 class OrderSerializer(serializers.ModelSerializer):
     asset_name = serializers.SerializerMethodField()
     order_lines = serializers.SerializerMethodField()
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
+    service_charge = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
 
     class Meta:
@@ -103,12 +114,20 @@ class OrderSerializer(serializers.ModelSerializer):
         return float(total)
 
     def get_taxed_amount(self, obj):
-        if obj.tax:
+        if obj.company.tax:
             total = self.get_total(obj)
-            taxed_amount = obj.tax / 100 * total
+            taxed_amount = float(obj.company.tax) / 100 * total
         else:
             taxed_amount = 0
         return float(taxed_amount)
 
+    def get_service_charge(self, obj):
+        if obj.company.service_charge:
+            total = self.get_total(obj)
+            service_charge = float(obj.company.service_charge) / 100 * total
+        else:
+            service_charge = 0
+        return float(service_charge)
+
     def get_grand_total(self, obj):
-        return float(self.get_total(obj) + self.get_taxed_amount(obj))
+        return float(self.get_total(obj) + self.get_taxed_amount(obj) + self.get_service_charge(obj))

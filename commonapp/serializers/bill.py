@@ -13,7 +13,9 @@ class BillSaveSerializer(serializers.ModelSerializer):
     sales_item = SalesItemSerializer(many=True, write_only=True)
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
+    service_charge = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
+    paid = serializers.SerializerMethodField()
 
     class Meta:
         model = Bill
@@ -24,7 +26,8 @@ class BillSaveSerializer(serializers.ModelSerializer):
         bill_obj = Bill.objects.create(**validated_data)
         voucher_list = []
         for sales_item in sales_item_data:
-            sales_item_obj = SalesItem.objects.create(bill=bill_obj, **sales_item)
+            sales_item['bill'] = bill_obj
+            sales_item_obj = SalesItem.objects.create(**sales_item)
             if sales_item_obj.voucher:
                 if str(sales_item_obj.voucher.id) not in voucher_list:
                     voucher_list.append(str(sales_item_obj.voucher.id))    
@@ -56,23 +59,39 @@ class BillSaveSerializer(serializers.ModelSerializer):
         for sales_item in sales_item_obj:
             total += sales_item.total
         return float(total)
-
+    
     def get_taxed_amount(self, obj):
-        if obj.tax:
+        if obj.company.tax:
             total = self.get_total(obj)
-            taxed_amount = obj.tax / 100 * total
+            taxed_amount = float(obj.company.tax) / 100 * total
         else:
             taxed_amount = 0
         return float(taxed_amount)
 
+    def get_service_charge(self, obj):
+        if obj.company.service_charge:
+            total = self.get_total(obj)
+            service_charge = float(obj.company.service_charge) / 100 * total
+        else:
+            service_charge = 0
+        return float(service_charge)
+
     def get_grand_total(self, obj):
-        return float(self.get_total(obj) + self.get_taxed_amount(obj))
+        return float(self.get_total(obj) + self.get_taxed_amount(obj) + self.get_service_charge(obj))
+    
+    def get_paid(self, obj):
+        if obj.paid_amount:
+            return float(obj.paid_amount) >= self.get_grand_total(obj)
+        else:
+            return False
 
 class BillSerializer(serializers.ModelSerializer):
     sales_item = serializers.SerializerMethodField()
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
+    service_charge = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
+    paid = serializers.SerializerMethodField()
 
     class Meta:
         model = Bill
@@ -91,15 +110,29 @@ class BillSerializer(serializers.ModelSerializer):
         return float(total)
 
     def get_taxed_amount(self, obj):
-        if obj.tax:
+        if obj.company.tax:
             total = self.get_total(obj)
-            taxed_amount = obj.tax / 100 * total
+            taxed_amount = float(obj.company.tax) / 100 * total
         else:
             taxed_amount = 0
         return float(taxed_amount)
 
+    def get_service_charge(self, obj):
+        if obj.company.service_charge:
+            total = self.get_total(obj)
+            service_charge = float(obj.company.service_charge) / 100 * total
+        else:
+            service_charge = 0
+        return float(service_charge)
+
     def get_grand_total(self, obj):
-        return float(self.get_total(obj) + self.get_taxed_amount(obj))
+        return float(self.get_total(obj) + self.get_taxed_amount(obj) + self.get_service_charge(obj))
+
+    def get_paid(self, obj):
+        if obj.paid_amount:
+            return float(obj.paid_amount) >= self.get_grand_total(obj)
+        else:
+            return False
 
 class BillUserDetailSerializer(serializers.Serializer):
     """
