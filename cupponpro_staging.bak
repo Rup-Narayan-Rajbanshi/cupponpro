@@ -1,0 +1,3301 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.4 (Ubuntu 12.4-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.4 (Ubuntu 12.4-0ubuntu0.20.04.1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: affiliate_link; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.affiliate_link (
+    id uuid NOT NULL,
+    url text,
+    discount_code character varying(50),
+    image character varying(100),
+    description text NOT NULL,
+    discount integer NOT NULL,
+    is_active boolean NOT NULL,
+    count integer NOT NULL,
+    deal_of_the_day boolean NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    category_id uuid NOT NULL,
+    company_id uuid NOT NULL,
+    sub_category_id uuid,
+    CONSTRAINT affiliate_link_count_check CHECK ((count >= 0)),
+    CONSTRAINT affiliate_link_discount_check CHECK ((discount >= 0))
+);
+
+
+ALTER TABLE public.affiliate_link OWNER TO cupponpro_staging;
+
+--
+-- Name: asset; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.asset (
+    id uuid NOT NULL,
+    name character varying(20) NOT NULL,
+    asset_type character varying(20) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.asset OWNER TO cupponpro_staging;
+
+--
+-- Name: auth_group; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.auth_group (
+    id integer NOT NULL,
+    name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.auth_group OWNER TO cupponpro_staging;
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE SEQUENCE public.auth_group_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.auth_group_id_seq OWNER TO cupponpro_staging;
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER SEQUENCE public.auth_group_id_seq OWNED BY public.auth_group.id;
+
+
+--
+-- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.auth_group_permissions (
+    id integer NOT NULL,
+    group_id integer NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE public.auth_group_permissions OWNER TO cupponpro_staging;
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE SEQUENCE public.auth_group_permissions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.auth_group_permissions_id_seq OWNER TO cupponpro_staging;
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER SEQUENCE public.auth_group_permissions_id_seq OWNED BY public.auth_group_permissions.id;
+
+
+--
+-- Name: auth_permission; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.auth_permission (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    content_type_id integer NOT NULL,
+    codename character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.auth_permission OWNER TO cupponpro_staging;
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE SEQUENCE public.auth_permission_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.auth_permission_id_seq OWNER TO cupponpro_staging;
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER SEQUENCE public.auth_permission_id_seq OWNED BY public.auth_permission.id;
+
+
+--
+-- Name: authtoken_token; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.authtoken_token (
+    key character varying(40) NOT NULL,
+    created timestamp with time zone NOT NULL,
+    user_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.authtoken_token OWNER TO cupponpro_staging;
+
+--
+-- Name: banner; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.banner (
+    id uuid NOT NULL,
+    title character varying(200) NOT NULL,
+    description text NOT NULL,
+    image character varying(100) NOT NULL,
+    url text,
+    is_active boolean NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    expire_at timestamp with time zone
+);
+
+
+ALTER TABLE public.banner OWNER TO cupponpro_staging;
+
+--
+-- Name: bill; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.bill (
+    id uuid NOT NULL,
+    name character varying(100),
+    phone_number character varying(15) NOT NULL,
+    email character varying(50) NOT NULL,
+    payment_mode character varying(10) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL,
+    user_id uuid,
+    paid_amount numeric(9,6),
+    invoice_number character varying(8) NOT NULL
+);
+
+
+ALTER TABLE public.bill OWNER TO cupponpro_staging;
+
+--
+-- Name: bulk_quantity; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.bulk_quantity (
+    id uuid NOT NULL,
+    name character varying(30) NOT NULL,
+    quantity integer NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL,
+    CONSTRAINT bulk_quantity_quantity_check CHECK ((quantity >= 0))
+);
+
+
+ALTER TABLE public.bulk_quantity OWNER TO cupponpro_staging;
+
+--
+-- Name: category; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.category (
+    id uuid NOT NULL,
+    name character varying(30) NOT NULL,
+    icon character varying(100) NOT NULL,
+    image character varying(100),
+    token character varying(8) NOT NULL,
+    created_at timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.category OWNER TO cupponpro_staging;
+
+--
+-- Name: company; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.company (
+    country character varying(30),
+    state character varying(30),
+    city character varying(30),
+    address character varying(30),
+    zip_code character varying(30),
+    id uuid NOT NULL,
+    name character varying(200) NOT NULL,
+    logo character varying(100),
+    email character varying(50),
+    status boolean NOT NULL,
+    phone_number character varying(15),
+    longitude numeric(9,6),
+    latitude numeric(9,6),
+    is_verified boolean NOT NULL,
+    is_partner boolean NOT NULL,
+    is_affiliate boolean NOT NULL,
+    key character varying(8) NOT NULL,
+    currency character varying(10) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    author_id uuid,
+    category_id uuid NOT NULL,
+    sub_category_id uuid,
+    service_charge numeric(5,2),
+    tax numeric(5,2),
+    invoice_counter integer NOT NULL,
+    CONSTRAINT company_invoice_counter_check CHECK ((invoice_counter >= 0))
+);
+
+
+ALTER TABLE public.company OWNER TO cupponpro_staging;
+
+--
+-- Name: company_user; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.company_user (
+    id uuid NOT NULL,
+    is_staff boolean NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL,
+    user_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.company_user OWNER TO cupponpro_staging;
+
+--
+-- Name: coupon; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.coupon (
+    id uuid NOT NULL,
+    description character varying(250) NOT NULL,
+    expiry_date date NOT NULL,
+    token character varying(8) NOT NULL,
+    discount integer NOT NULL,
+    object_id uuid NOT NULL,
+    is_premium boolean NOT NULL,
+    deal_of_the_day boolean NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid,
+    content_type_id integer NOT NULL,
+    CONSTRAINT coupon_discount_check CHECK ((discount >= 0))
+);
+
+
+ALTER TABLE public.coupon OWNER TO cupponpro_staging;
+
+--
+-- Name: django_admin_log; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.django_admin_log (
+    id integer NOT NULL,
+    action_time timestamp with time zone NOT NULL,
+    object_id text,
+    object_repr character varying(200) NOT NULL,
+    action_flag smallint NOT NULL,
+    change_message text NOT NULL,
+    content_type_id integer,
+    user_id uuid NOT NULL,
+    CONSTRAINT django_admin_log_action_flag_check CHECK ((action_flag >= 0))
+);
+
+
+ALTER TABLE public.django_admin_log OWNER TO cupponpro_staging;
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE SEQUENCE public.django_admin_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.django_admin_log_id_seq OWNER TO cupponpro_staging;
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER SEQUENCE public.django_admin_log_id_seq OWNED BY public.django_admin_log.id;
+
+
+--
+-- Name: django_content_type; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.django_content_type (
+    id integer NOT NULL,
+    app_label character varying(100) NOT NULL,
+    model character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.django_content_type OWNER TO cupponpro_staging;
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE SEQUENCE public.django_content_type_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.django_content_type_id_seq OWNER TO cupponpro_staging;
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER SEQUENCE public.django_content_type_id_seq OWNED BY public.django_content_type.id;
+
+
+--
+-- Name: django_migrations; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.django_migrations (
+    id integer NOT NULL,
+    app character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    applied timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_migrations OWNER TO cupponpro_staging;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE SEQUENCE public.django_migrations_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.django_migrations_id_seq OWNER TO cupponpro_staging;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER SEQUENCE public.django_migrations_id_seq OWNED BY public.django_migrations.id;
+
+
+--
+-- Name: django_session; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.django_session (
+    session_key character varying(40) NOT NULL,
+    session_data text NOT NULL,
+    expire_date timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_session OWNER TO cupponpro_staging;
+
+--
+-- Name: django_site; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.django_site (
+    id integer NOT NULL,
+    domain character varying(100) NOT NULL,
+    name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.django_site OWNER TO cupponpro_staging;
+
+--
+-- Name: django_site_id_seq; Type: SEQUENCE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE SEQUENCE public.django_site_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.django_site_id_seq OWNER TO cupponpro_staging;
+
+--
+-- Name: django_site_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER SEQUENCE public.django_site_id_seq OWNED BY public.django_site.id;
+
+
+--
+-- Name: document; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.document (
+    id uuid NOT NULL,
+    name character varying(50) NOT NULL,
+    document_number character varying(50),
+    document character varying(100) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.document OWNER TO cupponpro_staging;
+
+--
+-- Name: facility; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.facility (
+    id uuid NOT NULL,
+    name character varying(20) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.facility OWNER TO cupponpro_staging;
+
+--
+-- Name: favourite_company; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.favourite_company (
+    id uuid NOT NULL,
+    is_favourite boolean NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL,
+    user_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.favourite_company OWNER TO cupponpro_staging;
+
+--
+-- Name: image; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.image (
+    id uuid NOT NULL,
+    image character varying(100) NOT NULL,
+    object_id uuid NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    content_type_id integer NOT NULL
+);
+
+
+ALTER TABLE public.image OWNER TO cupponpro_staging;
+
+--
+-- Name: login_token; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.login_token (
+    id uuid NOT NULL,
+    token character varying(4) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    is_used boolean NOT NULL,
+    user_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.login_token OWNER TO cupponpro_staging;
+
+--
+-- Name: news_article; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.news_article (
+    id uuid NOT NULL,
+    news_partner character varying(50) NOT NULL,
+    url text NOT NULL,
+    headline character varying(255) NOT NULL,
+    description text NOT NULL,
+    image character varying(100) NOT NULL,
+    created_at timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.news_article OWNER TO cupponpro_staging;
+
+--
+-- Name: order; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public."order" (
+    id uuid NOT NULL,
+    name character varying(100),
+    phone_number character varying(15) NOT NULL,
+    email character varying(50) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL,
+    user_id uuid,
+    voucher_id uuid,
+    asset_id uuid NOT NULL,
+    is_billed boolean NOT NULL,
+    bill_id uuid
+);
+
+
+ALTER TABLE public."order" OWNER TO cupponpro_staging;
+
+--
+-- Name: order_line; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.order_line (
+    id uuid NOT NULL,
+    rate integer NOT NULL,
+    quantity integer NOT NULL,
+    state character varying(20) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL,
+    product_id uuid NOT NULL,
+    order_id uuid NOT NULL,
+    total numeric(10,2) NOT NULL,
+    CONSTRAINT order_line_quantity_check CHECK ((quantity >= 0)),
+    CONSTRAINT order_line_rate_check CHECK ((rate >= 0))
+);
+
+
+ALTER TABLE public.order_line OWNER TO cupponpro_staging;
+
+--
+-- Name: password_reset_token; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.password_reset_token (
+    id uuid NOT NULL,
+    token character varying(6) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    is_used boolean NOT NULL,
+    user_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.password_reset_token OWNER TO cupponpro_staging;
+
+--
+-- Name: product; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.product (
+    id uuid NOT NULL,
+    product_code character varying(10) NOT NULL,
+    name character varying(30) NOT NULL,
+    brand_name character varying(30),
+    unit_price integer NOT NULL,
+    total_price integer NOT NULL,
+    token character varying(8) NOT NULL,
+    is_veg boolean NOT NULL,
+    gender character varying(6),
+    created_at timestamp with time zone NOT NULL,
+    bulk_quantity_id uuid,
+    company_id uuid NOT NULL,
+    product_category_id uuid NOT NULL,
+    CONSTRAINT product_total_price_check CHECK ((total_price >= 0)),
+    CONSTRAINT product_unit_price_check CHECK ((unit_price >= 0))
+);
+
+
+ALTER TABLE public.product OWNER TO cupponpro_staging;
+
+--
+-- Name: product_category; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.product_category (
+    id uuid NOT NULL,
+    name character varying(30) NOT NULL,
+    image character varying(100) NOT NULL,
+    token character varying(8) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.product_category OWNER TO cupponpro_staging;
+
+--
+-- Name: rating; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.rating (
+    id uuid NOT NULL,
+    description text,
+    rate numeric(2,1) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL,
+    user_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.rating OWNER TO cupponpro_staging;
+
+--
+-- Name: sales_item; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.sales_item (
+    id uuid NOT NULL,
+    rate integer NOT NULL,
+    quantity integer NOT NULL,
+    total numeric(10,2) NOT NULL,
+    discount integer,
+    created_at timestamp with time zone NOT NULL,
+    bill_id uuid,
+    product_id uuid,
+    voucher_id uuid,
+    order_id uuid,
+    CONSTRAINT sales_item_discount_check CHECK ((discount >= 0)),
+    CONSTRAINT sales_item_quantity_check CHECK ((quantity >= 0)),
+    CONSTRAINT sales_item_rate_e1c7de14_check CHECK ((rate >= 0))
+);
+
+
+ALTER TABLE public.sales_item OWNER TO cupponpro_staging;
+
+--
+-- Name: signup_token; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.signup_token (
+    id uuid NOT NULL,
+    email character varying(50) NOT NULL,
+    phone_number character varying(15) NOT NULL,
+    token character varying(4) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    is_used boolean NOT NULL
+);
+
+
+ALTER TABLE public.signup_token OWNER TO cupponpro_staging;
+
+--
+-- Name: social_link; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.social_link (
+    id uuid NOT NULL,
+    name character varying(15) NOT NULL,
+    url character varying(250) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    company_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.social_link OWNER TO cupponpro_staging;
+
+--
+-- Name: sub_category; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.sub_category (
+    id uuid NOT NULL,
+    name character varying(15) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    category_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.sub_category OWNER TO cupponpro_staging;
+
+--
+-- Name: subscribers; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.subscribers (
+    id uuid NOT NULL,
+    email character varying(50) NOT NULL,
+    promotion boolean NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    user_id uuid
+);
+
+
+ALTER TABLE public.subscribers OWNER TO cupponpro_staging;
+
+--
+-- Name: user; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public."user" (
+    password character varying(128) NOT NULL,
+    last_login timestamp with time zone,
+    country character varying(30),
+    state character varying(30),
+    city character varying(30),
+    address character varying(30),
+    zip_code character varying(30),
+    id uuid NOT NULL,
+    first_name character varying(50) NOT NULL,
+    middle_name character varying(50),
+    last_name character varying(50) NOT NULL,
+    gender character varying(6),
+    email character varying(50) NOT NULL,
+    phone_number character varying(15) NOT NULL,
+    image character varying(100),
+    admin boolean NOT NULL,
+    staff boolean NOT NULL,
+    active boolean NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    dob date
+);
+
+
+ALTER TABLE public."user" OWNER TO cupponpro_staging;
+
+--
+-- Name: user_group; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.user_group (
+    id integer NOT NULL,
+    user_id uuid NOT NULL,
+    group_id integer NOT NULL
+);
+
+
+ALTER TABLE public.user_group OWNER TO cupponpro_staging;
+
+--
+-- Name: user_group_id_seq; Type: SEQUENCE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE SEQUENCE public.user_group_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_group_id_seq OWNER TO cupponpro_staging;
+
+--
+-- Name: user_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER SEQUENCE public.user_group_id_seq OWNED BY public.user_group.id;
+
+
+--
+-- Name: voucher; Type: TABLE; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE TABLE public.voucher (
+    id uuid NOT NULL,
+    token character varying(20) NOT NULL,
+    is_redeem boolean NOT NULL,
+    watch_later boolean NOT NULL,
+    save_amount integer,
+    used_date timestamp with time zone,
+    created_at timestamp with time zone NOT NULL,
+    bill_id uuid,
+    coupon_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    CONSTRAINT voucher_save_amount_check CHECK ((save_amount >= 0))
+);
+
+
+ALTER TABLE public.voucher OWNER TO cupponpro_staging;
+
+--
+-- Name: auth_group id; Type: DEFAULT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_group ALTER COLUMN id SET DEFAULT nextval('public.auth_group_id_seq'::regclass);
+
+
+--
+-- Name: auth_group_permissions id; Type: DEFAULT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_group_permissions ALTER COLUMN id SET DEFAULT nextval('public.auth_group_permissions_id_seq'::regclass);
+
+
+--
+-- Name: auth_permission id; Type: DEFAULT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_permission ALTER COLUMN id SET DEFAULT nextval('public.auth_permission_id_seq'::regclass);
+
+
+--
+-- Name: django_admin_log id; Type: DEFAULT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_admin_log ALTER COLUMN id SET DEFAULT nextval('public.django_admin_log_id_seq'::regclass);
+
+
+--
+-- Name: django_content_type id; Type: DEFAULT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_content_type ALTER COLUMN id SET DEFAULT nextval('public.django_content_type_id_seq'::regclass);
+
+
+--
+-- Name: django_migrations id; Type: DEFAULT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('public.django_migrations_id_seq'::regclass);
+
+
+--
+-- Name: django_site id; Type: DEFAULT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_site ALTER COLUMN id SET DEFAULT nextval('public.django_site_id_seq'::regclass);
+
+
+--
+-- Name: user_group id; Type: DEFAULT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.user_group ALTER COLUMN id SET DEFAULT nextval('public.user_group_id_seq'::regclass);
+
+
+--
+-- Data for Name: affiliate_link; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.affiliate_link (id, url, discount_code, image, description, discount, is_active, count, deal_of_the_day, created_at, category_id, company_id, sub_category_id) FROM stdin;
+28bddc1a-6025-4050-a0e2-10ea2217fb11	www.daraz.com.np	daraz66	affiliate/daraz_affiliate_image_Q4IQBgQ.png	Real Test	25	t	0	f	2020-10-20 03:07:52.1739+00	f1213802-dc3c-4057-a003-3bf2993c5302	377b3f83-cae7-4396-b925-884daf16fe6b	\N
+6e675ebd-eac4-4f7a-b17d-0519af486a4c	https://sastodeal.com	\N	affiliate/daraz_affiliate_image.png	discount on t-shirt	40	t	0	f	2020-11-01 12:23:29.292785+00	f1213802-dc3c-4057-a003-3bf2993c5302	1499b071-cec6-4f48-8f58-4595dc0950cf	\N
+09bbb101-65db-4571-8bc0-7625f499689c	https:/flipkart.com	\N	affiliate/daraz_affiliate_image_ppNyNPI.png	Test Test	50	t	0	f	2020-11-02 17:40:24.956044+00	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	1812a85c-a22c-4a63-9e03-13868093af22	\N
+e266f3b8-1529-43c0-a05d-7d6a6dc252c0	https://myntra.com	\N	affiliate/daraz_affiliate_image_bawunIz.png	Myntra Test	33	t	0	f	2020-11-02 17:44:25.410729+00	f1213802-dc3c-4057-a003-3bf2993c5302	6e107b05-eac8-4d26-96e4-59e76b1b026d	\N
+cc080774-0ad0-4cff-8be9-b338da7f1dc4	https:/snapdeal.com	\N	affiliate/daraz_affiliate_image_vOD4dwr.png	Test snapdeal	45	t	0	f	2020-11-02 17:45:13.027074+00	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	2ed0d7ee-6ef0-4391-a6d6-6e2888f814b9	\N
+8a0bb2cb-97c9-4d55-850d-aea2d0249735	https://1mg.com	25%	affiliate/daraz_affiliate_image_riphABC.png	Test 1mg	15	t	0	t	2020-11-02 17:46:32.766153+00	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	46f2a43d-a0ba-41ea-a224-b5357a61e99a	\N
+53914cd7-f565-4245-b1f1-adba397760d6	https://hostgator.com	\N	affiliate/daraz_affiliate_image_HBxJOx3.png	Test hostgator	70	t	0	f	2020-11-02 17:48:19.897401+00	463381ce-5446-42b0-8cc3-eb942c1ea540	f97f2841-6c64-4985-b568-f236b7cb3638	\N
+de3dbfd1-38c2-415f-9f3a-07a98992f423	https://myntra.com	\N	affiliate/daraz_affiliate_image_grPo9Gd.png	testt	33	t	0	f	2020-11-02 18:01:11.557397+00	f1213802-dc3c-4057-a003-3bf2993c5302	6e107b05-eac8-4d26-96e4-59e76b1b026d	\N
+19d7492d-0ae2-43e1-a8ec-6a65490ed965	https://myntra.com	\N	affiliate/daraz_affiliate_image_vnyoSF6.png	test	23	t	0	f	2020-11-02 18:03:03.39783+00	175f39aa-90b1-4506-b51b-42e954031964	1499b071-cec6-4f48-8f58-4595dc0950cf	\N
+2a3bca49-649a-4dfd-a030-16b9d6ebb979	https://myntra.com	\N	affiliate/daraz_affiliate_image_DPhjjAD.png	https://myntra.com	80	t	0	f	2020-11-02 18:03:43.64023+00	f1213802-dc3c-4057-a003-3bf2993c5302	f97f2841-6c64-4985-b568-f236b7cb3638	\N
+2779d353-1d2b-4e16-a13e-464af9faa740	https://amazon.com	25%	affiliate/daraz_affiliate_image_n5nfYYa.png	Test	59	t	0	f	2020-10-20 03:06:11.133265+00	0a38b9dd-ea9a-4d1c-a9b0-c8b5777768c5	5fe5c575-984b-4f9b-94d0-3750833c5e16	\N
+36346bab-3c3d-4f27-a05f-5bd787cbeed5	https://fakir.com	\N	affiliate/daraz_affiliate_image_xBKz4un.png	test 11	11	t	0	f	2020-11-02 18:08:14.81937+00	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	2ed0d7ee-6ef0-4391-a6d6-6e2888f814b9	\N
+d131359f-50e7-4600-a730-6b4513ea3aaf	https://snapdeal.com	\N	affiliate/daraz_affiliate_image_Y9hihUJ.png	tesstt	37	t	0	f	2020-11-02 18:02:06.209144+00	8d07dab6-3b76-41c2-8ad0-096e106bd046	2ed0d7ee-6ef0-4391-a6d6-6e2888f814b9	\N
+\.
+
+
+--
+-- Data for Name: asset; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.asset (id, name, asset_type, created_at, company_id) FROM stdin;
+ff9735d2-8bfb-4415-a90e-f0705ce4297b	Room  541	Room	2020-11-06 11:43:36.986351+00	af174b04-b495-47c1-bc32-c0dff7170c34
+90a834d9-d9d2-4b39-8fb6-cc0cdf3ba20e	Room 555	Room	2020-11-06 16:40:10.287613+00	af174b04-b495-47c1-bc32-c0dff7170c34
+5f9a8d2a-8be2-4908-bae8-e266033d94a5	Table 17	Table	2020-11-06 16:40:27.439475+00	af174b04-b495-47c1-bc32-c0dff7170c34
+7a257169-906e-41a9-8c21-37c383fb1c96	Room 77	Room	2020-11-06 16:47:49.375862+00	af174b04-b495-47c1-bc32-c0dff7170c34
+\.
+
+
+--
+-- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.auth_group (id, name) FROM stdin;
+1	user
+2	admin
+3	owner
+\.
+
+
+--
+-- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
+1	Can add log entry	1	add_logentry
+2	Can change log entry	1	change_logentry
+3	Can delete log entry	1	delete_logentry
+4	Can view log entry	1	view_logentry
+5	Can add permission	2	add_permission
+6	Can change permission	2	change_permission
+7	Can delete permission	2	delete_permission
+8	Can view permission	2	view_permission
+9	Can add group	3	add_group
+10	Can change group	3	change_group
+11	Can delete group	3	delete_group
+12	Can view group	3	view_group
+13	Can add content type	4	add_contenttype
+14	Can change content type	4	change_contenttype
+15	Can delete content type	4	delete_contenttype
+16	Can view content type	4	view_contenttype
+17	Can add session	5	add_session
+18	Can change session	5	change_session
+19	Can delete session	5	delete_session
+20	Can view session	5	view_session
+21	Can add site	6	add_site
+22	Can change site	6	change_site
+23	Can delete site	6	delete_site
+24	Can view site	6	view_site
+25	Can add Token	7	add_token
+26	Can change Token	7	change_token
+27	Can delete Token	7	delete_token
+28	Can view Token	7	view_token
+29	Can add news article	8	add_newsarticle
+30	Can change news article	8	change_newsarticle
+31	Can delete news article	8	delete_newsarticle
+32	Can view news article	8	view_newsarticle
+33	Can add banner	9	add_banner
+34	Can change banner	9	change_banner
+35	Can delete banner	9	delete_banner
+36	Can view banner	9	view_banner
+37	Can add bill	10	add_bill
+38	Can change bill	10	change_bill
+39	Can delete bill	10	delete_bill
+40	Can view bill	10	view_bill
+41	Can add bulk quantity	11	add_bulkquantity
+42	Can change bulk quantity	11	change_bulkquantity
+43	Can delete bulk quantity	11	delete_bulkquantity
+44	Can view bulk quantity	11	view_bulkquantity
+45	Can add category	12	add_category
+46	Can change category	12	change_category
+47	Can delete category	12	delete_category
+48	Can view category	12	view_category
+49	Can add company	13	add_company
+50	Can change company	13	change_company
+51	Can delete company	13	delete_company
+52	Can view company	13	view_company
+53	Can add coupon	14	add_coupon
+54	Can change coupon	14	change_coupon
+55	Can delete coupon	14	delete_coupon
+56	Can view coupon	14	view_coupon
+57	Can add product	15	add_product
+58	Can change product	15	change_product
+59	Can delete product	15	delete_product
+60	Can view product	15	view_product
+61	Can add voucher	16	add_voucher
+62	Can change voucher	16	change_voucher
+63	Can delete voucher	16	delete_voucher
+64	Can view voucher	16	view_voucher
+65	Can add sub category	17	add_subcategory
+66	Can change sub category	17	change_subcategory
+67	Can delete sub category	17	delete_subcategory
+68	Can view sub category	17	view_subcategory
+69	Can add social link	18	add_sociallink
+70	Can change social link	18	change_sociallink
+71	Can delete social link	18	delete_sociallink
+72	Can view social link	18	view_sociallink
+73	Can add sales item	19	add_salesitem
+74	Can change sales item	19	change_salesitem
+75	Can delete sales item	19	delete_salesitem
+76	Can view sales item	19	view_salesitem
+77	Can add rating	20	add_rating
+78	Can change rating	20	change_rating
+79	Can delete rating	20	delete_rating
+80	Can view rating	20	view_rating
+81	Can add product category	21	add_productcategory
+82	Can change product category	21	change_productcategory
+83	Can delete product category	21	delete_productcategory
+84	Can view product category	21	view_productcategory
+85	Can add image	22	add_image
+86	Can change image	22	change_image
+87	Can delete image	22	delete_image
+88	Can view image	22	view_image
+89	Can add favourite company	23	add_favouritecompany
+90	Can change favourite company	23	change_favouritecompany
+91	Can delete favourite company	23	delete_favouritecompany
+92	Can view favourite company	23	view_favouritecompany
+93	Can add facility	24	add_facility
+94	Can change facility	24	change_facility
+95	Can delete facility	24	delete_facility
+96	Can view facility	24	view_facility
+97	Can add document	25	add_document
+98	Can change document	25	change_document
+99	Can delete document	25	delete_document
+100	Can view document	25	view_document
+101	Can add company user	26	add_companyuser
+102	Can change company user	26	change_companyuser
+103	Can delete company user	26	delete_companyuser
+104	Can view company user	26	view_companyuser
+105	Can add affiliate link	27	add_affiliatelink
+106	Can change affiliate link	27	change_affiliatelink
+107	Can delete affiliate link	27	delete_affiliatelink
+108	Can view affiliate link	27	view_affiliatelink
+109	Can add user	28	add_user
+110	Can change user	28	change_user
+111	Can delete user	28	delete_user
+112	Can view user	28	view_user
+113	Can add signup token	29	add_signuptoken
+114	Can change signup token	29	change_signuptoken
+115	Can delete signup token	29	delete_signuptoken
+116	Can view signup token	29	view_signuptoken
+117	Can add subscription	30	add_subscription
+118	Can change subscription	30	change_subscription
+119	Can delete subscription	30	delete_subscription
+120	Can view subscription	30	view_subscription
+121	Can add password reset token	31	add_passwordresettoken
+122	Can change password reset token	31	change_passwordresettoken
+123	Can delete password reset token	31	delete_passwordresettoken
+124	Can view password reset token	31	view_passwordresettoken
+125	Can add login token	32	add_logintoken
+126	Can change login token	32	change_logintoken
+127	Can delete login token	32	delete_logintoken
+128	Can view login token	32	view_logintoken
+129	Can add asset	33	add_asset
+130	Can change asset	33	change_asset
+131	Can delete asset	33	delete_asset
+132	Can view asset	33	view_asset
+133	Can add order	34	add_order
+134	Can change order	34	change_order
+135	Can delete order	34	delete_order
+136	Can view order	34	view_order
+137	Can add order line	35	add_orderline
+138	Can change order line	35	change_orderline
+139	Can delete order line	35	delete_orderline
+140	Can view order line	35	view_orderline
+\.
+
+
+--
+-- Data for Name: authtoken_token; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.authtoken_token (key, created, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: banner; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.banner (id, title, description, image, url, is_active, created_at, expire_at) FROM stdin;
+e9ad990c-aab2-4ee1-b25b-e9c50c219c0c	test1	test banner	banner_image/banner_cupponpro.png		t	2020-11-02 17:29:07.597003+00	\N
+\.
+
+
+--
+-- Data for Name: bill; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.bill (id, name, phone_number, email, payment_mode, created_at, company_id, user_id, paid_amount, invoice_number) FROM stdin;
+a641b49f-f928-4fab-bc51-1fb82fef6b4c	Shyam Shrestha	987009802	shyam@gmail.com	Cash	2020-11-08 08:03:52.925668+00	af174b04-b495-47c1-bc32-c0dff7170c34	\N	\N	0
+998568e7-f921-41a4-a2b6-5c945411fa60	Shyam Shrestha	987009802	shyam@gmail.com	Cash	2020-11-08 08:03:58.426889+00	af174b04-b495-47c1-bc32-c0dff7170c34	\N	\N	0
+f96d015f-9679-470a-b237-30b391af6d45	Rashikraj Shrestha	9860080002	rashik123.rs@gmail.com	Card	2020-11-08 08:07:57.581486+00	af174b04-b495-47c1-bc32-c0dff7170c34	\N	\N	0
+6f6d6b11-2803-4430-bb05-c0db65fb7fbe	Rashikraj Shrestha	9860080002	rashik123.rs@gmail.com	Card	2020-11-08 08:10:53.206658+00	af174b04-b495-47c1-bc32-c0dff7170c34	\N	\N	0
+d22b0f94-256f-4f20-84e7-e8f5121320af	Shyam Shrestha	987009802	shyam@gmail.com	Cash	2020-11-08 16:43:00.633342+00	af174b04-b495-47c1-bc32-c0dff7170c34	\N	\N	0
+\.
+
+
+--
+-- Data for Name: bulk_quantity; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.bulk_quantity (id, name, quantity, created_at, company_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: category; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.category (id, name, icon, image, token, created_at) FROM stdin;
+c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	Affiliate	icons/Icon_map-furniture-store.svg	category/affiliate.jpg	T5o6mjCe	2020-10-20 03:04:41.70089+00
+0a38b9dd-ea9a-4d1c-a9b0-c8b5777768c5	Gadgets	icons/Icon_map-electrician_LiiNJzk.svg	category/gadgets.jpg	5H568YyP	2020-10-20 03:06:02.730647+00
+f1213802-dc3c-4057-a003-3bf2993c5302	Fashion	icons/Icon_awesome-tshirt.svg	category/fashion.jpg	Hu8NxaoT	2020-10-20 03:07:47.085488+00
+175f39aa-90b1-4506-b51b-42e954031964	Shop	icons/Icon_metro-shop.svg		iWLP7dWs	2020-11-02 17:57:01.195342+00
+68273b5b-6083-455f-98ca-3ff9005f3be7	food	icons/Icon_map-food.svg		PM2uNs7n	2020-11-02 17:58:11.056005+00
+8d07dab6-3b76-41c2-8ad0-096e106bd046	gym	icons/Icon_map-gym.svg		Cj6PxcnC	2020-11-02 17:59:06.693645+00
+29b5f1c8-3668-4b64-a892-1e291a4aeb9c	Restro	icons/Icon_awesome-hotel_SkyC3jc.svg	category/restro_KMt4N6C.jpg	nxQ6LJpb	2020-10-20 02:48:12.133632+00
+463381ce-5446-42b0-8cc3-eb942c1ea540	Tech	icons/Icon_map-electrician.svg	category/it.jpg	mDE5W4Gv	2020-10-20 02:48:31.411489+00
+\.
+
+
+--
+-- Data for Name: company; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.company (country, state, city, address, zip_code, id, name, logo, email, status, phone_number, longitude, latitude, is_verified, is_partner, is_affiliate, key, currency, created_at, author_id, category_id, sub_category_id, service_charge, tax, invoice_counter) FROM stdin;
+\N	\N	\N	\N	\N	377b3f83-cae7-4396-b925-884daf16fe6b	Daraz	logo/daraz-logo.png	\N	t	123432145	\N	\N	f	t	t	Nt8pvmME	NPR	2020-10-20 03:04:59.993807+00	\N	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	\N	\N	\N	0
+Nepal	2	kathmandu	thamel	44600	af174b04-b495-47c1-bc32-c0dff7170c34	KFC	logo/kfc.jpg	kfc_1@gmail.com	f	321312312	\N	\N	t	f	f	Ydv5gVfy	NPR	2020-10-20 02:49:01.983012+00	7ffb3e0a-265c-4924-aff5-68d4a9141e7c	29b5f1c8-3668-4b64-a892-1e291a4aeb9c	\N	\N	\N	0
+Nepal	2	kathmandu	thamel	44600	a6b6fadf-d645-438a-8441-5069fd83fb87	Logpoint	logo/logpoint.jpg	logpoint_1@gmail.com	f	123123123	\N	\N	t	t	f	n2toUepf	NPR	2020-10-20 02:53:20.975636+00	8d8dcaf6-c7d3-412e-948c-0ec143beb2fa	463381ce-5446-42b0-8cc3-eb942c1ea540	\N	\N	\N	0
+\N	\N	\N	\N	\N	011a3714-3baa-4183-8430-975132832fd6	Prabal		\N	f	\N	\N	\N	f	f	f	RXe5gjxD	Nrs	2020-10-21 06:32:55.722669+00	be29526b-b66c-46d1-8f27-16e18aa3c07f	f1213802-dc3c-4057-a003-3bf2993c5302	\N	\N	\N	0
+\N	\N	\N	\N	\N	1499b071-cec6-4f48-8f58-4595dc0950cf	Sasto deal	logo/daraz_affiliate_image.png	\N	t	1231231231	\N	\N	t	f	t	oz8noweA	NPR	2020-11-01 12:20:57.211051+00	\N	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	\N	\N	\N	0
+\N	\N	\N	\N	\N	5fe5c575-984b-4f9b-94d0-3750833c5e16	Amazon	logo/amazon-logo.jpg	\N	t	123432554	\N	\N	t	f	t	X3mnyzfr	USD	2020-10-20 03:05:22.426401+00	\N	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	\N	\N	\N	0
+\N	\N	\N	\N	\N	1812a85c-a22c-4a63-9e03-13868093af22	flipkart	logo/daraz_affiliate_image_m1GNaNt.png	\N	t	9999999999	\N	\N	t	f	t	5KNJdAUX	INR	2020-11-02 17:38:59.977201+00	\N	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	\N	\N	\N	0
+\N	\N	\N	\N	\N	2ed0d7ee-6ef0-4391-a6d6-6e2888f814b9	Snapdeal		\N	t	1212121212	\N	\N	t	f	t	cyC5QNz3	INR	2020-11-02 17:42:30.421578+00	\N	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	\N	\N	\N	0
+\N	\N	\N	\N	\N	46f2a43d-a0ba-41ea-a224-b5357a61e99a	1Mg		\N	t	1121212112	\N	\N	t	f	t	7ewHojRP	INR	2020-11-02 17:43:00.796377+00	\N	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	\N	\N	\N	0
+\N	\N	\N	\N	\N	6e107b05-eac8-4d26-96e4-59e76b1b026d	Myntra		\N	t	1111222222	\N	\N	t	f	t	KDaYyM2P	INR	2020-11-02 17:43:32.111144+00	\N	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	\N	\N	\N	0
+\N	\N	\N	\N	\N	f97f2841-6c64-4985-b568-f236b7cb3638	Hostgator		asdasdf@gmail.com	t	1111111111	\N	\N	t	f	t	X3WcrjyV	INR	2020-11-02 17:47:28.37449+00	\N	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	\N	\N	\N	0
+Nepal	\N	Kathmandu	Baneshwor, Kathmandu	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	Clothing Nepal		\N	f	9779812346743	\N	\N	f	f	f	T8kfgXAn	$	2020-10-20 03:23:07.475466+00	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3	463381ce-5446-42b0-8cc3-eb942c1ea540	\N	\N	\N	0
+\.
+
+
+--
+-- Data for Name: company_user; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.company_user (id, is_staff, created_at, company_id, user_id) FROM stdin;
+45ba0b6f-2cb1-4359-99da-9a0b4bd54c47	f	2020-10-20 02:49:01.997089+00	af174b04-b495-47c1-bc32-c0dff7170c34	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+c7f61dd1-f369-4e50-bab5-56c0008daf75	f	2020-10-20 02:53:20.983788+00	a6b6fadf-d645-438a-8441-5069fd83fb87	8d8dcaf6-c7d3-412e-948c-0ec143beb2fa
+05ce0075-9e2e-427e-91fd-cd5962b7de7e	f	2020-10-20 03:23:07.483079+00	0933b203-e5fb-4428-b741-e8d28bb0537b	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+dcf648f7-33b0-4d2e-bb80-b1a8f9e0b0a3	f	2020-10-21 06:32:55.75206+00	011a3714-3baa-4183-8430-975132832fd6	be29526b-b66c-46d1-8f27-16e18aa3c07f
+\.
+
+
+--
+-- Data for Name: coupon; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.coupon (id, description, expiry_date, token, discount, object_id, is_premium, deal_of_the_day, created_at, company_id, content_type_id) FROM stdin;
+ca69d58f-970b-4194-bfde-efcdcb0d286f	10 Crunchy Fried Chicken	2020-12-12	QDe7H2HE	15	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	t	2020-11-02 06:06:34.647699+00	af174b04-b495-47c1-bc32-c0dff7170c34	15
+db814fad-69b0-4299-9f08-ec30b9cd8322	Chicken Legs	2020-12-12	jaSFC5ox	20	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	t	2020-11-02 06:06:33.224405+00	af174b04-b495-47c1-bc32-c0dff7170c34	15
+55376bb5-0c29-4af9-9fbe-193b3cf34c54	All Mobile App Development	2020-11-30	o98QiZ5q	15	1137f637-e22c-4da8-85c5-214145607c7f	f	t	2020-10-20 03:20:00.376737+00	a6b6fadf-d645-438a-8441-5069fd83fb87	15
+10c621a2-ce52-431c-8c6f-91e9db84b966	On all fried Chicken	2020-11-30	CHhDhYq4	15	5fb729aa-befe-4d92-8a38-825aba8f3b60	f	t	2020-10-20 03:17:29.513579+00	af174b04-b495-47c1-bc32-c0dff7170c34	21
+b7f02a24-6856-41b5-8fba-a2570fdee99c	something	2020-11-30	jeQJBXiE	25	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	f	2020-11-03 06:41:58.939287+00	af174b04-b495-47c1-bc32-c0dff7170c34	15
+c7b0bc37-6e88-451f-9204-cbea39b72791	updated	2020-12-12	GchAbFcA	15	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	f	2020-11-03 05:37:19.002331+00	a6b6fadf-d645-438a-8441-5069fd83fb87	15
+a2e1f8a8-755a-44ed-943e-665c4060d4d2	updated	2020-12-12	RceJkjyG	15	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	f	2020-11-03 05:37:18.630789+00	a6b6fadf-d645-438a-8441-5069fd83fb87	15
+71405dad-a40b-4a1c-a146-66254f142f12	updated	2020-12-12	NZp3RcmN	15	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	f	2020-11-03 05:37:19.377524+00	a6b6fadf-d645-438a-8441-5069fd83fb87	15
+10e90294-b200-46fd-a97e-1c471eea9ca4	Testing123	2020-12-01	U3eFhGvh	10	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	f	2020-11-03 07:08:57.549478+00	\N	15
+1c902f3a-7218-4429-a3d1-cb2053704eae	Testing123	2020-12-01	nTZSxeUH	10	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	f	2020-11-03 07:09:17.527142+00	\N	15
+a68bb18a-1a17-41a5-b7e6-add990838858	test1	2020-12-04	Hp2zctiW	25	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	f	2020-11-03 07:26:29.589839+00	\N	15
+37064d75-34a9-45c4-a532-e58f3c80684b	On all Devices	2020-12-12	pKxRSfZ4	25	625e1ed0-e3b5-42ca-a038-7a582c5331b6	f	f	2020-11-01 11:23:32.129514+00	a6b6fadf-d645-438a-8441-5069fd83fb87	15
+\.
+
+
+--
+-- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+1	2020-10-20 02:48:12.134679+00	29b5f1c8-3668-4b64-a892-1e291a4aeb9c	Restaurant	1	[{"added": {}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+2	2020-10-20 02:48:31.41207+00	463381ce-5446-42b0-8cc3-eb942c1ea540	IT	1	[{"added": {}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+3	2020-10-20 02:54:06.929018+00	0237b20c-4dcb-45c3-b0d5-bd8a62d10f03	logpoint.jpg	1	[{"added": {}}]	22	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+4	2020-10-20 02:54:46.997482+00	33505f19-df9b-4f85-b6f7-4ef5a641c509	logpoint_0tjHyJ3.jpg	1	[{"added": {}}]	22	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+5	2020-10-20 02:55:00.900688+00	9c08d3da-683f-462b-a1c0-94c2612d1fbf	logpoint_uZOPIxX.jpg	1	[{"added": {}}]	22	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+6	2020-10-20 02:56:23.303771+00	c0cc231f-a3da-4ec8-a84d-97dc367b0347	kfc.jpg	1	[{"added": {}}]	22	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+7	2020-10-20 02:56:40.14881+00	94bc0796-f2e7-4100-b199-b0641869bbea	kfc_JXl1Rb9.jpg	1	[{"added": {}}]	22	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+8	2020-10-20 02:56:54.931225+00	0170ab9b-4c79-42e9-8e13-3f7ae1588aa8	kfc_HEMJbFC.jpg	1	[{"added": {}}]	22	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+9	2020-10-20 02:58:53.568886+00	736d15da-700e-436b-a606-7a31eb2ee608	www.fb.com/kfc	1	[{"added": {}}]	18	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+10	2020-10-20 02:59:09.336748+00	7b5d8a54-1822-484b-b97f-bba71819007a	www.instagram.com/kfc	1	[{"added": {}}]	18	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+11	2020-10-20 02:59:30.979157+00	1a3c8971-1b8b-4585-a683-c3a279fba8cb	www.fb.com/logpoint	1	[{"added": {}}]	18	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+12	2020-10-20 02:59:47.381952+00	f5f8b599-0032-457f-8fa6-44cf9e7cb9a5	www.youtube.com/logpoint	1	[{"added": {}}]	18	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+13	2020-10-20 03:01:33.809704+00	631b31b1-9699-43b5-a8e8-d84ac78adf0a	Cupponpro Launches	1	[{"added": {}}]	8	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+14	2020-10-20 03:02:22.224321+00	920551ba-19f8-4237-a223-4b78ce20f19b	cupponpro launch delayed	1	[{"added": {}}]	8	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+15	2020-10-20 03:04:41.702497+00	c39d9f12-54f3-4c3a-9b8f-ef1f4ad70da5	Affiliate	1	[{"added": {}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+16	2020-10-20 03:04:59.99465+00	377b3f83-cae7-4396-b925-884daf16fe6b	Daraz	1	[{"added": {}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+17	2020-10-20 03:05:22.427165+00	5fe5c575-984b-4f9b-94d0-3750833c5e16	Amazon	1	[{"added": {}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+18	2020-10-20 03:06:02.731394+00	0a38b9dd-ea9a-4d1c-a9b0-c8b5777768c5	Gadgets	1	[{"added": {}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+19	2020-10-20 03:06:11.1343+00	2779d353-1d2b-4e16-a13e-464af9faa740	Great product	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+20	2020-10-20 03:07:47.086045+00	f1213802-dc3c-4057-a003-3bf2993c5302	Fashion	1	[{"added": {}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+21	2020-10-20 03:07:52.174546+00	28bddc1a-6025-4050-a0e2-10ea2217fb11	nice shirt	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+22	2020-10-20 03:08:22.599527+00	377b3f83-cae7-4396-b925-884daf16fe6b	Daraz	2	[{"changed": {"fields": ["logo"]}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+23	2020-10-20 03:08:52.306771+00	1	https://stagingapi.cupponpro.com	2	[{"changed": {"fields": ["domain", "name"]}}]	6	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+24	2020-10-20 03:15:00.70734+00	5fb729aa-befe-4d92-8a38-825aba8f3b60	momo	1	[{"added": {}}]	21	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+25	2020-10-20 03:15:26.203778+00	056d497c-6dde-4874-935e-3f91c17a1a06	chicken momo	1	[{"added": {}}]	15	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+26	2020-10-20 03:15:50.178791+00	15b52655-1a39-4838-82e1-820ab7e5af8b	chowmein	1	[{"added": {}}]	21	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+27	2020-10-20 03:16:13.921481+00	40a561f9-1ad6-457b-9c97-3dd5e4a11c02	veg chowmein	1	[{"added": {}}]	15	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+28	2020-10-20 03:16:38.635093+00	eb36c534-6708-43eb-8d07-b36d801c6011	software development	1	[{"added": {}}]	21	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+29	2020-10-20 03:16:47.025399+00	1137f637-e22c-4da8-85c5-214145607c7f	web dev	1	[{"added": {}}]	15	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+30	2020-10-20 03:17:29.514781+00	10c621a2-ce52-431c-8c6f-91e9db84b966	discount on all momo	1	[{"added": {}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+31	2020-10-20 03:20:00.378163+00	55376bb5-0c29-4af9-9fbe-193b3cf34c54	10 percent discount on web dev	1	[{"added": {}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+32	2020-10-20 03:21:43.010371+00	a6b6fadf-d645-438a-8441-5069fd83fb87	Logpoint	2	[{"changed": {"fields": ["phone_number"]}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+33	2020-10-20 03:21:53.045696+00	af174b04-b495-47c1-bc32-c0dff7170c34	KFC	2	[{"changed": {"fields": ["logo", "phone_number"]}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+34	2020-10-20 03:23:04.152727+00	964bdedf-2a00-499e-8020-59197597228e	alankar parajuli-964bdedf-2a00-499e-8020-59197597228e	1	[{"added": {}}]	16	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+35	2020-10-20 03:25:32.039198+00	a6b6fadf-d645-438a-8441-5069fd83fb87	Logpoint	2	[{"changed": {"fields": ["logo"]}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+36	2020-10-20 03:26:24.401736+00	50edafdb-d114-4148-be91-8b18b9c06e6c	logpoint.jpg	1	[{"added": {}}]	22	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+37	2020-10-21 05:49:15.443558+00	1683dd84-77cc-4862-8a26-e832b0f5ae2f	33Rc	2	[{"changed": {"fields": ["is_used"]}}]	32	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+38	2020-10-21 05:55:17.443251+00	1683dd84-77cc-4862-8a26-e832b0f5ae2f	33Rc	2	[{"changed": {"fields": ["is_used"]}}]	32	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+39	2020-11-01 12:20:57.211772+00	1499b071-cec6-4f48-8f58-4595dc0950cf	Sasto deal	1	[{"added": {}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+40	2020-11-01 12:23:29.293636+00	6e675ebd-eac4-4f7a-b17d-0519af486a4c	discount on t-shirt	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+41	2020-11-02 17:29:07.598142+00	e9ad990c-aab2-4ee1-b25b-e9c50c219c0c	test1	1	[{"added": {}}]	9	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+42	2020-11-02 17:31:24.238103+00	1499b071-cec6-4f48-8f58-4595dc0950cf	Sasto deal	2	[{"changed": {"fields": ["logo"]}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+43	2020-11-02 17:32:05.0697+00	5fe5c575-984b-4f9b-94d0-3750833c5e16	Amazon	2	[{"changed": {"fields": ["is_verified"]}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+44	2020-11-02 17:33:07.746524+00	6e675ebd-eac4-4f7a-b17d-0519af486a4c	discount on t-shirt	2	[{"changed": {"fields": ["image"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+45	2020-11-02 17:34:26.205129+00	2779d353-1d2b-4e16-a13e-464af9faa740	Test	2	[{"changed": {"fields": ["url", "discount_code", "image", "description", "deal_of_the_day"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+46	2020-11-02 17:35:27.247452+00	28bddc1a-6025-4050-a0e2-10ea2217fb11	Real Test	2	[{"changed": {"fields": ["image", "description"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+47	2020-11-02 17:35:58.383915+00	28bddc1a-6025-4050-a0e2-10ea2217fb11	Real Test	2	[{"changed": {"fields": ["discount"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+48	2020-11-02 17:36:16.336082+00	6e675ebd-eac4-4f7a-b17d-0519af486a4c	discount on t-shirt	2	[{"changed": {"fields": ["discount"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+49	2020-11-02 17:36:33.771951+00	2779d353-1d2b-4e16-a13e-464af9faa740	Test	2	[{"changed": {"fields": ["discount"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+50	2020-11-02 17:38:59.977946+00	1812a85c-a22c-4a63-9e03-13868093af22	flipkart	1	[{"added": {}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+51	2020-11-02 17:40:24.956743+00	09bbb101-65db-4571-8bc0-7625f499689c	Test Test	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+52	2020-11-02 17:42:30.42233+00	2ed0d7ee-6ef0-4391-a6d6-6e2888f814b9	Snapdeal	1	[{"added": {}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+53	2020-11-02 17:43:00.797125+00	46f2a43d-a0ba-41ea-a224-b5357a61e99a	1Mg	1	[{"added": {}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+54	2020-11-02 17:43:32.111872+00	6e107b05-eac8-4d26-96e4-59e76b1b026d	Myntra	1	[{"added": {}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+55	2020-11-02 17:44:25.411421+00	e266f3b8-1529-43c0-a05d-7d6a6dc252c0	Myntra Test	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+56	2020-11-02 17:45:13.027751+00	cc080774-0ad0-4cff-8be9-b338da7f1dc4	Test snapdeal	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+57	2020-11-02 17:46:32.766877+00	8a0bb2cb-97c9-4d55-850d-aea2d0249735	Test 1mg	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+58	2020-11-02 17:47:28.375191+00	f97f2841-6c64-4985-b568-f236b7cb3638	Hostgator	1	[{"added": {}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+59	2020-11-02 17:48:19.898111+00	53914cd7-f565-4245-b1f1-adba397760d6	Test hostgator	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+60	2020-11-02 17:49:24.321197+00	f97f2841-6c64-4985-b568-f236b7cb3638	Hostgator	2	[{"changed": {"fields": ["email"]}}]	13	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+61	2020-11-02 17:50:27.867028+00	10c621a2-ce52-431c-8c6f-91e9db84b966	discount on all momo	2	[{"changed": {"fields": ["expiry_date", "discount"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+62	2020-11-02 17:57:01.196022+00	175f39aa-90b1-4506-b51b-42e954031964	Shop	1	[{"added": {}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+63	2020-11-02 17:58:11.056599+00	68273b5b-6083-455f-98ca-3ff9005f3be7	food	1	[{"added": {}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+64	2020-11-02 17:59:06.69423+00	8d07dab6-3b76-41c2-8ad0-096e106bd046	gym	1	[{"added": {}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+65	2020-11-02 17:59:25.114239+00	29b5f1c8-3668-4b64-a892-1e291a4aeb9c	Restro	2	[{"changed": {"fields": ["name"]}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+66	2020-11-02 18:01:11.558098+00	de3dbfd1-38c2-415f-9f3a-07a98992f423	testt	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+67	2020-11-02 18:02:06.20981+00	d131359f-50e7-4600-a730-6b4513ea3aaf	tesstt	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+68	2020-11-02 18:03:03.398519+00	19d7492d-0ae2-43e1-a8ec-6a65490ed965	https://myntra.com	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+69	2020-11-02 18:03:43.640934+00	2a3bca49-649a-4dfd-a030-16b9d6ebb979	https://myntra.com	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+70	2020-11-02 18:05:17.687109+00	19d7492d-0ae2-43e1-a8ec-6a65490ed965	test	2	[{"changed": {"fields": ["description"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+71	2020-11-02 18:05:54.386019+00	2a3bca49-649a-4dfd-a030-16b9d6ebb979	https://myntra.com	2	[{"changed": {"fields": ["discount"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+72	2020-11-02 18:07:03.674298+00	2779d353-1d2b-4e16-a13e-464af9faa740	Test	2	[{"changed": {"fields": ["discount"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+73	2020-11-02 18:08:14.82008+00	36346bab-3c3d-4f27-a05f-5bd787cbeed5	test 11	1	[{"added": {}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+74	2020-11-03 00:46:42.392534+00	463381ce-5446-42b0-8cc3-eb942c1ea540	Tech	2	[{"changed": {"fields": ["name"]}}]	12	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+75	2020-11-03 01:24:05.185737+00	55376bb5-0c29-4af9-9fbe-193b3cf34c54	10 percent discount on web dev	2	[{"changed": {"fields": ["deal_of_the_day"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+76	2020-11-03 01:24:50.787927+00	55376bb5-0c29-4af9-9fbe-193b3cf34c54	10 percent discount on web dev	2	[{"changed": {"fields": ["expiry_date"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+77	2020-11-03 01:25:31.028973+00	d988984b-990f-402d-a335-e5ce862c0e46	something	2	[{"changed": {"fields": ["company", "deal_of_the_day"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+78	2020-11-03 01:26:04.57675+00	d988984b-990f-402d-a335-e5ce862c0e46	something	2	[{"changed": {"fields": ["deal_of_the_day"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+79	2020-11-03 01:26:31.01865+00	37064d75-34a9-45c4-a532-e58f3c80684b	something	2	[{"changed": {"fields": ["company", "deal_of_the_day"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+80	2020-11-03 01:27:05.796614+00	d988984b-990f-402d-a335-e5ce862c0e46	something	2	[{"changed": {"fields": ["company", "deal_of_the_day"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+81	2020-11-03 01:29:13.181684+00	ca69d58f-970b-4194-bfde-efcdcb0d286f	size	2	[{"changed": {"fields": ["company", "deal_of_the_day"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+82	2020-11-03 01:29:28.710172+00	db814fad-69b0-4299-9f08-ec30b9cd8322	size	2	[{"changed": {"fields": ["company", "deal_of_the_day"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+83	2020-11-03 01:32:14.182398+00	ca69d58f-970b-4194-bfde-efcdcb0d286f	size	2	[]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+84	2020-11-03 01:33:33.063806+00	ca69d58f-970b-4194-bfde-efcdcb0d286f	10 Crunchy Fried Chicken	2	[{"changed": {"fields": ["description", "discount"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+85	2020-11-03 01:34:10.494746+00	db814fad-69b0-4299-9f08-ec30b9cd8322	Chicken Legs	2	[{"changed": {"fields": ["description", "discount"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+86	2020-11-03 01:34:46.761173+00	37064d75-34a9-45c4-a532-e58f3c80684b	On all Devices	2	[{"changed": {"fields": ["description"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+87	2020-11-03 01:35:34.969876+00	d988984b-990f-402d-a335-e5ce862c0e46	On all Softwares	2	[{"changed": {"fields": ["description", "discount"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+88	2020-11-03 01:37:03.899329+00	55376bb5-0c29-4af9-9fbe-193b3cf34c54	All Mobile App Development	2	[{"changed": {"fields": ["description", "discount"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+89	2020-11-03 01:38:51.845438+00	10c621a2-ce52-431c-8c6f-91e9db84b966	On all fried Chicken	2	[{"changed": {"fields": ["description"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+90	2020-11-03 01:51:25.973679+00	d988984b-990f-402d-a335-e5ce862c0e46	On all Softwares	2	[{"changed": {"fields": ["object_id"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+91	2020-11-03 01:56:01.983315+00	d988984b-990f-402d-a335-e5ce862c0e46	On all Softwares	2	[{"changed": {"fields": ["object_id"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+92	2020-11-03 07:05:25.61881+00	b7f02a24-6856-41b5-8fba-a2570fdee99c	something	2	[{"changed": {"fields": ["company"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+93	2020-11-03 07:05:31.592708+00	71405dad-a40b-4a1c-a146-66254f142f12	updated	2	[{"changed": {"fields": ["company"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+94	2020-11-03 07:05:37.409427+00	c7b0bc37-6e88-451f-9204-cbea39b72791	updated	2	[{"changed": {"fields": ["company"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+95	2020-11-03 07:05:49.836565+00	a2e1f8a8-755a-44ed-943e-665c4060d4d2	updated	2	[{"changed": {"fields": ["company"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+96	2020-11-03 07:07:27.785206+00	71405dad-a40b-4a1c-a146-66254f142f12	updated	2	[{"changed": {"fields": ["company"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+97	2020-11-03 07:11:05.609771+00	9753baa6-291a-4856-8152-75d6a2a8a52d	Rating object (9753baa6-291a-4856-8152-75d6a2a8a52d)	1	[{"added": {}}]	20	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+98	2020-11-03 07:18:28.489435+00	23a42b5d-ca20-4dbb-b89a-fb4b108a8071	kfc_JXl1Rb9.jpg	1	[{"added": {}}]	22	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+99	2020-11-03 07:34:57.898724+00	0a6565e5-0cfe-456c-9837-008041469a55	flipkart	1	[{"added": {}}]	15	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+100	2020-11-03 08:31:41.234568+00	d988984b-990f-402d-a335-e5ce862c0e46	On all Softwares	3		14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+101	2020-11-03 11:13:46.686252+00	d131359f-50e7-4600-a730-6b4513ea3aaf	tesstt	2	[{"changed": {"fields": ["deal_of_the_day"]}}]	27	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+102	2020-11-03 11:14:30.042341+00	37064d75-34a9-45c4-a532-e58f3c80684b	On all Devices	2	[{"changed": {"fields": ["deal_of_the_day"]}}]	14	cfedff13-a2f3-4f2c-8355-772b4f0eec6b
+\.
+
+
+--
+-- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.django_content_type (id, app_label, model) FROM stdin;
+1	admin	logentry
+2	auth	permission
+3	auth	group
+4	contenttypes	contenttype
+5	sessions	session
+6	sites	site
+7	authtoken	token
+8	articleapp	newsarticle
+9	bannerapp	banner
+10	commonapp	bill
+11	commonapp	bulkquantity
+12	commonapp	category
+13	commonapp	company
+14	commonapp	coupon
+15	commonapp	product
+16	commonapp	voucher
+17	commonapp	subcategory
+18	commonapp	sociallink
+19	commonapp	salesitem
+20	commonapp	rating
+21	commonapp	productcategory
+22	commonapp	image
+23	commonapp	favouritecompany
+24	commonapp	facility
+25	commonapp	document
+26	commonapp	companyuser
+27	commonapp	affiliatelink
+28	userapp	user
+29	userapp	signuptoken
+30	userapp	subscription
+31	userapp	passwordresettoken
+32	userapp	logintoken
+33	commonapp	asset
+34	commonapp	order
+35	commonapp	orderline
+\.
+
+
+--
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.django_migrations (id, app, name, applied) FROM stdin;
+1	contenttypes	0001_initial	2020-10-20 02:42:31.747881+00
+2	contenttypes	0002_remove_content_type_name	2020-10-20 02:42:31.756546+00
+3	auth	0001_initial	2020-10-20 02:42:31.775633+00
+4	auth	0002_alter_permission_name_max_length	2020-10-20 02:42:31.792362+00
+5	auth	0003_alter_user_email_max_length	2020-10-20 02:42:31.798544+00
+6	auth	0004_alter_user_username_opts	2020-10-20 02:42:31.804469+00
+7	auth	0005_alter_user_last_login_null	2020-10-20 02:42:31.810588+00
+8	auth	0006_require_contenttypes_0002	2020-10-20 02:42:31.812439+00
+9	auth	0007_alter_validators_add_error_messages	2020-10-20 02:42:31.818297+00
+10	auth	0008_alter_user_username_max_length	2020-10-20 02:42:31.824491+00
+11	auth	0009_alter_user_last_name_max_length	2020-10-20 02:42:31.831188+00
+12	auth	0010_alter_group_name_max_length	2020-10-20 02:42:31.840727+00
+13	auth	0011_update_proxy_permissions	2020-10-20 02:42:31.847381+00
+14	userapp	0001_initial	2020-10-20 02:42:31.892518+00
+15	admin	0001_initial	2020-10-20 02:42:31.923853+00
+16	admin	0002_logentry_remove_auto_add	2020-10-20 02:42:31.942977+00
+17	admin	0003_logentry_add_action_flag_choices	2020-10-20 02:42:31.953948+00
+18	articleapp	0001_initial	2020-10-20 02:42:31.961669+00
+19	authtoken	0001_initial	2020-10-20 02:42:31.976836+00
+20	authtoken	0002_auto_20160226_1747	2020-10-20 02:42:32.021879+00
+21	bannerapp	0001_initial	2020-10-20 02:42:32.032151+00
+22	commonapp	0001_initial	2020-10-20 02:42:32.568336+00
+23	sessions	0001_initial	2020-10-20 02:42:32.652391+00
+24	sites	0001_initial	2020-10-20 02:42:32.660865+00
+25	sites	0002_alter_domain_unique	2020-10-20 02:42:32.668064+00
+26	commonapp	0002_auto_20201020_0959	2020-10-20 04:14:24.191877+00
+27	commonapp	0003_auto_20201101_1514	2020-11-01 09:29:42.97235+00
+28	commonapp	0004_auto_20201102_2131	2020-11-02 15:46:16.380139+00
+29	commonapp	0005_auto_20201103_1210	2020-11-03 06:25:15.752303+00
+30	commonapp	0006_auto_20201104_1119	2020-11-04 05:34:15.90102+00
+31	commonapp	0007_auto_20201105_1343	2020-11-05 07:58:16.202904+00
+32	commonapp	0008_auto_20201106_0724	2020-11-06 01:39:58.409275+00
+33	commonapp	0009_order	2020-11-06 01:59:40.196757+00
+34	commonapp	0010_auto_20201106_1125	2020-11-06 05:40:53.588418+00
+35	commonapp	0011_order_bill	2020-11-06 06:51:05.257836+00
+36	commonapp	0012_bill_paid_amount	2020-11-08 08:57:18.485589+00
+37	commonapp	0013_auto_20201109_0554	2020-11-09 00:09:23.597963+00
+38	commonapp	0014_auto_20201109_1656	2020-11-09 11:12:06.659366+00
+\.
+
+
+--
+-- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
+so3p1o7en037gxzwy8oy9d0hjcvjra46	MDQ0ZTIxZjVjODY4YWUxZmYyMTViMjUyMTMzZGNkY2Y0OTE3M2VmMzp7Il9hdXRoX3VzZXJfaWQiOiI4ZDhkY2FmNi1jN2QzLTQxMmUtOTQ4Yy0wZWMxNDNiZWIyZmEiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6IjE5OTQ2NWRiMGE5NmY1NzI1YjY3NzgyNTliYzQxMWI1Y2ZhNGM5ODgifQ==	2020-11-03 02:52:29.515544+00
+z05u69dqeaw1y11z6xmnmujd31xn6boj	Y2UwNGU0ZTNjM2EzYmY4M2EyODgyZjAxYzU2YjU3MmUxNDk4YmVhNzp7Il9hdXRoX3VzZXJfaWQiOiI4YWQ2YTFlZS1kYmExLTQxZGYtODVlNC1mMmI1NmJiZjEzZjMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6IjEzNDVhNGJiYzY0N2M5ZjgzN2JhZjNkNWY0ODRmOGViM2E0YzBkYmQifQ==	2020-11-03 03:00:15.640551+00
+lvzt4uawpgoyrrqjg0t6i60z8735696w	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-03 04:21:55.704891+00
+2trqx0mbisgpekefen5znpfxv0x4alk9	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-03 06:22:49.426112+00
+g1zrnkaxiw003k177nee5dit2uy95xu0	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-03 07:26:23.253596+00
+e0mpiupb0isvpujujatdh7etmqr7cn7g	OTkyYTM1YzI0NTY4NDdkY2IwZTQxZTRmNTY4NDdiMzg5YzRhYjQwOTp7Il9hdXRoX3VzZXJfaWQiOiJiZTI5NTI2Yi1iNjZjLTQ2ZDEtOGYyNy0xNmUxOGFhM2MwN2YiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImZkYzEzZTgxNjQxNmM4MGViMTk4M2JkMjY1NzUxYjM0OTlhZjFiZDUifQ==	2020-11-04 05:40:55.091109+00
+uhfanwsftqclo0p6f11gfho6lkbjtr3r	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-04 06:21:53.468963+00
+17q9mmkxgl3ht4h83k4lup4tjqdpvg4y	OTkyYTM1YzI0NTY4NDdkY2IwZTQxZTRmNTY4NDdiMzg5YzRhYjQwOTp7Il9hdXRoX3VzZXJfaWQiOiJiZTI5NTI2Yi1iNjZjLTQ2ZDEtOGYyNy0xNmUxOGFhM2MwN2YiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImZkYzEzZTgxNjQxNmM4MGViMTk4M2JkMjY1NzUxYjM0OTlhZjFiZDUifQ==	2020-11-04 06:23:35.756524+00
+7s9tmbmn5ilchqckmpa00qiebrp9f80l	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-04 09:25:02.512402+00
+f340zhjdurt4ftu5nbzwscsupsdijd3j	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-15 11:16:24.999465+00
+4jzmxxrtz7m6kdy28971yeig12jfgiie	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-15 12:17:45.519259+00
+4ubrppkyk09f73zjb01tpa2ie2u97jpv	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-16 17:23:05.393265+00
+i2hooof8mdxd3snd4m3ij0x9j5pemp9m	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-17 04:25:57.366913+00
+if91veook9xa0vt78tdqgl0a5i55vtm8	Y2UwNGU0ZTNjM2EzYmY4M2EyODgyZjAxYzU2YjU3MmUxNDk4YmVhNzp7Il9hdXRoX3VzZXJfaWQiOiI4YWQ2YTFlZS1kYmExLTQxZGYtODVlNC1mMmI1NmJiZjEzZjMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6IjEzNDVhNGJiYzY0N2M5ZjgzN2JhZjNkNWY0ODRmOGViM2E0YzBkYmQifQ==	2020-11-17 05:44:13.228352+00
+l7yk0xz6sz08v2ssjk0iasx06xcffj8o	OTkyYTM1YzI0NTY4NDdkY2IwZTQxZTRmNTY4NDdiMzg5YzRhYjQwOTp7Il9hdXRoX3VzZXJfaWQiOiJiZTI5NTI2Yi1iNjZjLTQ2ZDEtOGYyNy0xNmUxOGFhM2MwN2YiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImZkYzEzZTgxNjQxNmM4MGViMTk4M2JkMjY1NzUxYjM0OTlhZjFiZDUifQ==	2020-11-17 07:00:15.8005+00
+muy2336ikcsjh7endo6i0zhx7fyi20ha	OTkyYTM1YzI0NTY4NDdkY2IwZTQxZTRmNTY4NDdiMzg5YzRhYjQwOTp7Il9hdXRoX3VzZXJfaWQiOiJiZTI5NTI2Yi1iNjZjLTQ2ZDEtOGYyNy0xNmUxOGFhM2MwN2YiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImZkYzEzZTgxNjQxNmM4MGViMTk4M2JkMjY1NzUxYjM0OTlhZjFiZDUifQ==	2020-11-17 07:02:30.967296+00
+t51kw48u5eoh5p2c3fvpfr5nl4vwekro	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-17 07:43:11.905833+00
+tzjah5920p5x9dfmmvtpul9jmne6mwrg	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-17 15:21:55.508555+00
+gc3z6ds1p065wiuveogm0s4u2ku12pl4	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-20 15:58:51.909992+00
+5gpbhy7vxe1orqk0toqttob6v6jp7z43	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-22 06:19:02.6854+00
+jhjbkvvqefab2r1rt0s6drgsk2mp86ap	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-22 06:20:43.072784+00
+8g6fkyl0tncd9mkkhpzig8ofcxsm2xgf	NmU2NTdjOWFlZGQxZjU3NzJiOTc0MDhmY2ZkYjM0N2NmYjI3ZTA3Mjp7Il9hdXRoX3VzZXJfaWQiOiJjZmVkZmYxMy1hMmYzLTRmMmMtODM1NS03NzJiNGYwZWVjNmIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVjM2E0OWEyM2IxMGVjMmQwN2MxY2YyYjY4NWQ3YmEyOGVjYjdmZWEifQ==	2020-11-22 15:05:10.748655+00
+\.
+
+
+--
+-- Data for Name: django_site; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.django_site (id, domain, name) FROM stdin;
+1	https://stagingapi.cupponpro.com	staging server
+\.
+
+
+--
+-- Data for Name: document; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.document (id, name, document_number, document, created_at, company_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: facility; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.facility (id, name, created_at, company_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: favourite_company; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.favourite_company (id, is_favourite, created_at, company_id, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: image; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.image (id, image, object_id, created_at, content_type_id) FROM stdin;
+0237b20c-4dcb-45c3-b0d5-bd8a62d10f03	company/logpoint.jpg	a6b6fadf-d645-438a-8441-5069fd83fb87	2020-10-20 02:54:06.928282+00	13
+33505f19-df9b-4f85-b6f7-4ef5a641c509	company/logpoint_0tjHyJ3.jpg	a6b6fadf-d645-438a-8441-5069fd83fb87	2020-10-20 02:54:46.996059+00	13
+9c08d3da-683f-462b-a1c0-94c2612d1fbf	company/logpoint_uZOPIxX.jpg	a6b6fadf-d645-438a-8441-5069fd83fb87	2020-10-20 02:55:00.900039+00	13
+c0cc231f-a3da-4ec8-a84d-97dc367b0347	company/kfc.jpg	af174b04-b495-47c1-bc32-c0dff7170c34	2020-10-20 02:56:23.303207+00	13
+94bc0796-f2e7-4100-b199-b0641869bbea	company/kfc_JXl1Rb9.jpg	af174b04-b495-47c1-bc32-c0dff7170c34	2020-10-20 02:56:40.148177+00	13
+0170ab9b-4c79-42e9-8e13-3f7ae1588aa8	company/kfc_HEMJbFC.jpg	af174b04-b495-47c1-bc32-c0dff7170c34	2020-10-20 02:56:54.930688+00	13
+50edafdb-d114-4148-be91-8b18b9c06e6c	product/logpoint.jpg	1137f637-e22c-4da8-85c5-214145607c7f	2020-10-20 03:26:24.400971+00	15
+23a42b5d-ca20-4dbb-b89a-fb4b108a8071	product/kfc_JXl1Rb9.jpg	625e1ed0-e3b5-42ca-a038-7a582c5331b6	2020-11-03 07:18:28.488751+00	15
+\.
+
+
+--
+-- Data for Name: login_token; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.login_token (id, token, created_at, is_used, user_id) FROM stdin;
+4f1a7175-eb99-456d-a4bc-60244224e7ac	4Pvc	2020-10-20 02:58:26.728102+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ce869ab4-d25e-4cf4-a8f2-868518a59f81	4QVH	2020-10-20 03:30:28.937025+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+4a365d99-2d77-4b24-ab65-37194de483bd	8sQs	2020-10-20 04:28:13.703012+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+c24108f7-3b7e-4165-b869-c770d6eed576	55bg	2020-10-20 11:19:56.483406+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+21a65b5c-0747-45d6-92a2-6e5cf096e6cc	3MP6	2020-10-21 00:36:18.997432+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+74157222-1632-4128-8fb5-bdc527a4e84b	33x2	2020-10-21 05:22:33.098385+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+0edcaa8f-d02f-4c54-be44-92f9cbccf6f1	5vwz	2020-10-28 06:40:53.532884+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+1dcc13e8-788e-47fd-bdf1-a73c5c7e272b	87Rm	2020-10-28 06:49:26.453341+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+1683dd84-77cc-4862-8a26-e832b0f5ae2f	33Rc	2020-10-21 05:32:11.178981+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+a9abe850-db71-44b3-8c7c-4bb45151fcce	7Hba	2020-10-21 05:58:41.909907+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+56ab82e7-2469-49c1-8315-c6673b0b72eb	5qsB	2020-10-21 07:05:46.087891+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+0cfd4a63-faee-43d4-9b58-a451318c73b6	3ovY	2020-10-21 07:09:19.445649+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+1f89808b-9ce2-4f35-b171-ec825e2d6ee0	7jB7	2020-10-21 07:10:07.289889+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+7e6cd736-9e5b-41fa-a6db-17432a51eae6	6EKZ	2020-10-21 10:28:57.288465+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+829b9cd9-b5d0-4030-a357-2986acf77d6c	94dc	2020-10-21 10:34:18.801081+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+1dbf060b-f4e6-4ea9-aff6-dac55b222086	3CTe	2020-10-21 10:40:28.304868+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+a2e836bc-8928-4be4-8cfd-94e2af51e112	6wLd	2020-10-21 10:44:34.675883+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+c484f2fa-311e-470d-b148-46bb0f943dd2	RANp	2020-10-21 10:48:04.638982+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+0c1dbb44-3994-4654-b672-dc07b7db4c2a	8ToB	2020-10-21 10:53:54.208071+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+36955c5e-18a3-4235-b809-1a6ff6454801	4nQ5	2020-10-21 10:55:11.373124+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+d88931a5-39d7-497b-8821-9f46c6b154f8	4spe	2020-10-21 17:04:31.171675+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ee0a7bad-fae8-44a4-8ba6-4206b85c6b07	AWMx	2020-10-22 02:54:17.784447+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+9dedc960-2cd6-4ea0-a35b-9abc30053bde	4H6R	2020-10-22 03:21:45.914784+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c214922c-48e6-42ee-b33e-9052092fdf16	6wJm	2020-10-22 03:27:05.704259+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c2fb5977-1dfd-4984-b50e-614de195e8bb	4rtw	2020-10-22 03:30:09.834391+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+abcb8a35-4883-45a3-be4d-b78fc3bf11c7	5H7j	2020-10-22 03:40:40.299852+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+f606e171-b001-479e-8ff4-d0a7e06e4a14	7ZZB	2020-10-22 05:24:57.613727+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+3d328d6f-0845-4d42-9393-974853f4987a	tfHM	2020-10-22 07:08:36.041143+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c35bdca9-24eb-428d-9b40-8b063b164fa7	3Pqn	2020-10-22 07:18:42.916488+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+86febb48-c333-4980-a5ab-6a2d9014e52b	7QKe	2020-10-21 10:55:23.534653+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+55eb4845-4a23-4445-8a53-f6a550861a87	4ob7	2020-10-22 11:52:53.439367+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+c088da30-6aa2-4754-9d71-2667154159cb	73fU	2020-10-22 11:54:34.882568+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+e904ec16-123e-41ba-a36f-6ba18c019890	5Fff	2020-10-22 12:55:50.904802+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+f45c168f-84e5-4a59-aaf7-2b6b9647ee09	5LzQ	2020-10-27 06:25:21.39487+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+4bf1ea86-4358-4d1a-85d2-7913ed65b9a5	3jew	2020-10-27 09:34:34.937303+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+0b2af5b1-a0f9-41a7-9f4e-d7cb1c382e0b	6Zy5	2020-10-27 12:02:47.460107+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+1d4d71b2-6d1c-4e98-9d04-7dd3fbb46b50	CMs3	2020-10-28 05:43:30.113428+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+6fc9a3bf-b16a-4c87-afcf-12dfbb5d953f	qtFt	2020-10-28 05:46:07.577381+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+d86ab07f-4017-4164-9be3-19d4f918d33d	okQz	2020-10-28 06:19:35.832732+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+24cc30ab-7649-467c-8b79-de51fc3017eb	8gqD	2020-10-28 06:21:41.578185+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+7a38e26c-52ef-41b7-9646-a4af18e89b1b	4MsP	2020-10-28 06:25:32.142686+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+165e735d-0277-4641-af7c-c3b72216c665	7fxK	2020-10-28 06:27:34.221261+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+1123af16-9176-49b7-876a-f5ea1ff28667	7XyJ	2020-10-28 06:32:06.61745+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+0562a26e-1bf5-4934-9fc2-978ea9ea7e03	6pfZ	2020-10-28 06:37:59.969114+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+1df1c259-4d93-4bba-beb2-11aa78988a10	6nhH	2020-10-28 10:49:31.346354+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+b491144f-8dc0-4f56-b3df-e73ac8f2bf80	7Hxp	2020-10-28 11:38:06.177145+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+f4d6b0d5-be6e-4408-8b5a-0d78ad2e1c19	gNNN	2020-10-28 12:27:26.371943+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+04b88f04-7f44-4e71-9966-21eb19d71106	6yyp	2020-10-29 05:10:40.998516+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+4aa106f0-306d-470f-8ff7-4fc113633484	5eUf	2020-10-29 05:17:41.850205+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+145cad18-0e05-43fb-9846-64617be28f66	7LUu	2020-10-29 05:37:07.077905+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+aa469b0a-b711-4afb-a204-50aacc90c0a0	7RxV	2020-10-29 06:32:04.62949+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+b78c0e1b-5e43-40c3-9ee8-3caee1182f55	XmdG	2020-10-30 00:57:05.853669+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c2af5e74-3ce2-4e8a-b5b3-d9d7f8d788f7	55LB	2020-10-30 01:00:18.028343+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c4a852fe-850a-4288-b52f-12184312b795	69yh	2020-10-30 01:10:59.77843+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+80d06c4c-59bb-4abe-a548-b873b4d996b2	4BwF	2020-10-30 04:02:33.690906+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c6447b3e-4ac5-49b5-a5fe-6c06c8843c3c	7DqA	2020-10-30 04:07:13.671738+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+0f7256cd-c71e-4756-b471-cc96efc29d62	5PSR	2020-10-30 04:48:59.677652+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ce16e63b-5a0d-4424-bc80-924100352eee	4Gzp	2020-10-30 04:57:05.973431+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+e8906602-8b4e-4b74-8942-0d2c459f4198	ufHK	2020-10-30 08:55:24.147775+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+b4949556-ca13-40dc-8a1e-f5f65c59754c	Fa2c	2020-10-30 08:56:57.940714+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ea58c869-beff-4244-8d31-da4fee0b4d1e	5fyL	2020-10-30 09:02:01.928997+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+dd06c357-b445-4668-b502-2af2b6a34710	gQ4X	2020-10-30 09:15:11.792387+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+b17c9de3-7f21-4623-81dd-db1677affd6e	w3GG	2020-11-01 00:47:03.021939+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+459e82b9-ce3e-4a93-b177-c4d85533c41f	7avt	2020-11-01 00:54:15.620347+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+a9b6f53f-fcc9-43bd-b2fc-5f308c5696b1	7xcT	2020-11-01 01:10:48.427451+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ed19fb10-cb25-4ebb-8e14-46e9477aa91e	govX	2020-11-01 01:15:59.987172+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+17ffa76c-8664-4bba-8cbe-55d1fb6efa08	wmMT	2020-11-01 01:17:04.107166+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c10d9091-9bf4-415f-b04e-956333f983ea	gYv2	2020-11-01 01:18:09.938104+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+becc41d7-b764-4ec8-9c7b-f7327652eaf1	4jdn	2020-11-01 01:22:55.885436+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+acb85500-8bd8-40ce-a5f4-5efa1d339044	5W5y	2020-11-01 01:29:55.911194+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+601945f8-57aa-4039-b642-90c6e94d171d	3W6D	2020-11-01 01:31:25.593105+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+7cc22b39-e667-4184-9bc7-c144cb61c30d	84hp	2020-11-01 01:33:27.431974+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+fba4e1c0-267f-4048-a24f-9ae636bafa75	3T4r	2020-11-01 01:44:40.357711+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ad2571aa-d253-43cc-851d-f459e138ee48	8jfB	2020-11-01 01:46:15.992547+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+bc7f1ccb-0202-4186-8283-2bf25d2e6c27	7c7b	2020-11-01 01:49:58.256084+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+653448ba-609d-4232-a7b4-13267752b300	CBJ6	2020-11-01 04:19:30.161656+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+fba32810-d1c7-41fe-a58a-f591efe14ff5	bnSa	2020-11-01 04:26:58.934581+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+00e8f48c-0d4d-40e2-9288-65cd4c1418c3	5GdV	2020-11-01 04:47:57.423642+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+08afab3e-12b1-4a59-9b11-f3b3bc2ce653	5Rrb	2020-11-01 05:35:21.314785+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+75d09e8c-f169-4424-8d65-c044b59abf63	5oBG	2020-11-01 05:45:33.932351+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+6dd3f01f-9bd0-411a-a7e9-880d622ea7a7	7Qt7	2020-11-01 05:52:17.82623+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+382ea6ad-df70-4274-8616-dcb907d84a2e	6hPQ	2020-11-01 05:28:51.51054+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+d2a00dbb-d7f1-4864-9dc8-5842be2ac306	8KgY	2020-11-01 06:45:53.147257+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+66012e30-e070-43a8-a41f-48d9f213663d	4NWw	2020-11-01 07:29:44.570352+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+6337f9e0-1923-449b-8104-5ed2328c75de	4EdA	2020-11-01 07:33:32.961683+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+f993fd11-b2a6-451f-8240-97f403e6b5ed	4Vg7	2020-11-01 07:35:11.059445+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+aa3946b7-7a5c-4aa0-bf56-ae1d4aed33fd	7XSq	2020-11-01 07:37:37.409155+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ff531655-b3a6-4992-a55e-a29092defb55	3bQR	2020-11-01 07:46:34.959852+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+5c584485-b614-4567-8980-8dd4e1dc9628	77KE	2020-11-01 08:12:42.877524+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+08125f0e-9f9a-4135-a238-5b9e6dc33870	3f5J	2020-11-01 08:18:13.028021+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+2c8a0279-2afe-4192-abfa-5b0d47c36b22	5cKv	2020-11-01 08:28:42.550337+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+4bd6ce69-3bf2-4f18-9937-dfa40db4093d	5o7q	2020-11-01 08:50:32.444302+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+eefe57ef-451c-48cc-8ef9-a6820f74182c	7Qo6	2020-11-01 08:53:24.030722+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+5716fd3d-6810-4dd6-ae0d-35051b6c58a1	3DV9	2020-11-01 09:09:59.410726+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+4efbc3e7-1f28-4aa6-a26b-45eacead5194	3YMP	2020-11-01 09:15:40.580317+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+6465155e-0bb5-487a-bc28-f1036a828d76	KCyU	2020-11-01 09:29:53.270115+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+c85c415c-b3ce-4312-947f-2f8b1eabdbf8	7gaD	2020-11-01 10:16:31.741185+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ada2bac8-1460-4344-ae9b-ede42635e962	8J7J	2020-11-01 10:27:21.990001+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+1a31dd97-e395-43d3-8887-75fe2bd560e8	3Xnp	2020-11-01 10:30:38.691284+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+74e1ff18-37e7-4ca8-8feb-dc266c10fbba	8KdA	2020-11-01 10:40:16.521071+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+72f192c1-0ac8-43f5-8d76-fe944b6be037	5Ct6	2020-11-01 10:45:53.659791+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+de6cea98-0877-4909-90f4-2c2c991adaeb	7qHr	2020-11-01 13:10:50.86158+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+1131c225-ff80-4bb2-bf9a-92bd7d9d2fc2	6DYW	2020-11-01 14:07:25.538896+00	f	ce23cb7b-4b6b-4217-9655-e6ad43863f07
+d67290ac-c070-41e0-b5ce-d80ba5c31ef9	6mJi	2020-11-01 15:26:49.772907+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+ef2979ab-da15-4315-ad71-257342701c8e	4xPw	2020-11-01 15:29:26.583561+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+c9536817-feac-4715-8a4b-7b1bf68e52dd	5Kab	2020-11-01 16:10:31.714752+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+f4395289-09da-4e94-af26-0b74a0d0107e	6SSh	2020-11-01 16:33:02.064396+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+7e940579-876b-4d7d-aaaa-a7f834c4caa5	8Zpn	2020-11-02 00:00:52.078071+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+fd161a99-7387-4c9d-8879-8bd5cca333d2	4Z5e	2020-11-02 00:07:41.83349+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+fd89dcee-5d7b-4952-8228-87416cf93d86	5XQZ	2020-11-02 01:21:10.734956+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+d7a3a353-32a7-4124-a493-2be6e9299ab9	7d4w	2020-11-02 05:30:21.111765+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+418307c4-4709-49e0-b609-9d3c87b7c2c1	8pdc	2020-11-02 05:41:33.68693+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+cba5a5f4-1549-4422-a0ce-20687e49d09b	K4TY	2020-11-02 05:56:20.745264+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+1706d9cc-a119-43ac-abd3-cb5592671c2c	F8JA	2020-11-02 05:58:37.373977+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+bf4eed05-3156-4f8f-a2c7-fd816d37df63	fijS	2020-11-02 07:25:19.869489+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+71bf379e-451f-488c-818f-43d7cafd86c8	8wxi	2020-11-02 08:10:27.302181+00	t	86c97c79-dacc-411a-a888-6e0ab73f5396
+bee10e4e-162b-486f-9e4f-ca0436cb78ee	5azn	2020-11-02 08:11:44.409872+00	t	86c97c79-dacc-411a-a888-6e0ab73f5396
+fb02b5c4-7783-4710-83f0-6c7aa8de51ba	NxAM	2020-11-02 09:18:54.664578+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+3e38a3c6-57cf-40f9-a8e7-0c3229c76863	4T9t	2020-11-02 13:30:30.206337+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+49facee7-2902-412d-9350-f5d1cbe5bb7a	5Wyb	2020-11-02 13:32:09.325603+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+2a08f599-f113-4cdf-b2b6-ad70487fd1ea	62je	2020-11-02 15:24:17.906958+00	t	8b371ea6-0768-42e9-80b0-cebbd06a8bb6
+7e61b2f6-a694-4744-9822-21960980d39f	5XHz	2020-11-02 15:35:55.986142+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+e8f03539-3355-45ce-97a5-299232d93324	8Xvx	2020-11-02 16:20:19.028755+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+ce78661d-7b2f-4e29-8cba-9ea129f9d97e	3gWd	2020-11-02 16:21:31.55424+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+9d4aa0c4-0202-4b26-953b-2b2e884c0343	3tKE	2020-11-03 01:05:51.931278+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+d5c15eec-b615-4709-9cfe-ff5efb6ee713	4moc	2020-11-03 04:25:47.122904+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+440b7e81-663c-4143-bd99-80f78eff5a4f	8sgw	2020-11-03 04:50:29.641117+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+469323e2-6e54-4c91-82cd-6aefdadcac80	4AQh	2020-11-03 05:29:21.554094+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+fc7482fb-11c4-4c4b-944e-4e4db39d4e8e	7s6U	2020-11-03 06:56:40.03525+00	t	3192e739-c768-4b2b-9e1f-31793af3e369
+8a4a8fa4-914f-47e9-89d9-a47f3b7e358f	5ZY9	2020-11-03 08:01:35.126691+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+0825f16a-61e0-47cb-8a6b-1d46ed938c09	5W84	2020-11-03 09:10:59.638814+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+6f079ec0-04d6-4050-90af-840e76bae5c9	5zTz	2020-11-03 10:32:09.122008+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ad1be76a-b66e-46d5-ac6b-fdfe58d626ed	593J	2020-11-03 11:57:17.85255+00	t	91350906-90cf-40cb-b34f-eade4a878ada
+5a932d5e-f0f6-46ee-9021-8384bfdf321d	46Gn	2020-11-03 15:49:39.797409+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+f4a10fa7-6036-48af-8455-4eed8c70e82d	4psS	2020-11-03 16:20:01.07349+00	t	91350906-90cf-40cb-b34f-eade4a878ada
+c52f0898-f3b8-47f0-ad99-36748a2bb67c	3HmE	2020-11-04 02:48:59.956097+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+2bf0e944-b47e-42cb-8d25-5ff2d34c7369	4MpV	2020-11-04 05:16:58.211556+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+538b057c-18ef-4f90-bdd3-80b724653dfc	6NQq	2020-11-04 05:28:04.066103+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+6bda5dc8-60ae-44fa-9924-83944f9c9866	4uHY	2020-11-04 06:07:48.966729+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+280c3631-c427-4702-84fa-5374dd212e58	963t	2020-11-04 08:39:57.44458+00	t	91350906-90cf-40cb-b34f-eade4a878ada
+7b8a7307-eb97-403d-8130-cee6c91ec804	8zdK	2020-11-04 05:18:10.574603+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+210828f6-e83d-48d0-9cb9-21c3406b6af6	96jp	2020-11-04 09:10:58.748553+00	t	be29526b-b66c-46d1-8f27-16e18aa3c07f
+f2051fe1-08a6-4d5a-9250-e709489af4c7	4kyR	2020-11-04 09:53:11.824782+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+19ca55f8-c092-420a-a07d-971777d4f535	6RVt	2020-11-04 10:40:29.900681+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+781dbaa0-cdfc-43b4-9ac4-234d6561f9ac	7GdZ	2020-11-04 10:41:59.147705+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+48872d4e-d8ca-4dd9-8de3-e865c1a36413	5UdM	2020-11-04 11:43:47.521526+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+42fd86c6-f765-4eff-baec-d0c85c655684	6J6h	2020-11-04 12:54:49.824009+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+392f8795-d455-4ffa-a81e-91b78d334449	7K6i	2020-11-04 13:05:01.399853+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+81ea20ea-c7d7-4c5c-b985-f50e2d33f6b1	4WJ3	2020-11-04 13:18:35.984641+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+8705801c-9367-48ba-a5a6-63068ede6566	3eZy	2020-11-04 13:20:19.061883+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+060b20bd-c141-49e2-b45b-708c7791e030	kuBk	2020-11-05 02:18:28.407245+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+be009bf1-9134-4a61-adf5-a6873735352c	3oUC	2020-11-05 02:23:27.274687+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+260022d4-8e50-451b-8b62-79a3c2558b30	7NW2	2020-11-05 03:18:23.949589+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+3a28aa1d-76e4-4a39-bfd1-6ee3ea04ffaa	5bvs	2020-11-05 04:32:22.439242+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+34c48d7b-aac5-4739-b50c-ec8c7fe84677	7b3e	2020-11-05 05:22:31.937811+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+eb7b47d0-d914-454d-94bb-fced37e838db	8Ysx	2020-11-05 07:34:34.933517+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c01ca9a4-af17-45b8-aa92-58ad3326335d	8zoY	2020-11-05 07:52:56.041677+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+80bb2489-058b-4235-b780-971452230742	ooa9	2020-11-05 11:27:25.56493+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+9832a576-651a-46b6-a815-14acc93b628e	8PG6	2020-11-05 15:48:21.483916+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+d89bf0df-bdef-4326-b2fb-824e8cb2286e	7o2q	2020-11-05 16:33:19.589378+00	t	91350906-90cf-40cb-b34f-eade4a878ada
+ecebd287-5f4c-4af1-a228-934e29c03317	95Mx	2020-11-06 06:41:10.058922+00	t	91350906-90cf-40cb-b34f-eade4a878ada
+b7160787-f4d3-4b27-9706-ecad062725cb	8MoJ	2020-11-06 07:31:42.786533+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+9690c807-9bcc-4d94-8920-4820219ff50b	3wba	2020-11-06 08:43:51.496909+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ad512b32-6fea-47b8-9518-755a90a7e162	8YY6	2020-11-06 09:27:51.028843+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+a368305f-2bda-4685-9273-1c349af2b708	4dYc	2020-11-06 15:58:20.47856+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+ef9d21ca-64b2-4110-9760-7cc4ea7bc858	3yDf	2020-11-07 03:24:21.880619+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ecb63c00-317a-4773-85df-e979b05dbb4f	4pTN	2020-11-07 03:37:25.617369+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+ba36b191-5856-481c-8566-01dab05514cb	8QHg	2020-11-07 08:24:55.224501+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+4f91e893-c2f0-48b1-8657-71a7631e8088	YdeJ	2020-11-07 11:05:08.455856+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+7a8d4143-cb12-4e2d-8c89-da4d7b92c13b	4e4w	2020-11-07 14:41:01.525913+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c8835e88-2c52-4160-8123-d8979ba53f33	38br	2020-11-07 15:34:01.935238+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+0c9e9a85-2812-4edc-8155-86fe02a63273	866m	2020-11-07 15:40:48.569972+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+582483ea-e524-4bea-9663-d003a111113e	5dKK	2020-11-07 15:42:10.428614+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+14a62426-3047-46ed-82cc-f316f9fa0c5d	8oaK	2020-11-08 02:32:11.308451+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+66cc81a2-8d17-4f00-9e67-c25e13836e80	6LBG	2020-11-08 02:39:54.230089+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+971bb1e6-b61d-4090-a2f4-9a598ccf1226	7RN7	2020-11-08 02:47:36.14363+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+6ca2eaec-41ff-4227-b8bc-c7650062a251	5CSz	2020-11-08 02:50:03.929818+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+7844738d-78d2-4773-ace5-080dcca035f4	mMj9	2020-11-08 02:51:37.272772+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+41cbe2b0-4804-4920-ac2f-58136b90f69f	94yt	2020-11-08 02:53:16.413093+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+3de6d53a-0a3e-42bf-b212-6b7185edfa25	5bak	2020-11-08 02:56:07.625025+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+a4c82a1a-3514-4d4f-b1ec-90c3b13b281b	4Kxs	2020-11-08 02:57:23.308336+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+cc11b181-7215-46db-b609-028358e4bf8c	Apqd	2020-11-08 03:02:31.92123+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+4d034634-51a8-4ba6-8996-525e0221a751	5JPX	2020-11-08 03:47:48.018516+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+65bf6e3b-f037-42b7-b56e-d11b10c2e117	8jUU	2020-11-08 04:45:07.395931+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+020ecc38-59c1-44c9-84c0-02189f2ca6af	7U5h	2020-11-08 04:55:31.293931+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+2ee4086d-2596-4618-9153-985cb17301a1	6BZF	2020-11-08 05:25:20.671819+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c01da3c9-6323-41ce-8c35-63546923589a	3dKu	2020-11-08 05:32:30.450608+00	f	6e0396c7-bf9a-4f2a-bea1-112a155ce9dd
+0d640825-f81e-471d-a361-b3f68aeeae72	3yax	2020-11-08 05:33:17.32373+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+6c1d6dc0-40dc-481c-a9f4-aa4af136a29c	55Yy	2020-11-08 05:35:19.361689+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+9797fae6-7b22-4ef6-8a49-efc3d941abff	75P8	2020-11-08 05:45:25.900045+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+49fff871-f788-45f0-aaea-40a82a1fbb86	7iWr	2020-11-08 05:47:10.212645+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+c901e7d1-a9ce-4968-8d43-2659292d0d2b	5DDE	2020-11-08 05:48:24.760466+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+3f0cca00-f3b9-475b-8bb5-84e1a6d7a5ed	8o5t	2020-11-08 05:50:46.822481+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+455fa750-9e1b-4409-b2fa-85bb9f05293f	4atE	2020-11-08 06:02:52.747315+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+5ddd1ad3-6e61-4040-ad26-fac15cdab99f	6aKy	2020-11-08 06:09:08.095263+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+05885887-d2b2-4129-b7af-cffb8ab7da6c	3QoX	2020-11-08 06:09:24.756447+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+b9b89435-898f-4cb7-8914-3ed7c32a8d6a	4zCQ	2020-11-08 06:10:52.144445+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+1633db67-eb6e-42ed-9313-cb0ca2dca091	pCoH	2020-11-08 06:19:43.413387+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+4cac41f5-4702-4b01-840e-c11db0f28173	6i5S	2020-11-08 06:21:02.052851+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+0ac14bd0-2884-480a-91e3-f1d8f1fa31e6	7ymp	2020-11-08 06:13:21.808246+00	t	7ffb3e0a-265c-4924-aff5-68d4a9141e7c
+ce92f423-6825-417a-bc65-d8a9a8d89cd9	3rTw	2020-11-08 06:23:35.555865+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+c3f07088-d14e-4a6d-a7cb-ad4dc9e56870	3Y5p	2020-11-08 06:55:08.715931+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+bcec782d-ddd1-4986-9f47-3f82ac59deea	4xih	2020-11-08 06:57:31.779793+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+5444b3e3-52d3-4e76-9d9e-d68f46473bd3	5EBS	2020-11-08 06:58:56.699654+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+53cbd6f8-1c00-4d4b-94b9-a1cf0ab1e360	BTzN	2020-11-08 07:08:02.256251+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+3538ed80-cf03-4e24-bd5e-1daf892f28f6	7Bvh	2020-11-09 04:59:46.695293+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+a52f98f2-1a97-41a7-a215-c7653be0f383	3frt	2020-11-09 06:08:30.039103+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+529d6513-7daf-4f0f-9465-c75a3d8a4aee	8Xun	2020-11-09 07:40:03.382486+00	t	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3
+\.
+
+
+--
+-- Data for Name: news_article; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.news_article (id, news_partner, url, headline, description, image, created_at) FROM stdin;
+631b31b1-9699-43b5-a8e8-d84ac78adf0a	himalayan times	www.himalayantimes.com.np	Cupponpro Launches	cupponpro is about to launch	news/ngo.png	2020-10-20 03:01:33.807613+00
+920551ba-19f8-4237-a223-4b78ce20f19b	kathmandu post	www.kathmandupost.com.np	cupponpro launch delayed	cupponpro launch has been delayed by a day	news/ngo_fn1ySBW.png	2020-10-20 03:02:22.223795+00
+\.
+
+
+--
+-- Data for Name: order; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public."order" (id, name, phone_number, email, created_at, company_id, user_id, voucher_id, asset_id, is_billed, bill_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: order_line; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.order_line (id, rate, quantity, state, created_at, company_id, product_id, order_id, total) FROM stdin;
+\.
+
+
+--
+-- Data for Name: password_reset_token; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.password_reset_token (id, token, created_at, is_used, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: product; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.product (id, product_code, name, brand_name, unit_price, total_price, token, is_veg, gender, created_at, bulk_quantity_id, company_id, product_category_id) FROM stdin;
+056d497c-6dde-4874-935e-3f91c17a1a06	momo12	chicken momo	\N	150	150	jyQn6wC2	f		2020-10-20 03:15:26.201529+00	\N	af174b04-b495-47c1-bc32-c0dff7170c34	5fb729aa-befe-4d92-8a38-825aba8f3b60
+40a561f9-1ad6-457b-9c97-3dd5e4a11c02	chowmein21	veg chowmein	\N	130	130	TTGDxfsg	t		2020-10-20 03:16:13.919742+00	\N	af174b04-b495-47c1-bc32-c0dff7170c34	15b52655-1a39-4838-82e1-820ab7e5af8b
+1137f637-e22c-4da8-85c5-214145607c7f	web12	web dev	\N	40000	40000	6dRr7nwc	f		2020-10-20 03:16:47.024728+00	\N	a6b6fadf-d645-438a-8441-5069fd83fb87	eb36c534-6708-43eb-8d07-b36d801c6011
+21ee9329-f3a9-4a32-8d29-8bb9a43d9ee9	app2	mobile app	\N	50000	50000	Y2YXGJyM	f	M	2020-10-20 04:02:56.202639+00	\N	a6b6fadf-d645-438a-8441-5069fd83fb87	eb36c534-6708-43eb-8d07-b36d801c6011
+08729c43-b7dc-4a69-920c-3c526d045850	test2	test210	\N	10	10	MR8MNJKX	f	M	2020-10-22 10:19:00.660492+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	5fb729aa-befe-4d92-8a38-825aba8f3b60
+502ec0b9-6172-4a0e-acf9-a325e2843dbe	new22	product new 22	\N	20	20	9sWnct3B	f	M	2020-11-02 00:38:06.00695+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	5fb729aa-befe-4d92-8a38-825aba8f3b60
+b5d4faa6-006e-4559-acd8-dac384ea2e9b	pro1	product 1	\N	30	30	SfRakae8	f	M	2020-11-02 00:37:08.22204+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	eb36c534-6708-43eb-8d07-b36d801c6011
+0bcd25f5-b2fa-4af4-961a-b4fab3da1b5f	no9231	no name	\N	20	20	sEm5MrWq	f	M	2020-10-21 09:49:47.17203+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	5fb729aa-befe-4d92-8a38-825aba8f3b60
+625e1ed0-e3b5-42ca-a038-7a582c5331b6	zxcv	Prabal	\N	10000	10000	Ga32wdFB	t	\N	2020-10-21 09:54:38.848652+00	\N	011a3714-3baa-4183-8430-975132832fd6	15b52655-1a39-4838-82e1-820ab7e5af8b
+0b13bdfd-ad0b-4f5c-9f46-dfbfc5cb41a8	pro 3	product 3	\N	30	30	tjx2L4xL	t	M	2020-11-02 00:38:58.706115+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	5fb729aa-befe-4d92-8a38-825aba8f3b60
+7ec1a1ef-f037-4be5-9b3b-44a427461f27	pro4	product 4	\N	20	20	hxDtvs59	t	M	2020-11-02 00:44:17.685795+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	eb36c534-6708-43eb-8d07-b36d801c6011
+67093c3d-60d5-4a06-bcae-2f7e8783c9dc	pro6	product 6	\N	20	20	ceB2mVR2	f	F	2020-11-02 00:50:17.031344+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+c8913cb4-560c-4865-9b0a-479f855811f1	pro5	product 5	\N	30	30	7A3iDw8U	f	F	2020-11-02 00:48:04.621208+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+2f25689c-b269-4473-8c1e-935b46771197	pro7	product 7	\N	20	20	EMYhVezr	f	F	2020-11-02 01:14:31.59194+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+3c9968a7-1d32-4966-a20b-36d7f01a6983	pro8	prodyct 8	\N	20	20	aTuf7juG	t	F	2020-11-03 01:14:42.08753+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+d5e106fd-eb57-49ba-bd12-c37dc67f64ff	pro9	product 9	\N	20	20	sVdrvj2J	t	F	2020-11-03 01:14:59.268574+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	5fb729aa-befe-4d92-8a38-825aba8f3b60
+3d8ee3dc-83b0-4327-83b6-550428e72d44	pro10	product 10	\N	40	40	Xoopj63q	f	F	2020-11-03 01:16:06.401483+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+0a6565e5-0cfe-456c-9837-008041469a55	asdf	flipkart	\N	2000	2000	DYw5RNHZ	f	\N	2020-11-03 07:34:57.897448+00	\N	af174b04-b495-47c1-bc32-c0dff7170c34	5fb729aa-befe-4d92-8a38-825aba8f3b60
+d11681fb-2a87-4a0b-9011-243c14c8b24d	pro11	product 11	\N	20	20	DsgBeitk	f	F	2020-11-03 09:14:52.563845+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+83fa2eda-9c78-416e-924a-0c649e5815a8	pro111	pro 11	\N	30	30	9BoVsbcP	f	U	2020-11-03 09:15:14.170296+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+284c26f7-4503-4c11-aa70-936f0d4488c7	pro12	product 12	\N	30	30	ongzWEKt	f	F	2020-11-03 09:16:00.33798+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+84ae056d-0369-46a3-b719-d3325380c40e	pro20	test product 20	\N	20	20	AtvpGaw3	t	U	2020-11-04 06:29:11.074313+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	eb36c534-6708-43eb-8d07-b36d801c6011
+67e28e78-0b50-4b0d-9163-472e3f8897c1	pro201	ne wproduct 20	\N	20	20	dnFmWSTM	f	U	2020-11-04 06:29:42.425982+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+d8e3c448-3623-4c3f-ac65-722949339286	pro102	product 102	\N	20	20	rYu9WCtE	f	F	2020-11-04 06:30:00.76758+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+fe99c23c-9a9e-4652-a2b1-5d9495120f62	pro15	proudct 15	\N	30	30	kNL2iMWT	f	U	2020-11-04 08:26:34.949067+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	eb36c534-6708-43eb-8d07-b36d801c6011
+6f0a38e1-cc34-4409-be3a-4264e4ae699d	pro16	product 16	\N	20	20	tACW45Dw	f	F	2020-11-04 08:26:56.551272+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+4da054f4-4749-42cb-ad3f-4c465e41f274	pro 18	poduct 18	\N	20	20	3XeKC8Db	t	U	2020-11-04 08:27:15.511543+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	eb36c534-6708-43eb-8d07-b36d801c6011
+adbea628-0e79-479a-b208-2e4cbe5a7d64	pro22	prodcut 22	\N	20	20	SUgsHwun	f	F	2020-11-04 08:27:40.588112+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+3cec87c3-cdb2-4c69-bfad-d96c8312aa77	pro21	test product 21	\N	30	30	battd8dV	f	F	2020-11-04 10:48:22.675091+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	15b52655-1a39-4838-82e1-820ab7e5af8b
+fe9e4453-ee92-4576-99b0-386906b7b0a9	pronew11	product 11	\N	40	40	XLRf94k5	f	F	2020-11-03 10:34:18.915899+00	\N	0933b203-e5fb-4428-b741-e8d28bb0537b	5fb729aa-befe-4d92-8a38-825aba8f3b60
+\.
+
+
+--
+-- Data for Name: product_category; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.product_category (id, name, image, token, created_at, company_id) FROM stdin;
+5fb729aa-befe-4d92-8a38-825aba8f3b60	momo	product_category/restro.jpg	PL7kRQK2	2020-10-20 03:15:00.706226+00	af174b04-b495-47c1-bc32-c0dff7170c34
+15b52655-1a39-4838-82e1-820ab7e5af8b	chowmein	product_category/kfc.jpg	cLUHqV9P	2020-10-20 03:15:50.174728+00	af174b04-b495-47c1-bc32-c0dff7170c34
+eb36c534-6708-43eb-8d07-b36d801c6011	software development	product_category/logpoint.jpg	aqFKn332	2020-10-20 03:16:38.634544+00	a6b6fadf-d645-438a-8441-5069fd83fb87
+\.
+
+
+--
+-- Data for Name: rating; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.rating (id, description, rate, created_at, company_id, user_id) FROM stdin;
+9753baa6-291a-4856-8152-75d6a2a8a52d	Good company	4.0	2020-11-03 07:11:05.606194+00	a6b6fadf-d645-438a-8441-5069fd83fb87	3192e739-c768-4b2b-9e1f-31793af3e369
+\.
+
+
+--
+-- Data for Name: sales_item; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.sales_item (id, rate, quantity, total, discount, created_at, bill_id, product_id, voucher_id, order_id) FROM stdin;
+e8523a8d-bf62-4c20-b10e-d259489d1dc6	150	4	600.00	\N	2020-11-08 08:03:52.928518+00	a641b49f-f928-4fab-bc51-1fb82fef6b4c	056d497c-6dde-4874-935e-3f91c17a1a06	\N	\N
+3aacfb69-b1dd-453a-967d-5040ccb150d7	150	4	600.00	\N	2020-11-08 08:03:58.428875+00	998568e7-f921-41a4-a2b6-5c945411fa60	056d497c-6dde-4874-935e-3f91c17a1a06	\N	\N
+056d497c-6dde-4874-935e-3f91c17a1a06	150	4	600.00	\N	2020-11-08 08:07:57.583852+00	f96d015f-9679-470a-b237-30b391af6d45	\N	\N	\N
+37aa2951-e118-4356-a3ba-861eaf8c0ffd	150	4	600.00	\N	2020-11-08 08:10:53.209759+00	6f6d6b11-2803-4430-bb05-c0db65fb7fbe	056d497c-6dde-4874-935e-3f91c17a1a06	\N	\N
+0f6629c9-4c22-4092-993b-90c858f12eb8	150	4	600.00	\N	2020-11-08 16:43:00.636302+00	d22b0f94-256f-4f20-84e7-e8f5121320af	056d497c-6dde-4874-935e-3f91c17a1a06	\N	\N
+\.
+
+
+--
+-- Data for Name: signup_token; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.signup_token (id, email, phone_number, token, created_at, is_used) FROM stdin;
+\.
+
+
+--
+-- Data for Name: social_link; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.social_link (id, name, url, created_at, company_id) FROM stdin;
+736d15da-700e-436b-a606-7a31eb2ee608	fb	www.fb.com/kfc	2020-10-20 02:58:53.566707+00	af174b04-b495-47c1-bc32-c0dff7170c34
+7b5d8a54-1822-484b-b97f-bba71819007a	instagram	www.instagram.com/kfc	2020-10-20 02:59:09.335944+00	af174b04-b495-47c1-bc32-c0dff7170c34
+1a3c8971-1b8b-4585-a683-c3a279fba8cb	fb	www.fb.com/logpoint	2020-10-20 02:59:30.977465+00	a6b6fadf-d645-438a-8441-5069fd83fb87
+f5f8b599-0032-457f-8fa6-44cf9e7cb9a5	youtube	www.youtube.com/logpoint	2020-10-20 02:59:47.38142+00	a6b6fadf-d645-438a-8441-5069fd83fb87
+\.
+
+
+--
+-- Data for Name: sub_category; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.sub_category (id, name, created_at, category_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: subscribers; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.subscribers (id, email, promotion, created_at, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: user; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public."user" (password, last_login, country, state, city, address, zip_code, id, first_name, middle_name, last_name, gender, email, phone_number, image, admin, staff, active, created_at, dob) FROM stdin;
+pbkdf2_sha256$150000$z9NkU4PElsnu$0WTlu/HIVH1W2eIqMcvCRns2TfeoiSCF2jf9Eye8dHs=	\N	\N	\N	\N	\N	\N	ce23cb7b-4b6b-4217-9655-e6ad43863f07	jkjk		jkjk	F	jkjk@gjk.com	9857458586	profile/default.png	f	f	t	2020-11-01 14:07:17.921498+00	\N
+pbkdf2_sha256$150000$Xhc0nm2BMB0z$pwUIjakumfw4X2mEp2Mt57YjNM79UzfX6m1pagcH7Ls=	\N	\N	\N	\N	\N	\N	86c97c79-dacc-411a-a888-6e0ab73f5396	Prabin		Khadka	M	pravinkhadka32@gmail.com	9862276168	profile/default.png	f	f	t	2020-11-02 07:35:01.921689+00	\N
+pbkdf2_sha256$150000$5GUxRbQkeuHo$sl7NQzH72bKb7NmJ37ODumvoiisQSLNzYB2/BDGe7t0=	\N	\N	\N	\N	\N	\N	8b371ea6-0768-42e9-80b0-cebbd06a8bb6	Mahesh		Maharjan	M	aakaruimahesh@gmail.com	9841010914	profile/default.png	f	f	t	2020-11-02 15:23:55.668147+00	\N
+pbkdf2_sha256$150000$StdfDkXDTXzv$vsiQBOxhZzJVWIfB2JYfvqkj0MYBi5daD8VmuMOA3us=	\N	\N	\N	\N	\N	\N	d8672ede-123d-4eaf-80c4-1f926c86106d	alankar		parajuli	M	alankar@gmail.com	987654323	profile/default.png	f	f	t	2020-10-20 02:46:02.507065+00	\N
+pbkdf2_sha256$150000$XnfAyBBalxR6$4V2cOGks8GyU63T1Uj+Z74Uvj7qnKwUyg69vQZEEoEw=	2020-10-20 02:52:29.512282+00	\N	\N	\N	\N	\N	8d8dcaf6-c7d3-412e-948c-0ec143beb2fa	logpoint		owner	F	logpoint@gmail.com	987654322	profile/default.png	f	f	t	2020-10-20 02:45:35.644401+00	\N
+pbkdf2_sha256$150000$f4yi7gvsUP8Z$JUr1p5Ys5TqBVn5DkV1rVi85/nbBRQudpg3qowlpRpQ=	2020-11-03 05:44:13.220621+00	\N	\N	\N	\N	\N	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3	Abhushit		Chaudhary	M	chaudhary.abhushit@gmail.com	9823644144	profile/default.png	f	f	t	2020-10-20 02:58:05.388037+00	\N
+pbkdf2_sha256$150000$ZP1Lik1ToXrl$TPPV/F4qu/zgMDGZ67yCuZxQRHX1ZYsFsKV+gheihPA=	\N	\N	\N	\N	\N	\N	6c7e635f-7bb9-4458-9995-2370226a8e67	Milan		Korangi	M	milan.korangi7878@gmail.com	9843873255	profile/default.png	f	f	t	2020-11-03 06:54:07.841763+00	\N
+pbkdf2_sha256$150000$znor5UzOrcnw$YVmXetaxwzIg+eJ9BsDtjlDBjGtXqe+ToF9QW+3W18w=	\N	\N	\N	\N	\N	\N	3192e739-c768-4b2b-9e1f-31793af3e369	Milan		Korangi	M	milan.korangi7878@icloud.com	9842116542	profile/default.png	f	f	t	2020-11-03 06:55:16.923474+00	\N
+pbkdf2_sha256$150000$Ysb2rmR0Mj4h$PgrahgkGSDx/HD0OpLvOLUxpNA5zNSL+y1d9d06lwNQ=	\N	\N	\N	\N	\N	\N	6e0396c7-bf9a-4f2a-bea1-112a155ce9dd	Sumir		Acharya	M	sumiracharya101@gmail.com	+9779861819088	profile/default.png	f	f	t	2020-11-08 05:32:23.407499+00	\N
+pbkdf2_sha256$150000$nNYfnkNu5Uql$HAj967o44knefDeSzY3fFUV6MXOgEuO6CYwNX2GEXEw=	2020-11-08 06:07:26.325619+00	\N	\N	\N	\N	\N	91350906-90cf-40cb-b34f-eade4a878ada	Milan		Korangi	M	anidiot78@gmail.com	9810435104	profile/default.png	f	f	t	2020-11-03 11:29:20.407017+00	\N
+pbkdf2_sha256$150000$DnhD5cPgwecG$ORkwlvXVGAhUYdRmmRgqZhZ6XXjk8Ta+ysb4Hrl/UA8=	2020-11-03 07:02:30.962406+00	\N	\N	\N	\N	\N	be29526b-b66c-46d1-8f27-16e18aa3c07f	Prabal		Bajracharya	M	prblbuzz@gmail.com	9843680171	profile/default.png	f	f	t	2020-10-21 05:22:11.05791+00	\N
+pbkdf2_sha256$150000$i1rJdWrueeql$/rEHwA9tDERhvXmU1khNTrTMV5aQlDKl6uohr5D+R4c=	\N	\N	\N	\N	\N	\N	8f02f12f-5f47-49f4-bfa5-d5bd701c5428	First		Lname	M	bimala@mailinator.com	1234567890	profile/default.png	f	f	t	2020-10-25 01:41:33.000876+00	\N
+pbkdf2_sha256$150000$iPvzT8dAWYQY$4lbwfvKMDB7VFElrTMSVtV7GSAJ1yfZnZrmyZqBq8gU=	2020-11-08 06:11:02.369569+00	\N	\N	\N	\N	\N	7ffb3e0a-265c-4924-aff5-68d4a9141e7c	kfc		owner	M	kfc@gmail.com	987654321	profile/default.png	f	f	t	2020-10-20 02:45:13.440704+00	\N
+pbkdf2_sha256$150000$2wdsOAPY8tdE$7nc0iz+jN7gCzalwP5F+vSWEiWYmJUqp1C3FgNpfLFI=	2020-11-08 15:05:10.74417+00	\N	\N	\N	\N	\N	cfedff13-a2f3-4f2c-8355-772b4f0eec6b	rashik	raj	shrestha	M	cupponpro.rashik@gmail.com	+977-9860080002	profile/default.png	t	t	t	2020-10-20 02:43:07.466282+00	\N
+\.
+
+
+--
+-- Data for Name: user_group; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.user_group (id, user_id, group_id) FROM stdin;
+1	cfedff13-a2f3-4f2c-8355-772b4f0eec6b	1
+2	cfedff13-a2f3-4f2c-8355-772b4f0eec6b	2
+3	7ffb3e0a-265c-4924-aff5-68d4a9141e7c	1
+4	7ffb3e0a-265c-4924-aff5-68d4a9141e7c	3
+5	8d8dcaf6-c7d3-412e-948c-0ec143beb2fa	1
+6	8d8dcaf6-c7d3-412e-948c-0ec143beb2fa	3
+7	d8672ede-123d-4eaf-80c4-1f926c86106d	1
+8	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3	1
+9	8ad6a1ee-dba1-41df-85e4-f2b56bbf13f3	3
+10	be29526b-b66c-46d1-8f27-16e18aa3c07f	1
+11	be29526b-b66c-46d1-8f27-16e18aa3c07f	3
+12	8f02f12f-5f47-49f4-bfa5-d5bd701c5428	1
+13	ce23cb7b-4b6b-4217-9655-e6ad43863f07	1
+14	86c97c79-dacc-411a-a888-6e0ab73f5396	1
+15	86c97c79-dacc-411a-a888-6e0ab73f5396	3
+16	8b371ea6-0768-42e9-80b0-cebbd06a8bb6	1
+17	6c7e635f-7bb9-4458-9995-2370226a8e67	1
+18	3192e739-c768-4b2b-9e1f-31793af3e369	1
+19	91350906-90cf-40cb-b34f-eade4a878ada	1
+20	91350906-90cf-40cb-b34f-eade4a878ada	3
+21	6e0396c7-bf9a-4f2a-bea1-112a155ce9dd	1
+\.
+
+
+--
+-- Data for Name: voucher; Type: TABLE DATA; Schema: public; Owner: cupponpro_staging
+--
+
+COPY public.voucher (id, token, is_redeem, watch_later, save_amount, used_date, created_at, bill_id, coupon_id, user_id) FROM stdin;
+964bdedf-2a00-499e-8020-59197597228e	NFkrDfWoI5LbDbG1	f	f	\N	\N	2020-10-20 03:23:04.151633+00	\N	10c621a2-ce52-431c-8c6f-91e9db84b966	d8672ede-123d-4eaf-80c4-1f926c86106d
+\.
+
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cupponpro_staging
+--
+
+SELECT pg_catalog.setval('public.auth_group_id_seq', 3, true);
+
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cupponpro_staging
+--
+
+SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
+
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cupponpro_staging
+--
+
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 140, true);
+
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cupponpro_staging
+--
+
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 102, true);
+
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cupponpro_staging
+--
+
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 35, true);
+
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cupponpro_staging
+--
+
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 38, true);
+
+
+--
+-- Name: django_site_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cupponpro_staging
+--
+
+SELECT pg_catalog.setval('public.django_site_id_seq', 1, true);
+
+
+--
+-- Name: user_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cupponpro_staging
+--
+
+SELECT pg_catalog.setval('public.user_group_id_seq', 21, true);
+
+
+--
+-- Name: affiliate_link affiliate_link_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.affiliate_link
+    ADD CONSTRAINT affiliate_link_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: asset asset_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.asset
+    ADD CONSTRAINT asset_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_name_key UNIQUE (name);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_permission_id_0cd325b0_uniq UNIQUE (group_id, permission_id);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_codename_01ab375a_uniq UNIQUE (content_type_id, codename);
+
+
+--
+-- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: authtoken_token authtoken_token_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.authtoken_token
+    ADD CONSTRAINT authtoken_token_pkey PRIMARY KEY (key);
+
+
+--
+-- Name: authtoken_token authtoken_token_user_id_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.authtoken_token
+    ADD CONSTRAINT authtoken_token_user_id_key UNIQUE (user_id);
+
+
+--
+-- Name: banner banner_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.banner
+    ADD CONSTRAINT banner_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bill bill_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.bill
+    ADD CONSTRAINT bill_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bulk_quantity bulk_quantity_name_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.bulk_quantity
+    ADD CONSTRAINT bulk_quantity_name_key UNIQUE (name);
+
+
+--
+-- Name: bulk_quantity bulk_quantity_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.bulk_quantity
+    ADD CONSTRAINT bulk_quantity_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: category category_name_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.category
+    ADD CONSTRAINT category_name_key UNIQUE (name);
+
+
+--
+-- Name: category category_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.category
+    ADD CONSTRAINT category_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: company company_email_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.company
+    ADD CONSTRAINT company_email_key UNIQUE (email);
+
+
+--
+-- Name: company company_phone_number_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.company
+    ADD CONSTRAINT company_phone_number_key UNIQUE (phone_number);
+
+
+--
+-- Name: company company_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.company
+    ADD CONSTRAINT company_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: company_user company_user_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.company_user
+    ADD CONSTRAINT company_user_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: coupon coupon_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.coupon
+    ADD CONSTRAINT coupon_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_app_label_model_76bd3d3b_uniq UNIQUE (app_label, model);
+
+
+--
+-- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_migrations
+    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_session
+    ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
+
+
+--
+-- Name: django_site django_site_domain_a2e37b91_uniq; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_site
+    ADD CONSTRAINT django_site_domain_a2e37b91_uniq UNIQUE (domain);
+
+
+--
+-- Name: django_site django_site_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_site
+    ADD CONSTRAINT django_site_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: document document_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.document
+    ADD CONSTRAINT document_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: facility facility_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.facility
+    ADD CONSTRAINT facility_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: favourite_company favourite_company_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.favourite_company
+    ADD CONSTRAINT favourite_company_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: image image_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.image
+    ADD CONSTRAINT image_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: login_token login_token_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.login_token
+    ADD CONSTRAINT login_token_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: news_article news_article_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.news_article
+    ADD CONSTRAINT news_article_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: order_line order_line_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.order_line
+    ADD CONSTRAINT order_line_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: order order_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public."order"
+    ADD CONSTRAINT order_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: password_reset_token password_reset_token_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.password_reset_token
+    ADD CONSTRAINT password_reset_token_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: product_category product_category_name_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.product_category
+    ADD CONSTRAINT product_category_name_key UNIQUE (name);
+
+
+--
+-- Name: product_category product_category_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.product_category
+    ADD CONSTRAINT product_category_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: product product_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.product
+    ADD CONSTRAINT product_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: product product_product_code_company_id_a22d2ccc_uniq; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.product
+    ADD CONSTRAINT product_product_code_company_id_a22d2ccc_uniq UNIQUE (product_code, company_id);
+
+
+--
+-- Name: rating rating_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.rating
+    ADD CONSTRAINT rating_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sales_item sales_item_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.sales_item
+    ADD CONSTRAINT sales_item_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: signup_token signup_token_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.signup_token
+    ADD CONSTRAINT signup_token_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: social_link social_link_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.social_link
+    ADD CONSTRAINT social_link_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sub_category sub_category_name_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.sub_category
+    ADD CONSTRAINT sub_category_name_key UNIQUE (name);
+
+
+--
+-- Name: sub_category sub_category_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.sub_category
+    ADD CONSTRAINT sub_category_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: subscribers subscribers_email_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.subscribers
+    ADD CONSTRAINT subscribers_email_key UNIQUE (email);
+
+
+--
+-- Name: subscribers subscribers_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.subscribers
+    ADD CONSTRAINT subscribers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user user_email_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT user_email_key UNIQUE (email);
+
+
+--
+-- Name: user_group user_group_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.user_group
+    ADD CONSTRAINT user_group_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_group user_group_user_id_group_id_e09efacc_uniq; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.user_group
+    ADD CONSTRAINT user_group_user_id_group_id_e09efacc_uniq UNIQUE (user_id, group_id);
+
+
+--
+-- Name: user user_phone_number_key; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT user_phone_number_key UNIQUE (phone_number);
+
+
+--
+-- Name: user user_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT user_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: voucher voucher_pkey; Type: CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.voucher
+    ADD CONSTRAINT voucher_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: affiliate_link_category_id_9537ec75; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX affiliate_link_category_id_9537ec75 ON public.affiliate_link USING btree (category_id);
+
+
+--
+-- Name: affiliate_link_company_id_f8e4e82d; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX affiliate_link_company_id_f8e4e82d ON public.affiliate_link USING btree (company_id);
+
+
+--
+-- Name: affiliate_link_sub_category_id_5524a543; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX affiliate_link_sub_category_id_5524a543 ON public.affiliate_link USING btree (sub_category_id);
+
+
+--
+-- Name: asset_company_id_09baf8e9; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX asset_company_id_09baf8e9 ON public.asset USING btree (company_id);
+
+
+--
+-- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX auth_group_name_a6ea08ec_like ON public.auth_group USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX auth_group_permissions_group_id_b120cbf9 ON public.auth_group_permissions USING btree (group_id);
+
+
+--
+-- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON public.auth_group_permissions USING btree (permission_id);
+
+
+--
+-- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX auth_permission_content_type_id_2f476e4b ON public.auth_permission USING btree (content_type_id);
+
+
+--
+-- Name: authtoken_token_key_10f0b77e_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX authtoken_token_key_10f0b77e_like ON public.authtoken_token USING btree (key varchar_pattern_ops);
+
+
+--
+-- Name: bill_company_id_d7ecc813; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX bill_company_id_d7ecc813 ON public.bill USING btree (company_id);
+
+
+--
+-- Name: bill_user_id_0345326c; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX bill_user_id_0345326c ON public.bill USING btree (user_id);
+
+
+--
+-- Name: bulk_quantity_company_id_8c41938c; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX bulk_quantity_company_id_8c41938c ON public.bulk_quantity USING btree (company_id);
+
+
+--
+-- Name: bulk_quantity_name_9d71d816_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX bulk_quantity_name_9d71d816_like ON public.bulk_quantity USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: category_name_15cb1e98_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX category_name_15cb1e98_like ON public.category USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: company_author_id_79373014; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX company_author_id_79373014 ON public.company USING btree (author_id);
+
+
+--
+-- Name: company_category_id_5d0cd9af; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX company_category_id_5d0cd9af ON public.company USING btree (category_id);
+
+
+--
+-- Name: company_email_2ceb088e_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX company_email_2ceb088e_like ON public.company USING btree (email varchar_pattern_ops);
+
+
+--
+-- Name: company_phone_number_531b620e_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX company_phone_number_531b620e_like ON public.company USING btree (phone_number varchar_pattern_ops);
+
+
+--
+-- Name: company_sub_category_id_8a51c36f; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX company_sub_category_id_8a51c36f ON public.company USING btree (sub_category_id);
+
+
+--
+-- Name: company_user_company_id_14d68691; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX company_user_company_id_14d68691 ON public.company_user USING btree (company_id);
+
+
+--
+-- Name: company_user_user_id_f0991752; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX company_user_user_id_f0991752 ON public.company_user USING btree (user_id);
+
+
+--
+-- Name: coupon_company_id_b4143665; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX coupon_company_id_b4143665 ON public.coupon USING btree (company_id);
+
+
+--
+-- Name: coupon_content_type_id_8ae63c59; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX coupon_content_type_id_8ae63c59 ON public.coupon USING btree (content_type_id);
+
+
+--
+-- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX django_admin_log_content_type_id_c4bce8eb ON public.django_admin_log USING btree (content_type_id);
+
+
+--
+-- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX django_admin_log_user_id_c564eba6 ON public.django_admin_log USING btree (user_id);
+
+
+--
+-- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX django_session_expire_date_a5c62663 ON public.django_session USING btree (expire_date);
+
+
+--
+-- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
+
+
+--
+-- Name: django_site_domain_a2e37b91_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX django_site_domain_a2e37b91_like ON public.django_site USING btree (domain varchar_pattern_ops);
+
+
+--
+-- Name: document_company_id_aa203b11; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX document_company_id_aa203b11 ON public.document USING btree (company_id);
+
+
+--
+-- Name: facility_company_id_b9918f34; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX facility_company_id_b9918f34 ON public.facility USING btree (company_id);
+
+
+--
+-- Name: favourite_company_company_id_db4769e9; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX favourite_company_company_id_db4769e9 ON public.favourite_company USING btree (company_id);
+
+
+--
+-- Name: favourite_company_user_id_5e585f61; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX favourite_company_user_id_5e585f61 ON public.favourite_company USING btree (user_id);
+
+
+--
+-- Name: image_content_type_id_de202a79; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX image_content_type_id_de202a79 ON public.image USING btree (content_type_id);
+
+
+--
+-- Name: login_token_user_id_352bc822; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX login_token_user_id_352bc822 ON public.login_token USING btree (user_id);
+
+
+--
+-- Name: order_asset_id_ec0a3fbb; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX order_asset_id_ec0a3fbb ON public."order" USING btree (asset_id);
+
+
+--
+-- Name: order_bill_id_b0f58a7e; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX order_bill_id_b0f58a7e ON public."order" USING btree (bill_id);
+
+
+--
+-- Name: order_company_id_9532ebc8; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX order_company_id_9532ebc8 ON public."order" USING btree (company_id);
+
+
+--
+-- Name: order_line_company_id_6b0ca6bf; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX order_line_company_id_6b0ca6bf ON public.order_line USING btree (company_id);
+
+
+--
+-- Name: order_line_order_id_b9148391; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX order_line_order_id_b9148391 ON public.order_line USING btree (order_id);
+
+
+--
+-- Name: order_line_product_id_e620902d; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX order_line_product_id_e620902d ON public.order_line USING btree (product_id);
+
+
+--
+-- Name: order_user_id_e323497c; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX order_user_id_e323497c ON public."order" USING btree (user_id);
+
+
+--
+-- Name: order_voucher_id_29b1ee1c; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX order_voucher_id_29b1ee1c ON public."order" USING btree (voucher_id);
+
+
+--
+-- Name: password_reset_token_user_id_4982bbf6; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX password_reset_token_user_id_4982bbf6 ON public.password_reset_token USING btree (user_id);
+
+
+--
+-- Name: product_bulk_quantity_id_a9eaec63; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX product_bulk_quantity_id_a9eaec63 ON public.product USING btree (bulk_quantity_id);
+
+
+--
+-- Name: product_category_company_id_5d148368; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX product_category_company_id_5d148368 ON public.product_category USING btree (company_id);
+
+
+--
+-- Name: product_category_name_905278b8_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX product_category_name_905278b8_like ON public.product_category USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: product_company_id_3bb8e5e9; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX product_company_id_3bb8e5e9 ON public.product USING btree (company_id);
+
+
+--
+-- Name: product_product_category_id_1ba01076; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX product_product_category_id_1ba01076 ON public.product USING btree (product_category_id);
+
+
+--
+-- Name: rating_company_id_17aee5d6; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX rating_company_id_17aee5d6 ON public.rating USING btree (company_id);
+
+
+--
+-- Name: rating_user_id_029b834f; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX rating_user_id_029b834f ON public.rating USING btree (user_id);
+
+
+--
+-- Name: sales_item_bill_id_eea2f611; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX sales_item_bill_id_eea2f611 ON public.sales_item USING btree (bill_id);
+
+
+--
+-- Name: sales_item_order_id_9453365f; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX sales_item_order_id_9453365f ON public.sales_item USING btree (order_id);
+
+
+--
+-- Name: sales_item_product_id_fefdf0b0; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX sales_item_product_id_fefdf0b0 ON public.sales_item USING btree (product_id);
+
+
+--
+-- Name: sales_item_voucher_id_b3f36d94; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX sales_item_voucher_id_b3f36d94 ON public.sales_item USING btree (voucher_id);
+
+
+--
+-- Name: social_link_company_id_225a5447; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX social_link_company_id_225a5447 ON public.social_link USING btree (company_id);
+
+
+--
+-- Name: sub_category_category_id_f461f657; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX sub_category_category_id_f461f657 ON public.sub_category USING btree (category_id);
+
+
+--
+-- Name: sub_category_name_42480096_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX sub_category_name_42480096_like ON public.sub_category USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: subscribers_email_ec259b32_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX subscribers_email_ec259b32_like ON public.subscribers USING btree (email varchar_pattern_ops);
+
+
+--
+-- Name: subscribers_user_id_c7dc1e8c; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX subscribers_user_id_c7dc1e8c ON public.subscribers USING btree (user_id);
+
+
+--
+-- Name: user_email_54dc62b2_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX user_email_54dc62b2_like ON public."user" USING btree (email varchar_pattern_ops);
+
+
+--
+-- Name: user_group_group_id_ce41bceb; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX user_group_group_id_ce41bceb ON public.user_group USING btree (group_id);
+
+
+--
+-- Name: user_group_user_id_80f07bf6; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX user_group_user_id_80f07bf6 ON public.user_group USING btree (user_id);
+
+
+--
+-- Name: user_phone_number_181d522d_like; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX user_phone_number_181d522d_like ON public."user" USING btree (phone_number varchar_pattern_ops);
+
+
+--
+-- Name: voucher_bill_id_2afe53d0; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX voucher_bill_id_2afe53d0 ON public.voucher USING btree (bill_id);
+
+
+--
+-- Name: voucher_coupon_id_d8eaaee5; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX voucher_coupon_id_d8eaaee5 ON public.voucher USING btree (coupon_id);
+
+
+--
+-- Name: voucher_user_id_ac4b3325; Type: INDEX; Schema: public; Owner: cupponpro_staging
+--
+
+CREATE INDEX voucher_user_id_ac4b3325 ON public.voucher USING btree (user_id);
+
+
+--
+-- Name: affiliate_link affiliate_link_category_id_9537ec75_fk_category_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.affiliate_link
+    ADD CONSTRAINT affiliate_link_category_id_9537ec75_fk_category_id FOREIGN KEY (category_id) REFERENCES public.category(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: affiliate_link affiliate_link_company_id_f8e4e82d_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.affiliate_link
+    ADD CONSTRAINT affiliate_link_company_id_f8e4e82d_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: affiliate_link affiliate_link_sub_category_id_5524a543_fk_sub_category_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.affiliate_link
+    ADD CONSTRAINT affiliate_link_sub_category_id_5524a543_fk_sub_category_id FOREIGN KEY (sub_category_id) REFERENCES public.sub_category(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: asset asset_company_id_09baf8e9_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.asset
+    ADD CONSTRAINT asset_company_id_09baf8e9_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissio_permission_id_84c5c92e_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_2f476e4b_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: authtoken_token authtoken_token_user_id_35299eff_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.authtoken_token
+    ADD CONSTRAINT authtoken_token_user_id_35299eff_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: bill bill_company_id_d7ecc813_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.bill
+    ADD CONSTRAINT bill_company_id_d7ecc813_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: bill bill_user_id_0345326c_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.bill
+    ADD CONSTRAINT bill_user_id_0345326c_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: bulk_quantity bulk_quantity_company_id_8c41938c_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.bulk_quantity
+    ADD CONSTRAINT bulk_quantity_company_id_8c41938c_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: company company_author_id_79373014_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.company
+    ADD CONSTRAINT company_author_id_79373014_fk_user_id FOREIGN KEY (author_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: company company_category_id_5d0cd9af_fk_category_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.company
+    ADD CONSTRAINT company_category_id_5d0cd9af_fk_category_id FOREIGN KEY (category_id) REFERENCES public.category(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: company company_sub_category_id_8a51c36f_fk_sub_category_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.company
+    ADD CONSTRAINT company_sub_category_id_8a51c36f_fk_sub_category_id FOREIGN KEY (sub_category_id) REFERENCES public.sub_category(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: company_user company_user_company_id_14d68691_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.company_user
+    ADD CONSTRAINT company_user_company_id_14d68691_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: company_user company_user_user_id_f0991752_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.company_user
+    ADD CONSTRAINT company_user_user_id_f0991752_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: coupon coupon_company_id_b4143665_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.coupon
+    ADD CONSTRAINT coupon_company_id_b4143665_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: coupon coupon_content_type_id_8ae63c59_fk_django_content_type_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.coupon
+    ADD CONSTRAINT coupon_content_type_id_8ae63c59_fk_django_content_type_id FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_content_type_id_c4bce8eb_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: document document_company_id_aa203b11_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.document
+    ADD CONSTRAINT document_company_id_aa203b11_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: facility facility_company_id_b9918f34_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.facility
+    ADD CONSTRAINT facility_company_id_b9918f34_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: favourite_company favourite_company_company_id_db4769e9_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.favourite_company
+    ADD CONSTRAINT favourite_company_company_id_db4769e9_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: favourite_company favourite_company_user_id_5e585f61_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.favourite_company
+    ADD CONSTRAINT favourite_company_user_id_5e585f61_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: image image_content_type_id_de202a79_fk_django_content_type_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.image
+    ADD CONSTRAINT image_content_type_id_de202a79_fk_django_content_type_id FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: login_token login_token_user_id_352bc822_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.login_token
+    ADD CONSTRAINT login_token_user_id_352bc822_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: order order_asset_id_ec0a3fbb_fk_asset_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public."order"
+    ADD CONSTRAINT order_asset_id_ec0a3fbb_fk_asset_id FOREIGN KEY (asset_id) REFERENCES public.asset(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: order order_bill_id_b0f58a7e_fk_bill_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public."order"
+    ADD CONSTRAINT order_bill_id_b0f58a7e_fk_bill_id FOREIGN KEY (bill_id) REFERENCES public.bill(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: order order_company_id_9532ebc8_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public."order"
+    ADD CONSTRAINT order_company_id_9532ebc8_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: order_line order_line_company_id_6b0ca6bf_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.order_line
+    ADD CONSTRAINT order_line_company_id_6b0ca6bf_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: order_line order_line_order_id_b9148391_fk_order_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.order_line
+    ADD CONSTRAINT order_line_order_id_b9148391_fk_order_id FOREIGN KEY (order_id) REFERENCES public."order"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: order_line order_line_product_id_e620902d_fk_product_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.order_line
+    ADD CONSTRAINT order_line_product_id_e620902d_fk_product_id FOREIGN KEY (product_id) REFERENCES public.product(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: order order_user_id_e323497c_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public."order"
+    ADD CONSTRAINT order_user_id_e323497c_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: order order_voucher_id_29b1ee1c_fk_voucher_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public."order"
+    ADD CONSTRAINT order_voucher_id_29b1ee1c_fk_voucher_id FOREIGN KEY (voucher_id) REFERENCES public.voucher(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: password_reset_token password_reset_token_user_id_4982bbf6_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.password_reset_token
+    ADD CONSTRAINT password_reset_token_user_id_4982bbf6_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: product product_bulk_quantity_id_a9eaec63_fk_bulk_quantity_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.product
+    ADD CONSTRAINT product_bulk_quantity_id_a9eaec63_fk_bulk_quantity_id FOREIGN KEY (bulk_quantity_id) REFERENCES public.bulk_quantity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: product_category product_category_company_id_5d148368_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.product_category
+    ADD CONSTRAINT product_category_company_id_5d148368_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: product product_company_id_3bb8e5e9_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.product
+    ADD CONSTRAINT product_company_id_3bb8e5e9_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: product product_product_category_id_1ba01076_fk_product_category_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.product
+    ADD CONSTRAINT product_product_category_id_1ba01076_fk_product_category_id FOREIGN KEY (product_category_id) REFERENCES public.product_category(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: rating rating_company_id_17aee5d6_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.rating
+    ADD CONSTRAINT rating_company_id_17aee5d6_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: rating rating_user_id_029b834f_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.rating
+    ADD CONSTRAINT rating_user_id_029b834f_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: sales_item sales_item_bill_id_eea2f611_fk_bill_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.sales_item
+    ADD CONSTRAINT sales_item_bill_id_eea2f611_fk_bill_id FOREIGN KEY (bill_id) REFERENCES public.bill(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: sales_item sales_item_order_id_9453365f_fk_order_line_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.sales_item
+    ADD CONSTRAINT sales_item_order_id_9453365f_fk_order_line_id FOREIGN KEY (order_id) REFERENCES public.order_line(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: sales_item sales_item_product_id_fefdf0b0_fk_product_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.sales_item
+    ADD CONSTRAINT sales_item_product_id_fefdf0b0_fk_product_id FOREIGN KEY (product_id) REFERENCES public.product(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: sales_item sales_item_voucher_id_b3f36d94_fk_voucher_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.sales_item
+    ADD CONSTRAINT sales_item_voucher_id_b3f36d94_fk_voucher_id FOREIGN KEY (voucher_id) REFERENCES public.voucher(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: social_link social_link_company_id_225a5447_fk_company_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.social_link
+    ADD CONSTRAINT social_link_company_id_225a5447_fk_company_id FOREIGN KEY (company_id) REFERENCES public.company(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: sub_category sub_category_category_id_f461f657_fk_category_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.sub_category
+    ADD CONSTRAINT sub_category_category_id_f461f657_fk_category_id FOREIGN KEY (category_id) REFERENCES public.category(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: subscribers subscribers_user_id_c7dc1e8c_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.subscribers
+    ADD CONSTRAINT subscribers_user_id_c7dc1e8c_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: user_group user_group_group_id_ce41bceb_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.user_group
+    ADD CONSTRAINT user_group_group_id_ce41bceb_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: user_group user_group_user_id_80f07bf6_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.user_group
+    ADD CONSTRAINT user_group_user_id_80f07bf6_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: voucher voucher_bill_id_2afe53d0_fk_bill_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.voucher
+    ADD CONSTRAINT voucher_bill_id_2afe53d0_fk_bill_id FOREIGN KEY (bill_id) REFERENCES public.bill(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: voucher voucher_coupon_id_d8eaaee5_fk_coupon_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.voucher
+    ADD CONSTRAINT voucher_coupon_id_d8eaaee5_fk_coupon_id FOREIGN KEY (coupon_id) REFERENCES public.coupon(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: voucher voucher_user_id_ac4b3325_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: cupponpro_staging
+--
+
+ALTER TABLE ONLY public.voucher
+    ADD CONSTRAINT voucher_user_id_ac4b3325_fk_user_id FOREIGN KEY (user_id) REFERENCES public."user"(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
