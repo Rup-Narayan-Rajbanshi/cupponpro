@@ -3,7 +3,7 @@ from rest_framework import serializers
 from commonapp.models.bill import Bill
 from commonapp.models.coupon import Voucher
 from commonapp.models.salesitem import SalesItem
-from commonapp.models.order import Order
+from commonapp.models.order import OrderLine
 from commonapp.serializers.coupon import VoucherSerializer
 from commonapp.serializers.salesitem import SalesItemSerializer
 from userapp.models.user import User
@@ -14,6 +14,7 @@ class BillSaveSerializer(serializers.ModelSerializer):
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
+    paid = serializers.SerializerMethodField()
 
     class Meta:
         model = Bill
@@ -24,16 +25,11 @@ class BillSaveSerializer(serializers.ModelSerializer):
         bill_obj = Bill.objects.create(**validated_data)
         voucher_list = []
         for sales_item in sales_item_data:
-            sales_item_obj = SalesItem.objects.create(bill=bill_obj, **sales_item)
+            sales_item['bill'] = bill_obj
+            sales_item_obj = SalesItem.objects.create(**sales_item)
             if sales_item_obj.voucher:
                 if str(sales_item_obj.voucher.id) not in voucher_list:
                     voucher_list.append(str(sales_item_obj.voucher.id))    
-            if sales_item_obj.order:
-                order_obj = Order.objects.filter(id=sales_item_obj.order_id)
-                print(order_obj)
-                if order_obj:
-                    order_obj[0].is_billed = True
-                    order_obj[0].save()
         Voucher.objects.filter(id__in=voucher_list).update(is_redeem=True, used_date=datetime.now())
         return bill_obj
 
@@ -52,7 +48,6 @@ class BillSaveSerializer(serializers.ModelSerializer):
         return bill_obj
 
     def get_sales(self, obj):
-        print(obj)
         sales_item_obj = SalesItem.objects.filter(bill__id=obj.id)
         serializer = SalesItemSerializer(sales_item_obj, many=True)
         return serializer.data
@@ -62,7 +57,7 @@ class BillSaveSerializer(serializers.ModelSerializer):
         total = 0
         for sales_item in sales_item_obj:
             total += sales_item.total
-        return total
+        return float(total)
 
     def get_taxed_amount(self, obj):
         if obj.tax:
@@ -70,16 +65,23 @@ class BillSaveSerializer(serializers.ModelSerializer):
             taxed_amount = obj.tax / 100 * total
         else:
             taxed_amount = 0
-        return taxed_amount
+        return float(taxed_amount)
 
     def get_grand_total(self, obj):
-        return self.get_total(obj) + self.get_taxed_amount(obj)
+        return float(self.get_total(obj) + self.get_taxed_amount(obj))
+    
+    def get_paid(self, obj):
+        if obj.paid_amount:
+            return float(obj.paid_amount) >= self.get_grand_total(obj)
+        else:
+            return False
 
 class BillSerializer(serializers.ModelSerializer):
     sales_item = serializers.SerializerMethodField()
     total = serializers.SerializerMethodField()
     taxed_amount = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
+    paid = serializers.SerializerMethodField()
 
     class Meta:
         model = Bill
@@ -95,7 +97,7 @@ class BillSerializer(serializers.ModelSerializer):
         total = 0
         for sales_item in sales_item_obj:
             total += sales_item.total
-        return total
+        return float(total)
 
     def get_taxed_amount(self, obj):
         if obj.tax:
@@ -103,10 +105,16 @@ class BillSerializer(serializers.ModelSerializer):
             taxed_amount = obj.tax / 100 * total
         else:
             taxed_amount = 0
-        return taxed_amount
+        return float(taxed_amount)
 
     def get_grand_total(self, obj):
-        return self.get_total(obj) + self.get_taxed_amount(obj)
+        return float(self.get_total(obj) + self.get_taxed_amount(obj))
+
+    def get_paid(self, obj):
+        if obj.paid_amount:
+            return float(obj.paid_amount) >= self.get_grand_total(obj)
+        else:
+            return False
 
 class BillUserDetailSerializer(serializers.Serializer):
     """

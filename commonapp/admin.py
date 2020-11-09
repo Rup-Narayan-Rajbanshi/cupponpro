@@ -9,7 +9,7 @@ from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.document import Document
 from commonapp.models.facility import Facility
 from commonapp.models.image import Image
-from commonapp.models.order import Order
+from commonapp.models.order import Order, OrderLine
 from commonapp.models.links import SocialLink
 from commonapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.models.rating import Rating
@@ -59,7 +59,7 @@ class AdminCompanyapp(admin.ModelAdmin):
                     )
                 }
             ),
-
+            (_("Billing"), {'fields':('service_charge', 'tax',)}),
             (_("Partner Client"), {'fields':('is_partner',)}),
 
             (_("Permission"), {'fields':('status',)}),)
@@ -119,6 +119,7 @@ admin.site.register(Facility)
 admin.site.register(FavouriteCompany)
 admin.site.register(Image, AdminImageapp)
 admin.site.register(Order)
+admin.site.register(OrderLine)
 admin.site.register(Product, AdminProductapp)
 admin.site.register(ProductCategory, AdminProductCategoryapp)
 admin.site.register(Rating, AdminRatingapp)

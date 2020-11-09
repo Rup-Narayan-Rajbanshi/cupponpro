@@ -84,7 +84,11 @@ class CouponDetailSerializer(serializers.ModelSerializer):
         return data
 
 class VoucherSerializer(serializers.ModelSerializer):
+    description = serializers.SerializerMethodField()
 
     class Meta:
         model = Voucher
-        exclude = ('token', )
+        fields = ('id', 'is_redeem', 'used_date', 'description')
+
+    def get_description(self, obj):
+        return obj.coupon.description
