@@ -59,7 +59,7 @@ class AdminCompanyapp(admin.ModelAdmin):
                     )
                 }
             ),
-
+            (_("Billing"), {'fields':('service_charge', 'tax',)}),
             (_("Partner Client"), {'fields':('is_partner',)}),
 
             (_("Permission"), {'fields':('status',)}),)

@@ -3,6 +3,7 @@ from commonapp.models.order import Order, OrderLine
 
 class OrderLineSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=False, allow_null=True)
+    order = serializers.UUIDField(read_only=False, allow_null=True)
     product_name = serializers.SerializerMethodField()
     product_code = serializers.SerializerMethodField()
 
@@ -32,7 +33,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         order_lines_data = validated_data.pop('order_lines')
         order_obj = Order.objects.create(**validated_data)
         for order_lines in order_lines_data:
-            order_lines['order'] = bill_obj.id
+            order_lines['order'] = str(order_obj.id)
             OrderLine.objects.create(**order_lines)  
         return order_obj
 
