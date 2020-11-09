@@ -25,7 +25,7 @@ class BillSaveSerializer(serializers.ModelSerializer):
         bill_obj = Bill.objects.create(**validated_data)
         voucher_list = []
         for sales_item in sales_item_data:
-            sales_item['bill'] = str(bill_obj.id)
+            sales_item['bill'] = bill_obj
             sales_item_obj = SalesItem.objects.create(**sales_item)
             if sales_item_obj.voucher:
                 if str(sales_item_obj.voucher.id) not in voucher_list:
