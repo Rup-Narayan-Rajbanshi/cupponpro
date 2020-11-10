@@ -61,17 +61,17 @@ class BillSaveSerializer(serializers.ModelSerializer):
         return float(total)
     
     def get_taxed_amount(self, obj):
-        if obj.company.tax:
+        if obj.tax:
             total = self.get_total(obj)
-            taxed_amount = float(obj.company.tax) / 100 * total
+            taxed_amount = float(obj.tax) / 100 * total
         else:
             taxed_amount = 0
         return float(taxed_amount)
 
     def get_service_charge(self, obj):
-        if obj.company.service_charge:
+        if obj.service_charge:
             total = self.get_total(obj)
-            service_charge = float(obj.company.service_charge) / 100 * total
+            service_charge = float(obj.service_charge) / 100 * total
         else:
             service_charge = 0
         return float(service_charge)
@@ -110,17 +110,17 @@ class BillSerializer(serializers.ModelSerializer):
         return float(total)
 
     def get_taxed_amount(self, obj):
-        if obj.company.tax:
+        if obj.tax:
             total = self.get_total(obj)
-            taxed_amount = float(obj.company.tax) / 100 * total
+            taxed_amount = float(obj.tax) / 100 * total
         else:
             taxed_amount = 0
         return float(taxed_amount)
 
     def get_service_charge(self, obj):
-        if obj.company.service_charge:
+        if obj.service_charge:
             total = self.get_total(obj)
-            service_charge = float(obj.company.service_charge) / 100 * total
+            service_charge = float(obj.service_charge) / 100 * total
         else:
             service_charge = 0
         return float(service_charge)
