@@ -50,7 +50,8 @@ class SalesItemVerifyView(generics.GenericAPIView):
                     if item['product'] in applicable_products_ids:
                         item['discount'] = discount_p
                         item['voucher'] = str(voucher_obj[0].id)
-                        item['total'] = (item['rate'] * item['quantity']) - (discount_p / 100 * (item['rate'] * item['quantity']))
+                        item['discount_amount'] = (discount_p / 100 * (item['rate'] * item['quantity']))
+                        item['total'] = (item['rate'] * item['quantity']) - item['discount_amount']
                     else:
                         item['total'] = item['rate'] * item['quantity']
                     total += item['total']
