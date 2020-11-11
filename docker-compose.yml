@@ -1,48 +1,40 @@
-version: '3'
+version: '3.7'
 services:
-  db:
-    image: mariadb:latest
-    ports:
-      - "3381:3306"
-    volumes:
-      - ./tmp/db:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: 'womcs_db'
-      MYSQL_USER: 'womcs'
-      MYSQL_PASSWORD: 'womcs_password'
-      MYSQL_ROOT_PASSWORD: 'greengrowth_password'
-      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+    cuppon-pro:
+        env_file: "env/${ENV}.env"
+        build:
+            context: .
+            dockerfile: dockerfiles/django/Dockerfile
+        image: cuppon-pro
+        entrypoint: ./scripts/run_web.sh
+        depends_on:
+        - db
+        volumes:
+        - "media_volume:/app/media/"
+        restart: unless-stopped
+        networks:
+        - cuppon-pro-net
+        ports:
+        - 8000
 
-  frontend:
-    build:
-      context: ./
-      dockerfile: docker/frontend/frontend.Dockerfile
-    volumes:
-      - ./staticfiles:/usr/share/nginx/html/static
-      - ./media:/usr/share/nginx/html/media
+    db:
+        env_file: "env/${ENV}.env"
+        image: bitnami/postgresql:12.4.0
+        volumes:
+        - "persist_volume:/var/lib/postgresql/data"
+        restart: unless-stopped
+        networks:
+        - cuppon-pro-net
 
-    restart: "no"
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-  backend:
-    build:
-      context: ./
-      dockerfile: docker/backend/backend.Dockerfile
-    # command: ["./docker/entry.sh"]
-    restart: "no"
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/code
-    depends_on:
-      - db
-    environment:
-      SECRET_KEY: 'tg7703_ddewirye6t0d^mam7-=42&!k&wv5dhi$$(35kouzi3ks'
-      DATABASE_ENGINE: django.db.backends.mysql
-      DATABASE_HOST: db
-      DATABASE_NAME: womcs_db
-      DATABASE_USER: womcs
-      DATABASE_PASSWORD: womcs_password
-      DATABASE_PORT: 3306
+networks:
+    cuppon-pro-net:
+        name: cuppon-pro-network
+        ipam:
+            driver: default
+            config:
+                - subnet: "172.16.238.0/24"
+                - subnet: "2001:3984:3989::/64"
+
+volumes:
+    persist_volume:
+    media_volume:

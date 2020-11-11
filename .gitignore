@@ -10,6 +10,6 @@ ngrok
 /log/
 media
 assets
-env
-.env
+*.env
 virtualenvs/
+local_settings.py

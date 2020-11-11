@@ -15,3 +15,8 @@ DATABASES = {
         'PASSWORD':config('STAGING_DATABASE_PASSWORD'),
     }
 }
+
+try:
+    from .local_settings import *
+except Exception as e:
+    pass
