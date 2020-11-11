@@ -14,10 +14,11 @@ class CouponDetailSerializer(serializers.ModelSerializer):
     coupon_relation = serializers.SerializerMethodField()
     is_redeemed = serializers.SerializerMethodField()
     vendor = serializers.SerializerMethodField()
+    expiry_date = serializers.DateField(read_only=True)
 
     class Meta:
         model = Coupon
-        fields = ('id', 'images', 'is_redeemed', 'description', 'discount', 'coupon_relation', 'vendor')
+        fields = ('id', 'images', 'is_redeemed', 'description', 'discount', 'coupon_relation', 'vendor', 'expiry_date')
 
     def get_images(self, obj):
         coupon_type = obj.content_type.name
