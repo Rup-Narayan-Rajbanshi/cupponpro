@@ -17,6 +17,7 @@ class SalesItem(models.Model):
     voucher = models.ForeignKey(Voucher, on_delete=models.PROTECT, null=True, blank=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.PositiveIntegerField(null=True, blank=True)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

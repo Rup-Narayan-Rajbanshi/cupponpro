@@ -53,7 +53,6 @@ class Voucher(models.Model):
     is_redeem = models.BooleanField(default=False)
     watch_later = models.BooleanField(default=False)
     bill = models.ForeignKey(Bill, on_delete=models.PROTECT, null=True, blank=True)
-    save_amount = models.PositiveIntegerField(editable=False, null=True)
     used_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

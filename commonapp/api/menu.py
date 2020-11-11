@@ -9,6 +9,9 @@ class MenuListView(generics.GenericAPIView):
     serializer_class = MenuSerializer
 
     def get(self, request, company_id):
+        """
+        An endpoint to list the necessary company detail and menu. Pass asset id as query parameter in 'asset' to get order detail as well.
+        """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
             serializer = MenuSerializer(company_obj[0], context={'request':request})
