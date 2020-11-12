@@ -3,6 +3,7 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from commonapp.models.company import Company
 from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order, OrderLine
 from commonapp.models.product import Product
@@ -236,12 +237,15 @@ class OrderLineVerifyView(generics.GenericAPIView):
         """
         voucher_obj = Voucher.objects.filter(id=request.data['voucher'])
         order_lines = request.data['order_lines']
+        company_obj = Company.objects.filter(id=request.data['company'])
         result = {
-            'tax': request.data['tax'],
-            'taxed_amount': None,
-            'total': None,
-            'grand_total': None,
-            'discount': None,
+            'tax': company_obj[0].tax,
+            'taxed_amount': 0,
+            'service_charge': company_obj[0].service_charge,
+            'service_charge_amount': 0,
+            'total': 0,
+            'grand_total': 0,
+            'discount_amount': 0,
             'order_lines': order_lines
         }
         if voucher_obj:
@@ -267,15 +271,19 @@ class OrderLineVerifyView(generics.GenericAPIView):
                     if item['product'] in applicable_products_ids:
                         item['discount'] = discount_p
                         item['voucher'] = str(voucher_obj[0].id)
-                        item['total'] = (item['rate'] * item['quantity']) - (discount_p / 100 * (item['rate'] * item['quantity']))
+                        item['discount_amount'] = discount_p / 100 * (item['rate'] * item['quantity'])
+                        item['total'] = (item['rate'] * item['quantity']) - item['discount_amount']
+                        result['discount_amount'] += item['discount_amount']
                     else:
                         item['total'] = item['rate'] * item['quantity']
                     total += item['total']
             result['total'] = total
             result['grand_total'] = total
             if result['tax']:
-                result['taxed_amount'] = result['tax']/100*result['total']
-                result['grand_total'] = result['total'] + result['taxed_amount']      
+                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])  
+            if result['service_charge']:
+                result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
+            result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']      
             result['order_lines'] = order_lines
             data = {
                 'success': 1,
@@ -288,10 +296,11 @@ class OrderLineVerifyView(generics.GenericAPIView):
                 item['total'] = item['rate'] * item['quantity']
                 total += item['total']
             result['total'] = total
-            result['grand_total'] = total
             if result['tax']:
-                result['taxed_amount'] = result['tax']/100*result['total']
-                result['grand_total'] = result['total'] + result['taxed_amount']
+                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])  
+            if result['service_charge']:
+                result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
+            result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']
             data = {
                 'success': 1,
                 'data': result
