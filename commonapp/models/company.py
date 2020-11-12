@@ -10,6 +10,8 @@ from commonapp.models.image import Image
 from commonapp.models.category import Category, SubCategory
 from django.dispatch import receiver
 from userapp.models import User
+from helpers.app_helpers import url_builder
+
 
 class Company(Address):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
@@ -45,6 +47,16 @@ class Company(Address):
     def __str__(self):
         return self.name
 
+    def to_representation(self, request=None):
+        logo = url_builder(self.logo, request)
+        return {
+            "id": self.id,
+            "name": self.name,
+            "logo": logo,
+            "latitude": self.latitude,
+            "longitude": self.longitude
+        }
+
     def save(self, *args, **kwargs):
         ''' On save, create key '''
         if not self.key:
@@ -70,12 +82,12 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
     """
     if not instance.pk:
         return False
-    
+
     try:
         old_file = sender.objects.get(pk=instance.pk).logo
     except:
         return False
-    
+
     new_file = instance.logo
     if old_file:
         if not old_file == new_file:

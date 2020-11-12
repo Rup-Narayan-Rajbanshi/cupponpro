@@ -77,7 +77,7 @@ class LoginJWTObtainView(generics.GenericAPIView):
             data = {
                 'success': 1,
                 'token': token,
-                'user': serializer.data                
+                'user': serializer.data
             }
             return Response(data, status=200)
         else:

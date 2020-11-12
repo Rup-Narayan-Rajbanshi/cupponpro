@@ -1,0 +1,24 @@
+
+DEFAULTS = {
+    'PHONE_NUMBER_EXT': '977',
+    'MARITAL_STATUS': 'SINGLE'
+}
+
+MAX_LENGTHS = {
+    'PHONE_NUMBER_EXT': 6,
+    'PHONE_NUMBER': 14,
+    'ADDRESS': 200,
+    'OTP': 8
+}
+
+OTP_TYPES = {
+    'USER_REGISTER': 0,
+    'RESET_PASSWORD': 1,
+    'CHANGE_PHONE_NUMBER': 2,
+}
+
+OTP_STATUS_TYPES = {
+    'EXPIRED': 0,
+    'ACTIVE': 1,
+    'INACTIVE': 2
+}

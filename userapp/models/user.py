@@ -11,6 +11,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from project.settings.base import EMAIL_HOST_USER
 from commonapp.models.address import Address
+from helpers.app_helpers import url_builder
 
 class UserManager(BaseUserManager):
     def _create_user(self, first_name, middle_name, last_name, email, phone_number,\
@@ -117,6 +118,16 @@ class User(AbstractBaseUser, Address):
     def has_module_perms(self, app_label):
         return True
 
+    def to_representation(self, request=None):
+        image = url_builder(self.image, request)
+        return {
+            "id": self.id,
+            "first_name": self.first_name,
+            "middle_name": self.middle_name,
+            "last_name": self.last_name,
+            "image": image,
+            "email": self.email
+        }
 
     @property
     def full_name(self):
