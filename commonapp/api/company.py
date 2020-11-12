@@ -402,11 +402,11 @@ class LocalRestaurantListView(generics.GenericAPIView):
         Pass 'Restaurant' or 'Hotel' as value to 'category' query to get local restaurant or hotel accordingly.
         """
         try:
-            latitude = int(request.GET.get('latitude', None))
-            longitude = int(request.GET.get('longitude', None))
-            distance = int(request.GET.get('distance', 5))
+            latitude = float(request.GET.get('latitude', None))
+            longitude = float(request.GET.get('longitude', None))
+            distance = float(request.GET.get('distance', 5))
             category = request.GET.get('category', None)
-        except:
+        except Exception as e:
             latitude = None
             longitude = None
             category = None

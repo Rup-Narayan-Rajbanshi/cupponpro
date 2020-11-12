@@ -52,6 +52,7 @@ DEV_APPS = [
     'bannerapp',
     'commonapp',
     'userapp',
+    'company',
 ]
 
 
