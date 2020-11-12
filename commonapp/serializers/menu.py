@@ -5,6 +5,16 @@ from commonapp.models.order import Order
 from commonapp.serializers.order import OrderSerializer
 from commonapp.serializers.image import ImageDetailSerializer
 
+class MenuProductSerializer(serializers.ModelSerializer):
+    images = ImageDetailSerializer(many=True, read_only=True)
+    price = serializers.SerializerMethodField()
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'price', 'images')
+    
+    def get_price(self, obj):
+        return obj.total_price
+
 class MenuSerializer(serializers.ModelSerializer):
     menu = serializers.SerializerMethodField()
     images = ImageDetailSerializer(many=True, read_only=True)
@@ -23,11 +33,8 @@ class MenuSerializer(serializers.ModelSerializer):
             products = list()
             product_obj = Product.objects.filter(product_category=product_category)
             for each_product in product_obj:
-                product = dict()
-                product['id'] = each_product.id
-                product['name'] = each_product.name
-                product['price'] = each_product.total_price
-                products.append(product)
+                serializers = MenuProductSerializer(each_product, context={'request':self.context['request']})
+                products.append(serializers.data)
             menu['products'] = products
             data.append(menu)
         return data
