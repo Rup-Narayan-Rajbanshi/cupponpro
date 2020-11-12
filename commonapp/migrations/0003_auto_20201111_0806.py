@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='bill',
             name='invoice_number',
-            field=models.CharField(default=django.utils.timezone.now, editable=False, max_length=8),
+            field=models.CharField(editable=False, max_length=8),
             preserve_default=False,
         ),
         migrations.AddField(
