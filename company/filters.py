@@ -19,4 +19,4 @@ class FavouriteCompanyUserFilter(FavouriteCompanyBaseFilter):
         company_user = CompanyUser.objects.filter(user=self.request.user).first()
         if company_user:
             return parent.filter(company=company_user.company)
-        return None
+        return parent.none()
