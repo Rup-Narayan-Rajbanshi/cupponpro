@@ -6,6 +6,8 @@ from django.db import models
 from django.dispatch import receiver
 from commonapp.models.image import Image
 from commonapp.models.company import Company
+from helpers.app_helpers import url_builder
+
 
 class BulkQuantity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
@@ -36,6 +38,14 @@ class ProductCategory(models.Model):
     def __str__(self):
         return self.name
 
+    def to_representation(self, request=None):
+        image = url_builder(self.image, request)
+        return {
+            "id": self.id,
+            "name": self.name,
+            "image": image
+        }
+
     def save(self, *args, **kwargs):
         ''' On save, create token '''
         if not self.token:
@@ -61,12 +71,12 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
     """
     if not instance.pk:
         return False
-    
+
     try:
         old_file = sender.objects.get(pk=instance.pk).image
     except:
         return False
-    
+
     new_file = instance.image
     if old_file:
         if not old_file == new_file:
@@ -107,6 +117,18 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_representation(self, request=None):
+        return {
+            "id": self.id,
+            "product_code": self.product_code,
+            "name": self.name,
+            "product_category": self.product_category.to_representation(),
+            "brand_name": self.brand_name,
+            "unit_price": self.unit_price,
+            "total_price": self.total_price,
+            "is_veg": self.is_veg
+        }
 
     def save(self, *args, **kwargs):
         ''' On save, add token, and check for bulk quantity and update price of product '''

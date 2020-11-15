@@ -86,7 +86,7 @@ class CouponListView(generics.GenericAPIView):
 
 class CouponDetailView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isAdminOrReadOnly]
-    serializer_class = CouponSerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request, coupon_id):
         """
@@ -94,7 +94,7 @@ class CouponDetailView(generics.GenericAPIView):
         """
         if Coupon.objects.filter(id=coupon_id):
             coupon_obj = Coupon.objects.get(id=coupon_id)
-            serializer = CouponSerializer(coupon_obj,\
+            serializer = CouponDetailSerializer(coupon_obj,\
                 context={"request":request})
             data = {
                 'success': 1,
@@ -113,7 +113,7 @@ class CouponDetailView(generics.GenericAPIView):
         An endpoint for updating coupon detail.
         """
         coupon_obj = Coupon.objects.filter(id=coupon_id)
-        if coupon_obj:   
+        if coupon_obj:
             serializer = CouponSerializer(instance=coupon_obj[0],\
                 data=request.data, context={'request':request})
             if serializer.is_valid():
@@ -140,7 +140,7 @@ class CouponDetailView(generics.GenericAPIView):
         """
         An endpoint for deleting coupon.
         """
-        coupon_obj = Coupon.objects.filter(id=coupon_id)            
+        coupon_obj = Coupon.objects.filter(id=coupon_id)
         if coupon_obj:
             try:
                 coupon_obj[0].delete()

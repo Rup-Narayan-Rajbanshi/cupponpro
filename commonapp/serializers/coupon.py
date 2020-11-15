@@ -4,6 +4,7 @@ from rest_framework import serializers
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.image import Image
 
+
 class CouponSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
@@ -15,10 +16,22 @@ class CouponDetailSerializer(serializers.ModelSerializer):
     is_redeemed = serializers.SerializerMethodField()
     vendor = serializers.SerializerMethodField()
     expiry_date = serializers.DateField(read_only=True)
+    content_type = serializers.SerializerMethodField()
+    content_object = serializers.SerializerMethodField()
 
     class Meta:
         model = Coupon
-        fields = ('id', 'images', 'is_redeemed', 'description', 'discount', 'coupon_relation', 'vendor', 'expiry_date')
+        fields = ('id', 'images', 'is_redeemed', 'description', 'discount', 'coupon_relation', 'vendor', 'expiry_date', 'content_type', 'content_object')
+
+    def get_content_type(self, obj):
+        content_type = obj.content_type.name
+        return content_type
+
+    def get_content_object(self, obj):
+        content_object = None
+        if obj.content_object:
+            content_object = obj.content_object.to_representation()
+        return content_object
 
     def get_images(self, obj):
         coupon_type = obj.content_type.name
