@@ -42,26 +42,20 @@ class CompanyRatingListView(generics.GenericAPIView):
         """
         An endpoint for creating vendor's rating.
         """
-        if int(request.data['company']) == company_id:
-            serializer = RatingSerializer(data=request.data, context={'request':request})
-            if serializer.is_valid():
-                serializer.save()
-                data = {
-                    'success': 1,
-                    'data': serializer.data
-                }
-                return Response(data, status=200)
+        serializer = RatingSerializer(data=request.data, context={'request':request})
+        if serializer.is_valid():
+            serializer.save()
             data = {
-                'success': 0,
-                'message': serializer.errors
+                'success': 1,
+                'data': serializer.data
             }
-            return Response(data, status=400)
-        else:
-            data = {
-                'success': 0,
-                'message': "Rating failed."
-            }
-            return Response(data, status=400)
+            return Response(data, status=200)
+        data = {
+            'success': 0,
+            'message': serializer.errors
+        }
+        return Response(data, status=400)
+
 
 class CompanyRatingDetailView(generics.GenericAPIView):
     permission_classes = (isUser, )
@@ -89,34 +83,27 @@ class CompanyRatingDetailView(generics.GenericAPIView):
         """
         An endpoint for updating vendor's rating detail.
         """
-        if int(request.data['company']) == company_id:
-            rating_obj = Rating.objects.filter(id=rating_id, company=company_id)
-            if rating_obj:
-                serializer = RatingSerializer(instance=rating_obj[0],\
-                    data=request.data, partial=True, context={'request':request})
-                if serializer.is_valid():
-                    serializer.save()
-                    data = {
-                        'success': 1,
-                        'data': serializer.data
-                    }
-                    return Response(data, status=200)
+        rating_obj = Rating.objects.filter(id=rating_id, company=company_id)
+        if rating_obj:
+            serializer = RatingSerializer(instance=rating_obj[0],\
+                data=request.data, partial=True, context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
                 data = {
-                    'success': 0,
-                    'message': serializer.errors
+                    'success': 1,
+                    'data': serializer.data
                 }
-                return Response(data, status=400)
+                return Response(data, status=200)
             data = {
                 'success': 0,
-                'message': "Rating doesn't exist."
-            }
-            return Response(data, status=404)
-        else:
-            data = {
-                'success': 0,
-                'message': "Rating Failed."
+                'message': serializer.errors
             }
             return Response(data, status=400)
+        data = {
+            'success': 0,
+            'message': "Rating doesn't exist."
+        }
+        return Response(data, status=404)
 
     def delete(self, request, company_id, rating_id):
         """
