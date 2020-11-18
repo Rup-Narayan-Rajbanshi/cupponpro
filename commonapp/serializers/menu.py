@@ -10,7 +10,7 @@ class MenuProductSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ('id', 'name', 'price', 'images')
+        fields = ('id', 'name', 'product_code', 'price', 'images')
     
     def get_price(self, obj):
         return obj.total_price
