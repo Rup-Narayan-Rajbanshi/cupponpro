@@ -119,15 +119,17 @@ class User(AbstractBaseUser, Address):
         return True
 
     def to_representation(self, request=None):
-        image = url_builder(self.image, request)
-        return {
-            "id": self.id,
-            "first_name": self.first_name,
-            "middle_name": self.middle_name,
-            "last_name": self.last_name,
-            "image": image,
-            "email": self.email
-        }
+        if self:
+            image = url_builder(self.image, request)
+            return {
+                "id": self.id,
+                "first_name": self.first_name,
+                "middle_name": self.middle_name,
+                "last_name": self.last_name,
+                "image": image,
+                "email": self.email
+            }
+        return None
 
     @property
     def full_name(self):

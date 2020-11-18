@@ -48,14 +48,16 @@ class Company(Address):
         return self.name
 
     def to_representation(self, request=None):
-        logo = url_builder(self.logo, request)
-        return {
-            "id": self.id,
-            "name": self.name,
-            "logo": logo,
-            "latitude": self.latitude,
-            "longitude": self.longitude
-        }
+        if self:
+            logo = url_builder(self.logo, request)
+            return {
+                "id": self.id,
+                "name": self.name,
+                "logo": logo,
+                "latitude": self.latitude,
+                "longitude": self.longitude
+            }
+        return None
 
     def save(self, *args, **kwargs):
         ''' On save, create key '''

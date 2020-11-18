@@ -6,8 +6,8 @@ from commonapp.models.company import Company, FavouriteCompany
 from userapp.models import User
 
 class FavouriteCompanySerializer(CustomModelSerializer):
-    company = DetailRelatedField(model=User, lookup='idx', representation='to_representation', read_only=True)
-    user = DetailRelatedField(model=User, lookup='idx', representation='to_representation', read_only=True)
+    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', read_only=True)
+    user = DetailRelatedField(model=User, lookup='id', representation='to_representation', read_only=True)
 
     class Meta(CustomModelSerializer.Meta):
         model = FavouriteCompany

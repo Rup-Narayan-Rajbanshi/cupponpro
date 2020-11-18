@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from helpers.serializer_fields import DetailRelatedField
 from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Company, FavouriteCompany
 from commonapp.models.links import SocialLink
@@ -13,7 +14,7 @@ class CompanySerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Company
         exclude = ('key', 'created_at')
@@ -52,7 +53,18 @@ class ChangeCompanyEmailSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
 
 class FavouriteCompanySerializer(serializers.ModelSerializer):
+    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', read_only=True)
+    user = DetailRelatedField(model=User, lookup='id', representation='to_representation', read_only=True)
+    is_favourite = serializers.BooleanField()
 
     class Meta:
         model = FavouriteCompany
         fields = "__all__"
+
+    def update(self, instance, vdata):
+        # user = self.context.get('request').user
+        # vdata['user'] = user
+        for attr, value in vdata.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
