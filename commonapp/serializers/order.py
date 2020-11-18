@@ -47,7 +47,8 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 OrderLine.objects.filter(id=order_lines['id']).update(**order_lines)
                 order_lines_ids.remove(str(order_lines['id']))
             else:
-                OrderLine.objects.create(**order_lines)
+                order_obj = Order.objects.get(id=order_lines.pop('order'))
+                OrderLine.objects.create(order=order_obj, **order_lines)
         OrderLine.objects.filter(id__in=order_lines_ids).delete()
         order_obj = Order.objects.filter(id=instance.id).update(**validated_data)
         return order_obj
