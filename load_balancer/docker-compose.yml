@@ -8,8 +8,8 @@ services:
         networks:
         - cuppon-pro-net
         ports:
-        - 7000:80
-        - 7055:443
+        - 80:80
+        - 443:443
 
 networks:
     cuppon-pro-net:
