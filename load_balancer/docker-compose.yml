@@ -11,7 +11,7 @@ services:
         - 80:80
         - 443:443
         volumes:
-        - "/etc/letsencrypt/live/api.cupponpro.com:/home/.certi"
+        - "/etc/letsencrypt/live/api.cupponpro.com:/home"
 
 networks:
     cuppon-pro-net:
