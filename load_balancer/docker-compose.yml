@@ -10,6 +10,8 @@ services:
         ports:
         - 80:80
         - 443:443
+        volumes:
+        - "/etc/letsencrypt/live/api.cupponpro.com:/home/api.cupponpro.com"
 
 networks:
     cuppon-pro-net:
