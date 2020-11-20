@@ -21,6 +21,16 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def to_representation(self, request=None):
+        icon = url_builder(self.icon, request)
+        image = url_builder(self.image, request)
+        return {
+            "id": self.id,
+            "name": self.name,
+            "image": image,
+            "icon": icon
+        }
+
     def save(self, *args, **kwargs):
         ''' On save, create token '''
         if not self.token:
