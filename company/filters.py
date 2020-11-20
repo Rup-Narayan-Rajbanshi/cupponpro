@@ -20,3 +20,10 @@ class FavouriteCompanyUserFilter(FavouriteCompanyBaseFilter):
         if company_user:
             return parent.filter(company=company_user.company)
         return parent.none()
+
+
+class UserFavouriteCompanyFilter(FavouriteCompanyBaseFilter):
+    @property
+    def qs(self):
+        parent = super(UserFavouriteCompanyFilter, self).qs
+        return parent.filter(user=self.request.user)
