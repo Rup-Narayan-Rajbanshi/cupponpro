@@ -4,6 +4,8 @@ import uuid
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.dispatch import receiver
+from helpers.app_helpers import url_builder
+
 
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
