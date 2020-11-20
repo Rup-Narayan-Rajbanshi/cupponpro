@@ -270,7 +270,7 @@ class VoucherListView(generics.GenericAPIView):
 
 class TrendingCouponListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
-    serializer_class = CouponSerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request):
         """
@@ -311,7 +311,7 @@ class TrendingCouponListView(generics.GenericAPIView):
 
 class DealOfTheDayCouponListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
-    serializer_class = CouponSerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request):
         """
