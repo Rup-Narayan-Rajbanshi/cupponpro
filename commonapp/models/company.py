@@ -10,13 +10,15 @@ from commonapp.models.image import Image
 from commonapp.models.category import Category, SubCategory
 from django.dispatch import receiver
 from userapp.models import User
-from helpers.app_helpers import url_builder
+from helpers.app_helpers import url_builder, content_file_name
+from helpers.validators import image_validator
 
 
 class Company(Address):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=200)
     logo = models.ImageField(upload_to='logo/', null=True, blank=True)
+    logo_icon = models.ImageField(upload_to=content_file_name, null=True, blank=True, validators=[image_validator])
     category = models.ForeignKey(Category, on_delete=models.PROTECT,\
         related_name="company_category")
     email = models.EmailField(max_length=50, unique=True, blank=True, null=True)
@@ -50,12 +52,14 @@ class Company(Address):
     def to_representation(self, request=None):
         if self:
             logo = url_builder(self.logo, request)
+            logo_icon = url_builder(self.logo_icon, request)
             return {
-                "id": self.id,
-                "name": self.name,
-                "logo": logo,
-                "latitude": self.latitude,
-                "longitude": self.longitude
+                'id': self.id,
+                'name': self.name,
+                'logo': logo,
+                'logo_icon': logo_icon,
+                'latitude': self.latitude,
+                'longitude': self.longitude
             }
         return None
 
