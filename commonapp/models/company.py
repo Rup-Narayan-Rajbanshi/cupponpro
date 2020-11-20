@@ -18,7 +18,7 @@ class Company(Address):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=200)
     logo = models.ImageField(upload_to='logo/', null=True, blank=True)
-    logo_icon = models.ImageField(upload_to=content_file_name, null=True, blank=True, validators=[image_validator])
+    logo_icon = models.ImageField(upload_to=content_file_name, null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,\
         related_name="company_category")
     email = models.EmailField(max_length=50, unique=True, blank=True, null=True)

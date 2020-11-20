@@ -21,7 +21,7 @@ class CouponDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Coupon
-        fields = ('id', 'images', 'is_redeemed', 'description', 'discount', 'coupon_relation', 'vendor', 'expiry_date', 'content_type', 'content_object')
+        fields = ('id', 'name', 'images', 'is_redeemed', 'description', 'discount_type', 'discount', 'coupon_relation', 'vendor', 'expiry_date', 'content_type', 'content_object')
 
     def get_content_type(self, obj):
         content_type = obj.content_type.name

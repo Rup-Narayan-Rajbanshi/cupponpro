@@ -96,3 +96,13 @@ def is_positive_numeric(value):
     if is_invalid:
         raise ValidationError('Value should be positive number.')
     return value
+
+
+def is_positive_float(value):
+    is_invalid = True
+    if isinstance(value, float):
+        if value > 0:
+            is_invalid = False
+    if is_invalid:
+        raise ValidationError('Value should be positive number.')
+    return value

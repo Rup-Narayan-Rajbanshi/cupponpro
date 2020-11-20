@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 import helpers.app_helpers
-import helpers.validators
 
 
 class Migration(migrations.Migration):
@@ -12,9 +11,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
+        migrations.AlterField(
             model_name='company',
             name='logo_icon',
-            field=models.ImageField(blank=True, null=True, upload_to=helpers.app_helpers.content_file_name, validators=[helpers.validators.image_validator]),
+            field=models.ImageField(blank=True, null=True, upload_to=helpers.app_helpers.content_file_name),
         ),
     ]

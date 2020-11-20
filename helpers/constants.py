@@ -22,3 +22,8 @@ OTP_STATUS_TYPES = {
     'ACTIVE': 1,
     'INACTIVE': 2
 }
+
+DISCOUNT_TYPE = {
+    'FLAT': 'FLAT',
+    'PERCENTAGE': 'PERCENTAGE'
+}
