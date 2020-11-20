@@ -404,7 +404,7 @@ def request_context(self):
 
 
 def file_representation(self, value):
-    from go_print.settings import PROXY_URL
+    from project.settings import PROXY_URL
 
     if not value:
         return None
@@ -495,7 +495,7 @@ class ImageFieldWithURL(serializers.ImageField):
 
     def to_internal_value(self, data):
         import os
-        from go_print.settings import MEDIA_ROOT
+        from project.settings import MEDIA_ROOT
 
         request = request_context(self)
         if isinstance(data, str):
@@ -511,7 +511,7 @@ class FileFieldWithURL(serializers.FileField):
 
     def to_internal_value(self, data):
         import os
-        from go_print.settings import MEDIA_ROOT
+        from project.settings import MEDIA_ROOT
 
         request = request_context(self)
         if isinstance(data, str):
@@ -535,3 +535,17 @@ class RoundUpFloat(serializers.FloatField):
     def to_representation(self, value):
         value = round(value, 2)
         return value
+
+
+class LowertoUpperCharField(serializers.CharField):
+
+    def to_internal_value(self, data):
+        data = data.upper() if data else data
+        return super(LowertoUpperCharField, self).to_internal_value(data)
+
+
+class LowertoUpperChoiceField(serializers.ChoiceField):
+
+    def to_internal_value(self, data):
+        data = data.upper() if data else data
+        return super(LowertoUpperCharField, self).to_internal_value(data)
