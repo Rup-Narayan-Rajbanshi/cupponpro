@@ -69,10 +69,10 @@ class CouponAdminForm(forms.ModelForm):
         fields = '__all__'
 
     def clean_name(self):
-        from helpers.validators import is_alphabetic
+        from helpers.validators import is_alphanumeric_with_exception
         name = self.cleaned_data['name']
         try:
-            name = is_alphabetic(name)
+            name = is_alphanumeric_with_exception(name)
         except Exception as e:
             raise forms.ValidationError(str(e.detail[0]))
         return name
