@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.AddField(
             model_name='company',
             name='logo_icon',
             field=models.ImageField(blank=True, null=True, upload_to=helpers.app_helpers.content_file_name),
