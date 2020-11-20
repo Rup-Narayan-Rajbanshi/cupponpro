@@ -13,3 +13,4 @@ assets
 *.env
 virtualenvs/
 local_settings.py
+load_balancer/.certi/*.pem
