@@ -6,18 +6,20 @@ from userapp.models import User, PasswordResetToken, LoginToken, SignupToken
 from userapp.models.subscription import Subscription
 
 class UserAdminForm(forms.ModelForm):
-    password = forms.CharField(max_length=64, widget=forms.PasswordInput)
+    password = forms.CharField(max_length=64, required=False, widget=forms.PasswordInput)
 
     class Meta:
         model = User
         fields = '__all__'
 
-    def clean_password(self):
+    def clean(self):
         from django.contrib.auth.hashers import make_password
         password = self.cleaned_data.get('password')
         if password:
             password = make_password(password)
-        return password
+        else:
+            self.cleaned_data.pop('password')
+        return self.cleaned_data
 
 
 class AdminUserapp(admin.ModelAdmin):
