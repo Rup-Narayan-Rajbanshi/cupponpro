@@ -6,7 +6,7 @@ from userapp.models import User, PasswordResetToken, LoginToken, SignupToken
 from userapp.models.subscription import Subscription
 
 class UserAdminForm(forms.ModelForm):
-    password = forms.CharField(max_length=64, required=False, widget=forms.PasswordInput)
+    # password = forms.CharField(max_length=64, required=False, widget=forms.PasswordInput)
 
     class Meta:
         model = User
