@@ -12,14 +12,11 @@ class UserAdminForm(forms.ModelForm):
         model = User
         fields = '__all__'
 
-    def clean(self):
+    def clean_password(self):
         from django.contrib.auth.hashers import make_password
         password = self.cleaned_data.get('password')
-        if password:
-            password = make_password(password)
-        else:
-            self.cleaned_data.pop('password')
-        return self.cleaned_data
+        password = make_password(password)
+        return password
 
 
 class AdminUserapp(admin.ModelAdmin):
