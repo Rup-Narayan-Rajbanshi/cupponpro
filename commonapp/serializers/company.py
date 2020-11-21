@@ -21,17 +21,20 @@ class CompanySerializer(serializers.ModelSerializer):
         # fields = "__all__"
 
     def get_rating(self, obj):
-        rating_obj = Rating.objects.filter(company=obj.id)
-        rating_count = len(rating_obj)
-        rating = 0
-        if rating_obj:
-            for each_rating_obj in rating_obj:
-                rating += each_rating_obj.rate
-            rating /= rating_count
+        # rating_obj = Rating.objects.filter(company=obj.id)
+        # rating_count = len(rating_obj)
+        # rating = 0
+        # if rating_obj:
+        #     for each_rating_obj in rating_obj:
+        #         rating += each_rating_obj.rate
+        #     rating /= rating_count
+        rating = obj.rating if getattr(obj, 'rating', None) else 0
         return rating
 
     def get_rating_count(self, obj):
-        return Rating.objects.filter(company=obj.id).count()
+        rating_count = obj.rating_count if getattr(obj, 'rating_count', None) else 0
+        return rating_count
+        # return Rating.objects.filter(company=obj.id).count()
 
     def get_links(self, obj):
         social_link_obj = SocialLink.objects.filter(company=obj.id)
