@@ -1,17 +1,34 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
+from django import forms
 from rest_framework.authtoken.models import Token
 from userapp.models import User, PasswordResetToken, LoginToken, SignupToken
 from userapp.models.subscription import Subscription
 
+class UserAdminForm(forms.ModelForm):
+    # password = forms.CharField(max_length=64, widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def clean_password(self):
+        from django.contrib.auth.hashers import make_password
+        password = self.cleaned_data.get('password')
+        if password:
+            password = make_password(password)
+        return password
+
+
 class AdminUserapp(admin.ModelAdmin):
     list_display = ('id', 'full_name', 'email', 'active', 'admin')
-    readonly_fields = ('password',)
+    # readonly_fields = ('password',)
+    form = UserAdminForm
     fieldsets = (
             (_("Personal info"), {
                 'fields':(
                     'email', 'first_name', 'middle_name',\
-                    'last_name', 'gender', 'phone_number', 'image'
+                    'last_name', 'gender', 'phone_number', 'image', 'password'
                     )
                 }
             ),
