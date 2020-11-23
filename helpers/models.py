@@ -19,11 +19,11 @@ class BaseModel(models.Model):
     """
 
     # the library does produce unique hash, but just in case
-    idx = ShortUUIDField(unique=True)
+    id = ShortUUIDField(unique=True)
     created_on = models.DateTimeField(default=timezone.now)
     modified_on = models.DateTimeField(auto_now=True)
-    obsolete_on = models.DateTimeField(null=True)
-    is_obsolete = models.BooleanField(default=False)
+    # obsolete_on = models.DateTimeField(null=True)
+    # is_obsolete = models.BooleanField(default=False)
 
     objects = BaseModelManager()
 
@@ -36,7 +36,7 @@ class BaseModel(models.Model):
     # all the common queryset filters goes here
     @classmethod
     def queryset(cls, **kwargs):
-        return cls.objects.filter(is_obsolete=False, **kwargs)
+        return cls.objects.filter(**kwargs)
 
     @classmethod
     def force_filter(cls, **kwargs):
@@ -48,18 +48,10 @@ class BaseModel(models.Model):
 
     @classmethod
     def flush(cls, force_delete=False, **kwargs):
-        if force_delete:
-            return cls.objects.filter(**kwargs).delete()
-        else:
-            return cls.objects.filter(**kwargs).update(is_obsolete=True, obsolete_on=timezone.now())
+        return cls.objects.filter(**kwargs).delete()
 
     def delete(self, force_delete=False, **kwargs):
-        if force_delete:
-            super(BaseModel, self).delete(**kwargs)
-        else:
-            self.update(is_obsolete=True, obsolete_on=timezone.now())
-            return self
+        super(BaseModel, self).delete(**kwargs)
 
     class Meta:
         abstract = True
-        # ordering = ('-created_on',)

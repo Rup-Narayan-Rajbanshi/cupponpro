@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class FAPIMixin:
-    lookup_field = "idx"
+    lookup_field = "id"
     permission_classes = [IsAuthenticated]
 
     def perform_destroy(self, instance):
