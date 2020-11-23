@@ -549,3 +549,7 @@ class LowertoUpperChoiceField(serializers.ChoiceField):
     def to_internal_value(self, data):
         data = data.upper() if data else data
         return super(LowertoUpperCharField, self).to_internal_value(data)
+
+    def to_representation(self, value):
+        value = value.lower() if value else value
+        return value

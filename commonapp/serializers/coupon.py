@@ -3,10 +3,14 @@ from django.contrib.sites.models import Site
 from rest_framework import serializers
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.image import Image
+from helpers.serializer_fields import LowertoUpperChoiceField
+from helpers.constants import COUPON_TYPE_MAPPER, DISCOUNT_TYPE
+from helpers.choices_variable import DISCOUNT_CHOICES
 
 
 class CouponSerializer(serializers.ModelSerializer):
-    
+    discount_type = LowertoUpperChoiceField(DISCOUNT_CHOICES)
+
     class Meta:
         model = Coupon
         fields = "__all__"
@@ -20,6 +24,7 @@ class CouponDetailSerializer(serializers.ModelSerializer):
     expiry_date = serializers.DateField(read_only=True)
     content_type = serializers.SerializerMethodField()
     content_object = serializers.SerializerMethodField()
+    discount_type = LowertoUpperChoiceField(DISCOUNT_CHOICES)
 
     class Meta:
         model = Coupon
@@ -27,7 +32,9 @@ class CouponDetailSerializer(serializers.ModelSerializer):
 
     def get_content_type(self, obj):
         content_type = obj.content_type.name
-        return content_type
+        if content_type in COUPON_TYPE_MAPPER:
+            return content_type
+        return 'all'
 
     def get_content_object(self, obj):
         content_object = None
