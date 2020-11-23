@@ -1,40 +1,44 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.exceptions import ValidationError
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.image import Image
-from helpers.serializer_fields import LowertoUpperChoiceField
-from helpers.constants import COUPON_TYPE_MAPPER, DISCOUNT_TYPE
+from helpers.serializer_fields import LowertoUpperChoiceField, CouponContentTypeField
+from helpers.constants import DISCOUNT_TYPE
 from helpers.choices_variable import DISCOUNT_CHOICES
 
 
 class CouponSerializer(serializers.ModelSerializer):
     discount_type = LowertoUpperChoiceField(DISCOUNT_CHOICES)
+    content_type = CouponContentTypeField(model=ContentType, lookup='model', representation='to_representation')
 
     class Meta:
         model = Coupon
         fields = "__all__"
 
+    def validate(self, attrs):
+        content_type = attrs.get('content_type')
+        object_id = attrs.get('object_id')
+        content_class = content_type.model_class()
+        try:
+            object = content_class.objects.get(id=object_id)
+        except ObjectDoesNotExist:
+            raise ValidationError({'object_id': 'Object does not exist.'})
+        return attrs
 
-class CouponDetailSerializer(serializers.ModelSerializer):
+class CouponDetailSerializer(CouponSerializer):
     images = serializers.SerializerMethodField()
     coupon_relation = serializers.SerializerMethodField()
     is_redeemed = serializers.SerializerMethodField()
     vendor = serializers.SerializerMethodField()
     expiry_date = serializers.DateField(read_only=True)
-    content_type = serializers.SerializerMethodField()
     content_object = serializers.SerializerMethodField()
-    discount_type = LowertoUpperChoiceField(DISCOUNT_CHOICES)
 
     class Meta:
         model = Coupon
         fields = ('id', 'name', 'images', 'is_redeemed', 'description', 'discount_type', 'discount', 'coupon_relation', 'vendor', 'expiry_date', 'content_type', 'content_object')
-
-    def get_content_type(self, obj):
-        content_type = obj.content_type.name
-        if content_type in COUPON_TYPE_MAPPER:
-            return content_type
-        return 'all'
 
     def get_content_object(self, obj):
         content_object = None

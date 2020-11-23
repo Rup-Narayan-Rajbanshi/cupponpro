@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from helpers.paginations import FPagination
 from rest_framework.permissions import AllowAny
 from helpers.api_mixins import FAPIMixin
-from helpers.constants import COUPON_TYPE_MAPPER
+from helpers.constants import COUPON_TYPE_DISPLAY_MAPPER
 
 
 '''
@@ -16,7 +16,7 @@ class CouponTypeListView(generics.GenericAPIView):
 
     def get(self, request):
         coupon_type = list()
-        for key, value in COUPON_TYPE_MAPPER.items():
+        for key, value in COUPON_TYPE_DISPLAY_MAPPER.items():
             coupon_type.append({'key': key, 'name': value})
         data = {
             'success': 1,

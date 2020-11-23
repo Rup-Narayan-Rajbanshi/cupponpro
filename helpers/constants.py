@@ -30,8 +30,14 @@ DISCOUNT_TYPE = {
 
 OTP_HEADER_FOR_NEW_PASSWORD = "HTTP_NEW_PASSWORD_TOKEN"
 
-COUPON_TYPE_MAPPER = {
+COUPON_TYPE_DISPLAY_MAPPER = {
     'all': 'On all items',
     'product': 'On specific item',
     'category': 'On item type'
+}
+
+COUPON_TYPE_MAPPER = {
+    'product': 'product',
+    'category': 'category',
+    'all': 'productcategory'
 }

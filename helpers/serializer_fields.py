@@ -237,9 +237,9 @@ class DetailRelatedField(serializers.RelatedField):
         if not kwargs.get("read_only"):
             kwargs["queryset"] = model.objects.all()
 
-        self.lookup = kwargs.pop("lookup", None) or "idx"
+        self.lookup = kwargs.pop("lookup", None) or "id"
         self.specify_object = kwargs.pop("specify_object", False)
-        self.is_obsolete = kwargs.pop("is_obsolete", None)
+        # self.is_obsolete = kwargs.pop("is_obsolete", None)
         try:
             self.representation = kwargs.pop("representation")
         except KeyError:
@@ -548,8 +548,31 @@ class LowertoUpperChoiceField(serializers.ChoiceField):
 
     def to_internal_value(self, data):
         data = data.upper() if data else data
-        return super(LowertoUpperCharField, self).to_internal_value(data)
+        return super(LowertoUpperChoiceField, self).to_internal_value(data)
 
     def to_representation(self, value):
         value = value.lower() if value else value
         return value
+
+
+class CouponContentTypeField(DetailRelatedField):
+
+    def to_internal_value(self, data):
+        try:
+            from .constants import COUPON_TYPE_MAPPER
+            if isinstance(type(data), self._kwargs.get('model')):
+                return data
+            data = COUPON_TYPE_MAPPER.get(data, 'all')
+            return self.queryset.get(**{self.lookup: data})
+        except ObjectDoesNotExist:
+            _error_msg = "Object does not exist."
+            if self.specify_object:
+                _error_msg = "Object \"{}\" does not exist.".format(data)
+            raise serializers.ValidationError(_error_msg)
+
+    def to_representation(self, obj):
+        from .constants import COUPON_TYPE_MAPPER
+        content_type = obj.name
+        if content_type in COUPON_TYPE_MAPPER:
+            return content_type
+        return 'all'
