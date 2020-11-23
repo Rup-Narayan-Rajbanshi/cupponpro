@@ -23,7 +23,7 @@ class Bill(models.Model):
     payment_mode = models.CharField(max_length=10, choices=PAYMENT, default=Cash)
     service_charge = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    paid_amount = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     invoice_number = models.CharField(max_length=8, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
