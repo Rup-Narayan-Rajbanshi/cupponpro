@@ -22,7 +22,7 @@ class BillListView(generics.GenericAPIView):
         """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        bill_obj = Bill.objects.all()
+        bill_obj = Bill.objects.filter(company=company_id)
         paginator = Paginator(bill_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = BillSerializer(page_obj, many=True,\
@@ -43,7 +43,7 @@ class BillListView(generics.GenericAPIView):
             'data': serializer.data
         }
         return Response(data, status=200)
-    
+
     def post(self,request, company_id):
         """
         An endpoint for creating bill.
@@ -166,7 +166,7 @@ class BillUserDetailView(generics.GenericAPIView):
         else:
             data = {
                 'success': 0,
-                'message': "Enter either phone number or email." 
+                'message': "Enter either phone number or email."
             }
             return Response(data, status=400)
 
