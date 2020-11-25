@@ -9,6 +9,7 @@ services:
         entrypoint: ./scripts/run_web.sh
         depends_on:
         - db
+        - rabbitmq
         volumes:
         - "media_volume:/app/media/"
         restart: unless-stopped
@@ -25,6 +26,27 @@ services:
         restart: unless-stopped
         networks:
         - cuppon-pro-net
+
+    rabbitmq:
+        env_file: "env/${ENV}.env"
+        image: bitnami/rabbitmq:3.8.9
+        restart: unless-stopped
+        networks:
+        - cuppon-pro-net
+
+    celery:
+        env_file: "env/${ENV}.env"
+        image: cuppon-pro
+        entrypoint: ./scripts/run_celery.sh
+        volumes:
+        - "media_volume:/app/media/"
+        depends_on:
+        - db
+        - rabbitmq
+        - cuppon-pro
+        networks:
+        - cuppon-pro-net
+        restart: unless-stopped
 
 networks:
     cuppon-pro-net:

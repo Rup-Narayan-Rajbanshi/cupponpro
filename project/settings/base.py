@@ -22,7 +22,7 @@ EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_BACKEprojectND = config('EMAIL_BACKEND')
 
 # Application definition
 
@@ -176,3 +176,10 @@ MEDIA_ROOT = os.path.join((BASE_DIR), "media")
 
 PROXY_URL = config('PROXY_URL', '')
 FE_URL = config('FE_URL', '')
+
+## celery
+RABBIT_HOST = 'rabbit'
+CELERY_BROKER_URL = 'amqp://{}:{}@{}//'.format(config("BROKER_USERNAME", ''), config("BROKER_PASSWORD", ''), config('RABBIT_HOST', ''))
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
