@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password
 
 class BaseModelManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_obsolete=False)
+        return super().get_queryset()
 
     def force_filter(self, **kwargs):
         return super().get_queryset().filter(**kwargs)
