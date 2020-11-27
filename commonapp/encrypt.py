@@ -1,4 +1,4 @@
-alphabet = "abcdefghijklmnopqrstuvwxyz-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+alphabet = "abcdefghijklmnopqrstuvwxyz-0123456789.ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 letter_to_index = dict(zip(alphabet, range(len(alphabet))))
 index_to_letter = dict(zip(range(len(alphabet)), alphabet))
@@ -8,7 +8,6 @@ def encrypt(message, key):
     split_message = [
         message[i : i + len(key)] for i in range(0, len(message), len(key))
     ]
-
     for each_split in split_message:
         i = 0
         for letter in each_split:

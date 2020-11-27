@@ -44,6 +44,18 @@ class Coupon(models.Model):
     def __str__(self):
         return self.description
 
+    def to_representation(self, request=None):
+        if self:
+            return {
+                'id': self.id,
+                'name': self.name,
+                'description': self.description,
+                'expiry_date': self.expiry_date,
+                'discount_type': self.discount_type,
+                'discount': self.discount
+            }
+        return None
+
     def save(self, *args, **kwargs):
         ''' on save, update token '''
         if not self.token:
@@ -85,5 +97,6 @@ class Voucher(models.Model):
             discount = discount[-2:]
             key = self.coupon.company.key
             voucher_token = coupon_type[coupon_content_type] + coupon_type_token + discount + uuid4
-            self.token = encrypt(voucher_token, key)
+            encrypted_value = encrypt(voucher_token, key)
+            self.token = encrypted_value
         super(Voucher, self).save(*args, **kwargs)

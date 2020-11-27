@@ -239,22 +239,23 @@ class VoucherListView(generics.GenericAPIView):
         An endpoint for creating user's voucher.
         """
         if str(request.user.id) == str(request.data.get('user', None)):
+            serializer = VoucherSerializer(data=request.data, context={'request':request})
+            if not serializer.is_valid():
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+
             voucher_obj = Voucher.objects.filter(user=request.user.id, coupon=request.data['coupon'])
             if not voucher_obj:
-                serializer = VoucherSerializer(data=request.data, context={'request':request}, partial=True)
-                if serializer.is_valid():
-                    serializer.save()
-                    data = {
-                        'success': 1,
-                        'data': serializer.data
-                    }
-                    return Response(data, status=200)
-                else:
-                    data = {
-                        'success': 0,
-                        'message': serializer.errors
-                    }
-                    return Response(data, status=400)
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'data': serializer.data
+                }
+                return Response(data, status=200)
+
             else:
                 data = {
                     'success': 0,

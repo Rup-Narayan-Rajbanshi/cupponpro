@@ -3,8 +3,10 @@ from django.contrib.sites.models import Site
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError
+from helpers.serializer_fields import DetailRelatedField
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.image import Image
+from userapp.models import User
 from helpers.serializer_fields import LowertoUpperChoiceField, CouponContentTypeField
 from helpers.constants import DISCOUNT_TYPE
 from helpers.choices_variable import DISCOUNT_CHOICES
@@ -118,9 +120,10 @@ class CouponDetailSerializer(CouponSerializer):
             'profile_image': None
         }
         if obj.company and obj.company.author:
+            from helpers.app_helpers import url_builder
             owner_id = obj.company.author.id
             owner_name = obj.company.author.full_name
-            profile_image = current_site.domain + obj.company.author.image.url
+            profile_image = url_builder(obj.company.author.image, self.context.get('request'))
             data = {
                 'owner_id': owner_id,
                 'owner_name': owner_name,
@@ -130,11 +133,13 @@ class CouponDetailSerializer(CouponSerializer):
         return company
 
 class VoucherSerializer(serializers.ModelSerializer):
+    coupon = DetailRelatedField(model=Coupon, lookup='id', representation='to_representation')
+    user = DetailRelatedField(model=User, lookup='id', representation='to_representation')
     description = serializers.SerializerMethodField()
 
     class Meta:
         model = Voucher
-        fields = ('id', 'is_redeem', 'used_date', 'description')
+        fields = ('id', 'is_redeem', 'used_date', 'description', 'coupon', 'user')
 
     def get_description(self, obj):
         return obj.coupon.description
