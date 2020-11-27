@@ -2,6 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth.models import Group
 from commonapp.models.company import CompanyUser
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
+from helpers.serializer_fields import ImageFieldWithURL
+
 
 class UserGroupSerializer(serializers.ModelSerializer):
     new_group = serializers.IntegerField(default=None)
@@ -16,6 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
     middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
     group = serializers.SerializerMethodField()
     company = serializers.SerializerMethodField()
+    image = ImageFieldWithURL(allow_empty_file=True)
 
     class Meta:
         model = User
@@ -42,6 +45,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
     group = serializers.SerializerMethodField()
     company = serializers.SerializerMethodField()
+    image = ImageFieldWithURL(allow_empty_file=True)
 
     class Meta:
         model = User
@@ -161,6 +165,8 @@ class ChangeUserProfilePictureSerializer(serializers.ModelSerializer):
     """
     Serializer for user's profile picture change endpoint.
     """
+    image = ImageFieldWithURL(allow_empty_file=True)
+
     class Meta:
         model = User
         fields = ('image',)

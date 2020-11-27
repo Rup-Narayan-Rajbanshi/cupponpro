@@ -494,8 +494,8 @@ class Base64ImageField(serializers.ImageField):
 class ImageFieldWithURL(serializers.ImageField):
 
     def to_internal_value(self, data):
-        import os
-        from project.settings import MEDIA_ROOT
+        # import os
+        # from project.settings import MEDIA_ROOT
 
         request = request_context(self)
         if isinstance(data, str):
@@ -510,8 +510,8 @@ class ImageFieldWithURL(serializers.ImageField):
 class FileFieldWithURL(serializers.FileField):
 
     def to_internal_value(self, data):
-        import os
-        from project.settings import MEDIA_ROOT
+        # import os
+        # from project.settings import MEDIA_ROOT
 
         request = request_context(self)
         if isinstance(data, str):

@@ -1,7 +1,11 @@
 from rest_framework import serializers
+from helpers.serializer_fields import ImageFieldWithURL
 from articleapp.models.news import NewsArticle
 
+
 class NewsArticleSerializer(serializers.ModelSerializer):
+    image = ImageFieldWithURL(allow_empty_file=False)
+
     class Meta:
         model = NewsArticle
         fields = '__all__'

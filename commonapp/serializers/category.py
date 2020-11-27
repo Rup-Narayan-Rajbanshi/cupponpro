@@ -1,8 +1,10 @@
 from rest_framework import serializers
-
 from commonapp.models.category import Category, SubCategory
+from helpers.serializer_fields import ImageFieldWithURL
+
 
 class CategorySerializer(serializers.ModelSerializer):
+    image = ImageFieldWithURL(allow_empty_file=True)
 
     class Meta:
         model = Category

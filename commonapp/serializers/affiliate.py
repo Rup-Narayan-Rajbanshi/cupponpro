@@ -1,9 +1,12 @@
 from django.contrib.sites.models import Site
 from rest_framework import serializers
 from commonapp.models.affiliate import AffiliateLink
+from helpers.serializer_fields import ImageFieldWithURL
+
 
 class AffiliateLinkSerializer(serializers.ModelSerializer):
     vendor = serializers.SerializerMethodField()
+    image = ImageFieldWithURL(allow_empty_file=True)
 
     class Meta:
         model = AffiliateLink
@@ -24,6 +27,7 @@ class AffiliateLinkSerializer(serializers.ModelSerializer):
 
 class AffiliateLinkDetailSerializer(serializers.ModelSerializer):
     vendor = serializers.SerializerMethodField()
+    image = ImageFieldWithURL(allow_empty_file=True)
 
     class Meta:
         model = AffiliateLink
@@ -41,7 +45,7 @@ class AffiliateLinkDetailSerializer(serializers.ModelSerializer):
             'logo': logo
         }
         return data
-        
+
     def exclude_fields(self, fields_to_exclude=None):
         if isinstance(fields_to_exclude, list):
             for f in fields_to_exclude:

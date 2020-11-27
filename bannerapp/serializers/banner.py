@@ -1,8 +1,10 @@
 from bannerapp.models.banner import Banner
 from rest_framework import serializers
+from helpers.serializer_fields import ImageFieldWithURL
 
 
 class BannerSerializer(serializers.ModelSerializer):
+    image = ImageFieldWithURL(allow_empty_file=False)
 
     class Meta:
         model = Banner

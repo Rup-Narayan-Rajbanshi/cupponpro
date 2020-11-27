@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from helpers.serializer_fields import DetailRelatedField
+from helpers.serializer_fields import ImageFieldWithURL
 from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Company, FavouriteCompany
 from commonapp.models.links import SocialLink
@@ -9,7 +10,8 @@ from commonapp.serializers.links import SocialLinkSerializer
 from userapp.models.user import User
 
 class CompanySerializer(serializers.ModelSerializer):
-
+    logo = ImageFieldWithURL(allow_empty_file=True)
+    logo_icon = ImageFieldWithURL(allow_empty_file=True)
     images = ImageDetailSerializer(many=True, read_only=True)
     rating = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
@@ -45,6 +47,7 @@ class CompanySerializer(serializers.ModelSerializer):
         if isinstance(fields_to_exclude, list):
             for f in fields_to_exclude:
                 f in self.fields.fields and self.fields.fields.pop(f) or next()
+
 
 class ChangeCompanyEmailSerializer(serializers.Serializer):
     """

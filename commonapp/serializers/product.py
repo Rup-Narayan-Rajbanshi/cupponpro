@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from helpers.serializer_fields import ImageFieldWithURL
 from commonapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.serializers.image import ImageDetailSerializer
 from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES
@@ -11,7 +12,8 @@ class BulkQuantitySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ProductCategorySerializer(serializers.ModelSerializer):
-
+    image = ImageFieldWithURL(allow_empty_file=False)
+    
     class Meta:
         model = ProductCategory
         fields = "__all__"
