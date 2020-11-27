@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from helpers.serializer_fields import ImageFieldWithURL
 from commonapp.models.company import Company
 from commonapp.models.product import Product, ProductCategory
 from commonapp.models.order import Order
+from commonapp.models.asset import Asset
 from commonapp.serializers.order import OrderSerializer
 from commonapp.serializers.image import ImageDetailSerializer
 
@@ -11,18 +13,33 @@ class MenuProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name', 'product_code', 'price', 'images')
-    
+
     def get_price(self, obj):
         return obj.total_price
 
 class MenuSerializer(serializers.ModelSerializer):
     menu = serializers.SerializerMethodField()
+    asset = serializers.SerializerMethodField()
     images = ImageDetailSerializer(many=True, read_only=True)
     order = serializers.SerializerMethodField()
+    logo = ImageFieldWithURL(allow_empty_file=True)
+    logo_icon = ImageFieldWithURL(allow_empty_file=True)
 
     class Meta:
         model = Company
-        fields = ('id', 'name', 'service_charge', 'tax', 'currency', 'logo', 'images', 'menu', 'order')
+        fields = ('id', 'name', 'service_charge', 'tax', 'currency', 'logo', 'logo_icon', 'asset', 'images', 'menu', 'order')
+
+    def get_asset(self, obj):
+        request = self.context.get('request', None)
+        asset = None
+        if request:
+            asset_id = request.GET.get('asset')
+            try:
+                asset = Asset.objects.get(id=asset_id)
+                asset = asset.to_representation()
+            except Exception as e:
+                pass
+        return asset
 
     def get_menu(self, obj):
         data = list()

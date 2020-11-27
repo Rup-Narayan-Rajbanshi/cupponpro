@@ -23,3 +23,12 @@ class Asset(models.Model):
 
     def __str__(self):
         return self.name + " of " + str(self.company.name)
+
+    def to_representation(self, request=None):
+        if self:
+            return {
+                'id': self.id,
+                'name': self.name,
+                'asset_type': self.asset_type
+            }
+        return None
