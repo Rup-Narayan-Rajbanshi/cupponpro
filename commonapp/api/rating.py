@@ -14,7 +14,7 @@ class CompanyRatingListView(generics.GenericAPIView):
         An endpoint for listing all the vendor's ratings. Pass 'page' and 'size' as query for requesting particular page and
         number of items per page respectively.
         """
-        rating_obj = Rating.objects.filter(company=company_id).order_by('-id')
+        rating_obj = Rating.objects.select_related('company').filter(company=company_id).order_by('-id')
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         paginator = Paginator(rating_obj, page_size)
@@ -42,7 +42,7 @@ class CompanyRatingListView(generics.GenericAPIView):
         """
         An endpoint for creating vendor's rating.
         """
-        serializer = RatingSerializer(data=request.data, context={'request':request})
+        serializer = RatingSerializer(data=request.data, context={'request':request, 'company_id': company_id})
         if serializer.is_valid():
             serializer.save()
             data = {
