@@ -470,7 +470,7 @@ class CompanyCouponListView(generics.GenericAPIView):
 
 class LocalRestaurantListView(generics.GenericAPIView):
     permission_classes = (AllowAny, )
-    serializer_class = CompanySerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request):
         """
@@ -496,27 +496,13 @@ class LocalRestaurantListView(generics.GenericAPIView):
             longitude_m = longitude - threshold_longitude
             category_Q = Q(category__name=category)
             distance_Q = (Q(latitude__range=[latitude_m,latitude_p]) & Q(longitude__range=[longitude_m,longitude_p]))
-            company_obj = Company.objects.filter(category_Q & distance_Q).annotate(
-                                rating = Coalesce(
-                                    Avg(
-                                        F("company_rating__rate"),
-                                        output_field=FloatField(),
-                                    ),
-                                    Value(0),
-                                ),
-                                rating_count = Coalesce(
-                                    Count(
-                                        F("company_rating"),
-                                        output_field=IntegerField(),
-                                    ),
-                                    Value(0),
-                                )
-                            ).order_by('-id')
+            company_obj = Company.objects.filter(category_Q & distance_Q).order_by('-id').values_list('id', flat=True)
+            coupons = Coupon.objects.select_related('company').filter(company__in=company_obj)
             page_size = request.GET.get('size', 10)
             page_number = request.GET.get('page')
-            paginator = Paginator(company_obj, page_size)
+            paginator = Paginator(coupons, page_size)
             page_obj = paginator.get_page(page_number)
-            serializer = CompanySerializer(page_obj, many=True,\
+            serializer = self.get_serializer(page_obj, many=True,\
                 context={"request":request})
             if page_obj.has_previous():
                 previous_page = page_obj.previous_page_number()

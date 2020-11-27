@@ -80,35 +80,54 @@ class CouponDetailSerializer(CouponSerializer):
                 return True
         return False
 
+    # def get_vendor(self, obj):
+    #     current_site = Site.objects.get_current()
+    #     try:
+    #         logo = current_site.domain + obj.company.logo.url
+    #     except:
+    #         logo = None
+    #     if obj.company:
+    #         company_id = obj.company.id
+    #         company_name = obj.company.name
+    #     else:
+    #         company_id = None
+    #         company_name = None
+    #     if obj.company and obj.company.author:
+    #         owner_id = obj.company.author.id
+    #         owner_name = obj.company.author.full_name
+    #         profile_image = current_site.domain + obj.company.author.image.url
+    #     else:
+    #         owner_id = None
+    #         owner_name = None
+    #         profile_image = None
+    #     data = {
+    #         'id': company_id,
+    #         'name': company_name,
+    #         'logo': logo,
+    #         'owner_id': owner_id,
+    #         'owner_name': owner_name,
+    #         'profile_image': profile_image
+    #     }
+    #     return data
+
     def get_vendor(self, obj):
-        current_site = Site.objects.get_current()
-        try:
-            logo = current_site.domain + obj.company.logo.url
-        except:
-            logo = None
-        if obj.company:
-            company_id = obj.company.id
-            company_name = obj.company.name
-        else:
-            company_id = None
-            company_name = None
+        company = obj.company.to_representation() if obj.company else dict()
+        data = {
+            'owner_id': None,
+            'owner_name': None,
+            'profile_image': None
+        }
         if obj.company and obj.company.author:
             owner_id = obj.company.author.id
             owner_name = obj.company.author.full_name
             profile_image = current_site.domain + obj.company.author.image.url
-        else:
-            owner_id = None
-            owner_name = None
-            profile_image = None
-        data = {
-            'id': company_id,
-            'name': company_name,
-            'logo': logo,
-            'owner_id': owner_id,
-            'owner_name': owner_name,
-            'profile_image': profile_image
-        }
-        return data
+            data = {
+                'owner_id': owner_id,
+                'owner_name': owner_name,
+                'profile_image': profile_image
+            }
+        company = {**company, **data}
+        return company
 
 class VoucherSerializer(serializers.ModelSerializer):
     description = serializers.SerializerMethodField()
