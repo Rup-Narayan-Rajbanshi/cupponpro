@@ -45,7 +45,7 @@ class OrderListView(generics.GenericAPIView):
             'data': serializer.data
         }
         return Response(data, status=200)
-    
+
     def post(self,request, company_id):
         """
         An endpoint for creating order.
@@ -147,7 +147,7 @@ class OrderDetailView(generics.GenericAPIView):
 
 class ActiveOrderListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll]
-    # serializer_class = 
+    # serializer_class =
 
     def get(self, request, company_id):
         """
@@ -180,7 +180,7 @@ class OrderUserDetailView(generics.GenericAPIView):
         else:
             data = {
                 'success': 0,
-                'message': "Enter either phone number or email." 
+                'message': "Enter either phone number or email."
             }
             return Response(data, status=400)
 
@@ -240,6 +240,12 @@ class OrderLineVerifyView(generics.GenericAPIView):
         company_obj = Company.objects.filter(id=request.data['company'])
         result = {
             'tax': company_obj[0].tax,
+            'user': request.data.get('user'),
+            'name': request.data.get('name'),
+            'phone_number': request.data.get('phone_number'),
+            'email': request.data.get('email'),
+            'company': request.data.get('company'),
+            'asset': request.data.get('asset'),
             'taxed_amount': 0,
             'service_charge': company_obj[0].service_charge,
             'service_charge_amount': 0,
@@ -280,10 +286,10 @@ class OrderLineVerifyView(generics.GenericAPIView):
             result['total'] = total
             result['grand_total'] = total
             if result['tax']:
-                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])  
+                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])
             if result['service_charge']:
                 result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
-            result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']      
+            result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']
             result['order_lines'] = order_lines
             data = {
                 'success': 1,
@@ -297,7 +303,7 @@ class OrderLineVerifyView(generics.GenericAPIView):
                 total += item['total']
             result['total'] = total
             if result['tax']:
-                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])  
+                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])
             if result['service_charge']:
                 result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
             result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']
