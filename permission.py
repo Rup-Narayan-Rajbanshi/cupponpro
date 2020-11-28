@@ -1,4 +1,6 @@
 from rest_framework import permissions
+from commonapp.models.company import CompanyUser
+
 
 class isAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self,request,view):
@@ -43,3 +45,12 @@ class publicReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method=='GET':
             return True
+
+
+class CompanyUserPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            company_user = CompanyUser.objects.filter(user=request.user).exists()
+            if company_user:
+                return True
+        return False

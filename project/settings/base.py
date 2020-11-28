@@ -54,6 +54,7 @@ DEV_APPS = [
     'userapp',
     'company',
     'productapp',
+    'orderapp',
 ]
 
 

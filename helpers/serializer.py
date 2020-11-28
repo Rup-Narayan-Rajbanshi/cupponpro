@@ -8,7 +8,7 @@ from helpers.serializer_mixins import CustomValidationMessageForSerializerMixin
 
 class CustomModelSerializer(CustomValidationMessageForSerializerMixin, serializers.ModelSerializer):
     serializer_related_field = FRelatedField
-    idx = serializers.CharField(read_only=True)
+    id = serializers.CharField(read_only=True)
 
     class Meta:
         fields = "__all__"

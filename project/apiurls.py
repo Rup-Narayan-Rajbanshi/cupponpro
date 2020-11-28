@@ -7,5 +7,6 @@ urlpatterns = [
     path('', include('commonapp.apiurls')),
     path('', include('userapp.apiurls')),
     path('company/', include('company.urls')),
-    path('product/', include('productapp.urls'))
+    path('product/', include('productapp.urls')),
+    path('order/', include('orderapp.urls'))
 ]

@@ -1,12 +1,14 @@
 import uuid
 from django.core.validators import RegexValidator
-from django.db import models
+from django.db import models, transaction
 from commonapp.models.asset import Asset
 from commonapp.models.bill import Bill
 from commonapp.models.company import Company
 from commonapp.models.coupon import Voucher
 from commonapp.models.product import Product
 from userapp.models.user import User
+from helpers.constants import MAX_LENGTHS, DEFAULTS
+from helpers.choices_variable import ORDER_STATUS_CHOICES
 
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
@@ -21,6 +23,7 @@ class Order(models.Model):
     voucher = models.ForeignKey(Voucher, on_delete=models.SET_NULL, null=True, blank=True)
     is_billed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=MAX_LENGTHS['ORDER_STATUS'], choices=ORDER_STATUS_CHOICES, default=DEFAULTS['ORDER_STATUS'])
 
     class Meta:
         db_table = 'order'
@@ -36,6 +39,15 @@ class Order(models.Model):
             self.email = self.user.email
             self.phone_number = self.user.phone_number
         return super(Order, self).save(*args, **kwargs)
+
+    @classmethod
+    @transaction.atomic
+    def execute_change_status(cls, order, v_data, request_user):
+        status = v_data.get('status')
+        order.status = status
+        order.save()
+        return order
+
 
 class OrderLine(models.Model):
     # order states

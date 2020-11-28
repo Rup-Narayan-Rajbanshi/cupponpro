@@ -25,17 +25,18 @@ class OrderSaveSerializer(serializers.ModelSerializer):
     taxed_amount = serializers.SerializerMethodField()
     service_charge = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
+    status = serializers.CharField(read_only=True)
 
     class Meta:
         model = Order
         fields = "__all__"
-    
+
     def create(self, validated_data):
         order_lines_data = validated_data.pop('order_lines')
         order_obj = Order.objects.create(**validated_data)
         for order_lines in order_lines_data:
             order_lines['order'] = order_obj
-            OrderLine.objects.create(**order_lines)  
+            OrderLine.objects.create(**order_lines)
         return order_obj
 
     def update(self, instance, validated_data):
@@ -94,6 +95,7 @@ class OrderSerializer(serializers.ModelSerializer):
     taxed_amount = serializers.SerializerMethodField()
     service_charge = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
+    status = serializers.CharField(read_only=True)
 
     class Meta:
         model = Order
