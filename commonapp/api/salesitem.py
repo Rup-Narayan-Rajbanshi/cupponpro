@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import permissions
+from helpers.constants import DISCOUNT_TYPE
 from commonapp.models.bill import Bill
 from commonapp.models.company import Company
 from commonapp.models.coupon import Voucher
@@ -51,6 +52,7 @@ class SalesItemVerifyView(generics.GenericAPIView):
                 applicable_products_ids = [applicable_products_ids]
             # get discount percentage from coupon
             discount_p = voucher_obj[0].coupon.discount
+            discount_type = voucher_obj[0].coupon.discount_type
             # loop in items and apply discount
             if applicable_products_ids:
                 total = 0
@@ -58,7 +60,10 @@ class SalesItemVerifyView(generics.GenericAPIView):
                     if item['product'] in applicable_products_ids:
                         item['discount'] = discount_p
                         item['voucher'] = str(voucher_obj[0].id)
-                        item['discount_amount'] = (discount_p / 100 * (item['rate'] * item['quantity']))
+                        if discount_type == DISCOUNT_TYPE['PERCENTAGE']:
+                            item['discount_amount'] = (discount_p / 100 * (item['rate'] * item['quantity']))
+                        else:
+                            item['discount_amount'] = discount_p
                         item['total'] = (item['rate'] * item['quantity']) - item['discount_amount']
                         result['discount_amount'] += item['discount_amount']
                     else:

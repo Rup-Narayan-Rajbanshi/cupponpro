@@ -12,6 +12,8 @@ from commonapp.serializers.order import OrderSerializer, OrderSaveSerializer,Ord
 from userapp.models.user import User
 from helper import isCompanyUser
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll, publicReadOnly
+from helpers.constants import DISCOUNT_TYPE
+
 
 class OrderListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll | AllowAny]
@@ -270,14 +272,20 @@ class OrderLineVerifyView(generics.GenericAPIView):
                 applicable_products_ids = [applicable_products_ids]
             # get discount percentage from coupon
             discount_p = voucher_obj[0].coupon.discount
+            discount_type = voucher_obj[0].coupon.discount_type
             # loop in items and apply discount
             if applicable_products_ids:
                 total = 0
                 for item in order_lines:
+                    if discount_type == DISCOUNT_TYPE['PERCENTAGE']:
+                        discount_amount = discount_p / 100 * (item['rate'] * item['quantity'])
                     if item['product'] in applicable_products_ids:
                         item['discount'] = discount_p
                         item['voucher'] = str(voucher_obj[0].id)
-                        item['discount_amount'] = discount_p / 100 * (item['rate'] * item['quantity'])
+                        if discount_type == DISCOUNT_TYPE['PERCENTAGE']:
+                            item['discount_amount'] = discount_p / 100 * (item['rate'] * item['quantity'])
+                        else:
+                            item['discount_amount'] = discount_p
                         item['total'] = (item['rate'] * item['quantity']) - item['discount_amount']
                         result['discount_amount'] += item['discount_amount']
                     else:
