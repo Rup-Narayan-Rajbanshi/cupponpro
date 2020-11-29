@@ -22,6 +22,10 @@ class SalesItemVerifyView(generics.GenericAPIView):
         items = request.data['sales_item']
         company_obj = Company.objects.filter(id=company_id)
         result = {
+            'user': request.data.get('user'),
+            'name': request.data.get('name'),
+            'phone_number': request.data.get('phone_number'),
+            'email': request.data.get('email'),
             'tax': company_obj[0].tax,
             'taxed_amount': 0,
             'service_charge': company_obj[0].service_charge,
@@ -62,10 +66,10 @@ class SalesItemVerifyView(generics.GenericAPIView):
                     total += item['total']
             result['total'] = total
             if result['tax']:
-                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])  
+                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])
             if result['service_charge']:
                 result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
-            result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']      
+            result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']
             result['sales_item'] = items
             data = {
                 'success': 1,
@@ -79,7 +83,7 @@ class SalesItemVerifyView(generics.GenericAPIView):
                 total += item['total']
             result['total'] = total
             if result['tax']:
-                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])  
+                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])
             if result['service_charge']:
                 result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
             result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']
