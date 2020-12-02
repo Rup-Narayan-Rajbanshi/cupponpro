@@ -270,29 +270,30 @@ def auto_send_login_token_email(sender, instance, **kwargs):
         return False
 
     try:
-        if not instance.is_used:
-            user = User.objects.get(id=instance.user.id)
-            token = LoginToken.objects.get(id=instance.pk).token
-            user_name = user.full_name
-            user_email = user.email
-            subject = 'Login Token'
-
-            text_template = get_template('email/loginTokenEmail.txt')
-            html_template = get_template('email/loginTokenEmail.html')
-            context = {
-                'subject': subject,
-                'user_name': user_name,
-                'user_email': user_email,
-                'token': token,
-                'domain_name': 'http://127.0.0.1:8000'
-            }
-            text_content = text_template.render(context)
-            html_content = html_template.render(context)
-            email_from = EMAIL_HOST_USER
-
-            mail = EmailMultiAlternatives(subject, text_content, email_from, [user_email])
-            mail.attach_alternative(html_content, "text/html")
-            mail.send()
+        return True
+        # if not instance.is_used:
+        #     user = User.objects.get(id=instance.user.id)
+        #     token = LoginToken.objects.get(id=instance.pk).token
+        #     user_name = user.full_name
+        #     user_email = user.email
+        #     subject = 'Login Token'
+        #
+        #     text_template = get_template('email/loginTokenEmail.txt')
+        #     html_template = get_template('email/loginTokenEmail.html')
+        #     context = {
+        #         'subject': subject,
+        #         'user_name': user_name,
+        #         'user_email': user_email,
+        #         'token': token,
+        #         'domain_name': 'http://127.0.0.1:8000'
+        #     }
+        #     text_content = text_template.render(context)
+        #     html_content = html_template.render(context)
+        #     email_from = EMAIL_HOST_USER
+        #
+        #     mail = EmailMultiAlternatives(subject, text_content, email_from, [user_email])
+        #     mail.attach_alternative(html_content, "text/html")
+        #     mail.send()
 
     except sender.DoesNotExist:
         return False
