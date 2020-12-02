@@ -184,3 +184,6 @@ CELERY_BROKER_URL = 'amqp://{}:{}@{}//'.format(config("BROKER_USERNAME", ''), co
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+## FCM API SECRET_KEY
+FCM_API_KEY = config("FCM_API_KEY", '<api-key>')
