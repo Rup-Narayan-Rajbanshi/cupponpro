@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-
+import uuid
 from shortuuidfield import ShortUUIDField
 from django.contrib.auth.hashers import make_password
 
@@ -19,7 +19,7 @@ class BaseModel(models.Model):
     """
 
     # the library does produce unique hash, but just in case
-    id = ShortUUIDField(unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     created_on = models.DateTimeField(default=timezone.now)
     modified_on = models.DateTimeField(auto_now=True)
     # obsolete_on = models.DateTimeField(null=True)

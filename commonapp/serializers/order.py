@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from commonapp.models.order import Order, OrderLine
+from notifications.constants import NOTIFICATION_CATEGORY
+from notifications.models import Notification, NotificationCategory
 
 class OrderLineSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=False, allow_null=True)
@@ -32,14 +34,28 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
+        from notifications.tasks import notify_company_staffs
         order_lines_data = validated_data.pop('order_lines')
         order_obj = Order.objects.create(**validated_data)
         for order_lines in order_lines_data:
             order_lines['order'] = order_obj
             OrderLine.objects.create(**order_lines)
+        ## sending notification to staffs  of associated company
+        company = order_obj.company.id
+        payload = {
+            'message': {
+                'en': 'New order is placed from {0} {1}'.format(order_obj.asset.asset_type, order_obj.asset.name)
+            }
+        }
+        notify_company_staffs.apply_async(kwargs={
+                            'company': company,
+                            'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
+                            'payload': payload
+                        })
         return order_obj
 
     def update(self, instance, validated_data):
+        from notifications.tasks import notify_company_staffs
         order_lines_data = validated_data.pop('order_lines')
         order_lines_obj = OrderLine.objects.filter(order=instance.id)
         order_lines_ids = [str(x.id) for x in order_lines_obj]
@@ -52,6 +68,18 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 OrderLine.objects.create(order=order_obj, **order_lines)
         OrderLine.objects.filter(id__in=order_lines_ids).delete()
         order_obj = Order.objects.filter(id=instance.id).update(**validated_data)
+        ## sending notification to staffs  of associated company
+        company = order_obj.company.id
+        payload = {
+            'message': {
+                'en': 'Order has been updated from {0} {1}'.format(order_obj.asset.asset_type, order_obj.asset.name)
+            }
+        }
+        notify_company_staffs.apply_async(kwargs={
+                            'company': company,
+                            'category': NOTIFICATION_CATEGORY['ORDER_UPDATED'],
+                            'payload': payload
+                        })
         return order_obj
 
     def get_asset_name(self, obj):
