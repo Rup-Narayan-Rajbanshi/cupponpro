@@ -64,15 +64,16 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 OrderLine.objects.filter(id=order_lines['id']).update(**order_lines)
                 order_lines_ids.remove(str(order_lines['id']))
             else:
-                order_obj = Order.objects.get(id=order_lines.pop('order'))
-                OrderLine.objects.create(order=order_obj, **order_lines)
+                # order_obj = Order.objects.get(id=order_lines.pop('order'))
+                order_lines.pop('order')
+                OrderLine.objects.create(order=instance, **order_lines)
         OrderLine.objects.filter(id__in=order_lines_ids).delete()
         order_obj = Order.objects.filter(id=instance.id).update(**validated_data)
         ## sending notification to staffs  of associated company
-        company = order_obj.company.id
+        company = instance.company.id
         payload = {
             'message': {
-                'en': 'Order has been updated from {0} {1}'.format(order_obj.asset.asset_type, order_obj.asset.name)
+                'en': 'Order has been updated from {0} {1}'.format(instance.asset.asset_type, instance.asset.name)
             }
         }
         notify_company_staffs.apply_async(kwargs={
