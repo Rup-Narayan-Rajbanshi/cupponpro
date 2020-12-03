@@ -44,13 +44,18 @@ def content_icon_name(instance, filename):
 def url_builder(obj, request):
     build_url = None
     try:
-        from project.settings import PROXY_URL
+        from project.settings import PROXY_URL, MEDIA_URL
         # if request is not None:
         #     url = request.build_absolute_uri(obj.url)
         # else:
         #     url = obj.url if obj else None
-        url = obj.url
+        url = None
+        if isinstance(obj, str):
+            len_media = len(MEDIA_URL)
+            url = obj if obj[:len_media] == MEDIA_URL else MEDIA_URL + obj
+        else:
+            url = obj.url
         build_url = PROXY_URL + url
-    except:
+    except Exception as e:
         build_url = None
     return build_url

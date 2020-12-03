@@ -29,6 +29,7 @@ class BulkQuantity(models.Model):
 class ProductCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=30, unique=True)
+    link = models.URLField(null=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_category/')
     token = models.CharField(max_length=8, editable=False)
@@ -46,8 +47,12 @@ class ProductCategory(models.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "image": image
+            "image": image,
+            "link": self.link
         }
+
+    def to_represent_minimal(self, request=None):
+        return self.to_representation(request=request)
 
     def save(self, *args, **kwargs):
         ''' On save, create token '''
@@ -103,6 +108,7 @@ class Product(models.Model):
     product_code = models.CharField(max_length=10)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=30)
+    link = models.URLField(null=True)
     product_category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT)
     brand_name = models.CharField(max_length=30, null=True, blank=True)
     purchase_price = models.PositiveIntegerField(default=0)
@@ -137,7 +143,8 @@ class Product(models.Model):
             "selling_currency": self.selling_currency,
             "purchase_price": self.purchase_price,
             "purchase_currency": self.purchase_currency,
-            "total_price": self.total_price
+            "total_price": self.total_price,
+            "link": self.link
         }
 
     def to_represent_minimal(self, request=None):
@@ -146,7 +153,8 @@ class Product(models.Model):
             "product_code": self.product_code,
             "name": self.name,
             "product_category": self.product_category.to_representation(),
-            "brand_name": self.brand_name
+            "brand_name": self.brand_name,
+            "link": self.link
         }
 
     def save(self, *args, **kwargs):
