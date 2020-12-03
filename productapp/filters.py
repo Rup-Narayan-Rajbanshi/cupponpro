@@ -51,3 +51,14 @@ class TrendingCouponFilter(CouponBaseFilter):
                                 content_type__model__in=content_type,
                                 company__affilated_companies__isnull=False
                             )
+
+
+class RecentCouponFilter(CouponBaseFilter):
+    @property
+    def qs(self):
+        parent = super(RecentCouponFilter, self).qs
+        content_type = ['product']
+        return parent.filter(expiry_date__gt=datetime.now().date(),
+                                content_type__model__in=content_type,
+                                company__affilated_companies__isnull=True
+                            )

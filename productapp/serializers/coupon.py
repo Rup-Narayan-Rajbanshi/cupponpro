@@ -52,8 +52,9 @@ class DealOfDaySerializer(CouponSerializer):
         fields= ('id', 'name', 'company', 'description', 'discount_type', 'discount', 'images', 'content_type', 'content_object')
 
 
-class TrendingCouponSerializer(CouponSerializer):
+class TrendingCouponSerializer(DealOfDaySerializer):
+    pass
 
-    class Meta(CustomModelSerializer.Meta):
-        model = Coupon
-        fields= ('id', 'name', 'company', 'description', 'discount_type', 'discount', 'images', 'content_type', 'content_object')
+
+class RecentCouponSerializer(DealOfDaySerializer):
+    pass

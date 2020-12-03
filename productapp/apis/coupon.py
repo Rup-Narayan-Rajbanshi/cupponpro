@@ -7,8 +7,8 @@ from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
 from helpers.constants import COUPON_TYPE_DISPLAY_MAPPER
 from commonapp.models.coupon import Coupon
-from productapp.serializers.coupon import DealOfDaySerializer, TrendingCouponSerializer
-from productapp.filters import DealOfDayFilter, TrendingCouponFilter
+from productapp.serializers.coupon import DealOfDaySerializer, TrendingCouponSerializer, RecentCouponSerializer
+from productapp.filters import DealOfDayFilter, TrendingCouponFilter, RecentCouponFilter
 
 
 '''
@@ -42,5 +42,14 @@ class TrendingCouponAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMi
     serializer_class = TrendingCouponSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = TrendingCouponFilter
+    pagination_class = FPagination
+    permission_classes = (AllowAny, )
+
+
+class RecentCouponAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+    queryset = Coupon.objects.select_related('company', 'content_type').all()
+    serializer_class = RecentCouponSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = RecentCouponFilter
     pagination_class = FPagination
     permission_classes = (AllowAny, )
