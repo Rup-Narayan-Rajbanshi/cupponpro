@@ -12,12 +12,12 @@ from userapp.models import User
 class NotificationSerializer(CustomModelSerializer):
     category = DetailRelatedField(
         NotificationCategory,
-        lookup='idx',
+        lookup='id',
         representation='to_representation'
     )
     user = DetailRelatedField(
         User,
-        lookup='idx',
+        lookup='id',
         representation='to_representation'
     )
 
@@ -28,7 +28,7 @@ class NotificationSerializer(CustomModelSerializer):
 class DeviceSerializer(CustomModelSerializer):
     user = DetailRelatedField(
         User,
-        lookup='idx',
+        lookup='id',
         representation='to_representation',
         read_only=True
     )

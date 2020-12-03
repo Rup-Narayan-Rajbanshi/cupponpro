@@ -140,6 +140,15 @@ class Product(models.Model):
             "total_price": self.total_price
         }
 
+    def to_represent_minimal(self, request=None):
+        return {
+            "id": self.id,
+            "product_code": self.product_code,
+            "name": self.name,
+            "product_category": self.product_category.to_representation(),
+            "brand_name": self.brand_name
+        }
+
     def save(self, *args, **kwargs):
         ''' On save, add token, and check for bulk quantity and update price of product '''
         if not self.token:

@@ -10,12 +10,13 @@ from notifications.apis.notification import (
 )
 
 router = routers.SimpleRouter()
-router.register(r"api/notification-user", NotificationAPI)
+router.register(r"notification-user", NotificationAPI)
 # router.register(r"api/devices", DeviceAdminAPI, base_name='devices')
 
 urlpatterns = router.urls
 urlpatterns += [
-    url(r"^api/user-device/$", register_device, name="user-device"),
-    url(r"^api/notification-seen/(?P<idx>\w+)/$", notification_seen, name="notification-seen"),
-    url(r"^api/notification-unread-count/$", notification_unread_count, name="notification-unread-count")
+    url(r"^user-device/$", register_device, name="user-device"),
+    url(r"^mark-seen/?(?P<notification_id>[0-9a-f-]+|)/$", notification_seen, name="mark-seen"),
+    # url(r"^mark-seen/<uuid:user_id>\w+/$", notification_seen, name="mark-seen"),
+    url(r"^unread-count/$", notification_unread_count, name="unread-count")
 ]

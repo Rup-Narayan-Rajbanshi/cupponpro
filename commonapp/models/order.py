@@ -10,6 +10,7 @@ from userapp.models.user import User
 from helpers.constants import MAX_LENGTHS, DEFAULTS
 from helpers.choices_variable import ORDER_STATUS_CHOICES
 
+
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     bill = models.ForeignKey(Bill, on_delete=models.SET_NULL, null=True, blank=True)

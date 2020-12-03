@@ -42,7 +42,7 @@ class NotificationCategory(BaseModel):
 
     def to_representation(self, request=None):
         return {
-            'idx': self.idx,
+            'id': self.id,
             'name': self.name
         }
 

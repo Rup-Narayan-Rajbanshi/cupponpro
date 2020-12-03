@@ -22,7 +22,7 @@ class DeviceAdminFilter(filters.FilterSet):
 
     class Meta:
         model = Device
-        fields = ['user__idx']
+        fields = ['user__id']
 
     @property
     def qs(self):

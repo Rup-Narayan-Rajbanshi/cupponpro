@@ -71,17 +71,22 @@ def register_device(request):
         raise APIException(detail=str(e), code=500)
 
 
-@api_view(["POST"])
+@api_view(["PUT"])
 @renderer_classes([JSONRenderer])
 @permission_classes((IsAuthenticated,))
-def notification_seen(request, idx):
+def notification_seen(request, notification_id=None):
+    notification = None
     try:
-        notification = Notification.objects.get(idx=idx, user=request.user)
+        if notification_id:
+            notification = Notification.objects.get(id=notification_id, user=request.user)
     except Exception as e:
         return Response({"detail": "Object does not exist."}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        notification.mark_seen()
-    return Response({"detail": "Successfully seen notification."}, status=status.HTTP_200_OK)
+        if notification:
+            notification.mark_seen()
+        else:
+            Notification.objects.filter(user=request.user).update(seen=True)
+    return Response({"detail": "Successfully marked as seen."}, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
