@@ -26,9 +26,10 @@ class OrderListView(generics.GenericAPIView):
         """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        status = request.GET.getlist('status')
+        status = request.GET.get('status')
         order_obj = Order.objects.filter(company=company_id)
-        if request.GET.get('status'):
+        if status:
+            status = status.split(',')
             order_obj = order_obj.filter(status__in=status)
         paginator = Paginator(order_obj, page_size)
         page_obj = paginator.get_page(page_number)
