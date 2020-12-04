@@ -59,14 +59,19 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         order_lines_data = validated_data.pop('order_lines')
         order_lines_obj = OrderLine.objects.filter(order=instance.id)
         order_lines_ids = [str(x.id) for x in order_lines_obj]
+        create_list = list()
         for order_lines in order_lines_data:
-            if order_lines.get('id') in order_lines_ids:
-                OrderLine.objects.filter(id=order_lines['id']).update(**order_lines)
+            order_line_id = str(order_lines.get('id'))
+            if order_line_id and order_line_id in order_lines_ids:
+                OrderLine.objects.filter(id=order_line_id).update(**order_lines)
                 order_lines_ids.remove(str(order_lines['id']))
             else:
                 # order_obj = Order.objects.get(id=order_lines.pop('order'))
+                # order_lines.pop('id')
                 order_lines.pop('order')
-                OrderLine.objects.create(order=instance, **order_lines)
+                create_list.append(OrderLine(order=instance, **order_lines))
+                # OrderLine.objects.create(order=instance, **order_lines)
+        OrderLine.objects.bulk_create(create_list)
         OrderLine.objects.filter(id__in=order_lines_ids).delete()
         order_obj = Order.objects.filter(id=instance.id).update(**validated_data)
         ## sending notification to staffs  of associated company
