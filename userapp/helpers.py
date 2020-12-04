@@ -8,7 +8,7 @@ def send_otp(text, phone_number):
     print("Body: {0}".format(body))
     response = requests.post(
             settings.OTP_SPARROW['POST_URL'],
-            params=body)
+            data=body)
     response_json = response.json()
     message = ''
     if response.status_code == 200:
