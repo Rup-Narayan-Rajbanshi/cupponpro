@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from commonapp.models.order import Order, OrderLine
 from notifications.constants import NOTIFICATION_CATEGORY
 from notifications.models import Notification, NotificationCategory
@@ -34,14 +35,20 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        from notifications.tasks import notify_company_staffs
-        order_lines_data = validated_data.pop('order_lines')
-        order_obj = Order.objects.create(**validated_data)
-        for order_lines in order_lines_data:
-            order_lines['order'] = order_obj
-            OrderLine.objects.create(**order_lines)
+        try:
+            from notifications.tasks import notify_company_staffs
+            order_lines_data = validated_data.pop('order_lines')
+            order_obj = Order.objects.create(**validated_data)
+            create_list = list()
+            for order_lines in order_lines_data:
+                order_lines['order'] = order_obj
+                # OrderLine.objects.create(**order_lines)
+                create_list.append(OrderLine(**order_lines))
+            OrderLine.objects.bulk_create(create_list)
+        except Exception as e:
+            raise ValidationError({'detail': str(e)})
         ## sending notification to staffs  of associated company
-        company = order_obj.company.id
+        company = str(order_obj.company.id)
         payload = {
             'message': {
                 'en': 'New order is placed from {0} {1}'.format(order_obj.asset.asset_type, order_obj.asset.name)
@@ -60,22 +67,26 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         order_lines_obj = OrderLine.objects.filter(order=instance.id)
         order_lines_ids = [str(x.id) for x in order_lines_obj]
         create_list = list()
-        for order_lines in order_lines_data:
-            order_line_id = str(order_lines.get('id'))
-            if order_line_id in order_lines_ids:
-                OrderLine.objects.filter(id=order_line_id).update(**order_lines)
-                order_lines_ids.remove(order_line_id)
-            else:
-                # order_obj = Order.objects.get(id=order_lines.pop('order'))
-                # order_lines.pop('id')
-                order_lines.pop('order')
-                create_list.append(OrderLine(order=instance, **order_lines))
-                # OrderLine.objects.create(order=instance, **order_lines)
-        OrderLine.objects.bulk_create(create_list)
-        OrderLine.objects.filter(id__in=order_lines_ids).delete()
-        order_obj = Order.objects.filter(id=instance.id).update(**validated_data)
+        try:
+            for order_lines in order_lines_data:
+                order_line_id = str(order_lines.get('id'))
+                if order_line_id in order_lines_ids:
+                    OrderLine.objects.filter(id=order_line_id).update(**order_lines)
+                    order_lines_ids.remove(order_line_id)
+                else:
+                    # order_obj = Order.objects.get(id=order_lines.pop('order'))
+                    # order_lines.pop('id')
+                    order_lines.pop('order')
+                    create_list.append(OrderLine(order=instance, **order_lines))
+                    # OrderLine.objects.create(order=instance, **order_lines)
+
+            OrderLine.objects.bulk_create(create_list)
+            OrderLine.objects.filter(id__in=order_lines_ids).delete()
+            order_obj = Order.objects.filter(id=instance.id).update(**validated_data)
+        except Exception as e:
+            raise ValidationError({'detail': str(e)})
         ## sending notification to staffs  of associated company
-        company = instance.company.id
+        company = str(instance.company.id)
         payload = {
             'message': {
                 'en': 'Order has been updated from {0} {1}'.format(instance.asset.asset_type, instance.asset.name)
