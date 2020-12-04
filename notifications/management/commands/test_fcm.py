@@ -7,7 +7,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         receivers = [
             {
-                'reg_id': 'asd',
+                'reg_id': 956551278923,
                 'title': "hello",
                 'payload': {
                     "message": {

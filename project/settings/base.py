@@ -188,3 +188,13 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 ## FCM API SECRET_KEY
 FCM_API_KEY = config("FCM_API_KEY", '<api-key>')
+#SPARROW CONFIG
+OTP_SPARROW = {
+    "POST_URL": "http://api.sparrowsms.com/v2/sms/",
+    "BODY": {
+        "token": config("SPARROW_TOKEN", ''),
+        "from": config('SPARROW_SENDER', 'Demo'),
+        "to": "",
+        "text": ""
+    }
+}

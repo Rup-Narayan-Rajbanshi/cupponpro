@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         notification_category = NotificationCategory.objects.all()[:3]
-        if notification_category.count() != 3:
+        if notification_category.count() != 4:
             call_command('loaddata', 'notification_category')
         else:
             print('NO NEED TO LOAD NOTIFICATION CATEGORY')
