@@ -4,3 +4,10 @@ NOTIFICATION_CATEGORY = {
     "ORDER_PAYMENT": '84d53355-15fc-45e4-99ac-66de301d1622',
     "ORDER_UPDATED": '6c10bf4e-9256-4d63-ae30-8ff18e399a3b'
 }
+
+NOTIFICATION_CATEGORY_NAME = {
+    "ORDER_PLACED": 'order_placed',
+    "ORDER_CHANGE_STATUS": 'order_status_change',
+    "ORDER_PAYMENT": 'order_payment',
+    "ORDER_UPDATED": 'order_updated'
+}

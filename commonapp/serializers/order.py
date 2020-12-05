@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from commonapp.models.order import Order, OrderLine
-from notifications.constants import NOTIFICATION_CATEGORY
+from notifications.constants import NOTIFICATION_CATEGORY, NOTIFICATION_CATEGORY_NAME
 from notifications.models import Notification, NotificationCategory
 
 class OrderLineSerializer(serializers.ModelSerializer):
@@ -50,6 +50,8 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         ## sending notification to staffs  of associated company
         company = str(order_obj.company.id)
         payload = {
+            'id': str(order_obj.id),
+            'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
             'message': {
                 'en': 'New order is placed from {0} {1}'.format(order_obj.asset.asset_type, order_obj.asset.name)
             }
@@ -88,6 +90,8 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         ## sending notification to staffs  of associated company
         company = str(instance.company.id)
         payload = {
+            'id': str(instance.id),
+            'category': NOTIFICATION_CATEGORY_NAME['ORDER_UPDATED'],
             'message': {
                 'en': 'Order has been updated from {0} {1}'.format(instance.asset.asset_type, instance.asset.name)
             }
