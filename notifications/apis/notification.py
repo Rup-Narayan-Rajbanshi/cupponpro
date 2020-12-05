@@ -68,7 +68,7 @@ def register_device(request):
             return Response(data=s.errors, status=400)
     except Exception as e:
         print(str(e))
-        raise APIException(detail=str(e), code=500)
+        raise APIException(detail=str(e), code=400)
 
 
 @api_view(["PUT"])

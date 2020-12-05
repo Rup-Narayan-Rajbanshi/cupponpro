@@ -11,18 +11,17 @@ from commonapp.serializers.bill import BillSerializer
 from commonapp.serializers.salesitem import SalesItemSerializer
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll
 
+
 class SalesItemVerifyView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll]
     serializer_class = SalesItemSerializer
 
-    def post(self, request, company_id):
-        """
-        An endpoint for sale item verification.
-        """
+    def sales_calculation(self, request, company_id):
         voucher_obj = Voucher.objects.filter(id=request.data['voucher'])
         items = request.data['sales_item']
         company_obj = Company.objects.filter(id=company_id)
         result = {
+            'company': company_id,
             'user': request.data.get('user'),
             'name': request.data.get('name'),
             'phone_number': request.data.get('phone_number'),
@@ -76,11 +75,6 @@ class SalesItemVerifyView(generics.GenericAPIView):
                 result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
             result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']
             result['sales_item'] = items
-            data = {
-                'success': 1,
-                'data': result
-            }
-            return Response(data, status=200)
         else:
             total = 0
             for item in items:
@@ -92,8 +86,15 @@ class SalesItemVerifyView(generics.GenericAPIView):
             if result['service_charge']:
                 result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
             result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']
-            data = {
-                'success': 1,
-                'data': result
-            }
-            return Response(data, status=200)
+        return result
+
+    def post(self, request, company_id):
+        """
+        An endpoint for sale item verification.
+        """
+        result = self.sales_calculation(request, company_id)
+        data = {
+            'success': 1,
+            'data': result
+        }
+        return Response(data, status=200)

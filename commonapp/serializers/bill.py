@@ -26,6 +26,7 @@ class BillSaveSerializer(serializers.ModelSerializer):
         bill_obj = Bill.objects.create(**validated_data)
         voucher_list = []
         for sales_item in sales_item_data:
+            sales_item.pop('id', None)
             sales_item['bill'] = bill_obj
             sales_item_obj = SalesItem.objects.create(**sales_item)
             if sales_item_obj.voucher:

@@ -33,6 +33,6 @@ class OrderStatusSerializer(CustomModelSerializer):
         return attrs
 
     def update(self, instance, validated_data):
-        request_user = self.context.get('request').user if self.context.get('request') else None
-        order = Order.execute_change_status(order=instance, v_data=validated_data, request_user=request_user)
+        request = self.context.get('request')
+        order = Order.execute_change_status(order=instance, v_data=validated_data, request=request)
         return order
