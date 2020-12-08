@@ -43,3 +43,9 @@ ORDER_STATUS_CHOICES = (
     (ORDER_STATUS['BILLABLE'], 'Billable'),
     (ORDER_STATUS['CANCELLED'], 'Cancelled')
 )
+
+GENDER_CHOICES = (
+    ('M', 'Male'),
+    ('F', 'Female'),
+    ('O', 'Other'),
+)

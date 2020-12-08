@@ -24,8 +24,9 @@ def image_validator(image):
 
 
 def is_numeric_value(value):
-    if not value.isnumeric():
-        raise ValidationError("The value should be numeric.")
+    if value:
+        if not value.isnumeric():
+            raise ValidationError("The value should be numeric.")
     return value
 
 
@@ -105,4 +106,10 @@ def is_positive_float(value):
             is_invalid = False
     if is_invalid:
         raise ValidationError('Value should be positive number.')
+    return value
+
+
+def otp_validator(value):
+    if len(value) > 6:
+        raise ValidationError('Invalid OTP code.')
     return value

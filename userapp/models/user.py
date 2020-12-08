@@ -2,7 +2,7 @@ import os
 import shortuuid
 import uuid
 from django.core.validators import RegexValidator
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
@@ -12,6 +12,8 @@ from django.template.loader import get_template
 from project.settings.base import EMAIL_HOST_USER
 from commonapp.models.address import Address
 from helpers.app_helpers import url_builder
+from helpers.constants import OTP_TYPES, OTP_STATUS_TYPES
+
 
 class UserManager(BaseUserManager):
     def _create_user(self, first_name, middle_name, last_name, email, phone_number,\
@@ -150,6 +152,28 @@ class User(AbstractBaseUser, Address):
     @property
     def is_active(self):
         return self.active
+
+    @classmethod
+    @transaction.atomic
+    def register_user(cls, **kwargs):
+        from userapp.models import OTPVerificationCode
+        user_obj = User.objects.create_user(
+            first_name=kwargs['first_name'],
+            middle_name=kwargs.get('middle_name', ''),
+            last_name=kwargs['last_name'],
+            email=kwargs['email'],
+            phone_number=kwargs['phone_number'],
+            password=kwargs['password'],
+        )
+        user_group, _ = Group.objects.get_or_create(name='user')
+        user_obj.group.add(user_group)
+        if not kwargs.get('is_user'):
+            owner_groregister_userup, _ = Group.objects.get_or_create(name='owner')
+            user_obj.group.add(owner_group)
+        user_obj.gender = kwargs['gender']
+        user_obj.save()
+        OTPVerificationCode.objects.filter(phone_number=kwargs['phone_number'], type=OTP_TYPES['USER_REGISTER']).update(status=OTP_STATUS_TYPES['EXPIRED'])
+        return user_obj
 
 @receiver(models.signals.post_delete, sender=User)
 def auto_delete_file_on_delete(sender, instance, **kwargs):

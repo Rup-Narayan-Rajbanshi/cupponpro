@@ -46,3 +46,8 @@ class InvalidOTPException(APIException):
 class InvalidTokenException(APIException):
     status_code = 400
     default_detail = "The token given is invalid."
+
+
+class PhoneNumberExistsException(APIException):
+    status_code = 400
+    default_detail = "Phone number exists already."

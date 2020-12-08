@@ -3,6 +3,7 @@ from django.contrib.auth.models import Group
 from commonapp.models.company import CompanyUser
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from helpers.serializer_fields import ImageFieldWithURL
+from helpers.choices_variable import GENDER_CHOICES
 
 
 class UserGroupSerializer(serializers.ModelSerializer):
@@ -77,7 +78,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     middle_name = serializers.CharField(max_length=50, required=False)
-    is_user = serializers.BooleanField()
+    is_user = serializers.BooleanField(write_only=True)
+    gender = serializers.ChoiceField(GENDER_CHOICES)
 
     class Meta:
         model = User
