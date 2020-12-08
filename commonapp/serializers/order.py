@@ -3,6 +3,8 @@ from rest_framework.exceptions import ValidationError
 from commonapp.models.order import Order, OrderLine
 from notifications.constants import NOTIFICATION_CATEGORY, NOTIFICATION_CATEGORY_NAME
 from notifications.models import Notification, NotificationCategory
+from helpers.constants import ORDER_STATUS
+
 
 class OrderLineSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=False, allow_null=True)
@@ -33,6 +35,23 @@ class OrderSaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = "__all__"
+
+    def validate(self, attrs):
+        asset = attrs.get('asset')
+        company = attrs.get('company')
+        order = None
+        order = Order.objects.filter(
+                            asset=asset,
+                            company=company,
+                            status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'], ORDER_STATUS['PROCESSING']]).exists()
+        if not self.instance:
+            if order:
+                raise ValidationError({'detail': 'Order is already in process for this asset.'})
+        else:
+            if not order:
+                raise ValidationError({'detail': 'This Order cannot be updated. Please create a new order.'})
+
+        return super(OrderSaveSerializer, self).validate(attrs)
 
     def create(self, validated_data):
         try:
