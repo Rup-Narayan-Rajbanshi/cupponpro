@@ -1,5 +1,6 @@
 from datetime import datetime
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from commonapp.models.bill import Bill
 from commonapp.models.coupon import Voucher
 from commonapp.models.salesitem import SalesItem
@@ -7,6 +8,8 @@ from commonapp.models.order import OrderLine
 from commonapp.serializers.coupon import VoucherSerializer
 from commonapp.serializers.salesitem import SalesItemSerializer
 from userapp.models.user import User
+from helpers.constants import ORDER_STATUS
+
 
 class BillSaveSerializer(serializers.ModelSerializer):
     sales = serializers.SerializerMethodField()
@@ -20,6 +23,17 @@ class BillSaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bill
         fields = "__all__"
+
+    def validate(self, attrs):
+        sales_item_data = attrs.get('sales_item', [])
+        orderline = None
+        if len(sales_item_data) > 0:
+            orderline = sales_item_data[0].get('order')
+        if orderline:
+            order = orderline.order
+            if order.status != ORDER_STATUS['BILLABLE']:
+                raise ValidationError({'detail': 'Cannot generate bill. Order status is not {0}'.format(ORDER_STATUS['BILLABLE'].lower())})
+        return attrs
 
     def create(self, validated_data):
         sales_item_data = validated_data.pop('sales_item')

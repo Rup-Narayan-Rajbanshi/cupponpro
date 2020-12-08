@@ -125,6 +125,9 @@ class OrderLine(models.Model):
     def __str__(self):
         return "order " + str(self.id) + " of " + str(self.company.name)
 
+    def to_representation_id(self, request=None):
+        return self.id
+
     def save(self, *args, **kwargs):
         ''' On save, create key '''
         if not self.rate:
