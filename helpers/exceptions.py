@@ -56,3 +56,8 @@ class PhoneNumberExistsException(APIException):
 class OrderScanCooldownException(APIException):
     status_code = 400
     default_detail = "Please wait, someone is initializing the order."
+
+
+class OrderSessionExpiredException(APIException):
+    status_code = 408
+    default_detail = "Session expired. Please scan again to order."

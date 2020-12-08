@@ -6,7 +6,7 @@ from notifications.constants import NOTIFICATION_CATEGORY, NOTIFICATION_CATEGORY
 from notifications.models import Notification, NotificationCategory
 from helpers.constants import ORDER_STATUS, ORDER_HEADER, ORDER_SCAN_COOLDOWN
 from orderapp.models.order_scan_log import OrderScanLog
-from helpers.exceptions import InvalidRequestException
+from helpers.exceptions import InvalidRequestException, OrderSessionExpiredException
 
 
 class OrderLineSerializer(serializers.ModelSerializer):
@@ -44,15 +44,15 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         company = attrs.get('company')
         order = None
         request = self.context.get('request')
-        if request:
-            token = request.META.get(ORDER_HEADER)
-        if not token:
-            raise InvalidRequestException()
         order = Order.objects.filter(
                             asset=asset,
                             company=company,
                             status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'], ORDER_STATUS['PROCESSING']]).exists()
         if not self.instance:
+            if request:
+                token = request.META.get(ORDER_HEADER)
+            if not token:
+                raise InvalidRequestException()
             if order:
                 raise ValidationError({'detail': 'Order is already in process for this asset.'})
             scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_on').first()
@@ -66,7 +66,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
                     is_session_valid = False
             if not is_session_valid:
-                raise ValidationError({'detail': 'Session expired. Please scan again to order.'})
+                raise OrderSessionExpiredException()
 
         else:
             if not order:
