@@ -51,3 +51,8 @@ class InvalidTokenException(APIException):
 class PhoneNumberExistsException(APIException):
     status_code = 400
     default_detail = "Phone number exists already."
+
+
+class OrderScanCooldownException(APIException):
+    status_code = 400
+    default_detail = "Please wait, someone is initializing the order."

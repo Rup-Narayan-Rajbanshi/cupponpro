@@ -1,9 +1,12 @@
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from commonapp.models.order import Order, OrderLine
 from notifications.constants import NOTIFICATION_CATEGORY, NOTIFICATION_CATEGORY_NAME
 from notifications.models import Notification, NotificationCategory
-from helpers.constants import ORDER_STATUS
+from helpers.constants import ORDER_STATUS, ORDER_HEADER, ORDER_SCAN_COOLDOWN
+from orderapp.models.order_scan_log import OrderScanLog
+from helpers.exceptions import InvalidRequestException
 
 
 class OrderLineSerializer(serializers.ModelSerializer):
@@ -40,6 +43,11 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         asset = attrs.get('asset')
         company = attrs.get('company')
         order = None
+        request = self.context.get('request')
+        if request:
+            token = request.META.get(ORDER_HEADER)
+        if not token:
+            raise InvalidRequestException()
         order = Order.objects.filter(
                             asset=asset,
                             company=company,
@@ -47,6 +55,19 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         if not self.instance:
             if order:
                 raise ValidationError({'detail': 'Order is already in process for this asset.'})
+            scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_on').first()
+            is_session_valid = True
+            if not scan_validity:
+                is_session_valid = False
+            else:
+                scan_time = scan_validity.created_on
+                current_time = timezone.now()
+                time_diff = (current_time - scan_time).seconds
+                if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
+                    is_session_valid = False
+            if not is_session_valid:
+                raise ValidationError({'detail': 'Session expired. Please scan again to order.'})
+
         else:
             if not order:
                 raise ValidationError({'detail': 'This Order cannot be updated. Please create a new order.'})

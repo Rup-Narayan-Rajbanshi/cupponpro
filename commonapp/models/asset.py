@@ -32,3 +32,13 @@ class Asset(models.Model):
                 'asset_type': self.asset_type
             }
         return None
+
+    def to_representation_detail(self, request=None):
+        if self:
+            return {
+                'id': self.id,
+                'name': self.name,
+                'asset_type': self.asset_type,
+                'company': self.company.to_representation() if self.company else None
+            }
+        return None

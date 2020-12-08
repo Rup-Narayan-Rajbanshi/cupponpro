@@ -58,6 +58,7 @@ DISCOUNT_TYPE = {
 }
 
 OTP_HEADER = "HTTP_OTP_TOKEN"
+ORDER_HEADER = "HTTP_ORDER_TOKEN"
 
 COUPON_TYPE_DISPLAY_MAPPER = {
     'all': 'On all items',
@@ -74,3 +75,4 @@ COUPON_TYPE_MAPPER = {
 TIME_EARLY_THRESHOLD = 30           # unit = minute
 RESEND_COUNTDOWN = 1                # unit = minute
 OTP_VERIFY_MAX_TRIES = 3
+ORDER_SCAN_COOLDOWN = 1             # in minute
