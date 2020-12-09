@@ -6,7 +6,7 @@ from commonapp.models.order import OrderLine
 
 class SalesItemSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=False, allow_null=True)
-    order = DetailRelatedField(model=OrderLine, lookup='id', representation='__str__')
+    order = DetailRelatedField(model=OrderLine, lookup='id', representation='to_representation_id')
     product_name = serializers.SerializerMethodField()
     product_code = serializers.SerializerMethodField()
 

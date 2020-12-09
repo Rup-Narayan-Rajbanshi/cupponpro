@@ -31,8 +31,8 @@ class BillSaveSerializer(serializers.ModelSerializer):
             orderline = sales_item_data[0].get('order')
         if orderline:
             order = orderline.order
-            # if order.status != ORDER_STATUS['BILLABLE']:
-            #     raise ValidationError({'detail': 'Cannot generate bill. Order status is not {0}'.format(ORDER_STATUS['BILLABLE'].lower())})
+            if order.status != ORDER_STATUS['BILLABLE']:
+                raise ValidationError({'detail': 'Cannot generate bill. Order status is not {0}'.format(ORDER_STATUS['BILLABLE'].lower())})
         return attrs
 
     def create(self, validated_data):
