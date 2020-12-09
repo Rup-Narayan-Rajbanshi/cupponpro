@@ -49,25 +49,25 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                             company=company,
                             status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'], ORDER_STATUS['PROCESSING']]).exists()
         if not self.instance:
-            if request:
-                token = request.META.get(ORDER_HEADER)
-            if not token:
-                raise InvalidRequestException()
-            if order:
-                raise ValidationError({'detail': 'Order is already in process for this asset.'})
-            scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_on').first()
+            # if request:
+            #     token = request.META.get(ORDER_HEADER)
+            # if not token:
+            #     raise InvalidRequestException()
+
+            # scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_on').first()
             is_session_valid = True
-            if not scan_validity:
-                is_session_valid = False
-            else:
-                scan_time = scan_validity.created_on
-                current_time = timezone.now()
-                time_diff = (current_time - scan_time).seconds
-                if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
-                    is_session_valid = False
+            # if not scan_validity:
+            #     is_session_valid = False
+            # else:
+            #     scan_time = scan_validity.created_on
+            #     current_time = timezone.now()
+            #     time_diff = (current_time - scan_time).seconds
+            #     if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
+            #         is_session_valid = False
             if not is_session_valid:
                 raise OrderSessionExpiredException()
-
+            if order:
+                raise ValidationError({'detail': 'Order is already in process for this asset.'})
         else:
             if not order:
                 raise ValidationError({'detail': 'This Order cannot be updated. Please create a new order.'})
