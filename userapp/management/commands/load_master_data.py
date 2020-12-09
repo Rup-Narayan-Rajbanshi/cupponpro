@@ -9,7 +9,7 @@ from notifications.models import NotificationCategory
 class Command(BaseCommand):
     def handle(self, *args, **options):
 
-        notification_category = NotificationCategory.objects.all()[:3]
+        notification_category = NotificationCategory.objects.all()
         if notification_category.count() != 4:
             call_command('loaddata', 'notification_category')
         else:
