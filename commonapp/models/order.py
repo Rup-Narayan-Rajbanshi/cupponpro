@@ -50,6 +50,8 @@ class Order(models.Model):
         from commonapp.api.salesitem import SalesItemVerifyView
         from commonapp.serializers.bill import BillSaveSerializer
         status = v_data.get('status')
+        order.status = status
+        order.save()
         if status == ORDER_STATUS['BILLABLE']:
             request_user = request.user if request else None
             verify_class = SalesItemVerifyView()
@@ -90,8 +92,6 @@ class Order(models.Model):
             data = serializer.data
             order.is_billed = True
             order.bill = Bill.objects.filter(id=data.get('id')).first()
-        order.status = status
-        order.save()
         return order
 
 
