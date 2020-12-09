@@ -92,6 +92,7 @@ class Order(models.Model):
             data = serializer.data
             order.is_billed = True
             order.bill = Bill.objects.filter(id=data.get('id')).first()
+            order.save()
         return order
 
 
