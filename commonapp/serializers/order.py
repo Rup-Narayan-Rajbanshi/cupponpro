@@ -39,44 +39,45 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         model = Order
         fields = "__all__"
 
-    def validate(self, attrs):
-        asset = attrs.get('asset')
-        company = attrs.get('company')
-        order = None
-        request = self.context.get('request')
-        order = Order.objects.filter(
-                            asset=asset,
-                            company=company,
-                            status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'], ORDER_STATUS['PROCESSING']]).exists()
-        if not self.instance:
-            # if request:
-            #     token = request.META.get(ORDER_HEADER)
-            # if not token:
-            #     raise InvalidRequestException()
-            #
-            # scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_on').first()
-            is_session_valid = True
-            # if not scan_validity:
-            #     is_session_valid = False
-            # else:
-            #     scan_time = scan_validity.created_on
-            #     current_time = timezone.now()
-            #     time_diff = (current_time - scan_time).seconds
-            #     if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
-            #         is_session_valid = False
-            if not is_session_valid:
-                raise OrderSessionExpiredException()
-            if order:
-                raise ValidationError({'detail': 'Order is already in process for this asset.'})
-        else:
-            if not order:
-                raise ValidationError({'detail': 'This Order cannot be updated. Please create a new order.'})
-
-        return super(OrderSaveSerializer, self).validate(attrs)
+    # def validate(self, attrs):
+    #     asset = attrs.get('asset')
+    #     company = attrs.get('company')
+    #     order = None
+    #     request = self.context.get('request')
+    #     order = Order.objects.filter(
+    #                         asset=asset,
+    #                         company=company,
+    #                         status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'], ORDER_STATUS['PROCESSING']]).exists()
+    #     if not self.instance:
+    #         # if request:
+    #         #     token = request.META.get(ORDER_HEADER)
+    #         # if not token:
+    #         #     raise InvalidRequestException()
+    #         #
+    #         # scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_on').first()
+    #         is_session_valid = True
+    #         # if not scan_validity:
+    #         #     is_session_valid = False
+    #         # else:
+    #         #     scan_time = scan_validity.created_on
+    #         #     current_time = timezone.now()
+    #         #     time_diff = (current_time - scan_time).seconds
+    #         #     if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
+    #         #         is_session_valid = False
+    #         if not is_session_valid:
+    #             raise OrderSessionExpiredException()
+    #         if order:
+    #             raise ValidationError({'detail': 'Order is already in process for this asset.'})
+    #     else:
+    #         if not order:
+    #             raise ValidationError({'detail': 'This Order cannot be updated. Please create a new order.'})
+    #
+    #     return super(OrderSaveSerializer, self).validate(attrs)
 
     def create(self, validated_data):
+        order_obj = None
         try:
-            from notifications.tasks import notify_company_staffs
+            # from notifications.tasks import notify_company_staffs
             order_lines_data = validated_data.pop('order_lines')
             order_obj = Order.objects.create(**validated_data)
             create_list = list()
@@ -88,18 +89,18 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise ValidationError({'detail': str(e)})
         ## sending notification to staffs  of associated company
-        company = str(order_obj.company.id)
-        payload = {
-            'id': str(order_obj.id),
-            'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
-            'message': {
-                'en': 'New order is placed from {0} {1}'.format(order_obj.asset.asset_type, order_obj.asset.name)
-            }
-        }
-        notify_company_staffs.apply_async(kwargs={
-                            'company': company,
-                            'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
-                            'payload': payload
+        # company = str(order_obj.company.id)
+        # payload = {
+        #     'id': str(order_obj.id),
+        #     'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
+        #     'message': {
+        #         'en': 'New order is placed from {0} {1}'.format(order_obj.asset.asset_type, order_obj.asset.name)
+        #     }
+        # }
+        # notify_company_staffs.apply_async(kwargs={
+        #                     'company': company,
+        #                     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
+        #                     'payload': payload
                         })
         return order_obj
 
