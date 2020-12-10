@@ -59,5 +59,5 @@ class OrderScanCooldownException(APIException):
 
 
 class OrderSessionExpiredException(APIException):
-    status_code = 403
+    status_code = 408
     default_detail = "Session expired. Please scan again to order."
