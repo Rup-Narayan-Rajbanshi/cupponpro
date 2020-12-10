@@ -117,7 +117,7 @@ class VerifyOTPSerializer(CustomBaseSerializer):
         token = None
         request = self.context.get('request')
         if request:
-            token = request.META.get(OTP_HEADER)
+            token = request.GET.get(OTP_HEADER)
         if not token:
             raise InvalidRequestException()
         try:
@@ -185,7 +185,7 @@ class SetPasswordSerializer(CustomBaseSerializer):
         super().__init__(*args, **kwargs)
 
     def validate(self, attrs):
-        if OTP_HEADER not in self.context['request'].META:
+        if OTP_HEADER not in self.context['request'].GET:
             raise InvalidRequestException()
 
         if attrs['password'] != attrs['confirm_password']:
@@ -193,7 +193,7 @@ class SetPasswordSerializer(CustomBaseSerializer):
 
         try:
             self.otp_verification_code = OTPVerificationCode.objects.get(
-                token=self.context['request'].META[OTP_HEADER],
+                token=self.context['request'].GET.get(OTP_HEADER),
                 status=OTP_STATUS_TYPES['ACTIVE']
             )
             delta = timezone.now() - self.otp_verification_code.created_on

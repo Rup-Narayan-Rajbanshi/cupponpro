@@ -50,7 +50,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                             status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'], ORDER_STATUS['PROCESSING']]).exists()
         if not self.instance:
             if request:
-                token = request.META.get(ORDER_HEADER)
+                token = request.GET.get(ORDER_HEADER)
             if not token:
                 raise InvalidRequestException()
 
