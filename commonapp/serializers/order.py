@@ -88,7 +88,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
             OrderLine.objects.bulk_create(create_list)
         except Exception as e:
             raise ValidationError({'detail': str(e)})
-        ## sending notification to staffs  of associated company
+        # # sending notification to staffs  of associated company
         # company = str(order_obj.company.id)
         # payload = {
         #     'id': str(order_obj.id),
@@ -101,7 +101,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         #                     'company': company,
         #                     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
         #                     'payload': payload
-                        })
+        #                 })
         return order_obj
 
     def update(self, instance, validated_data):
