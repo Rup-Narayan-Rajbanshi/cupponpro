@@ -58,3 +58,7 @@ class TrendingCouponSerializer(DealOfDaySerializer):
 
 class RecentCouponSerializer(DealOfDaySerializer):
     pass
+
+
+class LocalBusinessCouponSerializer(DealOfDaySerializer):
+    pass
