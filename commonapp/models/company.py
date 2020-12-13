@@ -79,6 +79,10 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         if os.path.isfile(instance.logo.path):
             os.remove(instance.logo.path)
 
+    if instance.logo_icon:
+        if os.path.isfile(instance.logo_icon.path):
+            os.remove(instance.logo_icon.path)
+
 @receiver(models.signals.pre_save, sender=Company)
 def auto_delete_file_on_change(sender, instance, **kwargs):
     """
@@ -90,15 +94,22 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         return False
 
     try:
-        old_file = sender.objects.get(pk=instance.pk).logo
+        old_instance = sender.objects.get(pk=instance.pk)
     except:
         return False
-
+    old_file = old_instance.logo
+    old_logo_icon = old_instance.logo_icon
     new_file = instance.logo
+    new_logo_icon = instance.logo_icon
     if old_file:
         if not old_file == new_file:
             if os.path.isfile(old_file.path):
                 os.remove(old_file.path)
+    if old_logo_icon:
+        if not old_logo_icon == new_logo_icon:
+            if os.path.isfile(old_logo_icon.path):
+                os.remove(old_logo_icon.path)
+
 
 class CompanyUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)

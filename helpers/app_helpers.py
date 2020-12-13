@@ -17,8 +17,14 @@ def content_file_name(instance, filename):
         pass
     name = ''
     if model_name == 'User':
-        name = instance.idx
+        name = str(instance.id)
         name = '/'.join(['profile_pics', name, random_string])
+    elif model_name == 'Company':
+        name = str(instance.id)
+        name = '/'.join(['company', name, random_string])
+    elif model_name == 'Partner':
+        name = str(instance.id)
+        name = '/'.join(['partner', name, random_string])
     else:
         name = '/'.join(['extra', random_string])
     return name

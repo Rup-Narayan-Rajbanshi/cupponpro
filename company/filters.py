@@ -1,6 +1,9 @@
+import math
+from django.db.models import Q
 from django_filters import rest_framework as filters
 from userapp.models import User
 from commonapp.models.company import FavouriteCompany, CompanyUser, Company
+from company.models import Partner
 
 
 class FavouriteCompanyBaseFilter(filters.FilterSet):
@@ -38,9 +41,44 @@ class CompanyBaseFilter(filters.FilterSet):
 
 
 class LocalBusinessFilter(CompanyBaseFilter):
+
+    def try_catch_get(self, key, default, type):
+        value = default
+        try:
+            if type == 'float':
+                value = float(self.request.GET.get(key, value))
+            else:
+                value = self.request.GET.get(key, value)
+        except Exception as e:
+            pass
+        return value
+
     @property
     def qs(self):
         parent = super(LocalBusinessFilter, self).qs
+        latitude = self.try_catch_get('latitude', None, 'float')
+        longitude = self.try_catch_get('longitude', None, 'float')
+        distance = self.try_catch_get('distance', 5, 'float')
+        category = self.try_catch_get('category', None, 'str')
+        if latitude and longitude:
+            threshold_latitude = distance / 110.574
+            threshold_longitude = distance / (111.320 * math.cos(latitude / math.pi / 180))
+            latitude_p = latitude + threshold_latitude
+            latitude_m = latitude - threshold_latitude
+            longitude_p = longitude + threshold_longitude
+            longitude_m = longitude - threshold_longitude
+            distance_Q = Q(latitude__range=[latitude_m, latitude_p], longitude__range=[longitude_m, longitude_p])
+            parent = parent.filter(distance_Q)
+        if category:
+            parent = parent.filter(category__name__iexact=category)
         return parent.filter(affilated_companies__isnull=True,
                             company_coupons__isnull=False
                         ).distinct()
+
+
+class PartnerBaseFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name='name__istartswith')
+
+    class Meta:
+        model = Partner
+        fields = ['name']
