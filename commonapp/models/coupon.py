@@ -23,7 +23,7 @@ from helpers.choices_variable import DISCOUNT_CHOICES
 class Coupon(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=30, null=True, validators=[is_alphanumeric_with_exception, ])
-    company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True, related_name='company_coupons')
     description = models.CharField(max_length=250)
     expiry_date = models.DateField()
     token = models.CharField(max_length=8, editable=False)

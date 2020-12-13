@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 from userapp.models import User
-from commonapp.models.company import FavouriteCompany, CompanyUser
+from commonapp.models.company import FavouriteCompany, CompanyUser, Company
 
 
 class FavouriteCompanyBaseFilter(filters.FilterSet):
@@ -27,3 +27,20 @@ class UserFavouriteCompanyFilter(FavouriteCompanyBaseFilter):
     def qs(self):
         parent = super(UserFavouriteCompanyFilter, self).qs
         return parent.filter(user=self.request.user)
+
+
+class CompanyBaseFilter(filters.FilterSet):
+    author = filters.CharFilter(field_name='user__id')
+
+    class Meta:
+        model = Company
+        fields = ['author', 'name']
+
+
+class LocalBusinessFilter(CompanyBaseFilter):
+    @property
+    def qs(self):
+        parent = super(LocalBusinessFilter, self).qs
+        return parent.filter(affilated_companies__isnull=True,
+                            company_coupons__isnull=False
+                        ).distinct()

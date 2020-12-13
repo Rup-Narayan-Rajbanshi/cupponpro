@@ -100,5 +100,5 @@ class LocalBusinessCouponFilter(CouponBaseFilter):
             parent = parent.filter(company__category__name__iexact=category)
         content_type = ['product']
         return parent.filter(expiry_date__gt=datetime.now().date(),
-                                # company__affilated_companies__isnull=True
+                                company__affilated_companies__isnull=True
                             )

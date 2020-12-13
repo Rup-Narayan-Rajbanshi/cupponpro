@@ -97,3 +97,9 @@ class SubCategory(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_representation(self, request=None):
+        return {
+            "id": self.id,
+            "name": self.name
+        }
