@@ -386,6 +386,12 @@ class ProductCategoryListView(generics.GenericAPIView):
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         product_category_obj = ProductCategory.objects.all()
+        user = request.user
+        user_id = user.id
+        if user_id:
+            company_user = CompanyUser.objects.select_related('company').filter(user=user_id).first()
+            if company_user:
+                product_category_obj = product_category_obj.filter(company=product_category_obj.company)
         paginator = Paginator(product_category_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = ProductCategorySerializer(page_obj, many=True,\
@@ -466,4 +472,3 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
                 'message': serializer.errors
             }
             return Response(data, status=400)
-            

@@ -28,7 +28,7 @@ class BulkQuantity(models.Model):
 
 class ProductCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=30)
     link = models.URLField(null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_category/')
@@ -38,6 +38,7 @@ class ProductCategory(models.Model):
     class Meta:
         db_table = 'product_category'
         verbose_name_plural = "product categories"
+        unique_together = ('name', 'company')
 
     def __str__(self):
         return self.name
