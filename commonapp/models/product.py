@@ -29,7 +29,7 @@ class BulkQuantity(models.Model):
 class ProductCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=30, unique=True)
-    link = models.URLField(null=True)
+    link = models.URLField(null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_category/')
     token = models.CharField(max_length=8, editable=False)
@@ -108,7 +108,7 @@ class Product(models.Model):
     product_code = models.CharField(max_length=10)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=30)
-    link = models.URLField(null=True)
+    link = models.URLField(null=True, blank=True)
     product_category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT)
     brand_name = models.CharField(max_length=30, null=True, blank=True)
     purchase_price = models.PositiveIntegerField(default=0)
