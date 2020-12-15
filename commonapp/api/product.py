@@ -391,7 +391,7 @@ class ProductCategoryListView(generics.GenericAPIView):
         if user_id:
             company_user = CompanyUser.objects.select_related('company').filter(user=user_id).first()
             if company_user:
-                product_category_obj = product_category_obj.filter(company=product_category_obj.company)
+                product_category_obj = product_category_obj.filter(company=company_user.company)
         paginator = Paginator(product_category_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = ProductCategorySerializer(page_obj, many=True,\
