@@ -5,6 +5,8 @@ from commonapp.models.company import Company, CompanyUser
 from commonapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, publicReadOnly
+from commonapp.app_helper import custom_paginator
+
 
 class CompanyBulkQuantityListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
@@ -23,28 +25,11 @@ class CompanyBulkQuantityListView(generics.GenericAPIView):
             else:
                 company_user_obj = False
             if company_user_obj:
-                page_size = request.GET.get('size', 10)
-                page_number = request.GET.get('page')
                 bulk_quantity_obj = BulkQuantity.objects.filter(company=company_obj[0]).order_by('-id')
-                paginator = Paginator(bulk_quantity_obj, page_size)
-                page_obj = paginator.get_page(page_number)
-                serializer = BulkQuantitySerializer(page_obj, many=True,\
-                    context={"request":request})
-                if page_obj.has_previous():
-                    previous_page = page_obj.previous_page_number()
-                else:
-                    previous_page = None
-                if page_obj.has_next():
-                    next_page = page_obj.next_page_number()
-                else:
-                    next_page = None
-                data = {
-                    'success': 1,
-                    'previous_page': previous_page,
-                    'next_page': next_page,
-                    'page_count': paginator.num_pages,
-                    'data': serializer.data,
-                }
+                data = custom_paginator(request=request,
+                                queryset=bulk_quantity_obj,
+                                serializer=BulkQuantitySerializer
+                            )
                 return Response(data, status=200)
             else:
                 data = {
@@ -224,25 +209,10 @@ class CompanyProductListView(generics.GenericAPIView):
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         product_obj = Product.objects.filter(company=company_id).order_by('-id')
-        paginator = Paginator(product_obj, page_size)
-        page_obj = paginator.get_page(page_number)
-        serializer = ProductSerializer(page_obj, many=True,\
-            context={"request":request})
-        if page_obj.has_previous():
-            previous_page = page_obj.previous_page_number()
-        else:
-            previous_page = None
-        if page_obj.has_next():
-            next_page = page_obj.next_page_number()
-        else:
-            next_page = None
-        data = {
-            'success': 1,
-            'previous_page': previous_page,
-            'next_page': next_page,
-            'page_count': paginator.num_pages,
-            'data': serializer.data
-        }
+        data = custom_paginator(request=request,
+                        queryset=product_obj,
+                        serializer=ProductSerializer
+                    )
         return Response(data, status=200)
 
     def post(self, request, company_id):
@@ -379,12 +349,6 @@ class ProductCategoryListView(generics.GenericAPIView):
     serializer_class = ProductCategorySerializer
 
     def get(self, request):
-        """
-        An endpoint for listing all the product categories. Pass 'page' and 'size' as query for requesting particular page and
-        number of items per page respectively.
-        """
-        page_size = request.GET.get('size', 10)
-        page_number = request.GET.get('page')
         product_category_obj = ProductCategory.objects.all()
         user = request.user
         user_id = user.id
@@ -392,25 +356,10 @@ class ProductCategoryListView(generics.GenericAPIView):
             company_user = CompanyUser.objects.select_related('company').filter(user=user_id).first()
             if company_user:
                 product_category_obj = product_category_obj.filter(company=company_user.company)
-        paginator = Paginator(product_category_obj, page_size)
-        page_obj = paginator.get_page(page_number)
-        serializer = ProductCategorySerializer(page_obj, many=True,\
-            context={"request": request})
-        if page_obj.has_previous():
-            previous_page = page_obj.previous_page_number()
-        else:
-            previous_page = None
-        if page_obj.has_next():
-            next_page = page_obj.next_page_number()
-        else:
-            next_page = None
-        data = {
-            'success': 1,
-            'previous_page': previous_page,
-            'next_page': next_page,
-            'page_count': paginator.num_pages,
-            'data': serializer.data
-        }
+        data = custom_paginator(request=request,
+                        queryset=product_category_obj,
+                        serializer=ProductCategorySerializer
+                    )
         return Response(data, status=200)
 
 class CompanyProductCategoryListView(generics.GenericAPIView):
@@ -424,28 +373,11 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
         """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            page_size = request.GET.get('size', 10)
-            page_number = request.GET.get('page')
             product_category_obj = ProductCategory.objects.filter(company=company_obj[0]).order_by('-id')
-            paginator = Paginator(product_category_obj, page_size)
-            page_obj = paginator.get_page(page_number)
-            serializer = ProductCategorySerializer(page_obj, many=True,\
-                context={"request": request})
-            if page_obj.has_previous():
-                previous_page = page_obj.previous_page_number()
-            else:
-                previous_page = None
-            if page_obj.has_next():
-                next_page = page_obj.next_page_number()
-            else:
-                next_page = None
-            data = {
-                'success': 1,
-                'previous_page': previous_page,
-                'next_page': next_page,
-                'page_count': paginator.num_pages,
-                'data': serializer.data
-            }
+            data = custom_paginator(request=request,
+                            queryset=product_category_obj,
+                            serializer=ProductCategorySerializer
+                        )
             return Response(data, status=200)
         else:
             data = {
