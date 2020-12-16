@@ -38,10 +38,9 @@ class DealOfDayFilter(CouponBaseFilter):
     def qs(self):
         parent = super(DealOfDayFilter, self).qs
         content_type = ['product', 'productcategory']
-        return parent.filter(
-        # expiry_date__gt=datetime.now().date(),
-        #                         content_type__model__in=content_type,
-        #                         company__affilated_companies__isnull=False
+        return parent.filter(expiry_date__gt=datetime.now().date(),
+                                content_type__model__in=content_type,
+                                company__affilated_companies__isnull=False
                             )
 
 
