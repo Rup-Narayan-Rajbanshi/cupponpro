@@ -14,7 +14,7 @@ class CouponSerializer(CustomModelSerializer):
     name = serializers.CharField(max_length=30, validators=[is_alphanumeric_with_exception,])
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', read_only=True)
     discount_type = LowertoUpperChoiceField(DISCOUNT_CHOICES)
-    content_type = CouponContentTypeField(model=ContentType, lookup='model', representation='to_representation')
+    content_type = CouponContentTypeField(model=ContentType, allow_null=True, lookup='model', representation='to_representation')
     content_object = serializers.SerializerMethodField()
     expiry_date = serializers.DateField(read_only=True)
     images = serializers.SerializerMethodField()

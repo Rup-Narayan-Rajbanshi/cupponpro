@@ -562,7 +562,9 @@ class CouponContentTypeField(DetailRelatedField):
             from .constants import COUPON_TYPE_MAPPER
             if isinstance(type(data), self._kwargs.get('model')):
                 return data
-            data = COUPON_TYPE_MAPPER.get(data, 'all')
+            data = COUPON_TYPE_MAPPER.get(data, COUPON_TYPE_MAPPER['all'])
+            # if not data:
+            #     return None
             return self.queryset.get(**{self.lookup: data})
         except ObjectDoesNotExist:
             _error_msg = "Object does not exist."
@@ -572,7 +574,7 @@ class CouponContentTypeField(DetailRelatedField):
 
     def to_representation(self, obj):
         from .constants import COUPON_TYPE_MAPPER
-        content_type = obj.name
+        content_type = obj.model
         if content_type in COUPON_TYPE_MAPPER:
             return content_type
-        return 'all'
+        return COUPON_TYPE_MAPPER['all']

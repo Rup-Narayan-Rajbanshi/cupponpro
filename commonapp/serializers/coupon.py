@@ -14,7 +14,7 @@ from helpers.choices_variable import DISCOUNT_CHOICES
 
 class CouponSerializer(serializers.ModelSerializer):
     discount_type = LowertoUpperChoiceField(DISCOUNT_CHOICES)
-    content_type = CouponContentTypeField(model=ContentType, lookup='model', representation='to_representation')
+    content_type = CouponContentTypeField(model=ContentType, allow_null=True, lookup='model', representation='to_representation')
 
     class Meta:
         model = Coupon
@@ -23,12 +23,14 @@ class CouponSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         content_type = attrs.get('content_type')
         object_id = attrs.get('object_id')
-        content_class = content_type.model_class()
-        try:
-            object = content_class.objects.get(id=object_id)
-        except ObjectDoesNotExist:
-            raise ValidationError({'object_id': 'Object does not exist.'})
+        if content_type and object_id:
+            content_class = content_type.model_class()
+            try:
+                object = content_class.objects.get(id=object_id)
+            except ObjectDoesNotExist:
+                raise ValidationError({'object_id': 'Object does not exist.'})
         return attrs
+
 
 class CouponDetailSerializer(CouponSerializer):
     images = serializers.SerializerMethodField()

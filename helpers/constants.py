@@ -63,13 +63,13 @@ ORDER_HEADER = "session"
 COUPON_TYPE_DISPLAY_MAPPER = {
     'all': 'On all items',
     'product': 'On specific item',
-    'category': 'On item type'
+    'productcategory': 'On item type'
 }
 
 COUPON_TYPE_MAPPER = {
     'product': 'product',
-    'category': 'category',
-    'all': 'productcategory'
+    'productcategory': 'productcategory',
+    'all': None
 }
 
 TIME_EARLY_THRESHOLD = 30           # unit = minute
