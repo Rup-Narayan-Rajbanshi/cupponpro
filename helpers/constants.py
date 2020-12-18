@@ -75,4 +75,4 @@ COUPON_TYPE_MAPPER = {
 TIME_EARLY_THRESHOLD = 30           # unit = minute
 RESEND_COUNTDOWN = 1                # unit = minute
 OTP_VERIFY_MAX_TRIES = 3
-ORDER_SCAN_COOLDOWN = 1             # in minute
+ORDER_SCAN_COOLDOWN = 3             # in minute
