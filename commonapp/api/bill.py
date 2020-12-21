@@ -22,7 +22,29 @@ class BillListView(generics.GenericAPIView):
         """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        bill_obj = Bill.objects.filter(company=company_id)
+        # bill_obj = Bill.objects.filter(company=company_id)
+
+        filter_fields = ['invoice_number', 'created_at', 'customer_name', 'status']
+        sort_by_fields = ['invoice_number', 'created_at', 'customer_name', 'status', 'paid_amount']
+
+        sort_by = request.GET.get('sort_by') if request.GET.get('sort_by') in sort_by_fields else 'id'
+        sort_by = 'name__icontains' if sort_by == 'customer_name' else sort_by
+        order_by = '' if request.GET.get('order_by') == 'asc' else '-'
+
+        filter_kwargs = {'{key}{lookup}'.format(
+            key=key, lookup='__icontains'
+            ): value for key, value in request.GET.items() if key in filter_fields}
+
+        if 'customer_name__icontains' in filter_kwargs.keys():
+            filter_kwargs['name__icontains'] = filter_kwargs['customer_name__icontains']
+            del filter_kwargs['customer_name__icontains']
+
+        bill_obj = Bill.objects.filter(**filter_kwargs, company=company_id).order_by(
+            '{order_by}{sort_by}'.format(
+                order_by=order_by,
+                sort_by=sort_by
+            ))
+
         paginator = Paginator(bill_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = BillSerializer(page_obj, many=True,\

@@ -98,7 +98,7 @@ class Notification(BaseModel):
                 if kwargs['category']:
                     payload = kwargs.get('payload', {})
                     if 'message' in payload:
-                        message = payload.gpasset('message', {})
+                        message = payload.get('message', {})
                         try:
                             if not isinstance(message, dict):
                                 kwargs['payload']['message'] = eval(message)

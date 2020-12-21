@@ -197,6 +197,7 @@ class CompanyBulkQuantityDetailView(generics.GenericAPIView):
             }
             return Response(data, status=404)
 
+
 class CompanyProductListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | publicReadOnly]
     serializer_class = ProductSerializer
@@ -208,7 +209,32 @@ class CompanyProductListView(generics.GenericAPIView):
         """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        product_obj = Product.objects.filter(company=company_id).order_by('-id')
+
+        filter_fields = ['name', 'product_category', 'status']
+        sort_by_fields = ['name', 'code', 'product_category', 'selling_price', 'status']
+
+        sort_by = request.GET.get('sort_by') if request.GET.get('sort_by') in sort_by_fields else 'id'
+
+        if sort_by == 'code':
+            sort_by = 'product_code'
+        elif sort_by == 'product_category':
+            sort_by = 'product_category__name'
+        order_by = '' if request.GET.get('order_by') == 'asc' else '-'
+
+        filter_kwargs = {'{key}{lookup}'.format(
+            key=key, lookup='__icontains'
+            ): value for key, value in request.GET.items() if key in filter_fields}
+
+        if 'product_category__icontains' in filter_kwargs.keys():
+            filter_kwargs['product_category__name__icontains'] = filter_kwargs['product_category__icontains']
+            del filter_kwargs['product_category__icontains']
+
+        product_obj = Product.objects.filter(**filter_kwargs, company=company_id).order_by(
+            '{order_by}{sort_by}'.format(
+                order_by=order_by,
+                sort_by=sort_by
+            ))
+
         data = custom_paginator(request=request,
                         queryset=product_obj,
                         serializer=ProductSerializer

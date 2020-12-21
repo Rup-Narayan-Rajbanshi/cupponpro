@@ -10,7 +10,7 @@ from commonapp.models.coupon import Voucher
 from commonapp.models.product import Product
 from userapp.models.user import User
 from helpers.constants import MAX_LENGTHS, DEFAULTS, ORDER_STATUS
-from helpers.choices_variable import ORDER_STATUS_CHOICES
+from helpers.choices_variable import ORDER_STATUS_CHOICES, ORDER_LINE_STATUS, ORDER_LINE_STATUS_CHOICES
 from commonapp.app_helper import Request
 
 
@@ -97,18 +97,6 @@ class Order(models.Model):
 
 
 class OrderLine(models.Model):
-    # order states
-    New = 'New'
-    Progress = 'Progress'
-    Completed = 'Completed'
-    Cancelled = 'Cancelled'
-    states = [
-        (New, 'New'),
-        (Progress, 'Progress'),
-        (Completed, 'Completed'),
-        (Cancelled, 'Cancelled'),
-    ]
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
@@ -116,7 +104,7 @@ class OrderLine(models.Model):
     rate = models.PositiveIntegerField(blank=True)
     quantity = models.PositiveIntegerField()
     total = models.DecimalField(max_digits=10, decimal_places=2)
-    state = models.CharField(max_length=20, choices=states, default=New)
+    status = models.CharField(max_length=20, choices=ORDER_LINE_STATUS_CHOICES, default=DEFAULTS['ORDER_LINE_STATUS'])
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
