@@ -16,17 +16,28 @@ def content_file_name(instance, filename):
     except:
         pass
     name = ''
+    name_array = list()
+    compamy = getattr(instance, 'company', None)
+    company_id = ''
+    try:
+        company_id = str(compamy.id)
+        name_array.append(company_id)
+    except:
+        pass
     if model_name == 'User':
         name = str(instance.id)
-        name = '/'.join(['profile_pics', name, random_string])
+        name_array += ['profile_pics', name, random_string]
     elif model_name == 'Company':
         name = str(instance.id)
-        name = '/'.join(['company', name, random_string])
+        name_array += [name, 'profile', random_string]
     elif model_name == 'Partner':
-        name = str(instance.id)
-        name = '/'.join(['partner', name, random_string])
+        name_array += ['partner', random_string]
+    elif model_name == 'ProductCategory':
+        name_array += ['product_category', random_string]
     else:
-        name = '/'.join(['extra', random_string])
+        name_array += ['extra', random_string]
+
+    name = '/'.join(name_array)
     return name
 
 
@@ -43,7 +54,17 @@ def content_icon_name(instance, filename):
         model_name = type(instance).__name__
     except:
         pass
-    name = '/'.join(['extra', random_string])
+    name = ''
+    name_array = list()
+    compamy = getattr(instance, 'company', None)
+    company_id = ''
+    try:
+        company_id = str(compamy.id)
+        name_array.append(company_id)
+    except:
+        pass
+    name_array += ['extra', random_string]
+    name = '/'.join(name_array)
     return name
 
 

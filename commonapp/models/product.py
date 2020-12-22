@@ -6,7 +6,7 @@ from django.db import models
 from django.dispatch import receiver
 from commonapp.models.image import Image
 from commonapp.models.company import Company
-from helpers.app_helpers import url_builder
+from helpers.app_helpers import url_builder, content_file_name
 from helpers.constants import DEFAULTS, MAX_LENGTHS
 from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES
 
@@ -31,7 +31,7 @@ class ProductCategory(models.Model):
     name = models.CharField(max_length=30)
     link = models.URLField(null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    image = models.ImageField(null=True, upload_to='product_category/')
+    image = models.ImageField(null=True, upload_to=content_file_name)
     token = models.CharField(max_length=8, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
