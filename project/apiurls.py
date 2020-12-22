@@ -9,5 +9,6 @@ urlpatterns = [
     path('company/', include('company.urls')),
     path('product/', include('productapp.urls')),
     path('order/', include('orderapp.urls')),
-    path('notification/', include('notifications.urls'))
+    path('notification/', include('notifications.urls')),
+    path('data_manager/', include('data_manager.urls'))
 ]

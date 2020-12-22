@@ -162,7 +162,7 @@ def find_most_matched_setting(columns, **kwargs):
 def create_or_update_from_dataframe(model, df, unique_field, insert_type):
     df_copy = df.copy()
     for column in df:
-        if df[column].astype(str).str.match(r'\d{2}/\d{2}/\d{4}').all():
+        if hasattr(df[column].astype(str), 'str') and df[column].astype(str).str.match(r'\d{2}/\d{2}/\d{4}').all():
             df_copy[column] = pd.to_datetime(df[column])
     if insert_type == 'update':
         records = df_copy.to_dict('records')

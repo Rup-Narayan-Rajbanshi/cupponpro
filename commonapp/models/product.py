@@ -117,7 +117,7 @@ class Product(models.Model):
     selling_price = models.PositiveIntegerField()
     selling_currency = models.CharField(max_length=MAX_LENGTHS['CURRENCY_TYPE'], choices=CURRENCY_TYPE_CHOICES, default=DEFAULTS['CURRENCY_TYPE'])
     bulk_quantity = models.ForeignKey(BulkQuantity, on_delete=models.PROTECT, null=True, blank=True)
-    total_price = models.PositiveIntegerField(editable=False)
+    total_price = models.PositiveIntegerField(blank=True, null=True)
     token = models.CharField(max_length=8, editable=False)
     # is_veg = models.BooleanField(default=False) #only for food item
     # gender = models.CharField(max_length=6, choices=GENDER, default=Null, null=True, blank=True) # usable for clothing and similar category

@@ -56,6 +56,7 @@ DEV_APPS = [
     'productapp',
     'orderapp',
     'notifications',
+    'data_manager'
 ]
 
 

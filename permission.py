@@ -50,7 +50,8 @@ class publicReadOnly(permissions.BasePermission):
 class CompanyUserPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_authenticated:
-            company_user = CompanyUser.objects.filter(user=request.user).exists()
-            if company_user:
+            company_user = CompanyUser.objects.filter(user=request.user)
+            if company_user.exists():
+                request.company = company_user[0].company
                 return True
         return False
