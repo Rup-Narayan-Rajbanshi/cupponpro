@@ -104,7 +104,7 @@ class OrderLine(models.Model):
     rate = models.PositiveIntegerField(blank=True)
     quantity = models.PositiveIntegerField()
     total = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=ORDER_LINE_STATUS_CHOICES, default=DEFAULTS['ORDER_LINE_STATUS'])
+    state = models.CharField(max_length=20, choices=ORDER_LINE_STATUS_CHOICES, default=DEFAULTS['ORDER_LINE_STATUS'])
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

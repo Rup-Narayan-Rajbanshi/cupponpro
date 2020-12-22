@@ -1,11 +1,10 @@
 import uuid
-from django.utils import timezone
 from django.db import models
-from django.dispatch import receiver
 from commonapp.models.bill import Bill
 from commonapp.models.product import Product
 from commonapp.models.coupon import Voucher
 from commonapp.models.order import OrderLine
+
 
 class SalesItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)

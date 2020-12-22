@@ -1,8 +1,10 @@
 from rest_framework import serializers
 from commonapp.models.asset import Asset
 
+
 class AssetSerializer(serializers.ModelSerializer):
     qr = serializers.SerializerMethodField()
+    order_status = serializers.SerializerMethodField()
 
     class Meta:
         model = Asset
@@ -13,3 +15,9 @@ class AssetSerializer(serializers.ModelSerializer):
             'asset': obj.id,
             'company': obj.company_id
         }
+
+    def get_order_status(self, obj):
+        recent_order = obj.company.order_set.order_by('-id')[0]
+        if recent_order:
+            return recent_order.status
+        return ''

@@ -1,20 +1,15 @@
 import uuid
 from django.db import models
 from commonapp.models.company import Company
+from helpers.choices_variable import ASSET_TYPE_CHOICES
+from helpers.constants import ASSET_TYPE
+
 
 class Asset(models.Model):
-    # asset types
-    Room = 'Room'
-    Table = 'Table'
-    asset_types = [
-        (Room, 'Room'),
-        (Table, 'Table'),
-    ]
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=20)
-    asset_type = models.CharField(max_length=20, choices=asset_types, default=Room)
+    asset_type = models.CharField(max_length=20, choices=ASSET_TYPE_CHOICES, default=ASSET_TYPE['ROOM'])
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
