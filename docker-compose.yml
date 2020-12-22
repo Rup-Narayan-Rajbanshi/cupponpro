@@ -11,7 +11,7 @@ services:
         - db
         - rabbitmq
         volumes:
-        - "~/.app/cupponpro/:/app/media/"
+        - "~/.app/cupponpro/media/:/app/media/"
         restart: unless-stopped
         networks:
         - cuppon-pro-net
@@ -22,7 +22,7 @@ services:
         env_file: "env/${ENV}.env"
         image: bitnami/postgresql:12.4.0
         volumes:
-        - "/var/lib/pg_data:/var/lib/postgresql/data"
+        - "/var/lib/pg_data/:/var/lib/postgresql/data"
         restart: unless-stopped
         networks:
         - cuppon-pro-net
