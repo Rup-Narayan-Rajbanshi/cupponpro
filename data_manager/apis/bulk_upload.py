@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
-from data_manager.serializers.product_category import UploadExcelProductSerializer
+from data_manager.serializers.product_upload import UploadExcelProductSerializer
 from data_manager.serializers.product_category_upload import UploadExcelProductCategorySerializer
 from permission import CompanyUserPermission
 

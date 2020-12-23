@@ -113,3 +113,15 @@ def otp_validator(value):
     if len(value) > 6:
         raise ValidationError('Invalid OTP code.')
     return value
+
+
+def xlsx_validator(file):
+    try:
+        name = file.name
+        file_extension = name.split('.')[-1]
+    except Exception as e:
+        raise ValidationError("Invalid file.")
+    else:
+        if file_extension != 'xlsx':
+            raise ValidationError("Invalid file extension.")
+    return file

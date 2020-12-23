@@ -7,13 +7,14 @@ from commonapp.models.product import ProductCategory
 from data_manager.exception import DuplicateNameException, ProductCategoryAlreadyExistException
 from data_manager.helpers import create_or_update_from_dataframe
 from helpers.misc import title_to_snake_case
+from helpers.validators import xlsx_validator
 from helpers.serializer import CustomBaseSerializer
 
 ALLOWED_PRODUCT_CATEGORY_FIELDS = ['name', 'link', 'company']
 
 
 class UploadExcelProductCategorySerializer(CustomBaseSerializer):
-    upload_file = serializers.FileField(required=True)
+    upload_file = serializers.FileField(required=True, validators=[xlsx_validator])
 
     class Meta:
         validators = []

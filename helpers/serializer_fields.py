@@ -578,3 +578,17 @@ class CouponContentTypeField(DetailRelatedField):
         if content_type in COUPON_TYPE_MAPPER:
             return content_type
         return COUPON_TYPE_MAPPER['all']
+
+
+class CsvFileField(serializers.FileField):
+    def to_internal_value(self, value):
+        print("herer-----")
+        import os
+        super().validate(value)
+        file_extension = os.path.splitext(value.name)[1]
+        print(file_extension)
+        if file_extension != '.csv':
+            raise serializers.ValidationError(
+                 ('Invalid file extension'),
+                 code='invalid'
+            )

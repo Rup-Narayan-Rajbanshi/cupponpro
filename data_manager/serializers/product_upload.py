@@ -7,6 +7,7 @@ from commonapp.models.product import Product, ProductCategory
 from data_manager.exception import DuplicateNameException, ProductCategoryNotExistException, \
     ProductCodeAlreadyExistException
 from data_manager.helpers import create_or_update_from_dataframe
+from helpers.validators import xlsx_validator
 from helpers.misc import title_to_snake_case
 from helpers.serializer import CustomBaseSerializer
 
@@ -16,7 +17,7 @@ ALLOWED_PRODUCT_TABLE_FIELDS = [
 
 
 class UploadExcelProductSerializer(CustomBaseSerializer):
-    upload_file = serializers.FileField(required=True)
+    upload_file = serializers.FileField(required=True, validators=[xlsx_validator])
 
     class Meta:
         validators = []

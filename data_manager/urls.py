@@ -11,7 +11,7 @@ router = routers.SimpleRouter()
 urlpatterns = router.urls
 
 urlpatterns += [
-    path('upload-product-data/', product_data_upload, name='product_data_upload'),
-    path('upload-product-category-data/', product_category_data_upload, name='product_category_data_upload'),
+    path('upload-product/', product_data_upload, name='product_data_upload'),
+    path('upload-product-category/', product_category_data_upload, name='product_category_data_upload'),
 
 ]

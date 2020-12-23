@@ -10,5 +10,5 @@ urlpatterns = [
     path('product/', include('productapp.urls')),
     path('order/', include('orderapp.urls')),
     path('notification/', include('notifications.urls')),
-    path('data_manager/', include('data_manager.urls'))
+    path('data-manager/', include('data_manager.urls'))
 ]
