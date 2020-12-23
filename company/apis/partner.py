@@ -9,7 +9,7 @@ from company.filters import PartnerBaseFilter
 from permission import isCompanyOwnerAndAllowAll
 
 class PartnerAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
-    queryset = Partner.objects.all()
+    queryset = Partner.objects.all().order_by('name')
     serializer_class = PartnerSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = PartnerBaseFilter
