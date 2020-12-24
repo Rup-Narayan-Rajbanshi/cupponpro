@@ -11,7 +11,7 @@ from permission import isAdmin
 def export_company_qr(request):
     response = HttpResponse(content_type='application/ms-excel')
     random_name = shortuuid.ShortUUID().random(length=6)
-    name = 'QR-{0}.xlsx'.format(random_name)
+    name = 'QR-{0}.xls'.format(random_name)
     response['Content-Disposition'] = 'attachment; filename="{0}"'.format(name)
 
     wb = xlwt.Workbook(encoding='utf-8')
