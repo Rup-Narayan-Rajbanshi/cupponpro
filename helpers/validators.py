@@ -122,6 +122,6 @@ def xlsx_validator(file):
     except Exception as e:
         raise ValidationError("Invalid file.")
     else:
-        if file_extension != 'xlsx':
+        if file_extension not in ['xlsx', 'xls']:
             raise ValidationError("Invalid file extension.")
     return file
