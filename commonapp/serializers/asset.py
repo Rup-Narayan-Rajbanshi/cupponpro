@@ -17,7 +17,7 @@ class AssetSerializer(serializers.ModelSerializer):
         }
 
     def get_order_status(self, obj):
-        recent_order = obj.company.order_set.order_by('-id')[:1]
+        recent_order = obj.company.order_set.order_by('-created_at')[:1]
         if recent_order:
             return recent_order[0].status
         return ''
