@@ -23,21 +23,28 @@ def export_company_qr(request):
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
-    columns = ['S. No.', 'Link']
+    columns = ['S. No.', 'Link', 'Table No.', 'Merchant Name', 'Merchant Code']
 
     for col_num in range(len(columns)):
+        # if col_num == 1:
+        #     font_style.
         ws.write(row_num, col_num, columns[col_num], font_style)
+    link_col = ws.col(1)
+    link_col.width = 256 * 95
 
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = Asset.objects.all().values_list('id', 'company')
+    rows = Asset.objects.select_related('company').all().values_list('id', 'company', 'name', 'company__name', 'company__key')
     for row in rows:
         row_num += 1
         link_text = 'https://mastarqr.com/{0}?table_no={1}'.format(row[1], row[0])
         # for col_num in range(len(row)):
         ws.write(row_num, 0, row_num, font_style)
         ws.write(row_num, 1, link_text, font_style)
+        ws.write(row_num, 2, row[2], font_style)
+        ws.write(row_num, 3, row[3], font_style)
+        ws.write(row_num, 4, row[4], font_style)
 
     wb.save(response)
     return response
