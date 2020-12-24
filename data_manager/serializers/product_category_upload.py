@@ -3,14 +3,26 @@ import pandas as pd
 from django.db import transaction
 from rest_framework import serializers
 
+from commonapp.models.company import Company
 from commonapp.models.product import ProductCategory
 from data_manager.exception import DuplicateNameException, ProductCategoryAlreadyExistException
 from data_manager.helpers import create_or_update_from_dataframe
 from helpers.misc import title_to_snake_case
+from helpers.serializer_fields import DetailRelatedField
 from helpers.validators import xlsx_validator
-from helpers.serializer import CustomBaseSerializer
+from helpers.serializer import CustomBaseSerializer, CustomModelSerializer
 
 ALLOWED_PRODUCT_CATEGORY_FIELDS = ['name', 'link', 'company']
+
+
+class ProductCategorySerializer(CustomModelSerializer):
+
+    class Meta:
+        fields = ['name', 'link']
+        model = ProductCategory
+
+    def validate(self, attrs):
+        return super().validate(attrs)
 
 
 class UploadExcelProductCategorySerializer(CustomBaseSerializer):
@@ -36,6 +48,12 @@ class UploadExcelProductCategorySerializer(CustomBaseSerializer):
 
         # Prepare company for save
         df['company'] = str(company.id)
+
+        # Validate Customer Data
+        category_data = df.to_dict('records')
+        serializer = ProductCategorySerializer(data=category_data, many=True)
+        serializer.is_valid(raise_exception=True)
+
         df.rename(columns={'company': 'company_id'}, inplace=True)
 
         df.rename(columns=lambda x: x.strip(), inplace=True)
@@ -46,6 +64,7 @@ class UploadExcelProductCategorySerializer(CustomBaseSerializer):
         if duplicate_list:
             raise DuplicateNameException(duplicate_list)
         # df['id_expiry_date'] = pd.to_datetime(df["id_expiry_date"]).dt.strftime('%Y-%m-%d')
+
         return df
 
     @transaction.atomic

@@ -328,7 +328,7 @@ class FRelatedField(serializers.PrimaryKeyRelatedField):
 
     def to_internal_value(self, data):
         try:
-            return self.queryset.get(idx=data)
+            return self.queryset.get(id=data)
         except ObjectDoesNotExist:
             self.fail('does_not_exist', pk_value=data)
         except (TypeError, ValueError):

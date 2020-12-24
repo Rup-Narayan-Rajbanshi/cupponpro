@@ -136,12 +136,12 @@ def export_file_from_settings(file_feature_setting, include_join_fields=False):
 
 def create_attribute_list_from_column_data(data):
     fields = list()
-    idx, column_data = data
+    id, column_data = data
     for module in column_data.keys():
         for table in column_data[module].keys():
             fields += column_data[module][table]['fields']
     return {
-        'idx': str(idx),
+        'id': str(id),
         'fields': fields
     }
 
@@ -149,14 +149,14 @@ def create_attribute_list_from_column_data(data):
 def find_most_matched_setting(columns, **kwargs):
     filter_kwargs = kwargs.get('filter_kwargs', {})
     settings_attribute_list = [create_attribute_list_from_column_data(value) for value in
-                               FileFeatureSettings.objects.filter(**filter_kwargs).values_list('idx', 'column_data')]
+                               FileFeatureSettings.objects.filter(**filter_kwargs).values_list('id', 'column_data')]
 
     settings_attribute_list = list(map(lambda x: [
         len(set(x['fields']).intersection(columns)), x
     ], settings_attribute_list))
     most_match_index = max(enumerate(map(itemgetter(0), settings_attribute_list)), key=itemgetter(1))[0]
-    feature_settings_idx = settings_attribute_list[most_match_index][1]['idx']
-    return FileFeatureSettings.objects.get(idx=feature_settings_idx)
+    feature_settings_id = settings_attribute_list[most_match_index][1]['id']
+    return FileFeatureSettings.objects.get(id=feature_settings_id)
 
 
 def create_or_update_from_dataframe(model, df, unique_field, insert_type):
