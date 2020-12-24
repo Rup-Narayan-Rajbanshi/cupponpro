@@ -134,8 +134,12 @@ class AdminRatingapp(admin.ModelAdmin):
         ),
     )
 
+
+class Assetapp(admin.ModelAdmin):
+    change_list_template = "custom_asset_page.html"
+
 admin.site.register(AffiliateLink)
-admin.site.register(Asset)
+admin.site.register(Asset, Assetapp)
 admin.site.register(Bill, AdminBillapp)
 admin.site.register(BulkQuantity, AdminBulkQuantityapp)
 admin.site.register(Category, AdminCategoryapp)
