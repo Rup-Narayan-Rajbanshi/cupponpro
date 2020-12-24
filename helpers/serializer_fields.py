@@ -578,3 +578,10 @@ class CouponContentTypeField(DetailRelatedField):
         if content_type in COUPON_TYPE_MAPPER:
             return content_type
         return COUPON_TYPE_MAPPER['all']
+
+
+class CharToNumericField(serializers.CharField):
+
+    def to_internal_value(self, data):
+        data = int(data) if data else 0
+        return super(CharToNumericField, self).to_internal_value(data)

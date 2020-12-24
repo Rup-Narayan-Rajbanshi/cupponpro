@@ -7,13 +7,26 @@ from commonapp.models.product import Product, ProductCategory
 from data_manager.exception import DuplicateNameException, ProductCategoryNotExistException, \
     ProductCodeAlreadyExistException
 from data_manager.helpers import create_or_update_from_dataframe
-from helpers.validators import xlsx_validator
+from helpers.serializer_fields import CharToNumericField
+from helpers.validators import xlsx_validator, is_numeric_value
 from helpers.misc import title_to_snake_case
-from helpers.serializer import CustomBaseSerializer
+from helpers.serializer import CustomBaseSerializer, CustomModelSerializer
 
 ALLOWED_PRODUCT_TABLE_FIELDS = [
     'product_code', 'name', 'link', 'product_category', 'brand_name', 'purchase_price',
     'purchase_currency', 'selling_price', 'selling_currency']
+
+
+class ProductSerializer(CustomModelSerializer):
+    purchase_price = CharToNumericField(validators=[is_numeric_value], allow_null=True, allow_blank=True)
+
+    class Meta:
+        fields = ['product_code', 'name', 'link', 'brand_name',
+                  'purchase_price', 'purchase_currency', 'selling_price', 'selling_currency']
+        model = Product
+
+    def validate(self, attrs):
+        return super().validate(attrs)
 
 
 class UploadExcelProductSerializer(CustomBaseSerializer):
@@ -26,6 +39,7 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
         company = self.context['request'].company
 
         df = pd.read_excel(data['upload_file'])
+        df = df.replace(np.nan, '', regex=True)
         df.rename(columns={column_name: title_to_snake_case(column_name) for column_name in df.columns }, inplace=True)
 
         # Validate product category name
@@ -33,6 +47,11 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
 
         if code_qs.exists():
             raise ProductCodeAlreadyExistException(list(code_qs.values_list('product_code', flat=True)))
+
+        # Validate Product Data
+        product_data = df.to_dict('records')
+        serializer = ProductSerializer(data=product_data, many=True)
+        serializer.is_valid(raise_exception=True)
 
         # Validate product category name
         product_categories_set = set(df['product_category'])
@@ -44,8 +63,6 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
             raise ProductCategoryNotExistException(product_categories_set - existing_product_categories)
 
         # Replace nan with blank
-        df = df.replace(np.nan, '', regex=True)
-
         # Prepare company for save
         df['company'] = str(company.id)
         df.rename(columns={'company': 'company_id'}, inplace=True)
