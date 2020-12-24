@@ -17,7 +17,7 @@ def custom_paginator(request, queryset, serializer):
     page_size = request.GET.get('size', None)
     previous_page = None
     next_page = None
-    page_count = None
+    page_count = 1
     if page_size and page_size.isnumeric():
         page_number = request.GET.get('page')
         paginator = Paginator(queryset, page_size)
@@ -31,6 +31,7 @@ def custom_paginator(request, queryset, serializer):
             else:
                 next_page = None
         queryset = page_obj
+        page_count = paginator.num_pages
     serializers = serializer(queryset, many=True,\
         context={"request":request})
     data = {
