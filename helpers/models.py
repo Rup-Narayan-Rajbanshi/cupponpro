@@ -20,8 +20,8 @@ class BaseModel(models.Model):
 
     # the library does produce unique hash, but just in case
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
-    created_on = models.DateTimeField(default=timezone.now)
-    modified_on = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    modified_at = models.DateTimeField(auto_now=True)
     # obsolete_on = models.DateTimeField(null=True)
     # is_obsolete = models.BooleanField(default=False)
 

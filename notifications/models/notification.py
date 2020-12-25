@@ -56,7 +56,7 @@ class Notification(BaseModel):
     payload = JSONField(null=True, blank=True)
 
     class Meta:
-        ordering = ('-created_on',)
+        ordering = ('-created_at',)
 
     def mark_seen(self):
         self.seen = True

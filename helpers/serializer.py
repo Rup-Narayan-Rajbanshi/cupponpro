@@ -11,13 +11,12 @@ class CustomModelSerializer(CustomValidationMessageForSerializerMixin, serialize
     id = serializers.CharField(read_only=True)
 
     class Meta:
-        fields = "__all__"
-        # exclude = ["modified_on", "is_obsolete", 'obsolete_on']
-        # extra_kwargs = {
-        #     "created_on": {"read_only": True},
-        #     "modified_on": {"read_only": True},
-        #     "obsolete_on": {"read_only": True}
-        # }
+        # fields = "__all__"
+        exclude = ["modified_at"]
+        extra_kwargs = {
+            "created_at": {"read_only": True},
+            "modified_at": {"read_only": True}
+        }
 
 
 class CustomBaseSerializer(CustomValidationMessageForSerializerMixin, serializers.Serializer):

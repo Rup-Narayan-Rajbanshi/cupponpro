@@ -54,12 +54,12 @@ class OrderSaveSerializer(serializers.ModelSerializer):
             if not token:
                 raise InvalidRequestException()
 
-            scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_on').first()
+            scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_at').first()
             is_session_valid = True
             if not scan_validity:
                 is_session_valid = False
             else:
-                scan_time = scan_validity.created_on
+                scan_time = scan_validity.created_at
                 current_time = timezone.now()
                 time_diff = (current_time - scan_time).seconds
                 if (ORDER_SCAN_COOLDOWN * 60) < time_diff:

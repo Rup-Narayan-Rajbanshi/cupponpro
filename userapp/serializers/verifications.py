@@ -67,10 +67,10 @@ class SendOTPSerializer(CustomBaseSerializer):
         one_min_earlier = now - timedelta(minutes=RESEND_COUNTDOWN)
         time_early_threshold = now - timedelta(minutes=TIME_EARLY_THRESHOLD)
 
-        if OTPVerificationCode.objects.filter(created_on__range=[one_min_earlier, now], phone_number=phone_number, type=otp_type).exists():
+        if OTPVerificationCode.objects.filter(created_at__range=[one_min_earlier, now], phone_number=phone_number, type=otp_type).exists():
             raise OTPCoolDownException()
 
-        if OTPVerificationCode.objects.filter(created_on__range=[time_early_threshold, now], phone_number=phone_number, type=otp_type).count() > 20:
+        if OTPVerificationCode.objects.filter(created_at__range=[time_early_threshold, now], phone_number=phone_number, type=otp_type).count() > 20:
             raise MaxResendOTPLimitReached()
         return attrs
 
@@ -144,7 +144,7 @@ class VerifyOTPSerializer(CustomBaseSerializer):
                 tries = self.otp_verification_code.tries + 1
                 code = self.otp_verification_code.code
                 if attrs['code'] == code:
-                    delta = timezone.now() - self.otp_verification_code.created_on
+                    delta = timezone.now() - self.otp_verification_code.created_at
                     if delta.days >= 1:
                         is_invalid = True
                 else:
@@ -196,7 +196,7 @@ class SetPasswordSerializer(CustomBaseSerializer):
                 token=self.context['request'].GET.get(OTP_HEADER),
                 status=OTP_STATUS_TYPES['ACTIVE']
             )
-            delta = timezone.now() - self.otp_verification_code.created_on
+            delta = timezone.now() - self.otp_verification_code.created_at
             if delta.days >= 1:
                 raise InvalidTokenException()
 

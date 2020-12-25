@@ -14,7 +14,7 @@ from userapp.serializers.verifications import SendOTPSerializer, VerifyOTPSerial
 
 
 class SendVerificationCodeAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
-    queryset = OTPVerificationCode.objects.all().order_by('-created_on')
+    queryset = OTPVerificationCode.objects.all().order_by('-created_at')
     serializer_class = SendOTPSerializer
     permission_classes = (AllowAny, )
 
@@ -26,7 +26,7 @@ class SendVerificationCodeAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet
         return Response(data=data, status=status.HTTP_201_CREATED)
 
 class VerifyVerificationCodeAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
-    queryset = OTPVerificationCode.objects.all().order_by('-created_on')
+    queryset = OTPVerificationCode.objects.all().order_by('-created_at')
     serializer_class = VerifyOTPSerializer
     permission_classes = (AllowAny, )
 

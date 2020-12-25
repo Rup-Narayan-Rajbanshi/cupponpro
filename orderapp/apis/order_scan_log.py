@@ -10,7 +10,7 @@ from orderapp.serializers.order_scan_log import ValidateOrderScanSerializer
 
 
 class ValidateOrderScanAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
-    queryset = OrderScanLog.objects.all().order_by('-created_on')
+    queryset = OrderScanLog.objects.all().order_by('-created_at')
     serializer_class = ValidateOrderScanSerializer
     permission_classes = (AllowAny, )
 

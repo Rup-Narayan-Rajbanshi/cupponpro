@@ -34,7 +34,7 @@ class ValidateOrderScanSerializer(CustomModelSerializer):
         if not self.order:
             now  = self.current_datetiem
             earlier_time = now - timedelta(minutes=ORDER_SCAN_COOLDOWN)
-            self.scan_log = OrderScanLog.objects.filter(created_on__range=[earlier_time, now], asset=asset).order_by('-created_on').first()
+            self.scan_log = OrderScanLog.objects.filter(created_at__range=[earlier_time, now], asset=asset).order_by('-created_at').first()
             # if self.scan_log:
             #     raise OrderScanCooldownException()
         return attrs
@@ -43,7 +43,7 @@ class ValidateOrderScanSerializer(CustomModelSerializer):
         if not self.order:
             scan_cooldown = ORDER_SCAN_COOLDOWN * 60
             if self.scan_log:
-                scan_diff = self.current_datetiem - self.scan_log.created_on
+                scan_diff = self.current_datetiem - self.scan_log.created_at
                 scan_diff_second = scan_diff.seconds
                 scan_cooldown = scan_cooldown - scan_diff_second
                 scan_cooldown = 0 if scan_cooldown < 0 else scan_cooldown
