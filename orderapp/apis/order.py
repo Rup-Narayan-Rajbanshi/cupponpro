@@ -37,4 +37,4 @@ class OrderCountAPI(generics.GenericAPIView):
             "total_orders": qs.count(),
             "total_sales": SalesItem.objects.filter(product__company__id=company_user.company.id).count()
         }
-        return Response(data, status=404)
+        return Response(data, status=200)
