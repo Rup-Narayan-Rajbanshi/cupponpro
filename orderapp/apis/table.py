@@ -14,7 +14,7 @@ from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
 
 
 class TableFilter(filters.FilterSet):
-    order_status = filters.CharFilter(field_name='company__order__status')
+    order_status = filters.CharFilter(field_name='company__order__status', exclude=True)
 
     class Meta:
         model = Asset
