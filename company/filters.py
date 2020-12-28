@@ -60,6 +60,7 @@ class LocalBusinessFilter(CompanyBaseFilter):
         longitude = self.try_catch_get('longitude', None, 'float')
         distance = self.try_catch_get('distance', 5, 'float')
         category = self.try_catch_get('category', None, 'str')
+        search = self.try_catch_get('search', None, 'str')
         if latitude and longitude:
             threshold_latitude = distance / 110.574
             threshold_longitude = distance / (111.320 * math.cos(latitude / math.pi / 180))
@@ -71,6 +72,8 @@ class LocalBusinessFilter(CompanyBaseFilter):
             parent = parent.filter(distance_Q)
         if category:
             parent = parent.filter(category__name__iexact=category)
+        if search:
+            parent = parent.filter(name__icontains=search)
         return parent.filter(affilated_companies__isnull=True,
                             # company_coupons__isnull=False
                         ).distinct()
