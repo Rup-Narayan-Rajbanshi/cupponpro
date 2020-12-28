@@ -34,10 +34,11 @@ class UserFavouriteCompanyFilter(FavouriteCompanyBaseFilter):
 
 class CompanyBaseFilter(filters.FilterSet):
     author = filters.CharFilter(field_name='user__id')
+    category = filters.CharFilter(field_name='category__name')
 
     class Meta:
         model = Company
-        fields = ['author', 'name']
+        fields = ['author', 'name', 'category']
 
 
 class LocalBusinessFilter(CompanyBaseFilter):
