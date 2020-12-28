@@ -72,7 +72,7 @@ class LocalBusinessFilter(CompanyBaseFilter):
         if category:
             parent = parent.filter(category__name__iexact=category)
         return parent.filter(affilated_companies__isnull=True,
-                            company_coupons__isnull=False
+                            # company_coupons__isnull=False
                         ).distinct()
 
 
