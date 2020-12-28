@@ -25,7 +25,7 @@ class LocalBusinessSerializer(CompanySerializer):
 
     class Meta:
         model = Company
-        fields = ['id', 'logo', 'name', 'country', 'state', 'latitude', 'longitude'
+        fields = ['id', 'logo', 'name', 'country', 'state', 'latitude', 'longitude',
                   'city', 'address', 'zip_code', 'author', 'images', 'discount']
 
     def get_discount(self, obj):
