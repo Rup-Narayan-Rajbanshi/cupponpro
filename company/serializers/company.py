@@ -14,6 +14,7 @@ class FavouriteCompanySerializer(CustomModelSerializer):
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', read_only=True)
     user = DetailRelatedField(model=User, lookup='id', representation='to_representation', read_only=True)
 
+
     class Meta(CustomModelSerializer.Meta):
         model = FavouriteCompany
 
@@ -30,4 +31,4 @@ class LocalBusinessSerializer(CompanySerializer):
         coupon = Coupon.objects.filter(company=obj, discount_type=DISCOUNT_TYPE['PERCENTAGE']).order_by('-discount').first()
         if not coupon:
             coupon = Coupon.objects.filter(company=obj, discount_type=DISCOUNT_TYPE['FLAT']).order_by('-discount').first()
-        return coupon.to_representation() if coupon else None
+        return coupon.to_representation() if coupon else 0
