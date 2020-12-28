@@ -25,7 +25,8 @@ class LocalBusinessSerializer(CompanySerializer):
 
     class Meta:
         model = Company
-        fields = ['id', 'logo', 'name', 'country', 'state', 'city', 'address', 'zip_code', 'author', 'images', 'discount']
+        fields = ['id', 'logo', 'name', 'country', 'state', 'latitude', 'longitude'
+                  'city', 'address', 'zip_code', 'author', 'images', 'discount']
 
     def get_discount(self, obj):
         coupon = Coupon.objects.filter(company=obj, discount_type=DISCOUNT_TYPE['PERCENTAGE']).order_by('-discount').first()
