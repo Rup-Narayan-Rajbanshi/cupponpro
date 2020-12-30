@@ -75,7 +75,9 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
         df.rename(columns=lambda x: x.strip(), inplace=True)
         duplicates = df[df['name'].duplicated() == True]
 
-        #Name duplication validation
+        df['purchase_price'] = df['purchase_price'].apply(lambda x: int(x) if x else 0)
+
+        # Name duplication validation
         duplicate_list = duplicates[duplicates['name'].duplicated() == False]['name'].tolist()
         if duplicate_list:
             raise DuplicateNameException(duplicate_list)
