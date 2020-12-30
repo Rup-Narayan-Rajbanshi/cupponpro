@@ -1,8 +1,5 @@
-import uuid
-from django.core.validators import RegexValidator
 from rest_framework.exceptions import APIException
 from django.db import models, transaction
-from django.db.models import F
 from helpers.models import BaseModel
 from commonapp.models.asset import Asset
 from commonapp.models.bill import Bill
@@ -10,16 +7,16 @@ from commonapp.models.company import Company
 from commonapp.models.coupon import Voucher
 from commonapp.models.product import Product
 from userapp.models.user import User
-from helpers.constants import MAX_LENGTHS, DEFAULTS, ORDER_STATUS
-from helpers.choices_variable import ORDER_STATUS_CHOICES, ORDER_LINE_STATUS, ORDER_LINE_STATUS_CHOICES
+from helpers.constants import MAX_LENGTHS, DEFAULTS, ORDER_STATUS, DISCOUNT_TYPE
+from helpers.choices_variable import ORDER_STATUS_CHOICES, ORDER_LINE_STATUS_CHOICES
 from commonapp.app_helper import Request
 
 
-class Order(BaseModel):
-    bill = models.ForeignKey(Bill, on_delete=models.SET_NULL, null=True)
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
-    asset = models.ForeignKey(Asset, on_delete=models.SET_NULL)
-    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+class Orders(BaseModel):
+    bill = models.ForeignKey(Bill, on_delete=models.SET_NULL, null=True, related_name='orders')
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, related_name='orders')
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name='orders')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='orders')
     status = models.CharField(max_length=MAX_LENGTHS['ORDER_STATUS'], choices=ORDER_STATUS_CHOICES, default=DEFAULTS['ORDER_STATUS'])
 
     class Meta:
@@ -43,7 +40,7 @@ class Order(BaseModel):
             order_dict = order.__dict__
             pop_items = ['is_billed', 'created_at', 'status']
             for pop_item in pop_items:
-                order_dict.pop(pop_item)
+                order_dict.pop(pop_item, None)
             rename_keys = {
                 'bill_id': 'bill',
                 'company_id': 'company',
@@ -52,9 +49,9 @@ class Order(BaseModel):
                 'voucher_id': 'voucher'
             }
             for key, renamed in rename_keys.items():
-                order_dict[renamed] = order_dict[key]
+                order_dict[renamed] = order_dict[key] if hasattr(order_dict, key) else None
                 order_dict.pop(key, None)
-            order_lines = OrderLine.objects.filter(order=order).values()
+            order_lines = OrderLines.objects.filter(order=order).values()
             order_dict['sales_item'] = list()
             for order_line in order_lines:
                 line = dict()
@@ -80,17 +77,22 @@ class Order(BaseModel):
             order.save()
         return order
 
+    def to_representation(self, request=None):
+        return {
+            "id": self.id,
+            "status": self.status
+        }
 
-class OrderLine(BaseModel):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+class OrderLines(BaseModel):
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='lines')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_lines')
     rate = models.PositiveIntegerField(blank=True)                  ## product.total_price
     quantity = models.PositiveIntegerField()
-    voucher = models.ForeignKey(Voucher, on_delete=models.PROTECT, null=True, blank=True)
+    voucher = models.ForeignKey(Voucher, on_delete=models.PROTECT, null=True, blank=True, related_name='order_lines')
     discount = models.PositiveIntegerField(null=True, blank=True)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
-    state = models.CharField(max_length=20, choices=ORDER_LINE_STATUS_CHOICES, default=DEFAULTS['ORDER_LINE_STATUS'])
+    status = models.CharField(max_length=20, choices=ORDER_LINE_STATUS_CHOICES, default=DEFAULTS['ORDER_LINE_STATUS'])
 
     class Meta:
         ordering = ['-created_at']
@@ -100,3 +102,24 @@ class OrderLine(BaseModel):
 
     def to_representation_id(self, request=None):
         return self.id
+
+    def get_discount(self):
+        if self.voucher:
+            discount = self.voucher.coupon.discount
+            discount_type = self.voucher.coupon.discount_type
+            if discount_type == DISCOUNT_TYPE['PERCENTAGE']:
+                return (discount / 100) * self.rate
+            return discount
+        return 0
+
+    def get_discounted_amount(self):
+        return self.get_discount() * self.quantity
+
+    def get_line_total(self):
+        return (self.rate * self.quantity) - self.get_discounted_amount()
+
+    def save(self, *args, **kwargs):
+        self.discount = self.get_discount()
+        self.discount_amount = self.get_discounted_amount()
+        self.total = self.get_line_total()
+        return super().save(*args, **kwargs)

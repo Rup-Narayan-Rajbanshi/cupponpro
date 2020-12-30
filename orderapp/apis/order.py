@@ -1,16 +1,16 @@
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, mixins
+from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet
 from rest_framework import generics
-from django_filters.rest_framework import DjangoFilterBackend
 
 from commonapp.models.company import CompanyUser
+from commonapp.models.order import Order
 from commonapp.models.salesitem import SalesItem
 from helpers.constants import ORDER_STATUS
 from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
+from orderapp.models.order import Orders
 from permission import CompanyUserPermission, isCompanyManagerAndAllowAll
-from commonapp.models.order import Order
-from orderapp.serializers.order import OrderStatusSerializer
+from orderapp.serializers.order import OrderStatusSerializer, TableOrderCreateSerializer, TableStatusChangeSerializer
 
 
 class OrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
@@ -38,3 +38,17 @@ class OrderCountAPI(generics.GenericAPIView):
             "total_sales": SalesItem.objects.filter(product__company__id=company_user.company.id).count()
         }
         return Response(data, status=200)
+
+
+class TableOrderAPI(ModelViewSet):
+    queryset = Orders.objects.all()
+    permission_classes = [CompanyUserPermission]
+    serializer_class = TableOrderCreateSerializer
+    pagination_class = FPagination
+
+
+class TableOrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
+    queryset = Orders.objects.all().order_by('-created_at')
+    serializer_class = TableStatusChangeSerializer
+    permission_classes = (CompanyUserPermission, )
+

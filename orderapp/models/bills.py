@@ -1,10 +1,8 @@
-import uuid
-from django.core.validators import RegexValidator
 from django.db import models
 from commonapp.models.company import Company
-from userapp.models.user import User
 
-class Bill(models.Model):
+
+class Bills(models.Model):
     ## these options needs to be moved in helpers/constant and choices variable and letter should be UPPER CASE
     # Payment Modes
     Card = 'Card'
@@ -43,4 +41,4 @@ class Bill(models.Model):
             company_obj.save()
             invoice_number = str(company_obj.invoice_counter)
             self.invoice_number = "0" * (8 - len(invoice_number)) + invoice_number
-        return super(Bill, self).save(*args, **kwargs)
+        return super(Bills, self).save(*args, **kwargs)
