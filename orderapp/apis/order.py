@@ -10,7 +10,7 @@ from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
 from orderapp.models.order import Orders
 from permission import CompanyUserPermission, isCompanyManagerAndAllowAll
-from orderapp.serializers.order import OrderStatusSerializer, TableOrderCreateSerializer, TableStatusChangeSerializer
+from orderapp.serializers.order import OrderStatusSerializer, TableOrderCreateSerializer, TableOrderSerializer
 
 
 class OrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
@@ -21,7 +21,7 @@ class OrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
 
 class OrderCountAPI(generics.GenericAPIView):
     permission_classes = [CompanyUserPermission | isCompanyManagerAndAllowAll]
-    serializer_class = OrderStatusSerializer
+    serializer_class = TableOrderSerializer
     pagination_class = FPagination
 
     def get(self, request):
@@ -29,7 +29,7 @@ class OrderCountAPI(generics.GenericAPIView):
         An endpoint for getting order counts product detail.
         """
         company_user = CompanyUser.objects.filter(user=self.request.user)[0]
-        qs = Order.objects.filter(company_id=company_user.company.id)
+        qs = Orders.objects.filter(company_id=company_user.company.id)
 
         data = {
             'success': 0,
@@ -49,6 +49,6 @@ class TableOrderAPI(ModelViewSet):
 
 class TableOrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
     queryset = Orders.objects.all().order_by('-created_at')
-    serializer_class = TableStatusChangeSerializer
+    serializer_class = TableOrderSerializer
     permission_classes = (CompanyUserPermission, )
 

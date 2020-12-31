@@ -10,6 +10,7 @@ from commonapp.serializers.asset import AssetSerializer
 from helpers.api_mixins import FAPIMixin
 from helpers.constants import ASSET_TYPE, ORDER_STATUS
 from helpers.paginations import FPagination
+from orderapp.models.order import Orders
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
 
 
@@ -25,14 +26,14 @@ class TableFilter(filters.FilterSet):
         qs = super(TableFilter, self).qs
         order_status = self.request.GET.get('order_status')
         if order_status == 'ACTIVE':
-            order_id_list = list(Order.objects.filter(status__in=[
+            order_id_list = list(Orders.objects.filter(status__in=[
                 ORDER_STATUS['NEW_ORDER'],
                 ORDER_STATUS['CONFIRMED']]).values_list('id', flat=True))
-            qs = qs.filter(company__order__id__in=order_id_list)
+            qs = qs.filter(company__orders__id__in=order_id_list)
         elif order_status == 'PENDING_PAYMENT':
-            order_id_list = list(Order.objects.filter(status__in=[
+            order_id_list = list(Orders.objects.filter(status__in=[
                 ORDER_STATUS['PROCESSING']]).values_list('id', flat=True))
-            qs = qs.filter(company__order__id__in=order_id_list)
+            qs = qs.filter(company__orders__id__in=order_id_list)
         return qs
 
 

@@ -42,14 +42,14 @@ class OrderStatusSerializer(CustomModelSerializer):
         return order
 
 
-class TableStatusChangeSerializer(OrderStatusSerializer):
+class TableOrderSerializer(OrderStatusSerializer):
 
     class Meta:
         model = Orders
         fields = ('status', )
 
     def update(self, instance, validated_data):
-        order = super(TableStatusChangeSerializer, self).update(instance, validated_data)
+        order = super(TableOrderSerializer, self).update(instance, validated_data)
         order.lines.update()
         return order
 
