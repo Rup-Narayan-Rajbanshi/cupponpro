@@ -11,7 +11,7 @@ class CustomModelSerializer(CustomValidationMessageForSerializerMixin, serialize
     id = serializers.CharField(read_only=True)
 
     class Meta:
-        # fields = "__all__"
+        fields = "__all__"
         # exclude = ["modified_at"]
         extra_kwargs = {
             "created_at": {"read_only": True},
