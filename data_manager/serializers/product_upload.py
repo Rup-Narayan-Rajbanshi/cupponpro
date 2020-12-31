@@ -39,9 +39,9 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
         company = self.context['request'].company
 
         df = pd.read_excel(data['upload_file'])
-        df['total_price'] = df['purchase_price']
         df = df.replace(np.nan, '', regex=True)
         df.rename(columns={column_name: title_to_snake_case(column_name) for column_name in df.columns }, inplace=True)
+        df['total_price'] = df['purchase_price']
 
         # Validate product category name
         code_qs = Product.objects.filter(product_code__in=set(df['product_code']), company=company)
