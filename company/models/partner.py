@@ -1,12 +1,17 @@
 import os
+import uuid
 from django.db import models
 from django.dispatch import receiver
-from helpers.models import BaseModel
+from django.db import models
+from django.utils import timezone
 from helpers.validators import is_alphanumeric_with_exception
 from helpers.app_helpers import content_file_name, url_builder
 
 
-class Partner(BaseModel):
+class Partner(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
+    created_on = models.DateTimeField(default=timezone.now)
+    modified_on = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=32, validators=[is_alphanumeric_with_exception])
     link = models.URLField()
     logo = models.ImageField(upload_to=content_file_name)
