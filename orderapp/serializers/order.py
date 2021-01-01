@@ -65,7 +65,8 @@ class TableOrderCreateSerializer(CustomModelSerializer):
 
     def get_fields(self):
         fields = super().get_fields()
-        if self.context['request'].method == 'GET':
+        request = self.context['request']
+        if request and request.method == 'GET':
             fields['order_lines'] = serializers.SerializerMethodField('lines')
         return fields
 

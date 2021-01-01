@@ -1,3 +1,4 @@
+from typing import Dict
 
 CURRENCY_TYPES = {
     'NRS': 'NRS',
@@ -10,7 +11,7 @@ PRODUCT_STATUS_TYPE = {
     'INACTIVE': 'INACTIVE'
 }
 
-ORDER_STATUS = {
+ORDER_STATUS: Dict[str, str] = {
     'NEW_ORDER': 'NEW_ORDER',
     'CONFIRMED': 'CONFIRMED',
     'PROCESSING': 'PROCESSING',
