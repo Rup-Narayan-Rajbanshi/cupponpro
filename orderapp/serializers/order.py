@@ -9,6 +9,7 @@ from helpers.serializer import CustomModelSerializer
 from helpers.constants import ORDER_STATUS
 from helpers.choices_variable import ORDER_STATUS_CHOICES
 from helpers.serializer_fields import DetailRelatedField
+from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
 from orderapp.serializers.order_line import OrderLineSerializer
 
@@ -43,14 +44,20 @@ class OrderStatusSerializer(CustomModelSerializer):
 
 
 class TableOrderSerializer(OrderStatusSerializer):
+    payment_mode = serializers.ChoiceField(choices=PAYMENT_CHOICES, required=False)
 
     class Meta:
         model = Orders
-        fields = ('status', )
+        fields = ('status', 'payment_mode')
+
+    def validate(self, attrs):
+        if not attrs.get('payment_mode') and attrs['status'] == ORDER_STATUS['BILLABLE']:
+            raise ValidationError('Please enter payment mode')
+        return super().validate(attrs)
 
     def update(self, instance, validated_data):
-        order = super(TableOrderSerializer, self).update(instance, validated_data)
-        order.lines.update()
+        request = self.context.get('request')
+        order = Orders.execute_change_status(order=instance, v_data=validated_data, request=request)
         return order
 
 
