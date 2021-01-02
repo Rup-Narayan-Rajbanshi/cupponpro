@@ -1,8 +1,7 @@
-# -*- coding:utf-8 -*-
 from django.urls import path
 from rest_framework import routers
 
-from orderapp.apis.bill import BillCreateAPI, get_order_list
+from orderapp.apis.bill import BillCreateAPI, get_order_list, ManualBillCreateAPI
 from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAPI
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
 from orderapp.apis.table import TableListAPI
@@ -14,6 +13,7 @@ router.register(r"table-order", TableOrderAPI)
 router.register(r"order-line", OrderLineAPI)
 router.register(r"update-order-line-status", OrderLineStatusUpdateAPI)
 router.register(r"create-bill", BillCreateAPI)
+router.register(r"manual-bill-create", ManualBillCreateAPI)
 
 urlpatterns = router.urls
 

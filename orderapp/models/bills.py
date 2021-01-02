@@ -16,6 +16,7 @@ class Bills(BaseModel):
     tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     invoice_number = models.CharField(max_length=8, editable=False)
+    is_manual = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-created_at']
@@ -60,6 +61,7 @@ class Bills(BaseModel):
     def to_representation(self):
         return {
             'id': self.id,
+            'is_manual': self.is_manual,
             'invoice_number': self.invoice_number,
             'payment_mode': self.payment_mode,
             'service_charge': self.service_charge,
