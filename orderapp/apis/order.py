@@ -1,9 +1,14 @@
+from rest_framework.decorators import api_view, renderer_classes, permission_classes
+from rest_framework.exceptions import APIException
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet
-from rest_framework import generics
+from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet, ViewSet
+from rest_framework import generics, status
 
 from commonapp.models.company import CompanyUser
+from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order
+from commonapp.models.product import Product
 from commonapp.models.salesitem import SalesItem
 from helpers.constants import ORDER_STATUS
 from helpers.paginations import FPagination
@@ -52,3 +57,25 @@ class TableOrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
     serializer_class = TableOrderSerializer
     permission_classes = (CompanyUserPermission, )
 
+
+class CalculateOrderAPI(generics.GenericAPIView):
+    permission_classes = (CompanyUserPermission, )
+
+    def post(self, request):
+        response = dict()
+        response['subtotal'] = 0.0
+        response['grand_total'] = 0.0
+        voucher = request.data['voucher']
+        if voucher:
+            voucher = Voucher.objects.filter(id=voucher).first()
+        order_lines = request.data['order_lines']
+        for line in order_lines:
+            product = Product.objects.filter(company=request.company, id=line['product']).first()
+            if not product:
+                raise APIException('Cannot find product {}'.format(line['product']))
+            response['subtotal'] = float(response['subtotal']) + float(product.get_line_subtotal(line['quantity'], voucher))
+        response['tax'] = request.company.tax if request.company.tax else 0
+        response['service_charge'] = request.company.service_charge if request.company.service_charge else 0
+        taxed_amount = (response['tax']/100) * response['subtotal']
+        response['grand_total'] = float(response['subtotal']) - response['service_charge'] - taxed_amount
+        return Response(response, status=status.HTTP_200_OK)

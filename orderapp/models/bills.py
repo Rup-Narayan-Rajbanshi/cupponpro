@@ -17,6 +17,7 @@ class Bills(BaseModel):
     paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     invoice_number = models.CharField(max_length=8, editable=False)
     is_manual = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-created_at']

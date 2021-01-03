@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from commonapp.models.image import Image
 from commonapp.models.company import Company
 from helpers.app_helpers import url_builder, content_file_name
-from helpers.constants import DEFAULTS, MAX_LENGTHS
+from helpers.constants import DEFAULTS, MAX_LENGTHS, DISCOUNT_TYPE
 from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES
 
 
@@ -67,7 +67,7 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     Deletes file from filesystem
     when corresponding `MediaFile` object is deleted.
     """
-    if instance.logo:
+    if instance.image:
         if os.path.isfile(instance.image.path):
             os.remove(instance.image.path)
 
@@ -167,3 +167,20 @@ class Product(models.Model):
         else:
             self.total_price = self.selling_price
         return super(Product, self).save(*args, **kwargs)
+
+    def get_line_subtotal(self, quantity, voucher=None):
+        if voucher:
+            discount = voucher.coupon.discount
+            discount_type = voucher.coupon.discount_type
+            if discount_type == DISCOUNT_TYPE['PERCENTAGE']:
+                discount = (discount / 100) * self.total_price
+            return (float(self.total_price) * float(quantity)) - float(discount)
+        else:
+            return float(self.total_price) * float(quantity)
+
+    def get_line_total(self, quantity, voucher=None):
+        subtotal = self.get_line_subtotal(quantity, voucher)
+        tax = self.company.tax if self.company.tax else 0
+        service_charge = self.company.service_charge if self.company.service_charge else 0
+        return
+

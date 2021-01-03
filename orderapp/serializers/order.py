@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 from commonapp.models.asset import Asset
 from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order
-from helpers.serializer import CustomModelSerializer
+from helpers.serializer import CustomModelSerializer, CustomBaseSerializer
 from helpers.constants import ORDER_STATUS
 from helpers.choices_variable import ORDER_STATUS_CHOICES
 from helpers.serializer_fields import DetailRelatedField
@@ -113,8 +113,9 @@ class TableOrderCreateSerializer(CustomModelSerializer):
         self.fields.pop('voucher')
         order_lines = validated_data.pop('order_lines')
         voucher = validated_data.pop('voucher') if validated_data.get('voucher') else None
-
         validated_data['user'] = self.context['request'].user
+        if voucher:
+            validated_data['user'] = voucher.user
         validated_data['company'] = self.context['request'].company
         order = super().create(validated_data)
 
