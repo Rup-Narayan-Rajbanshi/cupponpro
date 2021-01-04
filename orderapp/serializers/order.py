@@ -63,7 +63,8 @@ class TableOrderSerializer(OrderStatusSerializer):
 
 class TableOrderCreateSerializer(CustomModelSerializer):
     asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation')
-    voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation', required=False)
+    voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
+                                 required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
 
     class Meta:
@@ -112,11 +113,12 @@ class TableOrderCreateSerializer(CustomModelSerializer):
         self.fields.pop('order_lines')
         self.fields.pop('voucher')
         order_lines = validated_data.pop('order_lines')
-        voucher = validated_data.pop('voucher') if validated_data.get('voucher') else None
+        voucher = validated_data.pop('voucher', None)
         validated_data['user'] = self.context['request'].user
         if voucher:
             validated_data['user'] = voucher.user
         validated_data['company'] = self.context['request'].company
+
         order = super().create(validated_data)
 
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)

@@ -66,8 +66,8 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 time_diff = (current_time - scan_time).seconds
                 if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
                     is_session_valid = False
-            # if not is_session_valid:
-            #     raise OrderSessionExpiredException()
+            if not is_session_valid:
+                raise OrderSessionExpiredException()
             if order:
                 raise ValidationError({'detail': 'Order is already in process for this asset.'})
         else:
@@ -76,10 +76,18 @@ class OrderSaveSerializer(serializers.ModelSerializer):
 
         return super(OrderSaveSerializer, self).validate(attrs)
 
-    def prepare_new_table_order_data(self, validated_data):
+    def prepare_new_table_order_data(self, validated_data, order_lines_data):
+        new_line_data = list()
+        for line in order_lines_data:
+            new_line_data.append({
+                'product': line['product'].id,
+                'quantity': line['quantity']
+            })
         return {
-            'asset': validated_data.get('asset'),
-            'voucher': validated_data.get('voucher'),
+            'asset': validated_data.get('asset').id,
+            'order_lines': new_line_data,
+            'voucher': validated_data.get('voucher', None),
+            'extras': {}
         }
 
     @transaction.atomic
@@ -96,12 +104,17 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 create_list.append(OrderLine(**order_lines))
             OrderLine.objects.bulk_create(create_list)
 
-            new_order_data = self.prepare_new_table_order_data(validated_data)
-            new_order_data['legacy_order_id'] = order_obj.id
-            new_table_serializer = TableOrderCreateSerializer(**new_order_data)
+            new_order_data = self.prepare_new_table_order_data(validated_data, order_lines_data)
+            new_order_data['extras']['legacy_order_id'] = order_obj.id
+            request = self.context.get('request', {})
+
+            setattr(request, 'company', order_obj.company)
+            new_table_serializer = TableOrderCreateSerializer(data=new_order_data, context={'request': request})
             new_table_serializer.is_valid(raise_exception=True)
             new_table_serializer.save()
         except Exception as e:
+            print("New order error")
+            print(e)
             raise ValidationError({'detail': str(e)})
         ## sending notification to staffs  of associated company
         company = str(order_obj.company.id)
