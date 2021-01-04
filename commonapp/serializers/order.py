@@ -53,6 +53,9 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         if not self.instance:
             if request:
                 token = request.GET.get(ORDER_HEADER)
+            print('*******Scan Validity********')
+            print(token)
+            print('***************')
             if not token:
                 raise InvalidRequestException()
 
