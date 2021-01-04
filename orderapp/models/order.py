@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from rest_framework.exceptions import APIException
 
@@ -18,6 +19,7 @@ class Orders(BaseModel):
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name='orders')
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='orders')
     status = models.CharField(max_length=MAX_LENGTHS['ORDER_STATUS'], choices=ORDER_STATUS_CHOICES, default=DEFAULTS['ORDER_STATUS'])
+    extras = JSONField(blank=True, null=True)
 
     class Meta:
         ordering = ['-created_at']

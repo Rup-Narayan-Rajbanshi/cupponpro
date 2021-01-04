@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -7,6 +8,7 @@ from notifications.models import Notification, NotificationCategory
 from helpers.constants import ORDER_STATUS, ORDER_HEADER, ORDER_SCAN_COOLDOWN
 from orderapp.models.order_scan_log import OrderScanLog
 from helpers.exceptions import InvalidRequestException, OrderSessionExpiredException
+from orderapp.serializers.order import TableOrderCreateSerializer
 
 
 class OrderLineSerializer(serializers.ModelSerializer):
@@ -64,8 +66,8 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 time_diff = (current_time - scan_time).seconds
                 if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
                     is_session_valid = False
-            if not is_session_valid:
-                raise OrderSessionExpiredException()
+            # if not is_session_valid:
+            #     raise OrderSessionExpiredException()
             if order:
                 raise ValidationError({'detail': 'Order is already in process for this asset.'})
         else:
@@ -74,17 +76,31 @@ class OrderSaveSerializer(serializers.ModelSerializer):
 
         return super(OrderSaveSerializer, self).validate(attrs)
 
+    def prepare_new_table_order_data(self, validated_data):
+        return {
+            'asset': validated_data.get('asset'),
+            'voucher': validated_data.get('voucher'),
+        }
+
+    @transaction.atomic
     def create(self, validated_data):
         try:
             from notifications.tasks import notify_company_staffs
             order_lines_data = validated_data.pop('order_lines')
             order_obj = Order.objects.create(**validated_data)
             create_list = list()
+
             for order_lines in order_lines_data:
                 order_lines['order'] = order_obj
                 # OrderLine.objects.create(**order_lines)
                 create_list.append(OrderLine(**order_lines))
             OrderLine.objects.bulk_create(create_list)
+
+            new_order_data = self.prepare_new_table_order_data(validated_data)
+            new_order_data['legacy_order_id'] = order_obj.id
+            new_table_serializer = TableOrderCreateSerializer(**new_order_data)
+            new_table_serializer.is_valid(raise_exception=True)
+            new_table_serializer.save()
         except Exception as e:
             raise ValidationError({'detail': str(e)})
         ## sending notification to staffs  of associated company
