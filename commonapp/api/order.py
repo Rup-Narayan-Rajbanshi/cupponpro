@@ -72,6 +72,7 @@ class OrderListView(generics.GenericAPIView):
             'success': 0,
             'message': serializer.errors
         }
+        print(data)
         return Response(data, status=400)
 
 class OrderDetailView(generics.GenericAPIView):
