@@ -57,6 +57,9 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 raise InvalidRequestException()
 
             scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_at').first()
+            print('*******Scan Validity********')
+            print(scan_validity.__dict__)
+            print('***************')
             is_session_valid = True
             if not scan_validity:
                 is_session_valid = False
