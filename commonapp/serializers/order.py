@@ -53,16 +53,10 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         if not self.instance:
             if request:
                 token = request.GET.get(ORDER_HEADER)
-            print('*******Scan Validity********')
-            print(token)
-            print('***************')
             if not token:
                 raise InvalidRequestException()
 
             scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_at').first()
-            print('*******Scan Validity********')
-            print(scan_validity.__dict__)
-            print('***************')
             is_session_valid = True
             if not scan_validity:
                 is_session_valid = False
@@ -72,8 +66,8 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 time_diff = (current_time - scan_time).seconds
                 if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
                     is_session_valid = False
-            # if not is_session_valid:
-            #     raise OrderSessionExpiredException()
+            if not is_session_valid:
+                raise OrderSessionExpiredException()
             if order:
                 raise ValidationError({'detail': 'Order is already in process for this asset.'})
         else:
