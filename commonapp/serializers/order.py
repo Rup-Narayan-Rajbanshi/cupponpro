@@ -66,8 +66,8 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 time_diff = (current_time - scan_time).seconds
                 if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
                     is_session_valid = False
-            # if not is_session_valid:
-            #     raise OrderSessionExpiredException()
+            if not is_session_valid:
+                raise OrderSessionExpiredException()
             if order:
                 raise ValidationError({'detail': 'Order is already in process for this asset.'})
         else:

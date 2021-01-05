@@ -115,6 +115,8 @@ class TableOrderCreateSerializer(CustomModelSerializer):
         order_lines = validated_data.pop('order_lines')
         voucher = validated_data.pop('voucher', None)
         validated_data['user'] = self.context['request'].user
+        if not validated_data['user'].is_authenticated:
+            validated_data['user'] = None
         if voucher:
             validated_data['user'] = voucher.user
         validated_data['company'] = self.context['request'].company
