@@ -8,6 +8,7 @@ class AssetSerializer(serializers.ModelSerializer):
     order_status = serializers.SerializerMethodField()
     orders = serializers.SerializerMethodField()
     served = serializers.SerializerMethodField()
+    order_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Asset
@@ -19,8 +20,14 @@ class AssetSerializer(serializers.ModelSerializer):
             'company': obj.company_id
         }
 
+    def get_order_id(self, obj):
+        recent_order = obj.orders.order_by('-created_at').first()
+        if recent_order:
+            return recent_order.status
+        return ''
+
     def get_order_status(self, obj):
-        recent_order = obj.company.orders.order_by('-created_at')[:1]
+        recent_order = obj.orders.order_by('-created_at').first()
         if recent_order:
             return recent_order[0].status
         return ''
