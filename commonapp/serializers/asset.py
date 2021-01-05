@@ -29,7 +29,7 @@ class AssetSerializer(serializers.ModelSerializer):
     def get_order_status(self, obj):
         recent_order = obj.orders.order_by('-created_at').first()
         if recent_order:
-            return recent_order[0].status
+            return recent_order.status
         return ''
 
     def get_orders(self, obj):
