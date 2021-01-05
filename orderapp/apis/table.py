@@ -45,7 +45,7 @@ class AssetListAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
     filter_backends = (DjangoFilterBackend,)
     filter_class = AssetFilter
 
-    pagination_class = FPagination
+    # pagination_class = FPagination
 
     def get_queryset(self):
         return self.queryset.filter(company_id=self.request.company)
