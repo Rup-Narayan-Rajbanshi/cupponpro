@@ -59,13 +59,13 @@ class CompanyUserPermission(permissions.BasePermission):
         return False
 
 
-# class CompanyCustomerPermission(permissions.BasePermission):
-#     def has_permission(self, request, view):
-#         asset = request.GET.get('asset')
-#         asset = Asset.objects.filter(id=request.GET.get('asset')).first()
-#         if asset not request.user.is_authenticated:
-#             company_user = CompanyUser.objects.filter(user=request.user)
-#             if company_user.exists():
-#                 request.company = company_user[0].company
-#                 return True
-#         return False
+class CompanyCustomerPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        try:
+            asset = Asset.objects.filter(id=request.GET.get('asset')).first()
+            if asset and not request.user.is_authenticated:
+                request.company = asset.company
+                request.user = asset.company.get_or_create_company_customer_user()
+        except:
+            return False
+        return False

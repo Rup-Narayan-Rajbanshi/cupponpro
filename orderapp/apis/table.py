@@ -4,13 +4,10 @@ from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 
 from commonapp.models.asset import Asset
-from commonapp.models.company import CompanyUser
-from commonapp.models.order import Order
 from commonapp.serializers.asset import AssetSerializer
 from helpers.api_mixins import FAPIMixin
-from helpers.constants import ASSET_TYPE, ORDER_STATUS
+from helpers.constants import ORDER_STATUS, ORDER_LINE_STATUS
 from helpers.paginations import FPagination
-from orderapp.models.order import Orders
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
 
 
@@ -29,6 +26,14 @@ class AssetFilter(filters.FilterSet):
             qs = qs.filter(orders__status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED']])
         elif order_status == 'PENDING_PAYMENT':
             qs = qs.filter(orders__status__in=[ORDER_STATUS['PROCESSING']])
+            pending = []
+            for asset in qs:
+                latest_order = asset.orders.order_by('-created_at').first()
+                if latest_order.lines.filter(
+                    status=ORDER_LINE_STATUS['SERVED']
+                ).count() == latest_order.lines.count():
+                    pending.append(asset.id)
+                qs = qs.filter(id__in=pending)
         return qs.distinct()
 
 

@@ -69,6 +69,10 @@ class Company(Address):
             self.key = shortuuid.ShortUUID().random(length=8)
         return super(Company, self).save(*args, **kwargs)
 
+    def get_or_create_company_customer_user(self):
+        pass
+
+
 @receiver(models.signals.post_delete, sender=Company)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
