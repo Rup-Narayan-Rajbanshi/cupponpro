@@ -126,6 +126,10 @@ class CompanyUser(models.Model):
     def __str__(self):
         return self.user.full_name
 
+    @classmethod
+    def get_or_create_customer_user(self):
+        Group.ob
+
 
 class FavouriteCompany(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)

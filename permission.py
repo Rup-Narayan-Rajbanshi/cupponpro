@@ -1,4 +1,6 @@
 from rest_framework import permissions
+
+from commonapp.models.asset import Asset
 from commonapp.models.company import CompanyUser
 
 
@@ -55,3 +57,15 @@ class CompanyUserPermission(permissions.BasePermission):
                 request.company = company_user[0].company
                 return True
         return False
+
+
+# class CompanyCustomerPermission(permissions.BasePermission):
+#     def has_permission(self, request, view):
+#         asset = request.GET.get('asset')
+#         asset = Asset.objects.filter(id=request.GET.get('asset')).first()
+#         if asset not request.user.is_authenticated:
+#             company_user = CompanyUser.objects.filter(user=request.user)
+#             if company_user.exists():
+#                 request.company = company_user[0].company
+#                 return True
+#         return False

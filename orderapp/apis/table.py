@@ -26,15 +26,10 @@ class AssetFilter(filters.FilterSet):
         qs = super(AssetFilter, self).qs
         order_status = self.request.GET.get('order_status')
         if order_status == 'ACTIVE':
-            order_id_list = list(Orders.objects.filter(status__in=[
-                ORDER_STATUS['NEW_ORDER'],
-                ORDER_STATUS['CONFIRMED']]).values_list('id', flat=True))
-            qs = qs.filter(company__orders__id__in=order_id_list)
+            qs = qs.filter(orders__status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED']])
         elif order_status == 'PENDING_PAYMENT':
-            order_id_list = list(Orders.objects.filter(status__in=[
-                ORDER_STATUS['PROCESSING']]).values_list('id', flat=True))
-            qs = qs.filter(company__orders__id__in=order_id_list)
-        return qs
+            qs = qs.filter(orders__status__in=[ORDER_STATUS['PROCESSING']])
+        return qs.distinct()
 
 
 class AssetListAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):

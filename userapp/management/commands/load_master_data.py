@@ -17,7 +17,7 @@ class Command(BaseCommand):
             print('NO NEED TO LOAD NOTIFICATION CATEGORY')
 
         groups = Group.objects.count()
-        if groups != 5:
+        if groups != 6:
             # new_groups = [
             #     Group(name='admin'),
             #     Group(name='owner'),
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             #     Group(name='user')
             # ]
             # Group.objects.bulk_create(new_groups)
-            new_groups = ['admin', 'owner', 'manager', 'sales', 'user']
+            new_groups = ['admin', 'owner', 'manager', 'sales', 'user', 'customer']
             for group in new_groups:
                 g, _ = Group.objects.get_or_create(name=group)
             print("GROUP LOADED")

@@ -1,5 +1,6 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
+from django.db.models import Sum
 from rest_framework.exceptions import APIException
 
 from helpers.models import BaseModel
@@ -56,6 +57,10 @@ class Orders(BaseModel):
     def get_bills(self):
         bills = self.bill.to_representation()
         return bills
+
+    @property
+    def total(self):
+        return float(self.lines.aggregate(order_total=Sum('total'))['order_total'])
 
 
 class OrderLines(BaseModel):
