@@ -5,10 +5,7 @@ from helpers.constants import ORDER_LINE_STATUS
 
 class AssetSerializer(serializers.ModelSerializer):
     qr = serializers.SerializerMethodField()
-    order_status = serializers.SerializerMethodField()
     orders = serializers.SerializerMethodField()
-    served = serializers.SerializerMethodField()
-    order_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Asset
@@ -20,23 +17,13 @@ class AssetSerializer(serializers.ModelSerializer):
             'company': obj.company_id
         }
 
-    def get_order_id(self, obj):
-        recent_order = obj.orders.order_by('-created_at').first()
-        if recent_order:
-            return recent_order.id
-        return ''
-
-    def get_order_status(self, obj):
-        recent_order = obj.orders.order_by('-created_at').first()
-        if recent_order:
-            return recent_order.status
-        return ''
-
     def get_orders(self, obj):
         latest_order = obj.orders.order_by('-created_at').first()
-        return latest_order.lines.count() if latest_order else 0
-
-    def get_served(self, obj):
-        latest_order = obj.orders.order_by('-created_at').first()
-        return latest_order.lines.filter(
-            status=ORDER_LINE_STATUS['SERVED']).count() if latest_order else 0
+        return {
+            "has_active_order": True if latest_order else False,
+            "order_status": latest_order.status if latest_order else None,
+            "total": latest_order.lines.count() if latest_order else 0,
+            "served": latest_order.lines.filter(
+                status=ORDER_LINE_STATUS['SERVED']).count() if latest_order else 0,
+            "order_id": latest_order.id if latest_order else None
+        }
