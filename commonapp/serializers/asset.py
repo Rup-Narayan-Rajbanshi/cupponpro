@@ -26,10 +26,10 @@ class AssetSerializer(serializers.ModelSerializer):
         return ''
 
     def get_orders(self, obj):
-        latest_order = obj.company.orders.order_by('-created_at').first()
+        latest_order = obj.orders.order_by('-created_at').first()
         return latest_order.lines.count() if latest_order else 0
 
     def get_served(self, obj):
-        latest_order = obj.company.orders.order_by('-created_at').first()
+        latest_order = obj.orders.order_by('-created_at').first()
         return latest_order.lines.filter(
             status=ORDER_LINE_STATUS['SERVED']).count() if latest_order else 0

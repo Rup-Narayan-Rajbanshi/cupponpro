@@ -14,7 +14,7 @@ from orderapp.models.order import Orders
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
 
 
-class TableFilter(filters.FilterSet):
+class AssetFilter(filters.FilterSet):
     order_status = filters.CharFilter(field_name='company__order__status', exclude=True)
 
     class Meta:
@@ -23,7 +23,7 @@ class TableFilter(filters.FilterSet):
 
     @property
     def qs(self):
-        qs = super(TableFilter, self).qs
+        qs = super(AssetFilter, self).qs
         order_status = self.request.GET.get('order_status')
         if order_status == 'ACTIVE':
             order_id_list = list(Orders.objects.filter(status__in=[
@@ -37,15 +37,15 @@ class TableFilter(filters.FilterSet):
         return qs
 
 
-class TableListAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
-    queryset = Asset.objects.filter(asset_type=ASSET_TYPE['TABLE']).order_by('-created_at')
+class AssetListAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
+    # queryset = Asset.objects.filter(asset_type=ASSET_TYPE['TABLE']).order_by('-created_at')
+    queryset = Asset.objects.filter().order_by('-created_at')
     serializer_class = AssetSerializer
     permission_classes = [CompanyUserPermission | isCompanyManagerAndAllowAll]
     filter_backends = (DjangoFilterBackend,)
-    filter_class = TableFilter
+    filter_class = AssetFilter
 
     pagination_class = FPagination
 
     def get_queryset(self):
-        company_user = CompanyUser.objects.filter(user=self.request.user)[0]
-        return self.queryset.filter(company_id=company_user.company.id)
+        return self.queryset.filter(company_id=self.request.company)

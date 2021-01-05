@@ -4,7 +4,7 @@ from rest_framework import routers
 from orderapp.apis.order import OrderStatusAPI, OrderCountAPI, TableOrderAPI, TableOrderStatusAPI
 from orderapp.apis.order_line import OrderLineAPI
 from orderapp.apis.order_scan_log import ValidateOrderScanAPI
-from orderapp.apis.table import TableListAPI
+from orderapp.apis.table import AssetListAPI
 
 app_name = 'orderapp'
 
@@ -20,5 +20,5 @@ urlpatterns = router.urls
 
 urlpatterns += [
     path('order-count', OrderCountAPI.as_view(), name='order_count'),
-    path('tables', TableListAPI.as_view({'get': 'list'}), name='order_count'),
+    path('tables', AssetListAPI.as_view({'get': 'list'}), name='order_count'),
 ]
