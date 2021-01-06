@@ -184,7 +184,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         order_lines_obj = OrderLine.objects.filter(order=obj.id)
         total = 0
         for order_lines in order_lines_obj:
-            total += order_lines.total
+            total += order_lines.subtotal
         return float(total)
 
     def get_taxed_amount(self, obj):
@@ -231,7 +231,7 @@ class OrderSerializer(serializers.ModelSerializer):
         order_lines_obj = OrderLine.objects.filter(order=obj.id)
         total = 0
         for order_lines in order_lines_obj:
-            total += order_lines.total
+            total += order_lines.subtotal
         return float(total)
 
     def get_taxed_amount(self, obj):

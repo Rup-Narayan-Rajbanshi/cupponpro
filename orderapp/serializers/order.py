@@ -66,10 +66,11 @@ class TableOrderCreateSerializer(CustomModelSerializer):
     voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
+    price_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Orders
-        fields = ('id', 'voucher', 'asset', 'order_lines')
+        fields = ('id', 'voucher', 'asset', 'order_lines', 'price_details')
 
     def get_fields(self):
         fields = super().get_fields()
@@ -81,6 +82,15 @@ class TableOrderCreateSerializer(CustomModelSerializer):
     def lines(self, order):
         lines = OrderLineSerializer(order.lines.all(), many=True)
         return lines.data
+
+    def get_price_details(self, obj):
+        return {
+            'discount': obj.discount_amount,
+            'sub_total': obj.subtotal,
+            'tax': obj.company.tax,
+            'service_charge': obj.company.service_charge,
+            'grand_total': obj.grand_total
+        }
 
     def validate(self, attrs):
         if self.instance:

@@ -59,8 +59,26 @@ class Orders(BaseModel):
         return bills
 
     @property
-    def total(self):
+    def subtotal(self):
         return float(self.lines.aggregate(order_total=Sum('total'))['order_total'])
+
+    @property
+    def discount_amount(self):
+        value = 0.0
+        for line in self.lines.all():
+            value = value + line.get_discounted_amount()
+        return value
+
+    @property
+    def grand_total(self):
+        value = 0.0
+        for line in self.lines.all():
+            value = value + line.get_line_total()
+        # discount = self.lines.first().get_discount() if self.lines.first() else None
+        tax = self.company.tax if self.company.tax else 0
+        service_charge = self.company.service_charge if self.company.service_charge else 0
+        tax_amount = float(tax/100) * float(value)
+        return float(value) + tax_amount + float(service_charge)
 
 
 class OrderLines(BaseModel):

@@ -26,5 +26,5 @@ class AssetSerializer(serializers.ModelSerializer):
             "served": latest_order.lines.filter(
                 status=ORDER_LINE_STATUS['SERVED']).count() if latest_order else 0,
             "order_id": latest_order.id if latest_order else None,
-            "total_amount": latest_order.total if latest_order else 0
+            "total_amount": latest_order.subtotal if latest_order else 0
         }
