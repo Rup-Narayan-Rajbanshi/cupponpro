@@ -70,7 +70,7 @@ class TableOrderCreateSerializer(CustomModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ('id', 'voucher', 'asset', 'order_lines', 'price_details')
+        fields = ('id','status', 'voucher', 'asset', 'order_lines', 'price_details')
 
     def get_fields(self):
         fields = super().get_fields()
