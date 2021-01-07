@@ -56,10 +56,18 @@ class Bills(BaseModel):
 
     def get_subtotal(self):
         subtotal = 0
+        discount_amount = 0
+        voucher = self.orders.first().lines.first().voucher
         for order in self.orders.all():
             total = float(order.lines.aggregate(order_total=Sum('total'))['order_total'])
             subtotal = subtotal + total
-        return subtotal
+        if voucher:
+            discount = voucher.coupon.discount
+            if voucher.coupon.discount_type == 'PERCENTAGE':
+                discount_amount = (discount/100) * subtotal
+            else:
+                discount_amount = discount
+        return subtotal - discount_amount
 
     def to_representation(self):
         return {
@@ -72,5 +80,6 @@ class Bills(BaseModel):
             'subtotal': self.get_subtotal(),
             'grand_total': self.get_grand_total(),
             'company': self.company.to_representation(),
+            'custom_discount_percentage': self.custom_discount_percentage,
 
         }

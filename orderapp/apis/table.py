@@ -7,7 +7,6 @@ from commonapp.models.asset import Asset
 from commonapp.serializers.asset import AssetSerializer
 from helpers.api_mixins import FAPIMixin
 from helpers.constants import ORDER_STATUS, ORDER_LINE_STATUS
-from helpers.paginations import FPagination
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
 
 
