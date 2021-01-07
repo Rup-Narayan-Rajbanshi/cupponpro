@@ -41,7 +41,8 @@ ORDER_STATUS_CHOICES = (
     (ORDER_STATUS['CONFIRMED'], 'Confirmed'),
     (ORDER_STATUS['PROCESSING'], 'Processing'),
     (ORDER_STATUS['BILLABLE'], 'Billable'),
-    (ORDER_STATUS['CANCELLED'], 'Cancelled')
+    (ORDER_STATUS['CANCELLED'], 'Cancelled'),
+    (ORDER_STATUS['COMPLETED'], 'Completed')
 )
 
 GENDER_CHOICES = (
