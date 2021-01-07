@@ -18,5 +18,6 @@ class VoucherListAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
         if not phone_number:
             raise APIException('Phone number is required')
         return self.queryset.filter(
+            is_redeem=False,
             coupon__company=self.request.company,
             user__phone_number=phone_number)
