@@ -50,7 +50,7 @@ class TableOrderSerializer(OrderStatusSerializer):
 
     class Meta:
         model = Orders
-        fields = ('status', 'payment_mode')
+        fields = ('status', 'payment_mode', 'custom_discount_percentage')
 
     def validate(self, attrs):
         if not attrs.get('payment_mode') and attrs['status'] == ORDER_STATUS['BILLABLE']:
