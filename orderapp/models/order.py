@@ -36,7 +36,7 @@ class Orders(BaseModel):
         status = v_data.get('status')
         order.status = status
         order.save()
-        if status == ORDER_STATUS['BILLABLE']:
+        if status == ORDER_STATUS['COMPLETED']:
             data = dict()
             data['company'] = order.company.id
             data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
