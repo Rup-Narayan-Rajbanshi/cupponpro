@@ -61,7 +61,11 @@ class Orders(BaseModel):
 
     @property
     def subtotal(self):
-        return float(self.lines.aggregate(order_total=Sum('total'))['order_total'])
+        subtotal = self.lines.aggregate(order_total=Sum('total'))['order_total']
+        if subtotal:
+            return float(subtotal)
+        else:
+            return float(0)
 
     @property
     def discount_amount(self):
