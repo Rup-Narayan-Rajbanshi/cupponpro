@@ -14,10 +14,12 @@ class Bills(BaseModel):
     payment_mode = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default=PAYMENT_MODES['CASH'])
     service_charge = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    payable_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     invoice_number = models.CharField(max_length=8, editable=False)
     is_manual = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
+    custom_discount_percentage = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['-created_at']
@@ -38,7 +40,7 @@ class Bills(BaseModel):
             company_obj.save()
             invoice_number = str(company_obj.invoice_counter)
             self.invoice_number = "0" * (8 - len(invoice_number)) + invoice_number
-        self.paid_amount = self.get_grand_total()
+        self.payable_amount = self.get_grand_total()
         return super(Bills, self).save(*args, **kwargs)
 
     def get_grand_total(self):

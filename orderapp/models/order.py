@@ -41,6 +41,7 @@ class Orders(BaseModel):
             data['company'] = order.company.id
             data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
             data['tax'] = order.company.tax if order.company.tax else 0
+            data['custom_discount_percentage'] = v_data.get('custom_discount_percentage', 0)
             serializer = BillCreateSerializer(data=data, context={'request': request})
             if not serializer.is_valid():
                 raise APIException(detail='Cannot bill the order', code=400)

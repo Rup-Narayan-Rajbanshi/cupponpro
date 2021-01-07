@@ -9,6 +9,7 @@ from helpers.serializer import CustomModelSerializer, CustomBaseSerializer
 from helpers.constants import ORDER_STATUS
 from helpers.choices_variable import ORDER_STATUS_CHOICES
 from helpers.serializer_fields import DetailRelatedField
+from helpers.validators import is_numeric_value
 from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
 from orderapp.serializers.order_line import OrderLineSerializer
@@ -45,6 +46,7 @@ class OrderStatusSerializer(CustomModelSerializer):
 
 class TableOrderSerializer(OrderStatusSerializer):
     payment_mode = serializers.ChoiceField(choices=PAYMENT_CHOICES, required=False)
+    custom_discount_percentage = serializers.CharField(validators=[is_numeric_value], required=False)
 
     class Meta:
         model = Orders
