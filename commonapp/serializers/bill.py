@@ -124,7 +124,7 @@ class BillSerializer(serializers.ModelSerializer):
         sales_item_obj = SalesItem.objects.filter(bill=obj.id)
         total = 0
         for sales_item in sales_item_obj:
-            total += sales_item.subtotal
+            total += sales_item.total
         return float(total)
 
     def get_taxed_amount(self, obj):
