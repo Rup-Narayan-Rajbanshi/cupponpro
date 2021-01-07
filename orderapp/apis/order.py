@@ -66,9 +66,11 @@ class CalculateOrderAPI(generics.GenericAPIView):
         response = dict()
         response['subtotal'] = 0.0
         response['grand_total'] = 0.0
-        voucher = request.data['voucher']
-        if voucher:
-            voucher = Voucher.objects.filter(id=voucher).first()
+        response['voucher'] = request.data.get('voucher', 0)
+        if response['voucher']:
+            voucher = Voucher.objects.filter(id=response['voucher']).first()
+            response['discount'] = voucher.coupon.discount
+            response['discount_type'] = voucher.coupon.discount_type
         order_lines = request.data['order_lines']
         for line in order_lines:
             product = Product.objects.filter(company=request.company, id=line['product']).first()
@@ -78,5 +80,9 @@ class CalculateOrderAPI(generics.GenericAPIView):
         response['tax'] = request.company.tax if request.company.tax else 0
         response['service_charge'] = request.company.service_charge if request.company.service_charge else 0
         taxed_amount = (response['tax']/100) * response['subtotal']
-        response['grand_total'] = float(response['subtotal']) - response['service_charge'] - taxed_amount
+        response['grand_total'] = float(response['subtotal']) + float(response['service_charge']) + float(taxed_amount)
+        if response.get('discount_type', None) == 'PERCENTAGE':
+            response['grand_total'] = response['grand_total'] - (float(response['discount']/100) * response['grand_total'])
+        else:
+            response['grand_total'] = response['grand_total'] - float(response['discount'])
         return Response(response, status=status.HTTP_200_OK)
