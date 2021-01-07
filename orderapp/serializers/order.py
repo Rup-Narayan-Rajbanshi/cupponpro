@@ -52,10 +52,10 @@ class TableOrderSerializer(OrderStatusSerializer):
         model = Orders
         fields = ('status', 'payment_mode', 'custom_discount_percentage')
 
-    def validate(self, attrs):
-        if not attrs.get('payment_mode') and attrs['status'] == ORDER_STATUS['BILLABLE']:
-            raise ValidationError('Please enter payment mode')
-        return super().validate(attrs)
+    # def validate(self, attrs):
+    #     if not attrs.get('payment_mode') and attrs['status'] == ORDER_STATUS['BILLABLE']:
+    #         raise ValidationError('Please enter payment mode')
+    #     return super().validate(attrs)
 
     def update(self, instance, validated_data):
         request = self.context.get('request')
