@@ -75,7 +75,7 @@ class TableOrderSerializer(OrderStatusSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get('request')
-        voucher = validated_data['voucher']
+        voucher = validated_data.get('voucher')
         if voucher:
             for line in instance.lines.all():
                 line.update(voucher=voucher)
