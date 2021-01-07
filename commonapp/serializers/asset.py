@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from commonapp.models.asset import Asset
-from helpers.constants import ORDER_LINE_STATUS
+from helpers.constants import ORDER_LINE_STATUS, ORDER_STATUS
 
 
 class AssetSerializer(serializers.ModelSerializer):
@@ -18,7 +18,10 @@ class AssetSerializer(serializers.ModelSerializer):
         }
 
     def get_orders(self, obj):
-        latest_order = obj.orders.order_by('-created_at').first()
+        latest_order = obj.orders.filter(status__in=[
+            ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['PROCESSING'],
+            ORDER_STATUS['CONFIRMED'], ORDER_STATUS['BILLABLE'], ]
+        ).order_by('-created_at').first()
         return {
             "has_active_order": True if latest_order else False,
             "order_status": latest_order.status if latest_order else None,
