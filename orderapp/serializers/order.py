@@ -55,20 +55,20 @@ class TableOrderSerializer(OrderStatusSerializer):
     def validate(self, attrs):
         if not attrs.get('payment_mode') and attrs['status'] == ORDER_STATUS['COMPLETED']:
             raise ValidationError('Please enter payment mode')
-        # status = attrs['status']
-        # allowed_status_change = {
-        #     ORDER_STATUS['NEW_ORDER']: [ORDER_STATUS['CONFIRMED'], ORDER_STATUS['CANCELLED']],
-        #     ORDER_STATUS['CONFIRMED']: [ORDER_STATUS['PROCESSING']],
-        #     ORDER_STATUS['PROCESSING']: [ORDER_STATUS['BILLABLE']],
-        #     ORDER_STATUS['BILLABLE']: [],
-        #     ORDER_STATUS['CANCELLED']: [],
-        #     ORDER_STATUS['COMPLETED']: ['BILLABLE']
-        # }
-        #
-        # if self.instance is not None:
-        #     instance = self.instance
-        #     if status not in allowed_status_change[instance.status]:
-        #         raise ValidationError({'detail': 'Cannot change status from {} to {}.'.format(instance.status, status)})
+        status = attrs['status']
+        allowed_status_change = {
+            # ORDER_STATUS['NEW_ORDER']: [ORDER_STATUS['CONFIRMED'], ORDER_STATUS['CANCELLED']],
+            # ORDER_STATUS['CONFIRMED']: [ORDER_STATUS['PROCESSING']],
+            # ORDER_STATUS['PROCESSING']: [ORDER_STATUS['BILLABLE']],
+            # ORDER_STATUS['BILLABLE']: [],
+            # ORDER_STATUS['CANCELLED']: [],
+            # ORDER_STATUS['COMPLETED']: ['BILLABLE']
+        }
+
+        if self.instance.status in [ORDER_STATUS['CANCELLED'], ORDER_STATUS['COMPLETED']]:
+            # instance = self.instance
+            # if status not in allowed_status_change[instance.status]:
+            raise ValidationError({'detail': 'Cannot change status from {} to {}.'.format(self.instance.status, status)})
         return attrs
 
     def update(self, instance, validated_data):
@@ -115,6 +115,7 @@ class TableOrderCreateSerializer(CustomModelSerializer):
         elif attrs['asset'].orders.filter(status__in=[
             ORDER_STATUS['NEW_ORDER'],
             ORDER_STATUS['PROCESSING'],
+            ORDER_STATUS['BILLABLE'],
             ORDER_STATUS['CONFIRMED']]).exists():
 
             raise ValidationError('Table already has an active order')
