@@ -51,6 +51,9 @@ class TableOrderAPI(ModelViewSet):
     serializer_class = TableOrderCreateSerializer
     pagination_class = FPagination
 
+    def create(self, request, *args, **kwargs):
+        created_response = super().create(request, *args, **kwargs)
+        return Response(created_response, status=200)
 
 class TableOrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
     queryset = Orders.objects.all().order_by('-created_at')

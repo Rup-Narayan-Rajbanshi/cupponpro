@@ -2,7 +2,6 @@ import uuid
 from django.core.validators import RegexValidator
 from rest_framework.exceptions import APIException
 from django.db import models, transaction
-from django.db.models import F
 from commonapp.models.asset import Asset
 from commonapp.models.bill import Bill
 from commonapp.models.company import Company

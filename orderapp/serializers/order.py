@@ -47,10 +47,12 @@ class OrderStatusSerializer(CustomModelSerializer):
 class TableOrderSerializer(OrderStatusSerializer):
     payment_mode = serializers.ChoiceField(choices=PAYMENT_CHOICES, required=False)
     custom_discount_percentage = serializers.CharField(validators=[is_numeric_value], required=False)
+    voucher = DetailRelatedField(model=Voucher, lookup='id',
+                                 representation='to_representation', required=False)
 
     class Meta:
         model = Orders
-        fields = ('status', 'payment_mode', 'custom_discount_percentage')
+        fields = ('status', 'payment_mode', 'custom_discount_percentage', 'voucher')
 
     def validate(self, attrs):
         if not attrs.get('payment_mode') and attrs['status'] == ORDER_STATUS['COMPLETED']:
@@ -73,6 +75,10 @@ class TableOrderSerializer(OrderStatusSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get('request')
+        voucher = validated_data['voucher']
+        if voucher:
+            for line in instance.lines.all():
+                line.update(voucher=voucher)
         order = Orders.execute_change_status(order=instance, v_data=validated_data, request=request)
         return order
 
@@ -117,7 +123,6 @@ class TableOrderCreateSerializer(CustomModelSerializer):
             ORDER_STATUS['PROCESSING'],
             ORDER_STATUS['BILLABLE'],
             ORDER_STATUS['CONFIRMED']]).exists():
-
             raise ValidationError('Table already has an active order')
         return super().validate(attrs)
 
