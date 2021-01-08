@@ -100,3 +100,12 @@ class Voucher(models.Model):
             encrypted_value = encrypt(voucher_token, key)
             self.token = encrypted_value
         super(Voucher, self).save(*args, **kwargs)
+
+    def to_representation(self, request=None):
+        return {
+            'id': self.id,
+            'is_redeem': self.is_redeem,
+            'user': self.user.to_representation(),
+            'used_date': self.used_date,
+            'coupon': self.coupon.to_representation()
+        }
