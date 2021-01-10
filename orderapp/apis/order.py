@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view, renderer_classes, permission_classes
 from rest_framework.exceptions import APIException
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet, ViewSet
@@ -90,3 +91,19 @@ class CalculateOrderAPI(generics.GenericAPIView):
         else:
             response['grand_total'] = response['grand_total'] - float(response['discount'])
         return Response(response, status=status.HTTP_200_OK)
+
+
+class UserOrderListAPI(mixins.ListModelMixin, GenericViewSet):
+    queryset = Order.objects.all().order_by('-created_at')
+    permission_classes = (IsAuthenticated, )
+    serializer_class = TableOrderCreateSerializer
+    pagination_class = FPagination
+
+    def get_queryset(self):
+        status = self.request.GET.get('status')
+        if status == 'ACTIVE':
+            return self.queryset.filter(user=self.request.user,
+                                        status__in=[
+                                            ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'],
+                                            ORDER_STATUS['PROCESSING'], ORDER_STATUS['BILLABLE']])
+        return self.queryset.filter(user=self.request.user)

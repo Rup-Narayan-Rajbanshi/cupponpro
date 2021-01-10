@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework import routers
 
 from orderapp.apis.bill import BillCreateAPI, get_order_list, ManualBillCreateAPI
-from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAPI, CalculateOrderAPI
+from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAPI, CalculateOrderAPI, UserOrderListAPI
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
 from orderapp.apis.table import AssetListAPI
 from orderapp.apis.voucher import VoucherListAPI
@@ -23,4 +23,5 @@ urlpatterns += {
     path('order-count', OrderCountAPI.as_view(), name='order_count'),
     path('calculate-order', CalculateOrderAPI.as_view(), name='calculate_order'),
     path('assets', AssetListAPI.as_view({'get': 'list'}), name='order_count'),
+    path('user-orders', UserOrderListAPI.as_view({'get': 'list'}), name='user_orders'),
 }
