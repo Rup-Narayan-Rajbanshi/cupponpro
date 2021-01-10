@@ -10,6 +10,7 @@ from helpers.constants import ORDER_STATUS
 from helpers.choices_variable import ORDER_STATUS_CHOICES
 from helpers.serializer_fields import DetailRelatedField
 from helpers.validators import is_numeric_value
+from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CATEGORY
 from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
 from orderapp.serializers.order_line import OrderLineSerializer
@@ -84,7 +85,7 @@ class TableOrderSerializer(OrderStatusSerializer):
 
 
 class TableOrderCreateSerializer(CustomModelSerializer):
-    asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation')
+    asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=True)
     voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
@@ -118,6 +119,8 @@ class TableOrderCreateSerializer(CustomModelSerializer):
         if self.instance:
             if self.context['request'].company != self.instance.company:
                 raise ValidationError('Cannot update for another company')
+            if self.instance.status in [ORDER_STATUS['CANCELLED'], ORDER_STATUS['COMPLETED']]:
+                raise ValidationError('Cannot update completed or cancelled order')
         elif attrs['asset'].orders.filter(status__in=[
             ORDER_STATUS['NEW_ORDER'],
             ORDER_STATUS['PROCESSING'],
@@ -141,7 +144,8 @@ class TableOrderCreateSerializer(CustomModelSerializer):
         return bulk_create_data
 
     @transaction.atomic
-    def create(self, validated_data):
+    def create(self, validated_data, notify=True):
+        from notifications.tasks import notify_company_staffs
         self.fields.pop('order_lines')
         self.fields.pop('voucher')
         order_lines = validated_data.pop('order_lines')
@@ -157,10 +161,28 @@ class TableOrderCreateSerializer(CustomModelSerializer):
 
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
+        if notify:
+            company = str(order.company.id)
+            payload = {
+                'id': str(order.id),
+                'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
+                'message': {
+                    'en': 'New order is placed from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+                }
+            }
+            try:
+                notify_company_staffs.apply_async(kwargs={
+                                    'company': company,
+                                    'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
+                                    'payload': payload
+                                })
+            except:
+                pass
         return order
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        from notifications.tasks import notify_company_staffs
         self.fields.pop('order_lines')
         self.fields.pop('voucher')
         order_lines = validated_data.pop('order_lines')
@@ -175,4 +197,22 @@ class TableOrderCreateSerializer(CustomModelSerializer):
             line.delete(force_delete=True)
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(instance, order_lines, voucher)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
-        return super().update(instance, validated_data)
+        order = super().update(instance, validated_data)
+        company = str(order.company.id)
+        payload = {
+            'id': str(order.id),
+            'category': NOTIFICATION_CATEGORY_NAME['ORDER_UPDATED'],
+            'message': {
+                'en': 'Order is Updated from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+            }
+        }
+        try:
+            notify_company_staffs.apply_async(kwargs={
+                'company': company,
+                'category': NOTIFICATION_CATEGORY['ORDER_UPDATED'],
+                'payload': payload
+            })
+            pass
+        except:
+            pass
+        return order

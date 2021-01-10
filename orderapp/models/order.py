@@ -17,7 +17,7 @@ from helpers.choices_variable import ORDER_STATUS_CHOICES, ORDER_LINE_STATUS_CHO
 class Orders(BaseModel):
     bill = models.ForeignKey(Bills, on_delete=models.SET_NULL, null=True, related_name='orders')
     company = models.ForeignKey(Company, on_delete=models.PROTECT, related_name='orders')
-    asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name='orders')
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name='orders', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='orders')
     status = models.CharField(max_length=MAX_LENGTHS['ORDER_STATUS'], choices=ORDER_STATUS_CHOICES, default=DEFAULTS['ORDER_STATUS'])
     extras = JSONField(blank=True, null=True)
