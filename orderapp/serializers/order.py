@@ -169,8 +169,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
-        if order.lines.exclude(status__in='SERVED').count() == 0:
-            order.update(status=ORDER_STATUS['BILLABLE'])
+        # if order.lines.exclude(status__in='SERVED').count() == 0:
+        #     order.update(status=ORDER_STATUS['BILLABLE'])
         if notify:
             company = str(order.company.id)
             payload = {
