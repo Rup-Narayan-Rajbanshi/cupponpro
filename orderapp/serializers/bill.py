@@ -5,7 +5,7 @@ from helpers.constants import ORDER_STATUS
 from helpers.serializer import CustomModelSerializer
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
-from orderapp.serializers.order import TableOrderCreateSerializer
+from orderapp.serializers.order import CompanyTableOrderSerializer
 
 
 class BillCreateSerializer(CustomModelSerializer):
@@ -18,7 +18,7 @@ class BillCreateSerializer(CustomModelSerializer):
         return super().create(validated_data)
 
 
-class ManualBillCreateSerializer(TableOrderCreateSerializer):
+class ManualBillSerializerCompany(CompanyTableOrderSerializer):
 
     # class Meta:
     #     model = Orders

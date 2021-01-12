@@ -1,7 +1,5 @@
-from rest_framework.decorators import api_view, renderer_classes, permission_classes
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet, ViewSet
 from rest_framework import generics, status
@@ -10,13 +8,14 @@ from commonapp.models.company import CompanyUser
 from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order
 from commonapp.models.product import Product
-from commonapp.models.salesitem import SalesItem
 from helpers.constants import ORDER_STATUS
 from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
+from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
-from permission import CompanyUserPermission, isCompanyManagerAndAllowAll
-from orderapp.serializers.order import OrderStatusSerializer, TableOrderCreateSerializer, TableOrderSerializer
+from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser
+from orderapp.serializers.order import OrderStatusSerializer, CompanyTableOrderSerializer, TableOrderSerializer, \
+    UserOrderSerializerCompany
 
 
 class OrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
@@ -41,7 +40,7 @@ class OrderCountAPI(generics.GenericAPIView):
             'success': 0,
             "active_orders": qs.filter(status=ORDER_STATUS['NEW_ORDER']).count(),
             "total_orders": qs.count(),
-            "total_sales": SalesItem.objects.filter(product__company__id=company_user.company.id).count()
+            "total_sales": Bills.objects.filter(company=company_user.company).count()
         }
         return Response(data, status=200)
 
@@ -49,7 +48,7 @@ class OrderCountAPI(generics.GenericAPIView):
 class TableOrderAPI(ModelViewSet):
     queryset = Orders.objects.all()
     permission_classes = [CompanyUserPermission]
-    serializer_class = TableOrderCreateSerializer
+    serializer_class = CompanyTableOrderSerializer
     pagination_class = FPagination
 
     def create(self, request, *args, **kwargs):
@@ -96,7 +95,7 @@ class CalculateOrderAPI(generics.GenericAPIView):
 class UserOrderListAPI(mixins.ListModelMixin, GenericViewSet):
     queryset = Order.objects.all().order_by('-created_at')
     permission_classes = (IsAuthenticated, )
-    serializer_class = TableOrderCreateSerializer
+    serializer_class = CompanyTableOrderSerializer
     pagination_class = FPagination
 
     def get_queryset(self):
@@ -107,3 +106,14 @@ class UserOrderListAPI(mixins.ListModelMixin, GenericViewSet):
                                             ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'],
                                             ORDER_STATUS['PROCESSING'], ORDER_STATUS['BILLABLE']])
         return self.queryset.filter(user=self.request.user)
+
+
+class CustomerOrderAPI(ModelViewSet):
+    queryset = Orders.objects.all()
+    permission_classes = [isUser]
+    serializer_class = UserOrderSerializerCompany
+    pagination_class = FPagination
+
+    def create(self, request, *args, **kwargs):
+        created_response = super().create(request, *args, **kwargs)
+        return Response(created_response.data, status=200)

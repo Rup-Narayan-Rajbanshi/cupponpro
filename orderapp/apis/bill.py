@@ -7,7 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 from helpers.api_mixins import FAPIMixin
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
-from orderapp.serializers.bill import BillCreateSerializer, ManualBillCreateSerializer
+from orderapp.serializers.bill import BillCreateSerializer, ManualBillSerializerCompany
 from permission import CompanyUserPermission
 
 
@@ -19,7 +19,7 @@ class BillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
 
 class ManualBillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
     queryset = Orders.objects.all().order_by('-created_at')
-    serializer_class = ManualBillCreateSerializer
+    serializer_class = ManualBillSerializerCompany
     permission_classes = (CompanyUserPermission, )
 
     def create(self, request, *args, **kwargs):

@@ -2,7 +2,8 @@ from django.urls import path
 from rest_framework import routers
 
 from orderapp.apis.bill import BillCreateAPI, get_order_list, ManualBillCreateAPI
-from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAPI, CalculateOrderAPI, UserOrderListAPI
+from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAPI, CalculateOrderAPI, UserOrderListAPI, \
+    CustomerOrderAPI
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
 from orderapp.apis.table import AssetListAPI
 from orderapp.apis.voucher import VoucherListAPI
@@ -15,6 +16,7 @@ router.register(r"update-order-line-status", OrderLineStatusUpdateAPI)
 router.register(r"create-bill", BillCreateAPI)
 router.register(r"manual-bill-create", ManualBillCreateAPI)
 router.register(r"company-voucher", VoucherListAPI)
+router.register(r"customer-order", CustomerOrderAPI)
 
 urlpatterns = router.urls
 

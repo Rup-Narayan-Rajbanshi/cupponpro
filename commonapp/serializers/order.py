@@ -8,7 +8,7 @@ from notifications.models import Notification, NotificationCategory
 from helpers.constants import ORDER_STATUS, ORDER_HEADER, ORDER_SCAN_COOLDOWN
 from orderapp.models.order_scan_log import OrderScanLog
 from helpers.exceptions import InvalidRequestException, OrderSessionExpiredException
-from orderapp.serializers.order import TableOrderCreateSerializer
+from orderapp.serializers.order import CompanyTableOrderSerializer
 
 
 class OrderLineSerializer(serializers.ModelSerializer):
@@ -109,7 +109,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
             request = self.context.get('request', {})
 
             setattr(request, 'company', order_obj.company)
-            new_table_serializer = TableOrderCreateSerializer(data=new_order_data, context={'request': request})
+            new_table_serializer = CompanyTableOrderSerializer(data=new_order_data, context={'request': request})
             new_table_serializer.is_valid(raise_exception=True)
             new_table_serializer.save()
         except Exception as e:

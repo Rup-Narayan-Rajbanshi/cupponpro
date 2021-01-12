@@ -84,7 +84,7 @@ class TableOrderSerializer(OrderStatusSerializer):
         return order
 
 
-class TableOrderCreateSerializer(CustomModelSerializer):
+class CompanyTableOrderSerializer(CustomModelSerializer):
     asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=True)
     voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
                                  required=False, allow_null=True)
@@ -93,7 +93,7 @@ class TableOrderCreateSerializer(CustomModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ('id','status', 'voucher', 'asset', 'order_lines', 'price_details')
+        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details')
 
     def get_fields(self):
         fields = super().get_fields()
@@ -134,6 +134,7 @@ class TableOrderCreateSerializer(CustomModelSerializer):
         for line in validated_order_line_data:
             order_line = OrderLines(order=order,
                                     product=line['product'],
+                                    status=line.get('status', 'NEW'),
                                     quantity=int(line['quantity']),
                                     rate=float(line['product'].total_price),
                                     voucher=voucher)
@@ -216,3 +217,7 @@ class TableOrderCreateSerializer(CustomModelSerializer):
         except:
             pass
         return order
+
+
+class UserOrderSerializerCompany(CompanyTableOrderSerializer):
+    asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=False)
