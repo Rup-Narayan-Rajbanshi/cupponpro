@@ -12,10 +12,13 @@ class OrderLineSerializer(CustomModelSerializer):
     product = DetailRelatedField(model=Product, lookup='id', representation='to_representation')
     quantity = serializers.CharField(required=True)
     total = serializers.CharField(required=False)
+    new = serializers.IntegerField(required=False)
+    cooking = serializers.IntegerField(required=False)
+    served = serializers.IntegerField(required=False)
 
     class Meta:
         model = OrderLines
-        fields = ['id', 'rate', 'quantity', 'status', 'discount_amount', 'total', 'product']
+        fields = ['id', 'rate', 'quantity', 'status', 'discount_amount', 'total', 'product', 'new', 'cooking', 'served']
 
 
 class OrderLineUpdateSerializer(CustomModelSerializer):
