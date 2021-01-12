@@ -25,7 +25,6 @@ class AssetFilter(filters.FilterSet):
             qs = qs.filter(orders__status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED']])
         elif order_status == 'PENDING_PAYMENT':
             qs = qs.filter(orders__status__in=[
-                ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'],
                 ORDER_STATUS['PROCESSING'], ORDER_STATUS['BILLABLE']])
             pending = []
             for asset in qs:
