@@ -129,15 +129,19 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             raise ValidationError('Table already has an active order')
         return super().validate(attrs)
 
-    def build_orderline_bulk_create_data(self, order, validated_order_line_data, voucher):
+    def build_orderline_bulk_create_data(self, order, validated_order_line_data, voucher, served_products=None):
         bulk_create_data = list()
         for line in validated_order_line_data:
+            new_quantity = int(line['quantity'])
             order_line = OrderLines(order=order,
                                     product=line['product'],
                                     status=line.get('status', 'NEW'),
-                                    quantity=int(line['quantity']),
+                                    quantity=new_quantity,
                                     rate=float(line['product'].total_price),
                                     voucher=voucher)
+            # old_served_quantity = served_products.get(str(order_line.product_id))
+            # if old_served_quantity:
+            #     order_line.quantity = old_served_quantity if old_served_quantity > new_quantity else new_quantity - old_served_quantity
             order_line.discount = order_line.get_discount()
             order_line.discount_amount = order_line.get_discounted_amount()
             order_line.total = order_line.get_line_total()
@@ -194,9 +198,14 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         if voucher:
             validated_data['user'] = voucher.user
         validated_data['company'] = self.context['request'].company
+        served_products = dict()
         for line in instance.lines.all():
-            line.delete(force_delete=True)
-        order_line_bulk_create_data = self.build_orderline_bulk_create_data(instance, order_lines, voucher)
+            if line.status == 'SERVED':
+                served_products[str(line.product.id)] = line.quantity
+            else:
+                line.delete(force_delete=True)
+        order_line_bulk_create_data = self.build_orderline_bulk_create_data(instance, order_lines, voucher,
+                                                                            served_products)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
         order = super().update(instance, validated_data)
         company = str(order.company.id)
