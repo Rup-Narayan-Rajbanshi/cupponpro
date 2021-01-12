@@ -202,10 +202,10 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         validated_data['company'] = self.context['request'].company
         served_products = dict()
         for line in instance.lines.all():
-            if line.status == 'SERVED':
-                served_products[str(line.product.id)] = line.quantity
-            else:
-                line.delete(force_delete=True)
+            # if line.status == 'SERVED':
+            #     served_products[str(line.product.id)] = line.quantity
+            # else:
+            line.delete(force_delete=True)
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(instance, order_lines, voucher,
                                                                             served_products)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
