@@ -191,7 +191,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                                     'company': company,
                                     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
                                     'payload': payload,
-                                    'asset': validated_data.get('asset')
+                                    'asset': order.asset
                                 })
                 pass
             except:
@@ -238,7 +238,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                 'company': company,
                 'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
                 'payload': payload,
-                'asset': validated_data.get('asset')
+                'asset': order.asset
             })
         except:
             pass
