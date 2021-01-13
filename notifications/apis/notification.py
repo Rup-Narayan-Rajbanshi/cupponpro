@@ -54,7 +54,7 @@ class AssetNotificationAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
     def get_queryset(self):
         kwargs = self.request.parser_context.get('kwargs')
         if kwargs.get('asset_id'):
-            return self.queryset.filter(asset__id=kwargs.get('asset_id'))
+            return self.queryset.filter(asset__id=kwargs.get('asset_id'), seen=False)
         return self.queryset.none()
 
 
