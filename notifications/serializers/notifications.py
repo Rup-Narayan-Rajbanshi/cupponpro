@@ -1,3 +1,5 @@
+from rest_framework import serializers
+
 from helpers.serializer_fields import DetailRelatedField
 from helpers.serializer import CustomModelSerializer
 from notifications.models import (

@@ -6,11 +6,12 @@ from notifications.apis.alert_push_notification import send_table_alert_notifica
 from notifications.apis.notification import (
     NotificationAPI,
     register_device,
-    notification_seen, notification_unread_count
-)
+    notification_seen, notification_unread_count,
+    AssetNotificationAPI)
 
 router = routers.SimpleRouter()
 router.register(r"notification-user", NotificationAPI)
+router.register(r"(?P<asset_id>[0-9a-f-]+|)/asset-notifications", AssetNotificationAPI)
 # router.register(r"api/devices", DeviceAdminAPI, base_name='devices')
 
 urlpatterns = router.urls

@@ -25,6 +25,8 @@ from rest_framework.decorators import (
 from rest_framework.renderers import JSONRenderer
 from rest_framework.exceptions import APIException
 
+from permission import CompanyUserPermission
+
 
 class NotificationAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
     queryset = Notification.objects.select_related('user').all()
@@ -39,6 +41,21 @@ class NotificationAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixi
 
     def retrieve(self, request, *args, **kwargs):
         return super(NotificationAPI, self).retrieve(request, *args, **kwargs)
+
+
+class AssetNotificationAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
+    queryset = Notification.objects.select_related('user').all()
+    serializer_class = NotificationSerializer
+    permission_classes = (CompanyUserPermission, )
+    pagination_class = FPagination
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = NotificationFilter
+
+    def get_queryset(self):
+        kwargs = self.request.parser_context.get('kwargs')
+        if kwargs.get('asset_id'):
+            return self.queryset.filter(asset__id=kwargs.get('asset_id'))
+        return self.queryset.none()
 
 
 class DeviceAdminAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):

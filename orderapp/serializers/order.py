@@ -222,21 +222,24 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
         order = super().update(instance, validated_data)
         company = str(order.company.id)
+        if order.asset:
+            message = 'New order is placed from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+        else:
+            message = 'A new order is placed'
         payload = {
             'id': str(order.id),
-            'category': NOTIFICATION_CATEGORY_NAME['ORDER_UPDATED'],
+            'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
             'message': {
-                'en': 'Order is Updated from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+                'en': message
             }
         }
         try:
             notify_company_staffs.apply_async(kwargs={
                 'company': company,
-                'category': NOTIFICATION_CATEGORY['ORDER_UPDATED'],
+                'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
                 'payload': payload,
                 'asset': validated_data.get('asset')
             })
-            pass
         except:
             pass
         return order
