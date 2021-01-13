@@ -187,12 +187,14 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                 }
             }
             try:
-                notify_company_staffs.apply_async(kwargs={
-                                    'company': company,
-                                    'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
-                                    'payload': payload,
-                                    'asset': order.asset
-                                })
+                # notify_company_staffs.apply_async(kwargs={
+                #                     'company': company,
+                #                     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
+                #                     'payload': payload,
+                #                     'asset': order.asset
+                #                 })
+                notify_company_staffs(
+                    company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset)
                 pass
             except:
                 pass
@@ -234,13 +236,15 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             }
         }
         try:
-            notify_company_staffs.apply_async(kwargs={
-                'company': company,
-                'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
-                'payload': payload,
-                'asset': order.asset
-            })
-        except:
+            # notify_company_staffs.apply_async(kwargs={
+            #     'company': company,
+            #     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
+            #     'payload': payload,
+            #     'asset': order.asset
+            # })
+            notify_company_staffs(
+                company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset)
+        except Exception as e:
             pass
         return order
 
