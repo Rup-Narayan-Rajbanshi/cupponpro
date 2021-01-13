@@ -13,7 +13,7 @@ from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
-from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser
+from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser, MasterQRUser
 from orderapp.serializers.order import OrderStatusSerializer, CompanyTableOrderSerializer, TableOrderSerializer, \
     UserOrderSerializerCompany
 
@@ -121,8 +121,8 @@ class CustomerOrderAPI(ModelViewSet):
 
 class MasterQROrderAPI(ModelViewSet):
     queryset = Orders.objects.all()
-    permission_classes = [isUser]
-    serializer_class = UserOrderSerializerCompany
+    permission_classes = [MasterQRUser]
+    serializer_class = CompanyTableOrderSerializer
     pagination_class = FPagination
 
     def create(self, request, *args, **kwargs):
