@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 from commonapp.models.asset import Asset
-from commonapp.models.company import CompanyUser
+from commonapp.models.company import CompanyUser, Company
 
 
 class isAdminOrReadOnly(permissions.BasePermission):
@@ -37,10 +37,15 @@ class isCompanySalePersonAndAllowAll(permissions.BasePermission):
 
 class isUser(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method=='GET':
+        if request.method == 'GET':
             return True
         if request.user.is_authenticated and request.user.group.filter(name='user').exists():
-            return True
+            try:
+                company_id = request.parser_context.get('kwargs')['company_id']
+                request.company = Company.objects.get(id=company_id)
+                return True
+            except Exception as e:
+                pass
         return False
 
 class publicReadOnly(permissions.BasePermission):

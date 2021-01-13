@@ -117,3 +117,14 @@ class CustomerOrderAPI(ModelViewSet):
     def create(self, request, *args, **kwargs):
         created_response = super().create(request, *args, **kwargs)
         return Response(created_response.data, status=200)
+
+
+class MasterQROrderAPI(ModelViewSet):
+    queryset = Orders.objects.all()
+    permission_classes = [isUser]
+    serializer_class = UserOrderSerializerCompany
+    pagination_class = FPagination
+
+    def create(self, request, *args, **kwargs):
+        created_response = super().create(request, *args, **kwargs)
+        return Response(created_response.data, status=200)

@@ -125,7 +125,9 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             ORDER_STATUS['NEW_ORDER'],
             ORDER_STATUS['PROCESSING'],
             ORDER_STATUS['BILLABLE'],
-            ORDER_STATUS['CONFIRMED']]).exists():
+            ORDER_STATUS['CONFIRMED']],
+            user__companyuser__user__group__name__in=['sales', 'manager', 'owner']
+        ).exists():
             raise ValidationError('Table already has an active order')
         return super().validate(attrs)
 
@@ -235,3 +237,6 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
 class UserOrderSerializerCompany(CompanyTableOrderSerializer):
     asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=False)
+
+    def validate(self, attrs):
+        return attrs
