@@ -190,7 +190,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                 notify_company_staffs.apply_async(kwargs={
                                     'company': company,
                                     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
-                                    'payload': payload
+                                    'payload': payload,
+                                    'asset': validated_data.get('asset')
                                 })
                 pass
             except:
@@ -232,7 +233,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             notify_company_staffs.apply_async(kwargs={
                 'company': company,
                 'category': NOTIFICATION_CATEGORY['ORDER_UPDATED'],
-                'payload': payload
+                'payload': payload,
+                'asset': validated_data.get('asset')
             })
             pass
         except:

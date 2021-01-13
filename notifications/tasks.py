@@ -21,7 +21,7 @@ def send_fcm_task(receivers):
 
 
 @task(name="notify_company_staffs")
-def notify_company_staffs(company, category, payload):
+def notify_company_staffs(company, category, payload, asset=None):
     time.sleep(1)
     receivers = list()
     try:
@@ -29,7 +29,8 @@ def notify_company_staffs(company, category, payload):
         receivers = Notification.send_to_company_users(
             company=company,
             category=category,
-            payload=payload
+            payload=payload,
+            asset=asset
         )
     except Exception as e:
         logger.error(str(e))

@@ -1,4 +1,6 @@
 from django.db import models, transaction
+
+from commonapp.models.asset import Asset
 from helpers.models import BaseModel
 from userapp.models import User
 from commonapp.models.company import CompanyUser
@@ -54,6 +56,7 @@ class Notification(BaseModel):
     template = models.CharField(max_length=1000, null=True, blank=True)
     seen = models.BooleanField(default=False)
     payload = JSONField(null=True, blank=True)
+    asset = models.ForeignKey(Asset, on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         ordering = ('-created_at',)
@@ -114,15 +117,16 @@ class Notification(BaseModel):
 
     @classmethod
     @transaction.atomic
-    def send_to_company_users(cls, company, category, payload):
+    def send_to_company_users(cls, company, category, payload, asset=None):
         company_users = CompanyUser.objects.select_related('user').filter(company=company)
         notification_category = NotificationCategory.objects.filter(id=category).first()
         notifications = list()
         for company_user in company_users:
             user = company_user.user
             notifications.append(cls(category=notification_category,
-                                         payload=payload,
-                                         type='customer',
-                                         user=user))
+                                     payload=payload,
+                                     type='customer',
+                                     user=user,
+                                     asset=asset))
         receivers = cls.create_notification(bulk_notifications=notifications)
         return receivers
