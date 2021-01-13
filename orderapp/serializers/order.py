@@ -125,8 +125,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             ORDER_STATUS['NEW_ORDER'],
             ORDER_STATUS['PROCESSING'],
             ORDER_STATUS['BILLABLE'],
-            ORDER_STATUS['CONFIRMED']],
-            user__companyuser__user__group__name__in=['sales', 'manager', 'owner']
+            ORDER_STATUS['CONFIRMED']]
+            # user__companyuser__user__group__name__in=['sales', 'manager', 'owner', 'user']
         ).exists():
             raise ValidationError('Table already has an active order')
         return super().validate(attrs)
@@ -175,11 +175,15 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         #     order.update(status=ORDER_STATUS['BILLABLE'])
         if notify:
             company = str(order.company.id)
+            if order.asset:
+                message = 'New order is placed from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+            else:
+                message = 'A new order is placed'
             payload = {
                 'id': str(order.id),
                 'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
                 'message': {
-                    'en': 'New order is placed from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+                    'en': message
                 }
             }
             try:
@@ -188,6 +192,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                                     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
                                     'payload': payload
                                 })
+                pass
             except:
                 pass
         return order
@@ -236,7 +241,17 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
 
 class UserOrderSerializerCompany(CompanyTableOrderSerializer):
-    asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=False)
+    asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation',
+                               required=False, allow_null=True)
 
     def validate(self, attrs):
+        asset = attrs.get('asset', None)
+        if asset and asset.orders.filter(status__in=[
+            ORDER_STATUS['NEW_ORDER'],
+            ORDER_STATUS['PROCESSING'],
+            ORDER_STATUS['BILLABLE'],
+            ORDER_STATUS['CONFIRMED']],
+            # user__companyuser__user__group__name__in=['sales', 'manager', 'owner']
+        ).exists():
+            raise ValidationError('Table already has an active order')
         return attrs
