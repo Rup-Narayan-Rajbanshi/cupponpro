@@ -72,6 +72,20 @@ class Company(Address):
     def get_or_create_company_customer_user(self):
         pass
 
+    @property
+    def qr_user(self):
+        category = Category.objects.filter(name__icontains='Rest', ).first()
+        company_user = CompanyUser.objects.filter(is_qr_user=True).first()
+        if company_user:
+            return company_user.user
+        else:
+            user = User.objects.get_or_create(
+                first_name=self.name,
+                last_name=category.name,
+                category=category)
+            CompanyUser.objects.get_or_create(user=user, company=self, is_qr_user=True, is_staff=False)
+            return user
+
 
 @receiver(models.signals.post_delete, sender=Company)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
@@ -121,6 +135,7 @@ class CompanyUser(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     is_staff = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_qr_user = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'company_user'

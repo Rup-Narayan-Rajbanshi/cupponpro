@@ -74,3 +74,19 @@ class CompanyCustomerPermission(permissions.BasePermission):
         except:
             return False
         return False
+
+
+class MasterQRUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            return True
+        if not request.user.is_authenticated:
+            try:
+                company_id = request.parser_context.get('kwargs')['company_id']
+                company = Company.objects.get(id=company_id)
+                request.user = company.qr_user
+                request.company = company
+                return True
+            except Exception as e:
+                pass
+        return False
