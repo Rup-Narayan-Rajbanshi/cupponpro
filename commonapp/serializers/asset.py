@@ -41,6 +41,8 @@ class AssetSerializer(serializers.ModelSerializer):
         else:
             asset_notifications = obj.notification_set.none()
         return {
+            "unseen_notification_ids": list(asset_notifications.values_list('id', flat=True)),
+            "unseen_notification_count": asset_notifications.count(),
             "has_active_notification": True if asset_notifications.exists() else False,
-            "notifications": asset_notifications.values('payload', 'seen')
+            "notifications": asset_notifications.values('id', 'payload', 'seen')
         }
