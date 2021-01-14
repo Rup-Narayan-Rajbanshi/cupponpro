@@ -108,6 +108,18 @@ def notification_seen(request, notification_id=None):
     return Response({"detail": "Successfully marked as seen."}, status=status.HTTP_200_OK)
 
 
+@api_view(["POST"])
+@renderer_classes([JSONRenderer])
+@permission_classes((IsAuthenticated,))
+def bulk_notification_seen(request):
+    notification_ids = request.data.get('notification_ids', [])
+    try:
+        Notification.objects.filter(id__in=notification_ids).update(seen=True)
+    except:
+        return Response({"detail": "Unable to update notification"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"detail": "Successfully marked as seen."}, status=status.HTTP_200_OK)
+
+
 @api_view(["GET"])
 @renderer_classes([JSONRenderer])
 @permission_classes((IsAuthenticated,))

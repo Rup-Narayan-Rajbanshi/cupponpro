@@ -18,6 +18,7 @@ urlpatterns = router.urls
 urlpatterns += [
     url(r"^user-device/$", register_device, name="user-device"),
     url(r"^mark-seen/?(?P<notification_id>[0-9a-f-]+|)/$", notification_seen, name="mark-seen"),
+    url(r"^bulk-mark-seen/$", notification_seen, name="mark-seen"),
     # url(r"^mark-seen/<uuid:user_id>\w+/$", notification_seen, name="mark-seen"),
     url(r"^unread-count/$", notification_unread_count, name="unread-count"),
     url(r"^send-table-alert-notification/?(?P<asset_id>[0-9a-f-]+|)/$", send_table_alert_notification, name="send_table_alert_notification")

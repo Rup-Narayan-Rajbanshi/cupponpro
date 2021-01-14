@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from commonapp.models.asset import Asset
 from helpers.constants import ORDER_LINE_STATUS, ORDER_STATUS
+from notifications.models import Notification
 
 
 class AssetSerializer(serializers.ModelSerializer):
     qr = serializers.SerializerMethodField()
     orders = serializers.SerializerMethodField()
+    notification_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Asset
@@ -30,4 +32,15 @@ class AssetSerializer(serializers.ModelSerializer):
                 status=ORDER_LINE_STATUS['SERVED']).count() if latest_order else 0,
             "order_id": latest_order.id if latest_order else None,
             "total_amount": latest_order.subtotal if latest_order else 0
+        }
+
+    def get_notification_details(self, obj):
+        request = self.context.get('request')
+        if request:
+            asset_notifications = obj.notification_set.filter(seen=False, user=request.user)
+        else:
+            asset_notifications = obj.notification_set.none()
+        return {
+            "has_active_notification": True if asset_notifications.exists() else False,
+            "notifications": asset_notifications.values('payload', 'seen')
         }

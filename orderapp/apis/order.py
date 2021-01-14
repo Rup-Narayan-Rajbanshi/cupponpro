@@ -15,7 +15,7 @@ from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
 from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser, MasterQRUser
 from orderapp.serializers.order import OrderStatusSerializer, CompanyTableOrderSerializer, TableOrderSerializer, \
-    UserOrderSerializerCompany
+    UserOrderSerializerCompany, MasterQRSerializer
 
 
 class OrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
@@ -122,7 +122,7 @@ class CustomerOrderAPI(ModelViewSet):
 class MasterQROrderAPI(ModelViewSet):
     queryset = Orders.objects.all()
     permission_classes = [MasterQRUser]
-    serializer_class = CompanyTableOrderSerializer
+    serializer_class = MasterQRSerializer
     pagination_class = FPagination
 
     def create(self, request, *args, **kwargs):

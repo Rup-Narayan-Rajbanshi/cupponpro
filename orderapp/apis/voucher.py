@@ -1,17 +1,17 @@
 from rest_framework import mixins
 from rest_framework.exceptions import APIException
+from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import GenericViewSet
 
 from commonapp.models.coupon import Voucher
 from helpers.api_mixins import FAPIMixin
 from orderapp.serializers.voucher import VoucherListSerializer
-from permission import CompanyUserPermission
 
 
 class VoucherListAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
     queryset = Voucher.objects.all().order_by('-created_at')
     serializer_class = VoucherListSerializer
-    permission_classes = (CompanyUserPermission, )
+    permission_classes = (AllowAny, )
 
     def get_queryset(self):
         phone_number = self.request.GET.get('phone_number')

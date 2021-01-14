@@ -14,6 +14,7 @@ from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CAT
 from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
 from orderapp.serializers.order_line import OrderLineSerializer
+from userapp.models import User
 
 
 class OrderStatusSerializer(CustomModelSerializer):
@@ -264,3 +265,60 @@ class UserOrderSerializerCompany(CompanyTableOrderSerializer):
         ).exists():
             raise ValidationError('Table already has an active order')
         return attrs
+
+
+class MasterQRSerializer(CompanyTableOrderSerializer):
+    phone_number = serializers.CharField(required=False, allow_null=True)
+
+    class Meta:
+        model = Orders
+        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details', 'phone_number')
+
+    @transaction.atomic
+    def create(self, validated_data, notify=True):
+        from notifications.tasks import notify_company_staffs
+        self.fields.pop('order_lines')
+        self.fields.pop('voucher')
+        phone_number = self.fields.pop('phone_number')
+        phone_number_user = User.objects.filter(phone_number=phone_number)
+        order_lines = validated_data.pop('order_lines')
+        voucher = validated_data.pop('voucher', None)
+        validated_data['user'] = self.context['request'].user
+        if not validated_data['user'].is_authenticated:
+            validated_data['user'] = None
+        if voucher:
+            validated_data['user'] = voucher.user if not phone_number_user else phone_number_user
+
+        validated_data['company'] = self.context['request'].company
+        order = super().create(validated_data)
+
+        order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)
+        OrderLines.objects.bulk_create(order_line_bulk_create_data)
+        # if order.lines.exclude(status__in='SERVED').count() == 0:
+        #     order.update(status=ORDER_STATUS['BILLABLE'])
+        if notify:
+            company = str(order.company.id)
+            if order.asset:
+                message = 'New order is placed from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+            else:
+                message = 'A new order is placed'
+            payload = {
+                'id': str(order.id),
+                'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
+                'message': {
+                    'en': message
+                }
+            }
+            try:
+                # notify_company_staffs.apply_async(kwargs={
+                #                     'company': company,
+                #                     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
+                #                     'payload': payload,
+                #                     'asset': order.asset
+                #                 })
+                notify_company_staffs(
+                    company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset)
+                pass
+            except:
+                pass
+        return order
