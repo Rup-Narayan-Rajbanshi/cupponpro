@@ -269,6 +269,11 @@ class UserOrderSerializerCompany(CompanyTableOrderSerializer):
 
 class MasterQRSerializer(CompanyTableOrderSerializer):
     phone_number = serializers.CharField(required=False, allow_null=True)
+    asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=True)
+    voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
+                                 required=False, allow_null=True)
+    order_lines = OrderLineSerializer(many=True, required=True)
+    price_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Orders
@@ -281,15 +286,16 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
         self.fields.pop('voucher')
         phone_number = self.fields.pop('phone_number')
         phone_number_user = User.objects.filter(phone_number=phone_number)
+        company = validated_data['asset'].company
         order_lines = validated_data.pop('order_lines')
         voucher = validated_data.pop('voucher', None)
         validated_data['user'] = self.context['request'].user
         if not validated_data['user'].is_authenticated:
-            validated_data['user'] = None
+            validated_data['user'] = company.qr_user
         if voucher:
             validated_data['user'] = voucher.user if not phone_number_user else phone_number_user
 
-        validated_data['company'] = self.context['request'].company
+        validated_data['company'] = company
         order = super().create(validated_data)
 
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)

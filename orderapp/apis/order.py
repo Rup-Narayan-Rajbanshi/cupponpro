@@ -1,7 +1,7 @@
 from rest_framework.exceptions import APIException
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet, ViewSet
+from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet
 from rest_framework import generics, status
 
 from commonapp.models.company import CompanyUser
@@ -13,7 +13,7 @@ from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
-from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser, MasterQRUser
+from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser
 from orderapp.serializers.order import OrderStatusSerializer, CompanyTableOrderSerializer, TableOrderSerializer, \
     UserOrderSerializerCompany, MasterQRSerializer
 
@@ -121,7 +121,7 @@ class CustomerOrderAPI(ModelViewSet):
 
 class MasterQROrderAPI(ModelViewSet):
     queryset = Orders.objects.all()
-    permission_classes = [MasterQRUser]
+    permission_classes = [AllowAny]
     serializer_class = MasterQRSerializer
     pagination_class = FPagination
 
