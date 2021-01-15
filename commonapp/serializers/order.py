@@ -41,40 +41,40 @@ class OrderSaveSerializer(serializers.ModelSerializer):
         model = Order
         fields = "__all__"
 
-    def validate(self, attrs):
-        asset = attrs.get('asset')
-        company = attrs.get('company')
-        order = None
-        request = self.context.get('request')
-        order = Order.objects.filter(
-                            asset=asset,
-                            company=company,
-                            status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'], ORDER_STATUS['PROCESSING']]).exists()
-        if not self.instance:
-            if request:
-                token = request.GET.get(ORDER_HEADER)
-            if not token:
-                raise InvalidRequestException()
+    # def validate(self, attrs):
+    #     asset = attrs.get('asset')
+    #     company = attrs.get('company')
+    #     order = None
+    #     request = self.context.get('request')
+    #     order = Order.objects.filter(
+    #                         asset=asset,
+    #                         company=company,
+    #                         status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'], ORDER_STATUS['PROCESSING']]).exists()
+        # if not self.instance:
+        #     if request:
+        #         token = request.GET.get(ORDER_HEADER)
+        #     if not token:
+        #         raise InvalidRequestException()
+        #
+        #     scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_at').first()
+        #     is_session_valid = True
+        #     if not scan_validity:
+        #         is_session_valid = False
+        #     else:
+        #         scan_time = scan_validity.created_at
+        #         current_time = timezone.now()
+        #         time_diff = (current_time - scan_time).seconds
+        #         if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
+        #             is_session_valid = False
+        #     if not is_session_valid:
+        #         raise OrderSessionExpiredException()
+        #     if order:
+        #         raise ValidationError({'detail': 'Order is already in process for this asset.'})
+        # else:
+        #     if not order:
+        #         raise ValidationError({'detail': 'This Order cannot be updated. Please create a new order.'})
 
-            scan_validity = OrderScanLog.objects.filter(asset=asset, token=token).order_by('-created_at').first()
-            is_session_valid = True
-            if not scan_validity:
-                is_session_valid = False
-            else:
-                scan_time = scan_validity.created_at
-                current_time = timezone.now()
-                time_diff = (current_time - scan_time).seconds
-                if (ORDER_SCAN_COOLDOWN * 60) < time_diff:
-                    is_session_valid = False
-            if not is_session_valid:
-                raise OrderSessionExpiredException()
-            if order:
-                raise ValidationError({'detail': 'Order is already in process for this asset.'})
-        else:
-            if not order:
-                raise ValidationError({'detail': 'This Order cannot be updated. Please create a new order.'})
-
-        return super(OrderSaveSerializer, self).validate(attrs)
+        # return super(OrderSaveSerializer, self).validate(attrs)
 
     def prepare_new_table_order_data(self, validated_data, order_lines_data):
         new_line_data = list()
