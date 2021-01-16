@@ -40,6 +40,7 @@ class Company(Address):
     currency = models.CharField(max_length=10)
     invoice_counter = models.PositiveIntegerField(default=0, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'company'
