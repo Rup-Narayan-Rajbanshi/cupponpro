@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from orderapp.apis.bill import BillCreateAPI, get_order_list, ManualBillCreateAPI
 from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAPI, CalculateOrderAPI, UserOrderListAPI, \
-    CustomerOrderAPI, MasterQROrderAPI
+    CustomerOrderAPI, MasterQROrderAPI, latest_asset_order
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
 from orderapp.apis.table import AssetListAPI
 from orderapp.apis.voucher import VoucherListAPI, CustomerVoucherAPI
@@ -25,6 +25,7 @@ urlpatterns = router.urls
 
 urlpatterns += {
     path('get-order-bill/<order_id>', get_order_list, name='get_order_bill'),
+    path('latest-asset-order/<asset_id>', latest_asset_order, name='latest_asset_order'),
     path('order-count', OrderCountAPI.as_view(), name='order_count'),
     path('calculate-order', CalculateOrderAPI.as_view(), name='calculate_order'),
     path('user-orders', UserOrderListAPI.as_view({'get': 'list'}), name='user_orders'),

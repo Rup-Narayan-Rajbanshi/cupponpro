@@ -1,9 +1,12 @@
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet
 from rest_framework import generics, status
 
+from commonapp.models.asset import Asset
 from commonapp.models.company import CompanyUser
 from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order
@@ -125,3 +128,17 @@ class MasterQROrderAPI(ModelViewSet):
     serializer_class = MasterQRSerializer
     pagination_class = FPagination
 
+
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+@renderer_classes([JSONRenderer])
+def latest_asset_order(request, asset_id):
+    try:
+        asset = Asset.objects.filter(id=asset_id).first()
+        latest_order = asset.orders.order_by('-created_at').first()
+        if asset and latest_order:
+            return Response(CompanyTableOrderSerializer(latest_order, context={'request': request}
+                                                        ).data, status=status.HTTP_200_OK)
+    except:
+        pass
+    return Response({}, status=status.HTTP_200_OK)
