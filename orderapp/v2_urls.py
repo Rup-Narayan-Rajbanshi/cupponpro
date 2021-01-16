@@ -6,7 +6,7 @@ from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAP
     CustomerOrderAPI, MasterQROrderAPI
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
 from orderapp.apis.table import AssetListAPI
-from orderapp.apis.voucher import VoucherListAPI
+from orderapp.apis.voucher import VoucherListAPI, CustomerVoucherAPI
 
 router = routers.SimpleRouter()
 router.register(r"table-change-status", TableOrderStatusAPI)
@@ -18,6 +18,7 @@ router.register(r"update-order-line-status", OrderLineStatusUpdateAPI)
 router.register(r"create-bill", BillCreateAPI)
 router.register(r"manual-bill-create", ManualBillCreateAPI)
 router.register(r"company-voucher", VoucherListAPI)
+router.register(r"(?P<company_id>[0-9a-f-]+|)/customer-voucher", CustomerVoucherAPI)
 
 urlpatterns = router.urls
 
