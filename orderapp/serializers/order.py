@@ -296,7 +296,7 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
             validated_data['user'] = voucher.user if not phone_number_user else phone_number_user
 
         validated_data['company'] = company
-        order = super().create(validated_data)
+        order = super(CompanyTableOrderSerializer, self).create(validated_data)
 
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)

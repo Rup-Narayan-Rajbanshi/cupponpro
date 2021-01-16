@@ -125,6 +125,3 @@ class MasterQROrderAPI(ModelViewSet):
     serializer_class = MasterQRSerializer
     pagination_class = FPagination
 
-    def create(self, request, *args, **kwargs):
-        created_response = super().create(request, *args, **kwargs)
-        return Response(created_response.data, status=200)
