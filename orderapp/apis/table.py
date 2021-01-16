@@ -37,7 +37,7 @@ class AssetFilter(filters.FilterSet):
         return qs.distinct()
 
 
-class AssetListAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
+class AssetListAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
     # queryset = Asset.objects.filter(asset_type=ASSET_TYPE['TABLE']).order_by('-created_at')
     queryset = Asset.objects.filter().order_by('-created_at')
     serializer_class = AssetSerializer
