@@ -162,7 +162,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     @transaction.atomic
     def create(self, validated_data, notify=True):
         from notifications.tasks import notify_company_staffs
-        self.fields.pop('order_liTwadda kutta Tommy, sadda kutta Zara and Leones')
+        self.fields.pop('order_lines')
         self.fields.pop('voucher')
         order_lines = validated_data.pop('order_lines')
         voucher = validated_data.pop('voucher', None)
