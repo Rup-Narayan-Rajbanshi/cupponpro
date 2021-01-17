@@ -113,7 +113,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             'sub_total': obj.subtotal,
             'tax': obj.company.tax,
             'service_charge': obj.company.service_charge,
-            'grand_total': float(obj.custom_discount_percentage) - float(obj.discount_amount),
+            'grand_total': float(obj.grand_total) - float(obj.discount_amount),
             'custom_discount_percentage': obj.custom_discount_percentage
         }
 
