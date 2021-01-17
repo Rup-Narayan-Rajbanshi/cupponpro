@@ -119,8 +119,12 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     def validate(self, attrs):
         if self.instance:
-            if self.context['request'].parser_context['kwargs']['company_id'] != str(self.instance.company.id):
-                raise ValidationError('Cannot update for another company')
+            if hasattr(self.context['request'], 'company'):
+                if self.context['request'].company != str(self.instance.company):
+                    raise ValidationError('Cannot update for another company')
+            else:
+                if self.context['request'].parser_context['kwargs']['company_id'] != str(self.instance.company.id):
+                    raise ValidationError('Cannot update for another company')
             if self.instance.status in [ORDER_STATUS['CANCELLED'], ORDER_STATUS['COMPLETED']]:
                 raise ValidationError('Cannot update completed or cancelled order')
         elif attrs['asset'].orders.filter(status__in=[
@@ -131,6 +135,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             # user__companyuser__user__group__name__in=['sales', 'manager', 'owner', 'user']
         ).exists():
             raise ValidationError('Table already has an active order')
+        import ipdb
+        ipdb.set_trace()
         return super().validate(attrs)
 
     def build_orderline_bulk_create_data(self, order, validated_order_line_data, voucher, served_products=None):
