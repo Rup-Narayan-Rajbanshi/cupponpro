@@ -21,6 +21,7 @@ class Orders(BaseModel):
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='orders')
     status = models.CharField(max_length=MAX_LENGTHS['ORDER_STATUS'], choices=ORDER_STATUS_CHOICES, default=DEFAULTS['ORDER_STATUS'])
     extras = JSONField(blank=True, null=True)
+    custom_discount_percentage = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -34,14 +35,16 @@ class Orders(BaseModel):
     def execute_change_status(cls, order, v_data, request):
         from orderapp.serializers.bill import BillCreateSerializer
         status = v_data.get('status')
+        custom_discount_percentage = v_data.get('custom_discount_percentage', 0)
         order.status = status
+        order.custom_discount_percentage = custom_discount_percentage
         order.save()
         if status == ORDER_STATUS['COMPLETED']:
             data = dict()
             data['company'] = order.company.id
             data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
             data['tax'] = order.company.tax if order.company.tax else 0
-            data['custom_discount_percentage'] = v_data.get('custom_discount_percentage', 0)
+            data['custom_discount_percentage'] = custom_discount_percentage
             serializer = BillCreateSerializer(data=data, context={'request': request})
             if not serializer.is_valid():
                 raise APIException(detail='Cannot bill the order', code=400)
@@ -72,6 +75,9 @@ class Orders(BaseModel):
         value = 0.0
         for line in self.lines.all():
             value = value + line.get_discounted_amount()
+        if self.custom_discount_percentage:
+            custom_discount = float(self.custom_discount_percentage/100) * float(self.grand_total)
+            value = value + custom_discount
         return value
 
     @property
