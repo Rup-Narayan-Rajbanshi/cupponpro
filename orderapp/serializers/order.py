@@ -120,7 +120,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     def validate(self, attrs):
         if self.instance:
             if hasattr(self.context['request'], 'company'):
-                if self.context['request'].company != str(self.instance.company):
+                if self.context['request'].company != self.instance.company:
                     raise ValidationError('Cannot update for another company')
             else:
                 if self.context['request'].parser_context['kwargs']['company_id'] != str(self.instance.company.id):
