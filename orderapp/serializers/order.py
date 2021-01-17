@@ -114,7 +114,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             'tax': obj.company.tax,
             'service_charge': obj.company.service_charge,
             'grand_total': obj.grand_total,
-            'custom_discount_percentage': obj.custom_discount_percentage - obj.discount_amount
+            'custom_discount_percentage': float(obj.custom_discount_percentage) - float(obj.discount_amount)
         }
 
     def validate(self, attrs):
