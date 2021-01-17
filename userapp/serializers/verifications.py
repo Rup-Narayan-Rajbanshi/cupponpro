@@ -119,6 +119,8 @@ class VerifyOTPSerializer(CustomBaseSerializer):
         if request:
             token = request.GET.get(OTP_HEADER)
         if not token:
+            token = request.headers.get('Otp-Token')
+        if not token:
             raise InvalidRequestException()
         try:
             self.user = User.objects.get(phone_number=phone_number)
@@ -128,7 +130,6 @@ class VerifyOTPSerializer(CustomBaseSerializer):
         else:
             if otp_type == OTP_TYPES['USER_REGISTER']:
                 is_invalid = True
-
         if not is_invalid:
             self.otp_verification_code = OTPVerificationCode.objects.filter(
                 status__in=[OTP_STATUS_TYPES['ACTIVE'], OTP_STATUS_TYPES['INACTIVE']],

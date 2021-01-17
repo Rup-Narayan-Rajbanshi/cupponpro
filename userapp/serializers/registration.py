@@ -19,6 +19,8 @@ class UserRegisterSerializer(UserRegistrationSerializer):
         if request:
             token = request.META.get(OTP_HEADER)
         if not token:
+            token = request.headers.get('Otp-Token')
+        if not token:
             raise InvalidRequestException()
         if password != confirm_password:
             raise ValidationError({'detail': 'The password does not match with confirm password.'})
