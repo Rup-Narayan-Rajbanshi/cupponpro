@@ -328,3 +328,52 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
             except:
                 pass
         return order
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        from notifications.tasks import notify_company_staffs
+        self.fields.pop('order_lines')
+        self.fields.pop('voucher')
+        order_lines = validated_data.pop('order_lines')
+        voucher = validated_data.pop('voucher', None)
+        validated_data['user'] = self.context['request'].user
+        company = validated_data['asset'].company
+        if not validated_data['user'].is_authenticated:
+            validated_data['user'] = None
+        if voucher:
+            validated_data['user'] = voucher.user
+        validated_data['company'] = company
+        served_products = dict()
+        for line in instance.lines.all():
+            # if line.status == 'SERVED':
+            #     served_products[str(line.product.id)] = line.quantity
+            # else:
+            line.delete(force_delete=True)
+        order_line_bulk_create_data = self.build_orderline_bulk_create_data(instance, order_lines, voucher,
+                                                                            served_products)
+        OrderLines.objects.bulk_create(order_line_bulk_create_data)
+        order = super().update(instance, validated_data)
+        company = str(order.company.id)
+        if order.asset:
+            message = 'New order is placed from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+        else:
+            message = 'A new order is placed'
+        payload = {
+            'id': str(order.id),
+            'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
+            'message': {
+                'en': message
+            }
+        }
+        try:
+            # notify_company_staffs.apply_async(kwargs={
+            #     'company': company,
+            #     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
+            #     'payload': payload,
+            #     'asset': order.asset
+            # })
+            notify_company_staffs(
+                company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset)
+        except Exception as e:
+            pass
+        return order
