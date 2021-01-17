@@ -357,7 +357,7 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(instance, order_lines, voucher,
                                                                             served_products)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
-        order = super().update(instance, validated_data)
+        order = super(CompanyTableOrderSerializer, self).update(instance, validated_data)
         company = str(order.company.id)
         if order.asset:
             message = 'New order is placed from {0} {1}'.format(order.asset.asset_type, order.asset.name)
