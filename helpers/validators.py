@@ -29,6 +29,15 @@ def is_numeric_value(value):
             raise ValidationError("The value should be numeric.")
     return value
 
+def is_percentage(value):
+    if value:
+        if not value.isnumeric():
+            raise ValidationError("The value should be numeric.")
+        if int(value) < 0 or int(value) > 100:
+            raise ValidationError("Value must range from 0 to 100.")
+    return value
+
+
 
 def phone_number_validator(phone_no):
     if phone_no:
