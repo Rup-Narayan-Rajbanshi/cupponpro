@@ -119,7 +119,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     def validate(self, attrs):
         if self.instance:
-            if self.context['request'].company != self.instance.company:
+            if self.context['request'].parser_context['kwargs']['company_id'] != self.instance.company.id:
                 raise ValidationError('Cannot update for another company')
             if self.instance.status in [ORDER_STATUS['CANCELLED'], ORDER_STATUS['COMPLETED']]:
                 raise ValidationError('Cannot update completed or cancelled order')
