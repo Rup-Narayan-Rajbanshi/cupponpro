@@ -19,7 +19,7 @@ router.register(r"create-bill", BillCreateAPI)
 router.register(r"manual-bill-create", ManualBillCreateAPI)
 router.register(r"company-voucher", VoucherListAPI)
 router.register(r"assets", AssetListAPI)
-router.register(r"(?P<company_id>[0-9a-f-]+|)/customer-voucher", CustomerVoucherAPI)
+router.register(r"customer-vouchers", CustomerVoucherAPI)
 
 urlpatterns = router.urls
 

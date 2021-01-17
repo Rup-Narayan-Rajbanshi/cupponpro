@@ -32,7 +32,10 @@ class CustomerVoucherAPI(mixins.ListModelMixin, GenericViewSet):
     pagination_class = FPagination
 
     def get_queryset(self):
-        return self.queryset.filter(
+        qs = self.queryset.filter(
             is_redeem=False,
-            coupon__company__id=self.kwargs['company_id'],
             user=self.request.user)
+        company_id = self.request.GET.get('company_id')
+        if company_id:
+            qs = qs.filter(coupon__company__id=company_id)
+        return qs
