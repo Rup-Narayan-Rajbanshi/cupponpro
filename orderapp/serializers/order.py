@@ -135,8 +135,6 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             # user__companyuser__user__group__name__in=['sales', 'manager', 'owner', 'user']
         ).exists():
             raise ValidationError('Table already has an active order')
-        import ipdb
-        ipdb.set_trace()
         return super().validate(attrs)
 
     def build_orderline_bulk_create_data(self, order, validated_order_line_data, voucher, served_products=None):
