@@ -104,7 +104,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         return fields
 
     def lines(self, order):
-        lines = OrderLineSerializer(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']), many=True)
+        lines = OrderLineSerializer(order.lines.all(), many=True)
         return lines.data
 
     def get_price_details(self, obj):
