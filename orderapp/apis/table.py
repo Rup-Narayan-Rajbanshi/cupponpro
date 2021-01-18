@@ -17,23 +17,33 @@ class AssetFilter(filters.FilterSet):
         model = Asset
         fields = ['asset_type', 'order_status']
 
+    def get_pending_tables(self, qs, all_served=True):
+        qs = qs.filter(orders__status__in=[
+            ORDER_STATUS['PROCESSING'], ORDER_STATUS['BILLABLE']])
+        pending = []
+        for asset in qs:
+            latest_order = asset.orders.order_by('-created_at').first()
+            if latest_order.lines.filter(
+                status=ORDER_LINE_STATUS['SERVED']
+            ).count() == latest_order.lines.count():
+                pending.append(asset.id)
+
+        if all_served:
+            qs = qs.filter(id__in=pending)
+        else:
+            qs = qs.exclude(id__in=pending)
+        return qs
+
     @property
     def qs(self):
         qs = super(AssetFilter, self).qs
         order_status = self.request.GET.get('order_status')
         if order_status == 'ACTIVE':
+            pending_orders = self.get_pending_tables(qs, all_served=False)
             qs = qs.filter(orders__status__in=[ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED']])
+            qs = qs | pending_orders
         elif order_status == 'PENDING_PAYMENT':
-            qs = qs.filter(orders__status__in=[
-                ORDER_STATUS['PROCESSING'], ORDER_STATUS['BILLABLE']])
-            pending = []
-            for asset in qs:
-                latest_order = asset.orders.order_by('-created_at').first()
-                if latest_order.lines.filter(
-                    status=ORDER_LINE_STATUS['SERVED']
-                ).count() == latest_order.lines.count():
-                    pending.append(asset.id)
-            qs = qs.filter(id__in=pending)
+            qs = self.get_pending_tables(qs)
         return qs.distinct()
 
 
