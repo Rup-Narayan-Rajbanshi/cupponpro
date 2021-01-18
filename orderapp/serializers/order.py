@@ -141,22 +141,24 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         bulk_create_data = list()
         for line in validated_order_line_data:
             new_quantity = int(line['quantity'])
-            order_line = OrderLines(order=order,
-                                    product=line['product'],
-                                    status=line.get('status', 'NEW'),
-                                    new=line.get('new', 0),
-                                    cooking=line.get('cooking', 0),
-                                    served=line.get('served', 0),
-                                    quantity=new_quantity,
-                                    rate=float(line['product'].total_price),
-                                    voucher=voucher)
-            # old_served_quantity = served_products.get(str(order_line.product_id))
-            # if old_served_quantity:
-            #     order_line.quantity = old_served_quantity if old_served_quantity > new_quantity else new_quantity - old_served_quantity
-            order_line.discount = order_line.get_discount()
-            order_line.discount_amount = order_line.get_discounted_amount()
-            order_line.total = order_line.get_line_total()
-            bulk_create_data.append(order_line)
+            status = line.get('status', 'NEW')
+            if not status == ORDER_LINE_STATUS['CANCELLED']:
+                order_line = OrderLines(order=order,
+                                        product=line['product'],
+                                        status=status,
+                                        new=line.get('new', 0),
+                                        cooking=line.get('cooking', 0),
+                                        served=line.get('served', 0),
+                                        quantity=new_quantity,
+                                        rate=float(line['product'].total_price),
+                                        voucher=voucher)
+                # old_served_quantity = served_products.get(str(order_line.product_id))
+                # if old_served_quantity:
+                #     order_line.quantity = old_served_quantity if old_served_quantity > new_quantity else new_quantity - old_served_quantity
+                order_line.discount = order_line.get_discount()
+                order_line.discount_amount = order_line.get_discounted_amount()
+                order_line.total = order_line.get_line_total()
+                bulk_create_data.append(order_line)
         return bulk_create_data
 
     @transaction.atomic
