@@ -117,7 +117,7 @@ class Notification(BaseModel):
 
     @classmethod
     @transaction.atomic
-    def send_to_company_users(cls, company, category, payload, asset=None):
+    def send_to_company_users(cls, company, category, payload, asset=None, exclude_user=None):
         company_users = CompanyUser.objects.select_related('user').filter(company=company)
         notification_category = NotificationCategory.objects.filter(id=category).first()
         notifications = list()

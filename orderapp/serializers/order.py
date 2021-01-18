@@ -168,7 +168,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         self.fields.pop('voucher')
         order_lines = validated_data.pop('order_lines')
         voucher = validated_data.pop('voucher', None)
-        validated_data['user'] = self.context['request'].user
+        user = self.context['request'].user
+        validated_data['user'] = user
         if not validated_data['user'].is_authenticated:
             validated_data['user'] = None
         if voucher:
@@ -195,14 +196,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                 }
             }
             try:
-                # notify_company_staffs.apply_async(kwargs={
-                #                     'company': company,
-                #                     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
-                #                     'payload': payload,
-                #                     'asset': order.asset
-                #                 })
                 notify_company_staffs(
-                    company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset)
+                    company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset, exclude_user=user)
                 pass
             except:
                 pass
@@ -215,7 +210,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         self.fields.pop('voucher')
         order_lines = validated_data.pop('order_lines')
         voucher = validated_data.pop('voucher', None)
-        validated_data['user'] = self.context['request'].user
+        user = self.context['request'].user
+        validated_data['user'] = user
         if not validated_data['user'].is_authenticated:
             validated_data['user'] = None
         if voucher:
@@ -245,14 +241,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             }
         }
         try:
-            # notify_company_staffs.apply_async(kwargs={
-            #     'company': company,
-            #     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
-            #     'payload': payload,
-            #     'asset': order.asset
-            # })
             notify_company_staffs(
-                company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset)
+                company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset, exclude_user=user)
         except Exception as e:
             pass
         return order
@@ -308,8 +298,6 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
 
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
-        # if order.lines.exclude(status__in='SERVED').count() == 0:
-        #     order.update(status=ORDER_STATUS['BILLABLE'])
         if notify:
             company = str(order.company.id)
             if order.asset:
@@ -324,16 +312,9 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
                 }
             }
             try:
-                # notify_company_staffs.apply_async(kwargs={
-                #                     'company': company,
-                #                     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
-                #                     'payload': payload,
-                #                     'asset': order.asset
-                #                 })
                 notify_company_staffs(
                     company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset)
-                pass
-            except:
+            except Exception as e:
                 pass
         return order
 
@@ -352,10 +333,7 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
             validated_data['user'] = voucher.user
         validated_data['company'] = company
         served_products = dict()
-        for line in instance.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
-            # if line.status == 'SERVED':
-            #     served_products[str(line.product.id)] = line.quantity
-            # else:
+        for line in instance.lines.all():
             line.delete(force_delete=True)
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(instance, order_lines, voucher,
                                                                             served_products)
@@ -374,12 +352,6 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
             }
         }
         try:
-            # notify_company_staffs.apply_async(kwargs={
-            #     'company': company,
-            #     'category': NOTIFICATION_CATEGORY['ORDER_PLACED'],
-            #     'payload': payload,
-            #     'asset': order.asset
-            # })
             notify_company_staffs(
                 company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset)
         except Exception as e:
