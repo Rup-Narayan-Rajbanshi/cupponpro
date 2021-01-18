@@ -23,11 +23,10 @@ class AssetFilter(filters.FilterSet):
         pending = []
         for asset in qs:
             latest_order = asset.orders.order_by('-created_at').first()
-            if latest_order.lines.filter(
+            if latest_order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).filter(
                 status=ORDER_LINE_STATUS['SERVED']
-            ).count() == latest_order.lines.count():
+            ).count() == latest_order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).count():
                 pending.append(asset.id)
-
         if all_served:
             qs = qs.filter(id__in=pending)
         else:
