@@ -230,9 +230,9 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         order = super().update(instance, validated_data)
         company = str(order.company.id)
         if order.asset:
-            message = 'New order is placed from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+            message = 'Order has been updated at {0} {1}'.format(order.asset.asset_type, order.asset.name)
         else:
-            message = 'A new order is placed'
+            message = 'Order has been updated'
         payload = {
             'id': str(order.id),
             'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
@@ -341,9 +341,9 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
         order = super(CompanyTableOrderSerializer, self).update(instance, validated_data)
         company = str(order.company.id)
         if order.asset:
-            message = 'New order is placed from {0} {1}'.format(order.asset.asset_type, order.asset.name)
+            message = 'Order has been updated from {0} {1}'.format(order.asset.asset_type, order.asset.name)
         else:
-            message = 'A new order is placed'
+            message = 'An order has been updated'
         payload = {
             'id': str(order.id),
             'category': NOTIFICATION_CATEGORY_NAME['ORDER_PLACED'],
