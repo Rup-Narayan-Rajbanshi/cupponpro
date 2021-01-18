@@ -6,7 +6,7 @@ from commonapp.models.asset import Asset
 from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order
 from helpers.serializer import CustomModelSerializer, CustomBaseSerializer
-from helpers.constants import ORDER_STATUS
+from helpers.constants import ORDER_STATUS, ORDER_LINE_STATUS
 from helpers.choices_variable import ORDER_STATUS_CHOICES
 from helpers.serializer_fields import DetailRelatedField
 from helpers.validators import is_numeric_value, is_percentage
@@ -79,7 +79,7 @@ class TableOrderSerializer(OrderStatusSerializer):
         request = self.context.get('request')
         voucher = validated_data.get('voucher')
         if voucher:
-            for line in instance.lines.all():
+            for line in instance.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
                 line.update(voucher=voucher)
         order = Orders.execute_change_status(order=instance, v_data=validated_data, request=request)
         return order
@@ -104,7 +104,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         return fields
 
     def lines(self, order):
-        lines = OrderLineSerializer(order.lines.all(), many=True)
+        lines = OrderLineSerializer(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']), many=True)
         return lines.data
 
     def get_price_details(self, obj):
@@ -220,7 +220,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             validated_data['user'] = voucher.user
         validated_data['company'] = self.context['request'].company
         served_products = dict()
-        for line in instance.lines.all():
+        for line in instance.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
             # if line.status == 'SERVED':
             #     served_products[str(line.product.id)] = line.quantity
             # else:
@@ -349,7 +349,7 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
             validated_data['user'] = voucher.user
         validated_data['company'] = company
         served_products = dict()
-        for line in instance.lines.all():
+        for line in instance.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
             # if line.status == 'SERVED':
             #     served_products[str(line.product.id)] = line.quantity
             # else:

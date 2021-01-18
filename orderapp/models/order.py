@@ -10,7 +10,7 @@ from commonapp.models.coupon import Voucher
 from commonapp.models.product import Product
 from orderapp.models.bills import Bills
 from userapp.models.user import User
-from helpers.constants import MAX_LENGTHS, DEFAULTS, ORDER_STATUS, DISCOUNT_TYPE
+from helpers.constants import MAX_LENGTHS, DEFAULTS, ORDER_STATUS, DISCOUNT_TYPE, ORDER_LINE_STATUS
 from helpers.choices_variable import ORDER_STATUS_CHOICES, ORDER_LINE_STATUS_CHOICES
 
 
@@ -73,7 +73,7 @@ class Orders(BaseModel):
     @property
     def discount_amount(self):
         value = 0.0
-        for line in self.lines.all():
+        for line in self.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
             value = value + line.get_discounted_amount()
         if self.custom_discount_percentage:
             custom_discount = float(self.custom_discount_percentage/100) * float(self.grand_total)
@@ -83,7 +83,7 @@ class Orders(BaseModel):
     @property
     def grand_total(self):
         value = 0.0
-        for line in self.lines.all():
+        for line in self.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
             value = value + line.get_line_total()
         # discount = self.lines.first().get_discount() if self.lines.first() else None
         tax = self.company.tax if self.company.tax else 0
