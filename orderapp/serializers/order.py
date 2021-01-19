@@ -203,12 +203,23 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                 pass
         return order
 
+    def check_for_cancelled_order(self, order_lines):
+        is_cancelled = True
+        for line in order_lines:
+            is_cancelled = True if line.get('status') == ORDER_LINE_STATUS['CANCELLED'] else False
+        return is_cancelled
+
     @transaction.atomic
     def update(self, instance, validated_data):
         from notifications.tasks import notify_company_staffs
         self.fields.pop('order_lines')
         self.fields.pop('voucher')
         order_lines = validated_data.pop('order_lines')
+
+        is_cancelled = self.check_for_cancelled_order(order_lines)
+        if is_cancelled:
+            instance.delete()
+            return instance
         voucher = validated_data.pop('voucher', None)
         user = self.context['request'].user
         validated_data['user'] = user
@@ -240,11 +251,11 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                 'en': message
             }
         }
-        try:
-            notify_company_staffs(
-                company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset, exclude_user=user)
-        except Exception as e:
-            pass
+        # try:
+        #     notify_company_staffs(
+        #         company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset, exclude_user=user)
+        # except Exception as e:
+        #     pass
         return order
 
 
@@ -324,6 +335,11 @@ class MasterQRSerializer(CompanyTableOrderSerializer):
         self.fields.pop('order_lines')
         self.fields.pop('voucher')
         order_lines = validated_data.pop('order_lines')
+
+        is_cancelled = self.check_for_cancelled_order(order_lines)
+        if is_cancelled:
+            instance.delete()
+            return instance
         voucher = validated_data.pop('voucher', None)
         validated_data['user'] = self.context['request'].user
         company = validated_data['asset'].company
