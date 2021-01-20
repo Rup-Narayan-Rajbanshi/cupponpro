@@ -206,7 +206,9 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     def check_for_cancelled_order(self, order_lines):
         is_cancelled = True
         for line in order_lines:
-            is_cancelled = True if line.get('status') == ORDER_LINE_STATUS['CANCELLED'] else False
+            if not line.get('status') == ORDER_LINE_STATUS['CANCELLED']:
+                is_cancelled = False
+                break
         return is_cancelled
 
     @transaction.atomic
