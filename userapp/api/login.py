@@ -20,7 +20,7 @@ class LoginTokenView(generics.GenericAPIView):
             'vendor': ['owner', 'manager', 'sales'],
             'user': ['user']
         }
-        user_obj = User.objects.filter(email=request.data['email'])
+        user_obj = User.objects.filter(email=request.data['email'].lower())
         if user_obj:
             if user_obj[0].check_password(request.data['password']):
                 if user_obj[0].group.filter(name__in=group_name[group]).exists():

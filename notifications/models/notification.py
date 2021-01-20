@@ -121,12 +121,15 @@ class Notification(BaseModel):
         company_users = CompanyUser.objects.select_related('user').filter(company=company).exclude(user=exclude_user)
         notification_category = NotificationCategory.objects.filter(id=category).first()
         notifications = list()
+        sent_users = []
         for company_user in company_users:
             user = company_user.user
-            notifications.append(cls(category=notification_category,
-                                     payload=payload,
-                                     type='customer',
-                                     user=user,
-                                     asset=asset))
+            if user not in sent_users:
+                notifications.append(cls(category=notification_category,
+                                         payload=payload,
+                                         type='customer',
+                                         user=user,
+                                         asset=asset))
+                sent_users.append(user)
         receivers = cls.create_notification(bulk_notifications=notifications)
         return receivers
