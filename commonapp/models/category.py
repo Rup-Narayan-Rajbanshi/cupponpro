@@ -4,6 +4,8 @@ import uuid
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.dispatch import receiver
+from helpers.app_helpers import url_builder
+
 
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
@@ -20,6 +22,16 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_representation(self, request=None):
+        icon = url_builder(self.icon, request)
+        image = url_builder(self.image, request)
+        return {
+            "id": self.id,
+            "name": self.name,
+            "image": image,
+            "icon": icon
+        }
 
     def save(self, *args, **kwargs):
         ''' On save, create token '''
@@ -85,3 +97,9 @@ class SubCategory(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_representation(self, request=None):
+        return {
+            "id": self.id,
+            "name": self.name
+        }

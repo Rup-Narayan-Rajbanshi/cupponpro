@@ -2,6 +2,9 @@ from rest_framework import serializers
 from django.contrib.auth.models import Group
 from commonapp.models.company import CompanyUser
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
+from helpers.serializer_fields import ImageFieldWithURL
+from helpers.choices_variable import GENDER_CHOICES
+
 
 class UserGroupSerializer(serializers.ModelSerializer):
     new_group = serializers.IntegerField(default=None)
@@ -16,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
     middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
     group = serializers.SerializerMethodField()
     company = serializers.SerializerMethodField()
+    image = ImageFieldWithURL(allow_empty_file=True)
 
     class Meta:
         model = User
@@ -29,11 +33,11 @@ class UserSerializer(serializers.ModelSerializer):
         group = obj.group.all()
         group_list = [x.name for x in group]
         return group_list
-    
+
     def get_company(self, obj):
         company_user_obj = CompanyUser.objects.filter(user=obj.id)
         if company_user_obj:
-            company_ids = [company_obj.company.id for company_obj in company_user_obj]
+            company_ids = [company_obj.company.to_representation() for company_obj in company_user_obj]
             return company_ids
         else:
             return None
@@ -42,6 +46,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
     group = serializers.SerializerMethodField()
     company = serializers.SerializerMethodField()
+    image = ImageFieldWithURL(allow_empty_file=True)
 
     class Meta:
         model = User
@@ -64,7 +69,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         company_user_obj = CompanyUser.objects.filter(user=obj.id)
         if company_user_obj:
-            company_ids = [company_obj.company.id for company_obj in company_user_obj]
+            company_ids = [company_obj.company.to_representation() for company_obj in company_user_obj]
             return company_ids
         else:
             return None
@@ -73,7 +78,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     middle_name = serializers.CharField(max_length=50, required=False)
-    is_user = serializers.BooleanField()
+    is_user = serializers.BooleanField(write_only=True)
+    gender = serializers.ChoiceField(GENDER_CHOICES)
 
     class Meta:
         model = User
@@ -95,7 +101,7 @@ class CompanyUserRegistrationSerializer(serializers.ModelSerializer):
             'confirm_password', 'is_manager')
 
 
-class ChangePasswordSerializer(serializers.Serializer):  
+class ChangePasswordSerializer(serializers.Serializer):
     """
     Serializer for password change endpoint.
     """
@@ -117,7 +123,7 @@ class PasswordResetTokenSerializer(serializers.Serializer):
         user = User.objects.get(email=validated_data.get('email'))
         return PasswordResetToken.objects.create(user=user)
 
-class ResetPasswordSerializer(serializers.Serializer):  
+class ResetPasswordSerializer(serializers.Serializer):
     """
     Serializer for password change endpoint.
     """
@@ -126,7 +132,7 @@ class ResetPasswordSerializer(serializers.Serializer):
     token = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 
-class SignupTokenSerializer(serializers.ModelSerializer):  
+class SignupTokenSerializer(serializers.ModelSerializer):
     """
     Serializer for signup token endpoint.
     """
@@ -140,7 +146,7 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = ('id', 'name')
 
-class VerifyPasswordSerializer(serializers.Serializer):  
+class VerifyPasswordSerializer(serializers.Serializer):
     """
     Serializer for password verification endpoint.
     """
@@ -148,7 +154,7 @@ class VerifyPasswordSerializer(serializers.Serializer):
 
     password = serializers.CharField(required=True)
 
-class ChangeUserEmailSerializer(serializers.Serializer):  
+class ChangeUserEmailSerializer(serializers.Serializer):
     """
     Serializer for user's email change endpoint.
     """
@@ -157,10 +163,12 @@ class ChangeUserEmailSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
 
-class ChangeUserProfilePictureSerializer(serializers.ModelSerializer):  
+class ChangeUserProfilePictureSerializer(serializers.ModelSerializer):
     """
     Serializer for user's profile picture change endpoint.
     """
+    image = ImageFieldWithURL(allow_empty_file=True)
+
     class Meta:
         model = User
         fields = ('image',)

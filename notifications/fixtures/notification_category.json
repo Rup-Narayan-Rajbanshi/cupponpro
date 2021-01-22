@@ -1,0 +1,46 @@
+[
+    {
+        "model": "notifications.NotificationCategory",
+        "pk": 1,
+        "fields": {
+            "id": "b6ccb8e5-59dd-4bea-93de-f6d0a2bcf8e9",
+            "created_at": "2019-07-19T06:13:04Z",
+            "modified_at": "2019-11-23T05:28:47.822Z",
+            "name": "order_placed",
+            "description": "order_placed"
+        }
+    },
+    {
+        "model": "notifications.NotificationCategory",
+        "pk": 2,
+        "fields": {
+            "id": "011a3714-3baa-4183-8430-975132832fd6",
+            "created_at": "2019-07-19T06:13:04Z",
+            "modified_at": "2019-11-23T05:28:47.822Z",
+            "name": "order_status_change",
+            "description": "order_status_change"
+        }
+    },
+    {
+        "model": "notifications.NotificationCategory",
+        "pk": 3,
+        "fields": {
+            "id": "84d53355-15fc-45e4-99ac-66de301d1622",
+            "created_at": "2020-07-19T06:13:04Z",
+            "modified_at": "2020-11-23T05:28:47.822Z",
+            "name": "order_payment",
+            "description": "order_payment"
+        }
+    },
+    {
+        "model": "notifications.NotificationCategory",
+        "pk": 4,
+        "fields": {
+            "id": "6c10bf4e-9256-4d63-ae30-8ff18e399a3b",
+            "created_at": "2019-07-19T06:13:04Z",
+            "modified_at": "2019-11-23T05:28:47.822Z",
+            "name": "order_updated",
+            "description": "order_updated"
+        }
+    }
+]

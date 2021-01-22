@@ -22,7 +22,7 @@ EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_BACKEprojectND = config('EMAIL_BACKEND')
 
 # Application definition
 
@@ -52,6 +52,11 @@ DEV_APPS = [
     'bannerapp',
     'commonapp',
     'userapp',
+    'company',
+    'productapp',
+    'orderapp',
+    'notifications',
+    'data_manager'
 ]
 
 
@@ -64,17 +69,17 @@ AUTH_USER_MODEL = 'userapp.User'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
-
+CSRF_COOKIE_SECURE = False
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -171,3 +176,26 @@ STATICFILES_DIRS = (
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 
 MEDIA_ROOT = os.path.join((BASE_DIR), "media")
+
+PROXY_URL = config('PROXY_URL', '')
+FE_URL = config('FE_URL', '')
+
+## celery
+RABBIT_HOST = 'rabbit'
+CELERY_BROKER_URL = 'amqp://{}:{}@{}//'.format(config("BROKER_USERNAME", ''), config("BROKER_PASSWORD", ''), config('RABBIT_HOST', ''))
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+## FCM API SECRET_KEY
+FCM_API_KEY = config("FCM_API_KEY", '<api-key>')
+#SPARROW CONFIG
+OTP_SPARROW = {
+    "POST_URL": "http://api.sparrowsms.com/v2/sms/",
+    "BODY": {
+        "token": config("SPARROW_TOKEN", ''),
+        "from": config('SPARROW_SENDER', 'Demo'),
+        "to": "",
+        "text": ""
+    }
+}

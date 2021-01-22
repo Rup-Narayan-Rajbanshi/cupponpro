@@ -6,6 +6,8 @@ from commonapp.models.asset import Asset
 from commonapp.serializers.asset import AssetSerializer
 from helper import isCompanyUser
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, publicReadOnly
+from commonapp.app_helper import custom_paginator
+
 
 class AssetListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | publicReadOnly]
@@ -19,27 +21,12 @@ class AssetListView(generics.GenericAPIView):
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         asset_obj = Asset.objects.filter(company=company_id)
-        paginator = Paginator(asset_obj, page_size)
-        page_obj = paginator.get_page(page_number)
-        serializer = AssetSerializer(page_obj, many=True,\
-            context={'request':request})
-        if page_obj.has_previous():
-            previous_page = page_obj.previous_page_number()
-        else:
-            previous_page = None
-        if page_obj.has_next():
-            next_page = page_obj.next_page_number()
-        else:
-            next_page = None
-        data = {
-            'success': 1,
-            'previous_page': previous_page,
-            'next_page': next_page,
-            'page_count': paginator.num_pages,
-            'data': serializer.data
-        }
+        data = custom_paginator(request=request,
+                        queryset=asset_obj,
+                        serializer=AssetSerializer
+                    )
         return Response(data, status=200)
-    
+
     def post(self, request, company_id):
         """
         An endpoint for creating vendor's asset.

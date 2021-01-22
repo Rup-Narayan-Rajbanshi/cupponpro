@@ -4,6 +4,7 @@ from django.db import models
 from commonapp.models.company import Company
 from userapp.models.user import User
 
+
 class Bill(models.Model):
     # Payment Modes
     Card = 'Card'
@@ -21,7 +22,9 @@ class Bill(models.Model):
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
     email = models.EmailField(max_length=50, null=False, blank=True)
     payment_mode = models.CharField(max_length=10, choices=PAYMENT, default=Cash)
-    paid_amount = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    service_charge = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     invoice_number = models.CharField(max_length=8, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -38,6 +41,10 @@ class Bill(models.Model):
             self.name = self.user.full_name
             self.email = self.user.email
             self.phone_number = self.user.phone_number
+        if not self.service_charge:
+            self.service_charge = self.company.service_charge
+        if not self.tax:
+            self.tax = self.company.tax
         if not self.invoice_number:
             company_obj = Company.objects.get(id=self.company_id)
             company_obj.invoice_counter += 1

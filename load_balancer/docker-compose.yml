@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+    cupponpro-nginx:
+        build:
+            context: .
+        image: cupponpro-nginx
+        restart: unless-stopped
+        networks:
+        - cuppon-pro-net
+        ports:
+        - 80:80
+        - 443:443
+        volumes:
+        - "/etc/letsencrypt/:/etc/letsencrypt/"
+
+networks:
+    cuppon-pro-net:
+        name: cuppon-pro-network
+        ipam:
+            driver: default
+            config:
+                - subnet: "172.16.238.0/24"
+                - subnet: "2001:3984:3989::/64"

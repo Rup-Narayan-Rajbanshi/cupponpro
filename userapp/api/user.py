@@ -68,7 +68,7 @@ class UserGroupDetailView(generics.GenericAPIView):
                 'message': "User doesn't exist."
             }
             return Response(data, status=404)
-    
+
     def put(self, request, company_id, user_id):
         """
         An endpoint for changing vendor user's group.
@@ -109,7 +109,7 @@ class UserGroupDetailView(generics.GenericAPIView):
                 'success': 0,
                 'message': "Group change failed."
             }
-            return Response(data, status=400)     
+            return Response(data, status=400)
 
 class UserListView(generics.GenericAPIView):
     serializer_class = UserSerializer
@@ -175,7 +175,7 @@ class UpdateUser(generics.GenericAPIView):
         """
         An endpoint for updating detail.
         """
-        if str(request.user.id) == user_id:
+        if str(request.user.id) == str(user_id):
             if User.objects.filter(id=user_id):
                 user_obj = User.objects.get(id=user_id)
                 serializer = UserSerializer(instance=user_obj,\

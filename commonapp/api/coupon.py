@@ -6,7 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from commonapp.models.category import Category
 from commonapp.models.coupon import Coupon, Voucher
 from commonapp.models.company import Company
+from commonapp.models.product import Product, ProductCategory
 from commonapp.serializers.coupon import CouponSerializer, VoucherSerializer, CouponDetailSerializer
+from helpers.constants import COUPON_TYPE_MAPPER
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 from datetime import datetime
 
@@ -33,6 +35,7 @@ class CouponTypeListView(generics.GenericAPIView):
         }
         return Response(data, status=200)
 
+
 class CouponListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isAdminOrReadOnly]
     serializer_class = CouponSerializer
@@ -42,13 +45,38 @@ class CouponListView(generics.GenericAPIView):
         An endpoint for listing all the coupons. Pass 'page' and 'size' as query for requesting particular page and
         number of items per page respectively.
         """
+        filter_fields = ['discount_type', 'name']
+        sort_by_fields = ['name', 'expiry_date', 'discount']
+        coupon_type = request.GET.get('coupon_type') if request.GET.get('coupon_type') in list(COUPON_TYPE_MAPPER.keys()) else None
+
+        order_by = '' if request.GET.get('order_by') == 'asc' else '-'
+        sort_by = request.GET.get('sort_by') if request.GET.get('sort_by') in sort_by_fields else 'id'
+        filter_kwargs = {'{key}{lookup}'.format(
+            key=key, lookup='__icontains'
+            ): value for key, value in request.GET.items() if key in filter_fields}
+
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        coupon_obj = Coupon.objects.all().order_by('-id')
+        company = request.GET.get('company')
+
+        if coupon_type:
+            coupon_obj = Coupon.objects.select_related('company').filter(**filter_kwargs,
+                                                                         content_type__model=COUPON_TYPE_MAPPER[coupon_type]).order_by(
+                '{order_by}{sort_by}'.format(
+                    order_by=order_by,
+                    sort_by=sort_by
+                ))
+        else:
+            coupon_obj = Coupon.objects.select_related('company').filter(**filter_kwargs).order_by('{order_by}{sort_by}'.format(
+                order_by=order_by,
+                sort_by=sort_by
+            ))
+
+        if company:
+            coupon_obj = coupon_obj.filter(company=company)
         paginator = Paginator(coupon_obj, page_size)
         page_obj = paginator.get_page(page_number)
-        serializer = CouponDetailSerializer(page_obj, many=True,\
-            context={"request":request})
+        serializer = CouponDetailSerializer(page_obj, many=True, context={"request": request})
         if page_obj.has_previous():
             previous_page = page_obj.previous_page_number()
         else:
@@ -84,9 +112,10 @@ class CouponListView(generics.GenericAPIView):
         }
         return Response(data, status=400)
 
+
 class CouponDetailView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isAdminOrReadOnly]
-    serializer_class = CouponSerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request, coupon_id):
         """
@@ -94,7 +123,7 @@ class CouponDetailView(generics.GenericAPIView):
         """
         if Coupon.objects.filter(id=coupon_id):
             coupon_obj = Coupon.objects.get(id=coupon_id)
-            serializer = CouponSerializer(coupon_obj,\
+            serializer = CouponDetailSerializer(coupon_obj,\
                 context={"request":request})
             data = {
                 'success': 1,
@@ -113,7 +142,7 @@ class CouponDetailView(generics.GenericAPIView):
         An endpoint for updating coupon detail.
         """
         coupon_obj = Coupon.objects.filter(id=coupon_id)
-        if coupon_obj:   
+        if coupon_obj:
             serializer = CouponSerializer(instance=coupon_obj[0],\
                 data=request.data, context={'request':request})
             if serializer.is_valid():
@@ -140,7 +169,7 @@ class CouponDetailView(generics.GenericAPIView):
         """
         An endpoint for deleting coupon.
         """
-        coupon_obj = Coupon.objects.filter(id=coupon_id)            
+        coupon_obj = Coupon.objects.filter(id=coupon_id)
         if coupon_obj:
             try:
                 coupon_obj[0].delete()
@@ -238,23 +267,24 @@ class VoucherListView(generics.GenericAPIView):
         """
         An endpoint for creating user's voucher.
         """
-        if str(request.user.id) == str(request.data('user', None)):
+        if str(request.user.id) == str(request.data.get('user', None)):
+            serializer = VoucherSerializer(data=request.data, context={'request':request})
+            if not serializer.is_valid():
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
+
             voucher_obj = Voucher.objects.filter(user=request.user.id, coupon=request.data['coupon'])
             if not voucher_obj:
-                serializer = VoucherSerializer(data=request.data, context={'request':request}, partial=True)
-                if serializer.is_valid():
-                    serializer.save()
-                    data = {
-                        'success': 1,
-                        'data': serializer.data
-                    }
-                    return Response(data, status=200)
-                else:
-                    data = {
-                        'success': 0,
-                        'message': serializer.errors
-                    }
-                    return Response(data, status=400)
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'data': serializer.data
+                }
+                return Response(data, status=200)
+
             else:
                 data = {
                     'success': 0,
@@ -270,7 +300,7 @@ class VoucherListView(generics.GenericAPIView):
 
 class TrendingCouponListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
-    serializer_class = CouponSerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request):
         """
@@ -311,7 +341,7 @@ class TrendingCouponListView(generics.GenericAPIView):
 
 class DealOfTheDayCouponListView(generics.GenericAPIView):
     permission_classes = (isAdminOrReadOnly, )
-    serializer_class = CouponSerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request):
         """

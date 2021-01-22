@@ -24,7 +24,8 @@ urlpatterns = [
     # path('api/v1/auth/login', obtain_jwt_token),
     path('api/v1/auth/token/refresh', refresh_jwt_token),
     path('api/v1/auth/token/verify', verify_jwt_token),
-    path('api/v1/', include('project.apiurls')),
+    path('api/v1/', include('project.v1_api_urls')),
+    path('api/v2/', include('project.v2_api_urls')),
     path('', include_docs_urls(title='Cupponpro API')),
     # path('swagger', schema_view)
 ]

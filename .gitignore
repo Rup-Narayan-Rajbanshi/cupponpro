@@ -1,7 +1,8 @@
+.idea
 /tmp/
 /htmlcov/
 .coverage
-/__pycache__/
+__pycache__/
 *.pyc
 .pytest_cache/
 db.sqlite3
@@ -10,6 +11,8 @@ ngrok
 /log/
 media
 assets
-env
-migrations/
-.env
+*.env
+virtualenvs/
+local_settings.py
+load_balancer/.certi/*.pem
+celerybeat-schedule

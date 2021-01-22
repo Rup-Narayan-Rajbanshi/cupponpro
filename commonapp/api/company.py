@@ -2,7 +2,7 @@ import math
 from django.db.models import Q
 from django.core.paginator import Paginator
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import generics
 from commonapp.models.company import Company, CompanyUser, FavouriteCompany
 from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer, ChangeCompanyEmailSerializer
@@ -12,6 +12,17 @@ from permission import isCompanyOwnerAndAllowAll, publicReadOnly
 from helper import isCompanyUser
 from commonapp.models.coupon import Coupon
 from commonapp.serializers.coupon import CouponSerializer, CouponDetailSerializer
+from django.db.models import (
+    F,
+    FloatField,
+    Q,
+    Value,
+    Avg,
+    Count,
+    IntegerField
+)
+from django.db.models.functions import Coalesce
+
 
 class CompanyListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | publicReadOnly]
@@ -24,7 +35,28 @@ class CompanyListView(generics.GenericAPIView):
         """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        company_obj = Company.objects.all().order_by('-id')
+        search = request.GET.get('search')
+        filter_by = request.GET.get('filter_by')
+        company_obj = Company.objects.annotate(
+                            rating = Coalesce(
+                                Avg(
+                                    F("company_rating__rate"),
+                                    output_field=FloatField(),
+                                ),
+                                Value(0),
+                            ),
+                            rating_count = Coalesce(
+                                Count(
+                                    F("company_rating"),
+                                    output_field=IntegerField(),
+                                ),
+                                Value(0),
+                            )
+                        ).all().order_by('-id')
+        if search:
+            company_obj = company_obj.filter(name__istartswith=search)
+        if filter_by == 'top_rated':
+            company_obj = company_obj.order_by('-rating', '-id')
         paginator = Paginator(company_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = CompanySerializer(page_obj, many=True,\
@@ -81,7 +113,22 @@ class CompanyDetailView(generics.GenericAPIView):
         """
         An endpoint for getting vendor detail.
         """
-        company_obj = Company.objects.filter(id=company_id)
+        company_obj = Company.objects.filter(id=company_id).annotate(
+                            rating = Coalesce(
+                                Avg(
+                                    F("company_rating__rate"),
+                                    output_field=FloatField(),
+                                ),
+                                Value(0),
+                            ),
+                            rating_count = Coalesce(
+                                Count(
+                                    F("company_rating"),
+                                    output_field=IntegerField(),
+                                ),
+                                Value(0),
+                            )
+                        )
         if company_obj:
             serializer = CompanySerializer(company_obj[0], context={'request':request})
             data = {
@@ -189,6 +236,7 @@ class ChangeCompanyEmailView(generics.GenericAPIView):
 
 class CompanyFavouriteView(generics.GenericAPIView):
     serializer_class = FavouriteCompanySerializer
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request, company_id):
         """
@@ -214,24 +262,23 @@ class CompanyFavouriteView(generics.GenericAPIView):
         """
         An endpoint for updating vendor as favourite.
         """
-        if (str(request.data.get('user', None)) == str(request.user.id)) and (str(request.data('company', None)) == company_id):
-            favourite_company_obj = FavouriteCompany.objects.filter(user=request.user, company=company_id)
-            if favourite_company_obj:
-                serializer = FavouriteCompanySerializer(favourite_company_obj[0], data=request.data,\
-                    context={'request':request})
-                if serializer.is_valid():
-                    serializer.save()
-                    data = {
-                        'success': 1,
-                        'data': serializer.data
-                    }
-                    return Response(data, status=200)
-                else:
-                    data = {
-                        'success': 0,
-                        'message': serializer.errors
-                    }
-                    return Response(data, status=400)
+        favourite_company_obj = FavouriteCompany.objects.filter(user=request.user, company=company_id)
+        if favourite_company_obj:
+            serializer = FavouriteCompanySerializer(favourite_company_obj[0], data=request.data,\
+                context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                    'success': 1,
+                    'data': serializer.data
+                }
+                return Response(data, status=200)
+            else:
+                data = {
+                    'success': 0,
+                    'message': serializer.errors
+                }
+                return Response(data, status=400)
         data = {
             'success': 0,
             'message': 'Favourite company data not found.'
@@ -292,7 +339,22 @@ class PartnerListView(generics.GenericAPIView):
         An endpoint for listing all the vendor's that are partners. Pass 'page' and 'size' as query for requesting particular page and
         number of items per page respectively.
         """
-        company_obj = Company.objects.filter(is_partner=True).order_by('-id')
+        company_obj = Company.objects.filter(is_partner=True).annotate(
+                            rating = Coalesce(
+                                Avg(
+                                    F("company_rating__rate"),
+                                    output_field=FloatField(),
+                                ),
+                                Value(0),
+                            ),
+                            rating_count = Coalesce(
+                                Count(
+                                    F("company_rating"),
+                                    output_field=IntegerField(),
+                                ),
+                                Value(0),
+                            )
+                        ).order_by('-id')
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         paginator = Paginator(company_obj, page_size)
@@ -325,7 +387,22 @@ class CategoryCompanyListView(generics.GenericAPIView):
         An endpoint for listing all the company according to category. Pass 'page' and 'size' as query for requesting particular page and
         number of items per page respectively.
         """
-        company_obj = Company.objects.filter(category=category_id).order_by('-id')
+        company_obj = Company.objects.filter(category=category_id).annotate(
+                            rating = Coalesce(
+                                Avg(
+                                    F("company_rating__rate"),
+                                    output_field=FloatField(),
+                                ),
+                                Value(0),
+                            ),
+                            rating_count = Coalesce(
+                                Count(
+                                    F("company_rating"),
+                                    output_field=IntegerField(),
+                                ),
+                                Value(0),
+                            )
+                        ).order_by('-id')
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         paginator = Paginator(company_obj, page_size)
@@ -393,7 +470,7 @@ class CompanyCouponListView(generics.GenericAPIView):
 
 class LocalRestaurantListView(generics.GenericAPIView):
     permission_classes = (AllowAny, )
-    serializer_class = CompanySerializer
+    serializer_class = CouponDetailSerializer
 
     def get(self, request):
         """
@@ -402,11 +479,11 @@ class LocalRestaurantListView(generics.GenericAPIView):
         Pass 'Restaurant' or 'Hotel' as value to 'category' query to get local restaurant or hotel accordingly.
         """
         try:
-            latitude = int(request.GET.get('latitude', None))
-            longitude = int(request.GET.get('longitude', None))
-            distance = int(request.GET.get('distance', 5))
+            latitude = float(request.GET.get('latitude', None))
+            longitude = float(request.GET.get('longitude', None))
+            distance = float(request.GET.get('distance', 5))
             category = request.GET.get('category', None)
-        except:
+        except Exception as e:
             latitude = None
             longitude = None
             category = None
@@ -419,12 +496,13 @@ class LocalRestaurantListView(generics.GenericAPIView):
             longitude_m = longitude - threshold_longitude
             category_Q = Q(category__name=category)
             distance_Q = (Q(latitude__range=[latitude_m,latitude_p]) & Q(longitude__range=[longitude_m,longitude_p]))
-            company_obj = Company.objects.filter(category_Q & distance_Q).order_by('-id')
+            company_obj = Company.objects.filter(category_Q & distance_Q).order_by('-id').values_list('id', flat=True)
+            coupons = Coupon.objects.select_related('company').filter(company__in=company_obj)
             page_size = request.GET.get('size', 10)
             page_number = request.GET.get('page')
-            paginator = Paginator(company_obj, page_size)
+            paginator = Paginator(coupons, page_size)
             page_obj = paginator.get_page(page_number)
-            serializer = CompanySerializer(page_obj, many=True,\
+            serializer = self.get_serializer(page_obj, many=True,\
                 context={"request":request})
             if page_obj.has_previous():
                 previous_page = page_obj.previous_page_number()

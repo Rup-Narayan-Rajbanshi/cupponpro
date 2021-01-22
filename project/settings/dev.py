@@ -3,7 +3,7 @@ from decouple import config
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['stagingapi.cupponpro.com', '157.245.103.32', '127.0.0.1']
+ALLOWED_HOSTS = ['api.cupponpro.com', 'stagingapi.cupponpro.com', '157.245.103.32', '127.0.0.1', 'localhost']
 
 DATABASES = {
     'default':{
@@ -15,3 +15,8 @@ DATABASES = {
         'PASSWORD':config('STAGING_DATABASE_PASSWORD'),
     }
 }
+
+try:
+    from .local_settings import *
+except Exception as e:
+    pass

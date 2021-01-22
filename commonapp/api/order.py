@@ -3,6 +3,7 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from commonapp.models.company import Company
 from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order, OrderLine
 from commonapp.models.product import Product
@@ -11,6 +12,8 @@ from commonapp.serializers.order import OrderSerializer, OrderSaveSerializer,Ord
 from userapp.models.user import User
 from helper import isCompanyUser
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, isCompanySalePersonAndAllowAll, publicReadOnly
+from helpers.constants import DISCOUNT_TYPE
+
 
 class OrderListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll | AllowAny]
@@ -23,7 +26,11 @@ class OrderListView(generics.GenericAPIView):
         """
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        order_obj = Order.objects.all()
+        status = request.GET.get('status')
+        order_obj = Order.objects.filter(company=company_id)
+        if status:
+            status = status.split(',')
+            order_obj = order_obj.filter(status__in=status)
         paginator = Paginator(order_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = OrderSerializer(page_obj, many=True,\
@@ -44,7 +51,7 @@ class OrderListView(generics.GenericAPIView):
             'data': serializer.data
         }
         return Response(data, status=200)
-    
+
     def post(self,request, company_id):
         """
         An endpoint for creating order.
@@ -65,6 +72,7 @@ class OrderListView(generics.GenericAPIView):
             'success': 0,
             'message': serializer.errors
         }
+        print(data)
         return Response(data, status=400)
 
 class OrderDetailView(generics.GenericAPIView):
@@ -146,7 +154,7 @@ class OrderDetailView(generics.GenericAPIView):
 
 class ActiveOrderListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isCompanySalePersonAndAllowAll]
-    # serializer_class = 
+    # serializer_class =
 
     def get(self, request, company_id):
         """
@@ -179,7 +187,7 @@ class OrderUserDetailView(generics.GenericAPIView):
         else:
             data = {
                 'success': 0,
-                'message': "Enter either phone number or email." 
+                'message': "Enter either phone number or email."
             }
             return Response(data, status=400)
 
@@ -236,12 +244,21 @@ class OrderLineVerifyView(generics.GenericAPIView):
         """
         voucher_obj = Voucher.objects.filter(id=request.data['voucher'])
         order_lines = request.data['order_lines']
+        company_obj = Company.objects.filter(id=request.data['company'])
         result = {
-            'tax': request.data['tax'],
-            'taxed_amount': None,
-            'total': None,
-            'grand_total': None,
-            'discount': None,
+            'tax': company_obj[0].tax,
+            'user': request.data.get('user'),
+            'name': request.data.get('name'),
+            'phone_number': request.data.get('phone_number'),
+            'email': request.data.get('email'),
+            'company': request.data.get('company'),
+            'asset': request.data.get('asset'),
+            'taxed_amount': 0,
+            'service_charge': company_obj[0].service_charge,
+            'service_charge_amount': 0,
+            'total': 0,
+            'grand_total': 0,
+            'discount_amount': 0,
             'order_lines': order_lines
         }
         if voucher_obj:
@@ -260,22 +277,32 @@ class OrderLineVerifyView(generics.GenericAPIView):
                 applicable_products_ids = [applicable_products_ids]
             # get discount percentage from coupon
             discount_p = voucher_obj[0].coupon.discount
+            discount_type = voucher_obj[0].coupon.discount_type
             # loop in items and apply discount
             if applicable_products_ids:
                 total = 0
                 for item in order_lines:
+                    if discount_type == DISCOUNT_TYPE['PERCENTAGE']:
+                        discount_amount = discount_p / 100 * (item['rate'] * item['quantity'])
                     if item['product'] in applicable_products_ids:
                         item['discount'] = discount_p
                         item['voucher'] = str(voucher_obj[0].id)
-                        item['total'] = (item['rate'] * item['quantity']) - (discount_p / 100 * (item['rate'] * item['quantity']))
+                        if discount_type == DISCOUNT_TYPE['PERCENTAGE']:
+                            item['discount_amount'] = discount_p / 100 * (item['rate'] * item['quantity'])
+                        else:
+                            item['discount_amount'] = discount_p
+                        item['total'] = (item['rate'] * item['quantity']) - item['discount_amount']
+                        result['discount_amount'] += item['discount_amount']
                     else:
                         item['total'] = item['rate'] * item['quantity']
                     total += item['total']
             result['total'] = total
             result['grand_total'] = total
             if result['tax']:
-                result['taxed_amount'] = result['tax']/100*result['total']
-                result['grand_total'] = result['total'] + result['taxed_amount']      
+                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])
+            if result['service_charge']:
+                result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
+            result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']
             result['order_lines'] = order_lines
             data = {
                 'success': 1,
@@ -288,10 +315,11 @@ class OrderLineVerifyView(generics.GenericAPIView):
                 item['total'] = item['rate'] * item['quantity']
                 total += item['total']
             result['total'] = total
-            result['grand_total'] = total
             if result['tax']:
-                result['taxed_amount'] = result['tax']/100*result['total']
-                result['grand_total'] = result['total'] + result['taxed_amount']
+                result['taxed_amount'] = float(result['tax'])/100*float(result['total'])
+            if result['service_charge']:
+                result['service_charge_amount'] = float(result['service_charge'])/100*float(result['total'])
+            result['grand_total'] = result['total'] + result['taxed_amount'] + result['service_charge_amount']
             data = {
                 'success': 1,
                 'data': result

@@ -5,7 +5,7 @@ from commonapp.models.category import Category, SubCategory
 
 class AffiliateLink(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, related_name='affilated_companies')
     url = models.TextField(null=True, blank=True)
     discount_code = models.CharField(max_length=50, null=True, blank=True)
     image = models.ImageField(upload_to='affiliate/', null=True, blank=True)

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
+from django import forms
 from commonapp.models.affiliate import AffiliateLink
 from commonapp.models.asset import Asset
 from commonapp.models.bill import Bill
@@ -45,7 +46,7 @@ class AdminCompanyapp(admin.ModelAdmin):
     fieldsets = (
             (_("Company Info"), {
                 'fields':(
-                    'name', 'logo', 'phone_number', 'email', 'category', 'sub_category', 'author', 'currency', 'is_verified', 'is_affiliate'
+                    'name', 'logo', 'logo_icon', 'phone_number', 'email', 'category', 'sub_category', 'author', 'currency', 'is_verified', 'is_affiliate'
                     )
                 }
             ),
@@ -61,12 +62,42 @@ class AdminCompanyapp(admin.ModelAdmin):
 
             (_("Permission"), {'fields':('status',)}),)
 
+
+class CouponAdminForm(forms.ModelForm):
+    class Meta:
+        model = Coupon
+        fields = '__all__'
+
+    def clean_name(self):
+        from helpers.validators import is_alphanumeric_with_exception
+        name = self.cleaned_data['name']
+        try:
+            name = is_alphanumeric_with_exception(name)
+        except Exception as e:
+            raise forms.ValidationError(str(e.detail[0]))
+        return name
+
+    def clean_discount(self):
+        from helpers.constants import DISCOUNT_TYPE
+        from helpers.validators import is_positive_float
+        discount = self.cleaned_data['discount']
+        if self.cleaned_data['discount_type'] == DISCOUNT_TYPE['PERCENTAGE']:
+            if discount > 100:
+                raise forms.ValidationError('Discount cannot be greater then 100 for percentage discount type.')
+        try:
+            discount = is_positive_float(discount)
+        except Exception as e:
+            raise forms.ValidationError(str(e.detail[0]))
+        return discount
+
+
 class AdminCouponapp(admin.ModelAdmin):
     list_display = ('id', 'description', 'company', 'token')
+    form = CouponAdminForm
     fieldsets = (
             (_("Coupon Info"), {
                 'fields':(
-                    'company', 'description', 'expiry_date', 'discount', 'content_type', 'object_id', 'deal_of_the_day'
+                    'name', 'company', 'description', 'expiry_date', 'discount_type', 'discount', 'content_type', 'object_id', 'deal_of_the_day'
                 )
             }
         ),
@@ -103,8 +134,12 @@ class AdminRatingapp(admin.ModelAdmin):
         ),
     )
 
+
+class Assetapp(admin.ModelAdmin):
+    change_list_template = "custom_asset_page.html"
+
 admin.site.register(AffiliateLink)
-admin.site.register(Asset)
+admin.site.register(Asset, Assetapp)
 admin.site.register(Bill, AdminBillapp)
 admin.site.register(BulkQuantity, AdminBulkQuantityapp)
 admin.site.register(Category, AdminCategoryapp)
