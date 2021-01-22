@@ -43,12 +43,18 @@ class MenuSerializer(serializers.ModelSerializer):
 
     def get_menu(self, obj):
         data = list()
+        request = self.context.get('request', None)
+        name = request.GET.get('name') if request else ''
         product_category_obj = ProductCategory.objects.filter(company=obj.id)
+        if name:
+            product_category_obj = product_category_obj.filter(product__name__istartswith=name)
         for product_category in product_category_obj:
             menu = dict()
             menu['category_name'] = product_category.name
             products = list()
             product_obj = Product.objects.filter(product_category=product_category)
+            if name:
+                product_obj = product_obj.filter(name__istartswith=name)
             for each_product in product_obj:
                 serializers = MenuProductSerializer(each_product, context={'request':self.context['request']})
                 products.append(serializers.data)
