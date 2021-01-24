@@ -605,7 +605,7 @@ class ChangeUserProfilePictureView(generics.GenericAPIView):
         """
         An endpoint for changing user's profile picture.
         """
-        if str(request.user.id) == user_id:
+        if request.user.id == user_id:
             serializer = ChangeUserProfilePictureSerializer(instance=request.user, data=request.data, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
