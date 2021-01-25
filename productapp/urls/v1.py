@@ -7,7 +7,7 @@ from productapp.apis.product_image import CompanyProductImageAPI
 from productapp.apis.coupon import DealOfDayAPI, TrendingCouponAPI, RecentCouponAPI, LocalBusinessCouponAPI
 
 
-app_name = 'productapp'
+# app_name = 'productapp'
 
 
 router = routers.SimpleRouter()

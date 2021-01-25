@@ -4,7 +4,7 @@ from django_filters import rest_framework as filters
 from django.db.models import Q
 from commonapp.models.image import Image
 from commonapp.models.company import CompanyUser
-from commonapp.models.product import Product
+from commonapp.models.product import Product, ProductCategory
 from commonapp.models.coupon import Coupon
 
 
@@ -102,3 +102,22 @@ class LocalBusinessCouponFilter(CouponBaseFilter):
         return parent.filter(expiry_date__gt=datetime.now().date(),
                                 company__affilated_companies__isnull=True
                             )
+
+
+class ProductCategoryBaseFilter(filters.FilterSet):
+    company = filters.CharFilter(field_name='company__id')
+    name = filters.CharFilter(field_name='name__istartswith')
+
+    class Meta:
+        model = ProductCategory
+        fields = ['name', 'company']
+
+
+class ProductCategoryFilter(ProductCategoryBaseFilter):
+    @property
+    def qs(self):
+        parent = super(ProductCategoryFilter, self).qs
+        company = self.request.company
+        if company:
+            parent = parent.filter(company=company)
+        return parent
