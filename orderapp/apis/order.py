@@ -60,15 +60,12 @@ class TableOrderAPI(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        #serializer = self.get_serializer(instance)
-        order_line_status = self.request.query_params.get('order_line_status')
-        order_status = self.request.query_params.get('order_status')
-        if order_line_status==None or order_status==None:
-            data={
-                'success': 0,
-                'message': 'Provide order_line_status and order_status parameter.'
-            }
-            return Response(data, status=403)
+        order_status = instance.status
+        line_inst = instance.lines.all()
+        order_line_status = []
+        for line in line_inst:
+            order_line_status.append(line.status)
+        print(order_line_status)
 
         if 'SERVED' in order_line_status and order_status=='BILLABLE':
             data={
