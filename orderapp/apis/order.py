@@ -63,8 +63,6 @@ class TableOrderAPI(ModelViewSet):
         #serializer = self.get_serializer(instance)
         order_line_status = self.request.query_params.get('order_line_status')
         order_status = self.request.query_params.get('order_status')
-
-        #assert(order_status == 'BILLABLE')
         if order_line_status==None or order_status==None:
             data={
                 'success': 0,
@@ -72,7 +70,7 @@ class TableOrderAPI(ModelViewSet):
             }
             return Response(data, status=403)
 
-        if 'SERVED' in order_line_status and 'BILLABLE' in order_status:
+        if 'SERVED' in order_line_status and order_status=='BILLABLE':
             data={
                 'success': 0,
                 'message': 'Cannot delete with Order line status as served and order status as billable.'
@@ -86,7 +84,7 @@ class TableOrderAPI(ModelViewSet):
             }
             return Response(data, status=403)
 
-        elif 'BILLABLE' in order_status:
+        elif order_status=='BILLABLE':
             data={
                 'success': 0,
                 'message': 'Cannot delete with Order status as billable.'
