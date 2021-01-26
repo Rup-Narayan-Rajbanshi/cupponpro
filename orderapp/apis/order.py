@@ -58,6 +58,48 @@ class TableOrderAPI(ModelViewSet):
         created_response = super().create(request, *args, **kwargs)
         return Response(created_response.data, status=200)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        #serializer = self.get_serializer(instance)
+        order_line_status = self.request.query_params.get('order_line_status')
+        order_status = self.request.query_params.get('order_status')
+
+        #assert(order_status == 'BILLABLE')
+        if order_line_status==None or order_status==None:
+            data={
+                'success': 0,
+                'message': 'Provide order_line_status and order_status parameter.'
+            }
+            return Response(data, status=403)
+
+        if 'SERVED' in order_line_status and 'BILLABLE' in order_status:
+            data={
+                'success': 0,
+                'message': 'Cannot delete with Order line status as served and order status as billable.'
+            }
+            return Response(data, status=403)
+
+        elif 'SERVED' in order_line_status:
+            data={
+                'success': 0,
+                'message': 'Cannot delete with Order line status as served.'
+            }
+            return Response(data, status=403)
+
+        elif 'BILLABLE' in order_status:
+            data={
+                'success': 0,
+                'message': 'Cannot delete with Order status as billable.'
+            }
+            return Response(data, status=403)
+
+        else:
+            self.perform_destroy(instance)
+            data={
+                'success': 1,
+                'message': 'Deleted one table order.'
+            }
+            return Response(data, status=200)
 
 class TableOrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
     queryset = Orders.objects.all().order_by('-created_at')
