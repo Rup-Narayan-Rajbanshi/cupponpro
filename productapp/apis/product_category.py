@@ -25,10 +25,10 @@ class ProductCategoryAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelM
     permission_classes = (IsAuthenticated, (isAdmin | CompanyUserPermission))
 
 ####
-class ProductSubCategoryAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericViewSet):
-    queryset = ProductCategory.objects.select_related('company').all().order_by('name')
-    serializer_class = ProductCategorySerializer
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = ProductCategoryFilter
-    pagination_class = FPagination
-    permission_classes = (IsAuthenticated, (isAdmin | CompanyUserPermission))
+#class ProductSubCategoryAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericViewSet):
+#    queryset = ProductCategory.objects.select_related('company').all().order_by('name')
+#    serializer_class = ProductCategorySerializer
+#    filter_backends = (DjangoFilterBackend,)
+#    filter_class = ProductCategoryFilter
+#    pagination_class = FPagination
+#    permission_classes = (IsAuthenticated, (isAdmin | CompanyUserPermission))
