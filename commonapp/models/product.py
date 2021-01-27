@@ -28,6 +28,7 @@ class BulkQuantity(models.Model):
 
 class ProductCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=64)
     link = models.URLField(null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
