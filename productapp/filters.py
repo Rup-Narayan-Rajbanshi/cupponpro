@@ -106,11 +106,12 @@ class LocalBusinessCouponFilter(CouponBaseFilter):
 
 class ProductCategoryBaseFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
+    parent = filters.CharFilter(field_name='parent__id')
     name = filters.CharFilter(field_name='name__istartswith')
 
     class Meta:
         model = ProductCategory
-        fields = ['name', 'company']
+        fields = ['name', 'company', 'parent']
 
 
 class ProductCategoryFilter(ProductCategoryBaseFilter):

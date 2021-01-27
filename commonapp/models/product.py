@@ -50,7 +50,8 @@ class ProductCategory(models.Model):
             "id": self.id,
             "name": self.name,
             "image": image,
-            "link": self.link
+            "link": self.link,
+            'parent': self.parent.to_representation() if self.parent else None
         }
 
     def to_represent_minimal(self, request=None):
