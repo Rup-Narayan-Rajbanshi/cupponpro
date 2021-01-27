@@ -19,5 +19,5 @@ class ProductCategorySerializer(CustomModelSerializer):
             company = request.company
             if company:
                 attrs['company'] = company
-        return super(ProductCategorySerializer, self).attrs
+        return super(ProductCategorySerializer, self).validate(attrs)
     
