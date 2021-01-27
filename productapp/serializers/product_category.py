@@ -17,12 +17,11 @@ class ProductCategorySerializer(CustomModelSerializer):
 
     def validate(self, attrs):
         request = self.context.get('request')
-        id = self.instance.id
-        if request.method == 'PUT':
-            if 'parent' in attrs.keys():
-                if attrs['parent']!=None and id == attrs['parent'].id:
-                    raise serializers.ValidationError({'parent':'Product category cannot be parent of itself'})
         if request:
+            if request.method == 'PUT':
+                if 'parent' in attrs.keys():
+                    if attrs['parent']!=None and self.instance.id == attrs['parent'].id:
+                        raise serializers.ValidationError({'parent':'Product category cannot be parent of itself'})
             company = request.company
             if company:
                 attrs['company'] = company
