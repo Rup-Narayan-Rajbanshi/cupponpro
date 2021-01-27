@@ -4,7 +4,6 @@ from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import ImageFieldWithURL
 from commonapp.models.product import ProductCategory
 from commonapp.models.company import Company
-from rest_framework.response import Response
 
 
 class ProductCategorySerializer(CustomModelSerializer):
