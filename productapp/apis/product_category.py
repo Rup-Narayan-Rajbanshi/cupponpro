@@ -16,7 +16,7 @@ from productapp.filters import (
 from permission import CompanyUserPermission, isAdmin
 
 
-class ProductCategoryAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericViewSet):
+class ProductCategoryAPI(FAPIMixin, mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericViewSet):
     queryset = ProductCategory.objects.select_related('company').all().order_by('name')
     serializer_class = ProductCategorySerializer
     filter_backends = (DjangoFilterBackend,)
