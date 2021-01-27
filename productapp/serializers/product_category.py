@@ -20,3 +20,4 @@ class ProductCategorySerializer(CustomModelSerializer):
             if company:
                 attrs['company'] = company
         return super(ProductCategorySerializer, self).attrs
+    
