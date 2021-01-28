@@ -32,9 +32,10 @@ class ProductCategoryAPI(FAPIMixin, mixins.CreateModelMixin, mixins.ListModelMix
                 'success': 1,
                 'message': 'Deleted Successfully'
             }
+            return Respose(data, status=403)
         except:
             data = {
                 'success': 0,
                 'message': 'This Product Category cannot be deleted because. This category is already processed in order'
             }
-        return Response(data, status=200)
+            return Response(data, status=200)
