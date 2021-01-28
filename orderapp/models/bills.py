@@ -16,6 +16,7 @@ class Bills(BaseModel):
     tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     payable_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
+    is_credit = models.BooleanField(default=False)
     invoice_number = models.CharField(max_length=8, editable=False)
     is_manual = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
@@ -41,6 +42,7 @@ class Bills(BaseModel):
             invoice_number = str(company_obj.invoice_counter)
             self.invoice_number = "0" * (8 - len(invoice_number)) + invoice_number
         self.payable_amount = self.get_grand_total()
+        self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
         return super(Bills, self).save(*args, **kwargs)
 
     def get_grand_total(self):
@@ -68,6 +70,11 @@ class Bills(BaseModel):
             else:
                 discount_amount = discount
         return subtotal - discount_amount
+
+    def is_credited(self,payable_amount,paid_amount):
+        credited_amount = payable_amount - paid_amount
+        if credited_amount > 0:
+            return True
 
     def to_representation(self):
         return {
