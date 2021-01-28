@@ -57,7 +57,7 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
         # Validate product category name
         product_categories_set = set(df['product_category'])
 
-        category_qs = ProductCategory.objects.filter(name__in=product_categories_set)
+        category_qs = ProductCategory.objects.filter(name__in=product_categories_set, company=company)
         existing_product_categories = set(category_qs.values_list('name', flat=True))
 
         if len(product_categories_set - existing_product_categories) != 0:
