@@ -15,7 +15,7 @@ class BillCreateSerializer(CustomModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        return super().create(validated_data)
+        return super(BillCreateSerializer, self).create(validated_data)
 
 
 class ManualBillSerializerCompany(CompanyTableOrderSerializer):
