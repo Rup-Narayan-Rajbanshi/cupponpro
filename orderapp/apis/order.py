@@ -67,6 +67,10 @@ class TableOrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
     serializer_class = TableOrderSerializer
     permission_classes = (CompanyUserPermission, )
 
+    # def post(self, request):
+
+
+
 
 class CalculateOrderAPI(generics.GenericAPIView):
     permission_classes = (CompanyUserPermission, )
