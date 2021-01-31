@@ -9,7 +9,6 @@ from helpers.api_mixins import FAPIMixin
 from helpers.constants import ORDER_STATUS, ORDER_LINE_STATUS
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
 
-
 class AssetFilter(filters.FilterSet):
     order_status = filters.CharFilter(field_name='company__order__status', exclude=True)
 
@@ -21,6 +20,7 @@ class AssetFilter(filters.FilterSet):
         qs = qs.filter(orders__status__in=[
             ORDER_STATUS['PROCESSING'], ORDER_STATUS['BILLABLE']])
         pending = []
+        print(qs[0].orders.all())
         for asset in qs:
             latest_order = asset.orders.order_by('-created_at').first()
             if latest_order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).filter(
@@ -57,4 +57,27 @@ class AssetListAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
     # pagination_class = FPagination
 
     def get_queryset(self):
-        return self.queryset.filter(company_id=self.request.company)
+    #    arrangement_orders = {
+    #        'NEW_ORDER':1,
+    #        'CONFIRMED':1,
+    #        'PROCESSING':1,
+    #        'BILLABLE':2,
+    #        'CANCELLED':3,
+    #        'COMPLETED':3,
+    #        None:3,
+    #    }
+    #    for asset in self.queryset.filter(company_id=self.request.company):
+    #        status_all = asset.orders.values('status')[0]
+    #        if str(status_all['status'])=='NEW_ORDER' or 'CONFIRMED' or 'PROCESSING':
+    #            asset.orders.annotate(arrangement_order = 1)
+    #        elif status_all['status']=='BILLABLE':
+    #            asset.orders.annotate(arrangement_order = 2)
+    #        else:
+    #            asset.orders.annotate(arrangement_order = 3)
+    #        #asset.orders.annotate(arrangement=arrangement_order[status])
+        return self.queryset.filter(company_id=self.request.company)#.order_by('arrangement_order')
+
+
+    
+
+

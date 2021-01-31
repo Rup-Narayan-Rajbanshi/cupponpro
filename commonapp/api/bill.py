@@ -20,6 +20,7 @@ class BillListView(generics.GenericAPIView):
         An endpoint for listing all the bills. Pass 'page' and 'size' as query for requesting particular page and
         number of items per page respectively.
         """
+        print(request.GET)
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         # bill_obj = Bill.objects.filter(company=company_id)

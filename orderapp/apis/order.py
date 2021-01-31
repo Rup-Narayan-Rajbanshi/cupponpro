@@ -57,6 +57,9 @@ class TableOrderAPI(ModelViewSet):
     def create(self, request, *args, **kwargs):
         created_response = super().create(request, *args, **kwargs)
         return Response(created_response.data, status=200)
+    #def destroy(self, request, id, *args, **kwargs):
+    #    data = self.get_object()
+    #    if data.
 
 
 class TableOrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
