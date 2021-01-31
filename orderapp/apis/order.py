@@ -61,20 +61,15 @@ class TableOrderAPI(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         order_status = instance.status
-        line_inst = instance.lines.all()
-        order_line_status = []
-        for line in line_inst:
-            order_line_status.append(line.status)
-        print(order_line_status)
-
-        if 'SERVED' in order_line_status and order_status=='BILLABLE':
+        line_status = instance.lines.filter(status='SERVED').values_list('status', flat=True)
+        if line_status and order_status=='BILLABLE':
             data={
                 'success': 0,
                 'message': 'Cannot delete with Order line status as served and order status as billable.'
             }
             return Response(data, status=403)
 
-        elif 'SERVED' in order_line_status:
+        elif line_status:
             data={
                 'success': 0,
                 'message': 'Cannot delete with Order line status as served.'
