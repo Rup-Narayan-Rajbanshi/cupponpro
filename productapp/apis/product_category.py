@@ -23,19 +23,21 @@ class ProductCategoryAPI(FAPIMixin, mixins.CreateModelMixin, mixins.ListModelMix
     filter_class = ProductCategoryFilter
     pagination_class = FPagination
     permission_classes = (IsAuthenticated, (isAdmin | CompanyUserPermission))
- 
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        data = dict()
+        status = 403
         try:
             instance.delete()
+            status = 200
             data = {
                 'success': 1,
                 'message': 'Deleted Successfully'
             }
-            return Respose(data, status=403)
         except:
             data = {
                 'success': 0,
                 'message': 'This Product Category cannot be deleted because. This category is already processed in order'
             }
-            return Response(data, status=200)
+        return Response(data, status=status)

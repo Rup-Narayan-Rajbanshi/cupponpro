@@ -30,4 +30,3 @@ class ProductCategorySerializer(CustomModelSerializer):
     def get_has_child(self, obj):
         has_child = ProductCategory.objects.filter(parent=obj).exists()
         return has_child
-
