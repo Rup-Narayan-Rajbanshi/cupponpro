@@ -121,7 +121,7 @@ class Product(models.Model):
     bulk_quantity = models.ForeignKey(BulkQuantity, on_delete=models.PROTECT, null=True, blank=True)
     total_price = models.PositiveIntegerField(blank=True, null=True)
     token = models.CharField(max_length=8, editable=False)
-    # is_veg = models.BooleanField(default=False) #only for food item
+    #is_veg = models.BooleanField(default=False) #only for food item
     # gender = models.CharField(max_length=6, choices=GENDER, default=Null, null=True, blank=True) # usable for clothing and similar category
     images = GenericRelation(Image)
     status = models.CharField(max_length=MAX_LENGTHS['PRODUCT_STATUS'], choices=PRODUCT_STATUS_CHOICES, default=DEFAULTS['PRODUCT_STATUS'])

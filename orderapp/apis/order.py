@@ -61,6 +61,38 @@ class TableOrderAPI(ModelViewSet):
     #    data = self.get_object()
     #    if data.
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        order_status = instance.status
+        line_status = instance.lines.filter(status='SERVED').values_list('status', flat=True)
+        if line_status and order_status=='BILLABLE':
+            data={
+                'success': 0,
+                'message': 'Cannot delete with Order line status as served and order status as billable.'
+            }
+            return Response(data, status=403)
+
+        elif line_status:
+            data={
+                'success': 0,
+                'message': 'Cannot delete with Order line status as served.'
+            }
+            return Response(data, status=403)
+
+        elif order_status=='BILLABLE':
+            data={
+                'success': 0,
+                'message': 'Cannot delete with Order status as billable.'
+            }
+            return Response(data, status=403)
+
+        else:
+            self.perform_destroy(instance)
+            data={
+                'success': 1,
+                'message': 'Deleted one table order.'
+            }
+            return Response(data, status=200)
 
 class TableOrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
     queryset = Orders.objects.all().order_by('-created_at')
