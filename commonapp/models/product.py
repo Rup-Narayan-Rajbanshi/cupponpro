@@ -8,7 +8,7 @@ from commonapp.models.image import Image
 from commonapp.models.company import Company
 from helpers.app_helpers import url_builder, content_file_name
 from helpers.constants import DEFAULTS, MAX_LENGTHS, DISCOUNT_TYPE
-from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_TYPE_CHOICES, PRODUCT_SUB_TYPE_CHOICES
+from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_CAT_TYPE_CHOICES, PRODUCT_CAT_SUB_TYPE_CHOICES
 
 
 class BulkQuantity(models.Model):
@@ -34,8 +34,8 @@ class ProductCategory(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     image = models.ImageField(null=True, upload_to=content_file_name)
     token = models.CharField(max_length=8, editable=False)
-    types = models.CharField(max_length=MAX_LENGTHS['PRODUCT_TYPE'], choices=PRODUCT_TYPE_CHOICES, default=DEFAULTS['PRODUCT_TYPE'])
-    sub_type = models.CharField(max_length=MAX_LENGTHS['PRODUCT_SUB_TYPE'], choices=PRODUCT_SUB_TYPE_CHOICES, default=None, null=True)
+    types = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_TYPE'], choices=PRODUCT_CAT_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_TYPE'])
+    sub_type = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], choices=PRODUCT_CAT_SUB_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
