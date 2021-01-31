@@ -15,19 +15,27 @@ class ProductCategorySerializer(CustomModelSerializer):
     types = serializers.ChoiceField(PRODUCT_CAT_TYPE_CHOICES)
     sub_type = serializers.ChoiceField(PRODUCT_CAT_SUB_TYPE_CHOICES, allow_null=True)
 
-
-
     class Meta(CustomModelSerializer.Meta):
         model = ProductCategory
 
     def validate(self, attrs):
-        request = self.context.get('request')
+        request = self.context.get('request') 
         if request:
             if request.method == 'PUT':
                 if 'parent' in attrs.keys():
                     if attrs['parent']!=None and self.instance.id == attrs['parent'].id:
-                        raise serializers.ValidationError({'parent':'Product category cannot be parent of itself'})
-            if attrs['types']:
+                        raise serializers.ValidationError({'parent':'Product category cannot be parent of itself.'})
+                    if 'types' not in attrs.keys():
+                        if self.instance.types != attrs['parent']:
+                            raise serializers.ValidationError({'parent': 'Type of sub category has to be same as its parent Product category.'})
+                if self.instance.parent:
+                    if 'types' in attrs.keys():
+                        if self.instance.types != attrs['types']:
+                            raise serializers.ValidationError({'types':'Type of sub category has to be same as its parent Product category.'})
+            if ('parent' and 'types') in attrs.keys():
+                if attrs['parent'].types != attrs['types']:
+                        raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
+            if 'types' in attrs.keys():
                 if attrs['types'] == 'BAR':
                     attrs['sub_type'] = None
             company = request.company
