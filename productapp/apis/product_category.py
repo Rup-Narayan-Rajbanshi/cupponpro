@@ -24,6 +24,7 @@ class ProductCategoryAPI(FAPIMixin, mixins.CreateModelMixin, mixins.ListModelMix
     pagination_class = FPagination
     permission_classes = (IsAuthenticated, (isAdmin | CompanyUserPermission))
 
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         data = dict()
