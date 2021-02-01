@@ -3,6 +3,7 @@ services:
     cupponpro-nginx:
         build:
             context: .
+            dockerfile: ${ENV}/Dockerfile
         image: cupponpro-nginx
         restart: unless-stopped
         networks:
