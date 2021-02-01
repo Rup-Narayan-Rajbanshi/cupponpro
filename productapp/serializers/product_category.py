@@ -43,12 +43,12 @@ class ProductCategorySerializer(CustomModelSerializer):
         if change_order > 0:
             models = ProductCategory.objects.filter(position__gte=final_position,position__lt=initial_position)
             for model in models:
-                model.position = model.position + 1
+                model.position += 1
                 model.save()
         elif change_order < 0:
             models = ProductCategory.objects.filter(position__lte=final_position,position__gt=initial_position)
             for model in models:
-                model.position = model.position - 1
+                model.position -= 1
                 model.save()
         else:
             pass 
