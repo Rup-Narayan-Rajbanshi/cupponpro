@@ -34,6 +34,7 @@ class ProductCategory(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     image = models.ImageField(null=True, upload_to=content_file_name)
     token = models.CharField(max_length=8, editable=False)
+    position = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
