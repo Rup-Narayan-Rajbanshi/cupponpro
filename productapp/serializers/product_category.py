@@ -4,6 +4,7 @@ from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import ImageFieldWithURL
 from commonapp.models.product import ProductCategory
 from commonapp.models.company import Company
+from django.db.models import Max
 
 
 class ProductCategorySerializer(CustomModelSerializer):
@@ -18,15 +19,40 @@ class ProductCategorySerializer(CustomModelSerializer):
     def validate(self, attrs):
         request = self.context.get('request')
         if request:
+            company = request.company
+            if company:
+                attrs['company'] = company
             if request.method == 'PUT':
                 if 'parent' in attrs.keys():
                     if attrs['parent']!=None and self.instance.id == attrs['parent'].id:
                         raise serializers.ValidationError({'parent':'Product category cannot be parent of itself'})
-            company = request.company
-            if company:
-                attrs['company'] = company
+                if 'position' in attrs.keys():
+                    print('hello')
+                    print(attrs['position'])
+                    self.rearrange_order(self.instance.position, attrs['position'])
+            if request.method == 'POST':
+                last_position = ProductCategory.objects.all().aggregate(Max('position'))
+                value_last_position = last_position['position__max']
+                attrs['position']=value_last_position + 1
         return super(ProductCategorySerializer, self).validate(attrs)
 
     def get_has_child(self, obj):
         has_child = ProductCategory.objects.filter(parent=obj).exists()
         return has_child
+
+    def rearrange_order(self, initial_position, final_position):
+        change_order = initial_position - final_position
+        if change_order > 0:
+            models = ProductCategory.objects.filter(position__gte=final_position,position__lt=initial_position)
+      # models.update(position += 1)
+            for model in models:
+                model.position = model.position + 1
+                model.save()
+        elif change_order < 0:
+            models = ProductCategory.objects.filter(position__lte=final_position,position__gt=initial_position)
+            for model in models:
+                model.position = model.position - 1
+                model.save()
+        else:
+            pass 
+        
