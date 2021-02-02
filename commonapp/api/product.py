@@ -233,7 +233,7 @@ class CompanyProductListView(generics.GenericAPIView):
             del filter_kwargs['code__icontains']
 
         if 'product_category__icontains' in filter_kwargs.keys():
-            filter_kwargs['product_category__name__icontains'] = filter_kwargs['product_category__icontains']
+            filter_kwargs['product_category__id__icontains'] = filter_kwargs['product_category__icontains']
             del filter_kwargs['product_category__icontains']
 
         product_obj = Product.objects.filter(**filter_kwargs, company=company_id).order_by(
