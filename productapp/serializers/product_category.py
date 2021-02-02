@@ -27,8 +27,6 @@ class ProductCategorySerializer(CustomModelSerializer):
                     if attrs['parent']!=None and self.instance.id == attrs['parent'].id:
                         raise serializers.ValidationError({'parent':'Product category cannot be parent of itself'})
                 if 'position' in attrs.keys():
-                    print('hello')
-                    print(attrs['position'])
                     self.rearrange_order(self.instance.position, attrs['position'])
             if request.method == 'POST':
                 last_position = ProductCategory.objects.all().aggregate(Max('position'))
