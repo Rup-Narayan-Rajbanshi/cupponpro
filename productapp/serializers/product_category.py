@@ -38,7 +38,7 @@ class ProductCategorySerializer(CustomModelSerializer):
                         raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
             if 'types' in attrs.keys():
                 if attrs['types'] == 'BAR':
-                    attrs['sub_type'] = None
+                    attrs['sub_type'] = ''
             company = request.company
             if company:
                 attrs['company'] = company
