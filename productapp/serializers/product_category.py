@@ -5,6 +5,7 @@ from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import ImageFieldWithURL
 from commonapp.models.product import ProductCategory
 from commonapp.models.company import Company
+from helpers.constants import DEFAULTS
 
 
 class ProductCategorySerializer(CustomModelSerializer):
@@ -13,7 +14,7 @@ class ProductCategorySerializer(CustomModelSerializer):
     parent = DetailRelatedField(model=ProductCategory, lookup='id', representation='to_representation', allow_null=True, required=False)
     has_child = serializers.SerializerMethodField()
     types = serializers.ChoiceField(PRODUCT_CAT_TYPE_CHOICES)
-    sub_type = serializers.ChoiceField(PRODUCT_CAT_SUB_TYPE_CHOICES, allow_null=True)
+    sub_type = serializers.ChoiceField(PRODUCT_CAT_SUB_TYPE_CHOICES, allow_blank=True, default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], required=False)
 
     class Meta(CustomModelSerializer.Meta):
         model = ProductCategory
