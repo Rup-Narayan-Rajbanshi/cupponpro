@@ -55,7 +55,7 @@ class ProductCategory(models.Model):
             "link": self.link,
             'parent': self.parent.to_representation() if self.parent else None,
             'types': self.types,
-            'sub_type': self.sub_type
+            'sub_type': self.sub_type if self.sub_type else ''
         }
 
     def to_represent_minimal(self, request=None):
