@@ -442,3 +442,23 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
                 'message': serializer.errors
             }
             return Response(data, status=400)
+
+
+    # def put(self, request, company_id, position_from, position_to, product_id):
+    #     """
+    #     An endpoint for reordering vendor's product category.
+    #     """
+    #     company = Company.objects.filter(id=company_id)
+        
+    #     serializer = ProductCategorySerializer(isinstance=)
+
+
+        
+    #             return Response(data, status=404)
+    #     data = {
+    #         'success': 0,
+    #         'message': "You do not have permission to reorder product category."
+    #     }
+    #     return Response(data, status=403)
+
+    

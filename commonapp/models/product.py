@@ -36,6 +36,7 @@ class ProductCategory(models.Model):
     token = models.CharField(max_length=8, editable=False)
     types = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_TYPE'], choices=PRODUCT_CAT_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_TYPE'])
     sub_type = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], choices=PRODUCT_CAT_SUB_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], null=True)
+    position = models.PositiveIntegerField(default=0, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     position = models.PositiveIntegerField(default=0, blank=True)
     class Meta:
