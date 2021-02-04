@@ -258,11 +258,11 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                 'en': message
             }
         }
-        # try:
-        #     notify_company_staffs(
-        #         company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset, exclude_user=user)
-        # except Exception as e:
-        #     pass
+        try:
+            notify_company_staffs(
+                company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset, exclude_user=user)
+        except Exception as e:
+            pass
         return order
 
 
