@@ -4,6 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from commonapp.models.company import Company
+from rest_framework.exceptions import ValidationError
 from commonapp.models.product import ProductCategory
 from data_manager.exception import DuplicateNameException, ProductCategoryAlreadyExistException
 from data_manager.helpers import create_or_update_from_dataframe
@@ -36,6 +37,15 @@ class UploadExcelProductCategorySerializer(CustomBaseSerializer):
         df = pd.read_excel(data['upload_file'])
         df.rename(columns={column_name: title_to_snake_case(column_name) for column_name in df.columns},
                   inplace=True)
+
+        valid_column = ['parent', 'name', 'link', 'company', 'image',
+       'token', 'types', 'sub_type', 'position']
+
+        valid_column=list(set(valid_column))
+        columns = list(set(df.columns))
+
+        if not all(item in valid_column for item in columns):
+            raise ValidationError({'detail': 'Invalid file format.'})
 
         # Replace nan with blank
         df = df.replace(np.nan, '', regex=True)

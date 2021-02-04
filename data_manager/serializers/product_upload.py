@@ -46,9 +46,12 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
         valid_column = ['product_code', 'name', 'link', 'product_category', 'brand_name',
        'purchase_price', 'purchase_currency', 'selling_price',
        'selling_currency', 'total_price']
-        columns = list(df.columns)
-        if set(valid_column) != set(columns):
+
+        valid_column=list(set(valid_column))
+        columns = list(set(df.columns))
+        if not all(item in valid_column for item in columns):
             raise ValidationError({'detail': 'Invalid file format.'})
+
         # Validate product category name
         code_qs = Product.objects.filter(product_code__in=set(df['product_code']), company=company)
 

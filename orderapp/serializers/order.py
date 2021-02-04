@@ -91,10 +91,15 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
     price_details = serializers.SerializerMethodField()
+    user_name  = serializers.SerializerMethodField()
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details')
+        fields = ('id', 'status', 'user_name', 'voucher', 'asset', 'order_lines', 'price_details')
+
+    def get_user_name(self, obj):
+        user = obj.user.full_name
+        return user
 
     def get_fields(self):
         fields = super().get_fields()
