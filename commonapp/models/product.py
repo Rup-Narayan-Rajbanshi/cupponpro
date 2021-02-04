@@ -8,7 +8,7 @@ from commonapp.models.image import Image
 from commonapp.models.company import Company
 from helpers.app_helpers import url_builder, content_file_name
 from helpers.constants import DEFAULTS, MAX_LENGTHS, DISCOUNT_TYPE
-from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES
+from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_CAT_TYPE_CHOICES, PRODUCT_CAT_SUB_TYPE_CHOICES
 
 
 class BulkQuantity(models.Model):
@@ -34,8 +34,10 @@ class ProductCategory(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     image = models.ImageField(null=True, upload_to=content_file_name)
     token = models.CharField(max_length=8, editable=False)
+    types = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_TYPE'], choices=PRODUCT_CAT_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_TYPE'])
+    sub_type = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], choices=PRODUCT_CAT_SUB_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    #position = models.PositiveIntegerField(default=0, blank=True)
     class Meta:
         db_table = 'product_category'
         verbose_name_plural = "product categories"
@@ -51,7 +53,9 @@ class ProductCategory(models.Model):
             "name": self.name,
             "image": image,
             "link": self.link,
-            'parent': self.parent.to_representation() if self.parent else None
+            'parent': self.parent.to_representation() if self.parent else None,
+            'types': self.types,
+            'sub_type': self.sub_type if self.sub_type else ''
         }
 
     def to_represent_minimal(self, request=None):
