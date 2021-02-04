@@ -299,6 +299,8 @@ class CompanyUserListView(generics.GenericAPIView):
             # get user data from related company user data
             user_ids = [x.user.id for x in company_user_obj]
             user_obj = User.objects.filter(id__in=user_ids).order_by('-id')
+            print("here")
+            print(user_obj)
             page_size = request.GET.get('size', 10)
             page_number = request.GET.get('page')
             paginator = Paginator(user_obj, page_size)
