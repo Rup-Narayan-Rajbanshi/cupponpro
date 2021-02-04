@@ -46,7 +46,6 @@ class ProductCategorySerializer(CustomModelSerializer):
             company = request.company
             if company:
                 attrs['company'] = company
-                        raise serializers.ValidationError({'parent':'Product category cannot be parent of itself'})
                 if 'position' in attrs.keys():
                     self.rearrange_order(self.instance.position, attrs['position'])
             if request.method == 'POST':
