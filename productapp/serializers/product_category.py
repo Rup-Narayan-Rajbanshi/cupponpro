@@ -29,7 +29,6 @@ class ProductCategorySerializer(CustomModelSerializer):
             if request.method == 'PUT':
                 if 'parent' in attrs.keys():
                     if attrs['parent']!=None and self.instance.id == attrs['parent'].id:
-<<<<<<< HEAD
                         raise serializers.ValidationError({'parent':'Product category cannot be parent of itself.'})
                     if 'types' not in attrs.keys():
                         if self.instance.types != attrs['parent']:
@@ -47,7 +46,6 @@ class ProductCategorySerializer(CustomModelSerializer):
             company = request.company
             if company:
                 attrs['company'] = company
-=======
                         raise serializers.ValidationError({'parent':'Product category cannot be parent of itself'})
                 if 'position' in attrs.keys():
                     self.rearrange_order(self.instance.position, attrs['position'])
@@ -55,7 +53,6 @@ class ProductCategorySerializer(CustomModelSerializer):
                 last_position = ProductCategory.objects.all().aggregate(Max('position'))
                 value_last_position = last_position['position__max']
                 attrs['position']=value_last_position + 1
->>>>>>> feature/custom_ordering_product_category
         return super(ProductCategorySerializer, self).validate(attrs)
 
     def get_has_child(self, obj):
