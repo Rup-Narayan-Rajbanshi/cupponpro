@@ -308,7 +308,8 @@ class CompanyUserListView(generics.GenericAPIView):
             serializer = UserDetailSerializer(page_obj, many=True, context={"request":request})
             for each_serializer in serializer.data:
                 del each_serializer['admin']
-                each_serializer['staff'] = company_user_obj.get(user__id=each_serializer['id']).is_staff
+                each_serializer['staff'] = company_user_obj.filter(user__id=each_serializer['id']).first().is_staff
+
             if page_obj.has_previous():
                 previous_page = page_obj.previous_page_number()
             else:
