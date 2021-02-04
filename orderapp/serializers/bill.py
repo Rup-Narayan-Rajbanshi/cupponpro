@@ -1,12 +1,13 @@
 from django.db import transaction
 from rest_framework import serializers
-
+from helpers.serializer_fields import DetailRelatedField
 from helpers.constants import ORDER_STATUS
 from helpers.serializer import CustomModelSerializer
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
 from orderapp.serializers.order import CompanyTableOrderSerializer
-
+from commonapp.models.company import Company
+from userapp.serializers.user import UserDetailSerializer
 
 class BillCreateSerializer(CustomModelSerializer):
 
@@ -17,6 +18,18 @@ class BillCreateSerializer(CustomModelSerializer):
     def create(self, validated_data):
         return super(BillCreateSerializer, self).create(validated_data)
 
+class BillListSerializer(CustomModelSerializer):
+    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation')
+    order = serializers.SerializerMethodField()  
+    
+    class Meta:
+        model = Bills
+        fields = "__all__"
+
+    def get_order(self, obj):
+        serializer_context = {'request': self.context.get('request')}
+        serializer = CompanyTableOrderSerializer(obj.orders.all(), many=True, context=serializer_context)
+        return serializer.data
 
 class ManualBillSerializerCompany(CompanyTableOrderSerializer):
 

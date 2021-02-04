@@ -7,13 +7,18 @@ from rest_framework.viewsets import GenericViewSet
 from helpers.api_mixins import FAPIMixin
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
-from orderapp.serializers.bill import BillCreateSerializer, ManualBillSerializerCompany
+from orderapp.serializers.bill import BillCreateSerializer, ManualBillSerializerCompany, BillListSerializer
 from permission import CompanyUserPermission
 
 
 class BillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
     queryset = Bills.objects.all().order_by('-created_at')
     serializer_class = BillCreateSerializer
+    permission_classes = (CompanyUserPermission, )
+
+class BillListAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+    queryset = Bills.objects.all().order_by('-created_at')
+    serializer_class = BillListSerializer
     permission_classes = (CompanyUserPermission, )
 
 

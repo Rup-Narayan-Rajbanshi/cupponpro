@@ -28,6 +28,9 @@ class Orders(BaseModel):
 
     def __str__(self):
         return str(self.id)
+    
+    def to_representation_id(self, request=None):
+        return self.id
 
     ## need to revise the logic along with serializer with new model
     @classmethod
@@ -55,7 +58,7 @@ class Orders(BaseModel):
     def to_representation(self, request=None):
         return {
             "id": self.id,
-            "status": self.status
+            "status": self.status,
         }
 
     def get_bills(self):
