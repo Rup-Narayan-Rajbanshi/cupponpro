@@ -37,6 +37,8 @@ class ProductCategorySerializer(CustomModelSerializer):
                     if 'types' in attrs.keys():
                         if self.instance.types != attrs['types']:
                             raise serializers.ValidationError({'types':'Type of sub category has to be same as its parent Product category.'})
+                if 'position' in attrs.keys():
+                    self.rearrange_order(self.instance.position, attrs['position'])
             if ('parent' and 'types') in attrs.keys():
                 if attrs['parent'].types != attrs['types']:
                         raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
@@ -46,8 +48,6 @@ class ProductCategorySerializer(CustomModelSerializer):
             company = request.company
             if company:
                 attrs['company'] = company
-                if 'position' in attrs.keys():
-                    self.rearrange_order(self.instance.position, attrs['position'])
             if request.method == 'POST':
                 last_position = ProductCategory.objects.all().aggregate(Max('position'))
                 value_last_position = last_position['position__max']
