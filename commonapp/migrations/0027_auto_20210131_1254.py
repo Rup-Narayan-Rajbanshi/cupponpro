@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.AddField(
             model_name='productcategory',
             name='sub_type',
             field=models.CharField(choices=[('VEG', 'VEG'), ('NON-VEG', 'NON-VEG')], default='', max_length=8, null=True),
@@ -19,5 +19,5 @@ class Migration(migrations.Migration):
             model_name='productcategory',
             name='types',
             field=models.CharField(choices=[('FOOD', 'FOOD'), ('BAR', 'BAR')], default='FOOD', max_length=5),
-        ),
+        )
     ]
