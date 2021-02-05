@@ -95,7 +95,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'user_name', 'voucher', 'asset', 'order_lines', 'price_details')
+        fields = ('id', 'status', 'user_name', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at')
 
     def get_user_name(self, obj):
         if obj.user:
