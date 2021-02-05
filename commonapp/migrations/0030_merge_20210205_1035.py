@@ -7,7 +7,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('commonapp', '0029_auto_20210204_1315'),
-        ('commonapp', '0028_auto_20210201_1149'),
     ]
 
     operations = [
