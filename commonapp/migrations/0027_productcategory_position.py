@@ -9,10 +9,10 @@ class Migration(migrations.Migration):
         ('commonapp', '0026_auto_20210131_1137'),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='productcategory',
-            name='position',
-            field=models.PositiveIntegerField(default=0),
-        ),
-    ]
+    # operations = [
+    #     migrations.AddField(
+    #         model_name='productcategory',
+    #         name='position',
+    #         field=models.PositiveIntegerField(blank=True, default=0)
+    #     ),
+    # ]
