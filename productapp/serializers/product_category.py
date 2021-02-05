@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from helpers.choices_variable import PRODUCT_CAT_TYPE_CHOICES,
+from helpers.choices_variable import PRODUCT_CAT_TYPE_CHOICES
 from helpers.serializer_fields import DetailRelatedField
 from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import ImageFieldWithURL
