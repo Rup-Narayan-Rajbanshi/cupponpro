@@ -40,7 +40,8 @@ OTP_TYPES = {
 
 PRODUCT_CAT_TYPE = {
     'FOOD': 'FOOD',
-    'BAR': 'BAR'
+    'BAR': 'BAR',
+    'COFFEE': 'COFFEE'
 }
 
 
