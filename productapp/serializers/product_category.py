@@ -39,8 +39,9 @@ class ProductCategorySerializer(CustomModelSerializer):
                             raise serializers.ValidationError({'types':'Type of sub category has to be same as its parent Product category.'})
                 if 'position' in attrs.keys():
                     self.rearrange_order(self.instance.position, attrs['position'])
-            if ('parent' and 'types') in attrs.keys():
-                if attrs['parent'].types != attrs['types']:
+            if 'parent'in attrs.keys() and 'types' in attrs.keys():
+                if attrs['parent']:
+                    if attrs['parent'].types != attrs['types']:
                         raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
             if 'types' in attrs.keys():
                 if attrs['types'] == 'BAR':
