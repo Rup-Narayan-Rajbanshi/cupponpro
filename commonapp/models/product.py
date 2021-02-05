@@ -8,7 +8,7 @@ from commonapp.models.image import Image
 from commonapp.models.company import Company
 from helpers.app_helpers import url_builder, content_file_name
 from helpers.constants import DEFAULTS, MAX_LENGTHS, DISCOUNT_TYPE
-from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_CAT_TYPE_CHOICES, PRODUCT_CAT_SUB_TYPE_CHOICES
+from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_CAT_TYPE_CHOICES
 
 
 class BulkQuantity(models.Model):
@@ -35,7 +35,7 @@ class ProductCategory(models.Model):
     image = models.ImageField(null=True, upload_to=content_file_name)
     token = models.CharField(max_length=8, editable=False)
     types = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_TYPE'], choices=PRODUCT_CAT_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_TYPE'])
-    sub_type = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], choices=PRODUCT_CAT_SUB_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], null=True)
+    sub_type = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], null=True)
     position = models.PositiveIntegerField(default=0, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     position = models.PositiveIntegerField(default=0, blank=True)
@@ -126,7 +126,7 @@ class Product(models.Model):
     bulk_quantity = models.ForeignKey(BulkQuantity, on_delete=models.PROTECT, null=True, blank=True)
     total_price = models.PositiveIntegerField(blank=True, null=True)
     token = models.CharField(max_length=8, editable=False)
-    #is_veg = models.BooleanField(default=False) #only for food item
+    is_veg = models.BooleanField(default=False, null=True) #only for food item
     # gender = models.CharField(max_length=6, choices=GENDER, default=Null, null=True, blank=True) # usable for clothing and similar category
     images = GenericRelation(Image)
     status = models.CharField(max_length=MAX_LENGTHS['PRODUCT_STATUS'], choices=PRODUCT_STATUS_CHOICES, default=DEFAULTS['PRODUCT_STATUS'])
@@ -152,7 +152,8 @@ class Product(models.Model):
             "purchase_price": self.purchase_price,
             "purchase_currency": self.purchase_currency,
             "total_price": self.total_price,
-            "link": self.link
+            "link": self.link,
+            'is_veg': self.is_veg
         }
 
     def to_represent_minimal(self, request=None):

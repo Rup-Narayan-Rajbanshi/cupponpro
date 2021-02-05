@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from helpers.choices_variable import PRODUCT_CAT_TYPE_CHOICES, PRODUCT_CAT_SUB_TYPE_CHOICES
+from helpers.choices_variable import PRODUCT_CAT_TYPE_CHOICES,
 from helpers.serializer_fields import DetailRelatedField
 from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import ImageFieldWithURL
 from commonapp.models.product import ProductCategory
 from commonapp.models.company import Company
-from helpers.constants import DEFAULTS
+from helpers.constants import DEFAULTS, MAX_LENGTHS
 from django.db.models import Max
 
 
@@ -15,7 +15,7 @@ class ProductCategorySerializer(CustomModelSerializer):
     parent = DetailRelatedField(model=ProductCategory, lookup='id', representation='to_representation', allow_null=True, required=False)
     has_child = serializers.SerializerMethodField()
     types = serializers.ChoiceField(PRODUCT_CAT_TYPE_CHOICES)
-    sub_type = serializers.ChoiceField(PRODUCT_CAT_SUB_TYPE_CHOICES, allow_blank=True, default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], required=False)
+    sub_type = serializers.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], allow_blank=True, default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], required=False)
 
     class Meta(CustomModelSerializer.Meta):
         model = ProductCategory
@@ -43,9 +43,6 @@ class ProductCategorySerializer(CustomModelSerializer):
                 if attrs['parent']:
                     if attrs['parent'].types != attrs['types']:
                         raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
-            if 'types' in attrs.keys():
-                if attrs['types'] == 'BAR':
-                    attrs['sub_type'] = ''
             company = request.company
             if company:
                 attrs['company'] = company

@@ -23,6 +23,7 @@ class ProductSerializer(serializers.ModelSerializer):
     purchase_currency = serializers.ChoiceField(CURRENCY_TYPE_CHOICES)
     selling_currency = serializers.ChoiceField(CURRENCY_TYPE_CHOICES)
     status = serializers.ChoiceField(PRODUCT_STATUS_CHOICES)
+    is_veg = serializers.BooleanField(default=False, required=False)
 
     class Meta:
         model = Product

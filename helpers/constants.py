@@ -43,10 +43,6 @@ PRODUCT_CAT_TYPE = {
     'BAR': 'BAR'
 }
 
-PRODUCT_CAT_SUB_TYPE = {
-    'VEG': 'VEG',
-    'NON-VEG': 'NON-VEG',
-}
 
 DEFAULTS = {
     'PHONE_NUMBER_EXT': '977',
@@ -70,7 +66,7 @@ MAX_LENGTHS = {
     'ORDER_STATUS': 12,
     'OTP_TYPES': 20,
     'PRODUCT_CAT_TYPE': 5,
-    'PRODUCT_CAT_SUB_TYPE': 8
+    'PRODUCT_CAT_SUB_TYPE': 30
 }
 
 
