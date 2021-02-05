@@ -10,11 +10,12 @@ from django.db.models import Max
 
 
 class ProductCategorySerializer(CustomModelSerializer):
-    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation')
-    image = ImageFieldWithURL(allow_empty_file=False)
+    name = serializers.CharField(max_length=64, allow_null=True, required=False)
+    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False)
+    image = ImageFieldWithURL(allow_empty_file=False, required=False)
     parent = DetailRelatedField(model=ProductCategory, lookup='id', representation='to_representation', allow_null=True, required=False)
     has_child = serializers.SerializerMethodField()
-    types = serializers.ChoiceField(PRODUCT_CAT_TYPE_CHOICES)
+    types = serializers.ChoiceField(PRODUCT_CAT_TYPE_CHOICES, allow_blank = True, required = False)
     sub_type = serializers.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], allow_blank=True, default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], required=False)
 
     class Meta(CustomModelSerializer.Meta):
@@ -38,7 +39,7 @@ class ProductCategorySerializer(CustomModelSerializer):
                         if self.instance.types != attrs['types']:
                             raise serializers.ValidationError({'types':'Type of sub category has to be same as its parent Product category.'})
                 if 'position' in attrs.keys():
-                    self.rearrange_order(self.instance.position, attrs['position'])
+                    self.rearrange_order(self.instance.position, attrs['position'])        
             if 'parent'in attrs.keys() and 'types' in attrs.keys():
                 if attrs['parent']:
                     if attrs['parent'].types != attrs['types']:
