@@ -98,8 +98,11 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         fields = ('id', 'status', 'user_name', 'voucher', 'asset', 'order_lines', 'price_details')
 
     def get_user_name(self, obj):
-        user = obj.user.full_name
-        return user
+        if obj.user:
+            user = obj.user.full_name
+            return user
+        else:
+            return ''
 
     def get_fields(self):
         fields = super().get_fields()
