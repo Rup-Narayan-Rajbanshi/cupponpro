@@ -127,10 +127,6 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     def validate(self, attrs):
         request = self.context.get('request') 
-        if request.method == 'GET':
-            data = Customer.get(self.instance.customer)
-            attrs['customer'] = data
-
         if self.instance:
             if hasattr(self.context['request'], 'company'):
                 if self.context['request'].company != self.instance.company:
@@ -148,6 +144,10 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             # user__companyuser__user__group__name__in=['sales', 'manager', 'owner', 'user']
         ).exists():
             raise ValidationError('Table already has an active order')
+        
+        if !self.instance:
+            customer = Customer.getCreate_customer(**attrs)
+            attrs['customer'] = customer
         return super().validate(attrs)
 
     def build_orderline_bulk_create_data(self, order, validated_order_line_data, voucher, served_products=None):

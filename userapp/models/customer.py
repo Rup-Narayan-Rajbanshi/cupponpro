@@ -15,12 +15,30 @@ class Customer(BaseModel):
     address = models.CharField(max_length=MAX_LENGTHS['ADDRESS'], default=DEFAULTS['ADDRESS'])
 
     @classmethod
-    def get(cls, id):
-        customer = cls.objects.fiter(id=id).values_list('name', 'address', 'email', 'phone_number_ext', 'phone_number', flat=True)
-        data_customer = dict()
-        data_customer['name'] = customer.name
-        data_customer['address'] = customer.address
-        data_customer['email'] = customer.email
-        data_customer['phone_number_ext'] = customer.phone_number_ext
-        data_customer['phone_number']  = customer.phone_number
-        return data_customer
+    def getcreate_customer(cls, **kwargs):
+        required_data = ['phone_number', 'name']
+        optional_data = ['email', 'address']
+        data_list = required_data + optional_data
+        valid_data = dict()
+        for data in data_list:
+            if data in kwargs:
+                valid_data[data] = kwargs.get(data)
+        # assert(set())
+        cusotmer = None
+        phone_number = kwargs.get('phone_number')
+        try:
+            customer = cls.objects.get(phone_number=phone_number)
+        except:
+            customer = Customer.objects.create(**kwargs)
+        return customer
+    
+    def to_representation(self, request=None):
+        if self:
+            return {
+                "id": self.id,
+                "phone_number": self.first_name,
+                "name": self.middle_name,
+                "email": self.last_name,
+                "address": image
+            }
+        return None
