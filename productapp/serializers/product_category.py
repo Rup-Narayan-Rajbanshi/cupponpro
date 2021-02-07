@@ -24,9 +24,6 @@ class ProductCategorySerializer(CustomModelSerializer):
     def validate(self, attrs):
         request = self.context.get('request') 
         if request:
-            company = request.company
-            if company:
-                attrs['company'] = company
             if request.method == 'PUT':
                 if 'parent' in attrs.keys():
                     if attrs['parent']!=None and self.instance.id == attrs['parent'].id:
@@ -44,9 +41,6 @@ class ProductCategorySerializer(CustomModelSerializer):
                 if attrs['parent']:
                     if attrs['parent'].types != attrs['types']:
                         raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
-            company = request.company
-            if company:
-                attrs['company'] = company
             if request.method == 'POST':
                 last_position = ProductCategory.objects.all().aggregate(Max('position'))
                 value_last_position = last_position['position__max']
