@@ -15,6 +15,9 @@ from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
 from orderapp.serializers.order_line import OrderLineSerializer
 from userapp.models import User
+from userapp.models.customer import Customer
+from helpers.validators import phone_number_validator, is_numeric_value
+from helpers.constants import MAX_LENGTHS, DEFAULTS
 
 
 class OrderStatusSerializer(CustomModelSerializer):
@@ -90,18 +93,19 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
     price_details = serializers.SerializerMethodField()
-    user_name  = serializers.SerializerMethodField()
+    user  = DetailRelatedField(model=User, lookup='id', representation='to_representation')
+    customer = DetailRelatedField(model=Customer, lookup='phone_number', representation='to_representaion')
+    user_name = serializers.CharField(max_length=128, allow_blank=True, required=False)
+    phone_number = serializers.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER'],
+                                    validators=[phone_number_validator, is_numeric_value], allow_blank=True, required=False)
+    email = serializers.EmailField(max_length=MAX_LENGTHS['EMAIL'], allow_blank=True, required=False)
+    address = serializers.CharField(max_length=MAX_LENGTHS['ADDRESS'], default=DEFAULTS['ADDRESS'], allow_blank=True, required=False)
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'user_name', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at')
-
-    def get_user_name(self, obj):
-        if obj.user:
-            user = obj.user.full_name
-            return user
-        else:
-            return ''
+        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user_name', 'phone_number', 'email', 'address')
+        read_only_fields = ('user', 'customer')
+        write_only_fields = ('user_name','phone_number','email','address')
 
     def get_fields(self):
         fields = super().get_fields()
@@ -173,6 +177,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         from notifications.tasks import notify_company_staffs
         self.fields.pop('order_lines')
         self.fields.pop('voucher')
+        customer = Customer.getcreate_customer(**validated_data)
+        validated_data['customer'] = customer
         order_lines = validated_data.pop('order_lines')
         voucher = validated_data.pop('voucher', None)
         user = self.context['request'].user
