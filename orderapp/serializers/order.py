@@ -103,7 +103,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user_name', 'phone_number', 'email', 'address')
+        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user_name', 'phone_number', 'email', 'address','customer','user')
         read_only_fields = ('user', 'customer')
         write_only_fields = ('user_name','phone_number','email','address')
 
