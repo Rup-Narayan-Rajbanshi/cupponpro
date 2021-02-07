@@ -13,3 +13,14 @@ class Customer(BaseModel):
     name = models.CharField(max_length=128)
     email = models.EmailField(max_length=MAX_LENGTHS['EMAIL'], blank=True, default='')
     address = models.CharField(max_length=MAX_LENGTHS['ADDRESS'], default=DEFAULTS['ADDRESS'])
+
+    @classmethod
+    def get(cls, id):
+        customer = cls.objects.fiter(id=id).values_list('name', 'address', 'email', 'phone_number_ext', 'phone_number', flat=True)
+        data_customer = dict()
+        data_customer['name'] = customer.name
+        data_customer['address'] = customer.address
+        data_customer['email'] = customer.email
+        data_customer['phone_number_ext'] = customer.phone_number_ext
+        data_customer['phone_number']  = customer.phone_number
+        return data_customer
