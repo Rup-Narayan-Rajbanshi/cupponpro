@@ -118,7 +118,7 @@ class ProductCategoryFilter(ProductCategoryBaseFilter):
     @property
     def qs(self):
         parent = super(ProductCategoryFilter, self).qs
-        company = self.request.company
+        company = getattr(request, 'company', None)
         if company:
             parent = parent.filter(company=company)
         return parent

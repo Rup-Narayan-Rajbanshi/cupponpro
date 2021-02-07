@@ -22,12 +22,12 @@ class ProductCategorySerializer(CustomModelSerializer):
         model = ProductCategory
 
     def validate(self, attrs):
-        request = self.context.get('request') 
+        request = self.context.get('request')
         if request:
-            company = request.company
+            company = getattr(request, 'company', None)
             if company:
                 attrs['company'] = company
-            if request.method == 'PUT':
+            if self.instance:
                 if 'parent' in attrs.keys():
                     if attrs['parent']!=None and self.instance.id == attrs['parent'].id:
                         raise serializers.ValidationError({'parent':'Product category cannot be parent of itself.'})
@@ -39,15 +39,13 @@ class ProductCategorySerializer(CustomModelSerializer):
                         if self.instance.types != attrs['types']:
                             raise serializers.ValidationError({'types':'Type of sub category has to be same as its parent Product category.'})
                 if 'position' in attrs.keys():
-                    self.rearrange_order(self.instance.position, attrs['position'])        
+                    self.rearrange_order(self.instance.position, attrs['position'])
+            ## not clear
             if 'parent'in attrs.keys() and 'types' in attrs.keys():
                 if attrs['parent']:
                     if attrs['parent'].types != attrs['types']:
                         raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
-            company = request.company
-            if company:
-                attrs['company'] = company
-            if request.method == 'POST':
+            if not self.instance:
                 last_position = ProductCategory.objects.all().aggregate(Max('position'))
                 value_last_position = last_position['position__max']
                 attrs['position']=value_last_position + 1
@@ -70,5 +68,4 @@ class ProductCategorySerializer(CustomModelSerializer):
                 model.position -= 1
                 model.save()
         else:
-            pass 
-        
+            pass

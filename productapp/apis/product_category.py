@@ -22,7 +22,7 @@ class ProductCategoryAPI(FAPIMixin, mixins.CreateModelMixin, mixins.ListModelMix
     filter_backends = (DjangoFilterBackend,)
     filter_class = ProductCategoryFilter
     pagination_class = FPagination
-    permission_classes = (IsAuthenticated, (isAdmin | CompanyUserPermission))
+    permission_classes = ((CompanyUserPermission | isAdmin),)
 
 
     def destroy(self, request, *args, **kwargs):
