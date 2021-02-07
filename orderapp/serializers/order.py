@@ -92,8 +92,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
     price_details = serializers.SerializerMethodField()
-    user  = serializers.SerializerMethodField(model=User, lookup='id', representation='to_representation')
-    user_name = serializers.CharField(max_lengths=128, allow_blank=True, required=False)
+    user  = DetailRelatedField(model=User, lookup='id', representation='to_representation')
+    user_name = serializers.CharField(max_length=128, allow_blank=True, required=False)
     phone_number = serializers.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER'],
                                     validators=[phone_number_validator, is_numeric_value], allow_blank=True, required=False)
     email = serializers.EmailField(max_length=MAX_LENGTHS['EMAIL'], allow_blank=True, required=False)
