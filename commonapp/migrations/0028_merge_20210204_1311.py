@@ -11,4 +11,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterField(
+            model_name='productcategory',
+            name='sub_type',
+            field=models.CharField(choices=[('VEG', 'VEG'), ('NON-VEG', 'NON-VEG')], default='', max_length=8, null=True),
+        )
     ]
