@@ -4,6 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from commonapp.models.product import Product, ProductCategory
+from rest_framework.exceptions import ValidationError
 from data_manager.exception import DuplicateNameException, ProductCategoryNotExistException, \
     ProductCodeAlreadyExistException
 from data_manager.helpers import create_or_update_from_dataframe
@@ -42,6 +43,14 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
         df = df.replace(np.nan, '', regex=True)
         df.rename(columns={column_name: title_to_snake_case(column_name) for column_name in df.columns }, inplace=True)
         df['total_price'] = df['selling_price']
+        valid_column = ['product_code', 'name', 'link', 'product_category', 'brand_name',
+       'purchase_price', 'purchase_currency', 'selling_price',
+       'selling_currency', 'total_price']
+
+        valid_column=list(set(valid_column))
+        columns = list(set(df.columns))
+        if not all(item in valid_column for item in columns):
+            raise ValidationError({'detail': 'Invalid file format.'})
 
         # Validate product category name
         code_qs = Product.objects.filter(product_code__in=set(df['product_code']), company=company)

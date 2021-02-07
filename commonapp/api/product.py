@@ -7,6 +7,8 @@ from commonapp.serializers.product import BulkQuantitySerializer, ProductSeriali
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, publicReadOnly
 from commonapp.app_helper import custom_paginator
 
+import code
+
 
 class CompanyBulkQuantityListView(generics.GenericAPIView):
     permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
@@ -207,14 +209,14 @@ class CompanyProductListView(generics.GenericAPIView):
         An endpoint for listing all the vendor's product. Pass 'page' and 'size' as query for requesting particular page and
         number of items per page respectively.
         """
-        page_size = request.GET.get('size', 10)
+        page_size = request.GET.get('size', 10) 
         page_number = request.GET.get('page')
 
-        filter_fields = ['name', 'product_category', 'status']
+        filter_fields = ['name', 'code', 'product_category', 'status']
         sort_by_fields = ['name', 'code', 'product_category', 'selling_price', 'status']
 
         sort_by = request.GET.get('sort_by') if request.GET.get('sort_by') in sort_by_fields else 'id'
-
+        
         if sort_by == 'code':
             sort_by = 'product_code'
         elif sort_by == 'product_category':
@@ -224,10 +226,20 @@ class CompanyProductListView(generics.GenericAPIView):
         filter_kwargs = {'{key}{lookup}'.format(
             key=key, lookup='__icontains'
             ): value for key, value in request.GET.items() if key in filter_fields}
+        
+        
+        for item in filter_kwargs.copy():
+            if filter_kwargs[item]=='':
+                filter_kwargs.pop(item)
 
+        if 'code__icontains' in filter_kwargs.keys():
+            filter_kwargs['product_code'] = filter_kwargs['code__icontains']
+            del filter_kwargs['code__icontains']
+        
         if 'product_category__icontains' in filter_kwargs.keys():
-            filter_kwargs['product_category__name__icontains'] = filter_kwargs['product_category__icontains']
+            filter_kwargs['product_category__id__icontains'] = filter_kwargs['product_category__icontains']
             del filter_kwargs['product_category__icontains']
+
 
         product_obj = Product.objects.filter(**filter_kwargs, company=company_id).order_by(
             '{order_by}{sort_by}'.format(
@@ -430,3 +442,23 @@ class CompanyProductCategoryListView(generics.GenericAPIView):
                 'message': serializer.errors
             }
             return Response(data, status=400)
+
+
+    # def put(self, request, company_id, position_from, position_to, product_id):
+    #     """
+    #     An endpoint for reordering vendor's product category.
+    #     """
+    #     company = Company.objects.filter(id=company_id)
+        
+    #     serializer = ProductCategorySerializer(isinstance=)
+
+
+        
+    #             return Response(data, status=404)
+    #     data = {
+    #         'success': 0,
+    #         'message': "You do not have permission to reorder product category."
+    #     }
+    #     return Response(data, status=403)
+
+    

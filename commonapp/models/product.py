@@ -8,7 +8,7 @@ from commonapp.models.image import Image
 from commonapp.models.company import Company
 from helpers.app_helpers import url_builder, content_file_name
 from helpers.constants import DEFAULTS, MAX_LENGTHS, DISCOUNT_TYPE
-from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES
+from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_CAT_TYPE_CHOICES, PRODUCT_TYPE_CHOICES
 
 
 class BulkQuantity(models.Model):
@@ -28,13 +28,17 @@ class BulkQuantity(models.Model):
 
 class ProductCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='subcategory', null=True)
     name = models.CharField(max_length=64)
     link = models.URLField(null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     image = models.ImageField(null=True, upload_to=content_file_name)
     token = models.CharField(max_length=8, editable=False)
+    types = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_TYPE'], choices=PRODUCT_CAT_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_TYPE'])
+    sub_type = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], null=True)
+    position = models.PositiveIntegerField(default=0, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    position = models.PositiveIntegerField(default=0, blank=True)
     class Meta:
         db_table = 'product_category'
         verbose_name_plural = "product categories"
@@ -49,7 +53,10 @@ class ProductCategory(models.Model):
             "id": self.id,
             "name": self.name,
             "image": image,
-            "link": self.link
+            "link": self.link,
+            'parent': self.parent.to_representation() if self.parent else None,
+            'types': self.types,
+            'sub_type': self.sub_type if self.sub_type else ''
         }
 
     def to_represent_minimal(self, request=None):
@@ -119,7 +126,8 @@ class Product(models.Model):
     bulk_quantity = models.ForeignKey(BulkQuantity, on_delete=models.PROTECT, null=True, blank=True)
     total_price = models.PositiveIntegerField(blank=True, null=True)
     token = models.CharField(max_length=8, editable=False)
-    # is_veg = models.BooleanField(default=False) #only for food item
+    types = models.CharField(max_length=MAX_LENGTHS['PRODUCT_TYPE'], choices=PRODUCT_TYPE_CHOICES, default=DEFAULTS['PRODUCT_TYPE'], null=True)
+    #only for food item
     # gender = models.CharField(max_length=6, choices=GENDER, default=Null, null=True, blank=True) # usable for clothing and similar category
     images = GenericRelation(Image)
     status = models.CharField(max_length=MAX_LENGTHS['PRODUCT_STATUS'], choices=PRODUCT_STATUS_CHOICES, default=DEFAULTS['PRODUCT_STATUS'])
@@ -145,7 +153,8 @@ class Product(models.Model):
             "purchase_price": self.purchase_price,
             "purchase_currency": self.purchase_currency,
             "total_price": self.total_price,
-            "link": self.link
+            "link": self.link,
+            'types': self.types
         }
 
     def to_represent_minimal(self, request=None):

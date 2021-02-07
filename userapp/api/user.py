@@ -4,12 +4,15 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
-from commonapp.models.company import Company, CompanyUser
+from commonapp.models.company import Company, CompanyUser, FavouriteCompany
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
     ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, SignupTokenSerializer, VerifyPasswordSerializer,\
     ChangeUserEmailSerializer, ChangeUserProfilePictureSerializer
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
+from userapp.models.verifications import OTPVerificationCode
+from userapp.models.subscription import Subscription
+from notifications.models.notification import Notification , Device 
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 
 class GroupListView(generics.GenericAPIView):
@@ -73,7 +76,7 @@ class UserGroupDetailView(generics.GenericAPIView):
         """
         An endpoint for changing vendor user's group.
         """
-        group_modify_access = {'owner': ['manager', 'sales'], 'manager': ['sales']}
+        group_modify_access = {'owner': ['manager', 'sales', 'owner'], 'manager': ['sales']}
         group_name = Group.objects.get(id=request.data['new_group']).name
         user_group_queryset = request.user.group.exclude(name__in=['user','admin'])
         if group_name in group_modify_access[user_group_queryset[0].name]:
@@ -210,10 +213,39 @@ class UpdateUser(generics.GenericAPIView):
         """
         An endpoint for deleting user.
         """
-        if request.user.admin:
+        is_owner_or_admin = request.user.group.filter(name__in=['owner','admin']).exists()
+        if is_owner_or_admin:
             if User.objects.filter(id=user_id):
+
+                login_token_obj = LoginToken.objects.filter(user = user_id)
+                login_token_obj.delete()
+
+                password_reset_token_obj = PasswordResetToken.objects.filter(user = user_id)
+                password_reset_token_obj.delete()
+
+                otp_varification_code = OTPVerificationCode.objects.filter(user = user_id)
+                otp_varification_code.delete()
+
+                suscription = Subscription.objects.filter(user=user_id)
+                suscription.delete()
+
+                user_notification = Notification.objects.filter(user=user_id)
+                user_notification.delete()
+
+                device = Device.objects.filter(user = user_id)
+                device.delete()
+
+                favourite_company = FavouriteCompany.objects.filter(user=user_id)
+                favourite_company.delete()
+
+                company_user_obj = CompanyUser.objects.get(user=user_id)
+                company_user_obj.is_obsolete = True
+                company_user_obj.save()
+
                 user_obj = User.objects.get(id=user_id)
-                user_obj.delete()
+                user_obj.is_obsolete = True
+                user_obj.save()
+                
                 data = {
                     'success': 1,
                     'data': None
@@ -605,7 +637,7 @@ class ChangeUserProfilePictureView(generics.GenericAPIView):
         """
         An endpoint for changing user's profile picture.
         """
-        if str(request.user.id) == user_id:
+        if request.user.id == user_id:
             serializer = ChangeUserProfilePictureSerializer(instance=request.user, data=request.data, context={'request': request})
             if serializer.is_valid():
                 serializer.save()

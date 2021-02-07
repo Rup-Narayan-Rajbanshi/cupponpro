@@ -41,6 +41,7 @@ class Company(Address):
     invoice_counter = models.PositiveIntegerField(default=0, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)
+    pan_number  = models.CharField(max_length=16, default='')
 
     class Meta:
         db_table = 'company'
@@ -60,7 +61,9 @@ class Company(Address):
                 'logo': logo,
                 'logo_icon': logo_icon,
                 'latitude': self.latitude,
-                'longitude': self.longitude
+                'longitude': self.longitude,
+                'pan_number': self.pan_number,
+                'phone_number': self.phone_number
             }
         return None
 
@@ -135,6 +138,7 @@ class CompanyUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     is_staff = models.BooleanField(default=True)
+    is_obsolete = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     is_qr_user = models.BooleanField(default=False)
 

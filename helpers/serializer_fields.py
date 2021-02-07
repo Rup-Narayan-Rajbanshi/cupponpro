@@ -324,7 +324,7 @@ class FRelatedField(serializers.PrimaryKeyRelatedField):
                 pass
 
     def to_representation(self, obj):
-        return obj.idx
+        return obj.id
 
     def to_internal_value(self, data):
         try:
@@ -496,7 +496,6 @@ class ImageFieldWithURL(serializers.ImageField):
     def to_internal_value(self, data):
         # import os
         # from project.settings import MEDIA_ROOT
-
         request = request_context(self)
         if isinstance(data, str):
             return data

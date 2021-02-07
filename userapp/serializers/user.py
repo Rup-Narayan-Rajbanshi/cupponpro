@@ -4,6 +4,7 @@ from commonapp.models.company import CompanyUser
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from helpers.serializer_fields import ImageFieldWithURL
 from helpers.choices_variable import GENDER_CHOICES
+from commonapp.models.document import Document
 
 
 class UserGroupSerializer(serializers.ModelSerializer):
@@ -37,8 +38,13 @@ class UserSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         company_user_obj = CompanyUser.objects.filter(user=obj.id)
         if company_user_obj:
-            company_ids = [company_obj.company.to_representation() for company_obj in company_user_obj]
-            return company_ids
+            company_lists = list()
+            for company_obj in company_user_obj:
+                company = company_obj.company
+                company_obj = company.to_representation()
+                company_obj['documents'] = Document.objects.filter(company=company).values('id','name','document_number')
+                company_lists.append(company_obj)
+            return company_lists
         else:
             return None
 
@@ -69,8 +75,13 @@ class UserDetailSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         company_user_obj = CompanyUser.objects.filter(user=obj.id)
         if company_user_obj:
-            company_ids = [company_obj.company.to_representation() for company_obj in company_user_obj]
-            return company_ids
+            company_lists = list()
+            for company_obj in company_user_obj:
+                company = company_obj.company
+                company_obj = company.to_representation()
+                company_obj['documents'] = Document.objects.filter(company=company).values('id','name','document_number')
+                company_lists.append(company_obj)
+            return company_lists
         else:
             return None
 

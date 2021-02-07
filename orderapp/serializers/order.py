@@ -15,6 +15,8 @@ from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
 from orderapp.serializers.order_line import OrderLineSerializer
 from userapp.models import User
+from helpers.validators import phone_number_validator, is_numeric_value
+from helpers.constants import MAX_LENGTHS, DEFAULTS
 
 
 class OrderStatusSerializer(CustomModelSerializer):
@@ -47,7 +49,7 @@ class OrderStatusSerializer(CustomModelSerializer):
 
 
 class TableOrderSerializer(OrderStatusSerializer):
-    payment_mode = serializers.ChoiceField(choices=PAYMENT_CHOICES, required=False)
+    payment_mode = serializers.ChoiceField(PAYMENT_CHOICES, required=False)
     custom_discount_percentage = serializers.CharField(validators=[is_numeric_value, is_percentage], required=False)
     voucher = DetailRelatedField(model=Voucher, lookup='id',
                                  representation='to_representation', required=False)
@@ -68,7 +70,6 @@ class TableOrderSerializer(OrderStatusSerializer):
             # ORDER_STATUS['CANCELLED']: [],
             # ORDER_STATUS['COMPLETED']: ['BILLABLE']
         }
-
         if self.instance.status in [ORDER_STATUS['CANCELLED'], ORDER_STATUS['COMPLETED']]:
             # instance = self.instance
             # if status not in allowed_status_change[instance.status]:
@@ -91,10 +92,11 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
     price_details = serializers.SerializerMethodField()
+    user  = DetailRelatedField(model=User, lookup='id', representation='to_representation', read_only=True)
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details')
+        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
 
     def get_fields(self):
         fields = super().get_fields()
@@ -253,11 +255,11 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                 'en': message
             }
         }
-        # try:
-        #     notify_company_staffs(
-        #         company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset, exclude_user=user)
-        # except Exception as e:
-        #     pass
+        try:
+            notify_company_staffs(
+                company, NOTIFICATION_CATEGORY['ORDER_PLACED'], payload, asset=order.asset, exclude_user=user)
+        except Exception as e:
+            pass
         return order
 
 
