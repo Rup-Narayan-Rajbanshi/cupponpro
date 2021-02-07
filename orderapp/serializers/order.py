@@ -99,7 +99,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     phone_number = serializers.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER'],
                                     validators=[phone_number_validator, is_numeric_value], allow_blank=True, required=False)
     email = serializers.EmailField(max_length=MAX_LENGTHS['EMAIL'], allow_blank=True, required=False)
-    address = serializers.CharField(max_length=MAX_LENGTHS['ADDRESS'], default=DEFAULTS['ADDRESS'], allow_blank=True, required=False)
+    address = serializers.CharField(max_length=MAX_LENGTHS['ADDRESS'], allow_blank=True, required=False)
 
     class Meta:
         model = Orders
