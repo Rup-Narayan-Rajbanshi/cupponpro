@@ -12,6 +12,7 @@ class Bills(BaseModel):
     ## these options needs to be moved in helpers/constant and choices variable and letter should be UPPER CASE
     # Payment Modes
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    customer = models.ForeignKey('userapp.Customer', on_delete=models.SET_NULL, null=True, related_name='bills')
     payment_mode = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default=DEFAULTS['PAYMENT_CHOICES'])
     service_charge = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
@@ -86,7 +87,7 @@ class Bills(BaseModel):
 
     def credicted_amount(self, payable_amount, paid_amount):
         return payable_amount - paid_amount
-        
+
 
     def to_representation(self):
         return {

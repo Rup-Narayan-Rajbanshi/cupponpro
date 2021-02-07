@@ -7,6 +7,7 @@ from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
 from orderapp.serializers.order import CompanyTableOrderSerializer
 from commonapp.models.company import Company
+from userapp.models.customer import Customer
 from userapp.serializers.user import UserDetailSerializer
 
 class BillCreateSerializer(CustomModelSerializer):
@@ -20,8 +21,8 @@ class BillCreateSerializer(CustomModelSerializer):
 
 class BillListSerializer(CustomModelSerializer):
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation')
-    order = serializers.SerializerMethodField()  
-    
+    order = serializers.SerializerMethodField()
+
     class Meta:
         model = Bills
         fields = "__all__"
@@ -32,7 +33,12 @@ class BillListSerializer(CustomModelSerializer):
         return serializer.data
 
 class ManualBillSerializerCompany(CompanyTableOrderSerializer):
-
+    # customer = DetailRelatedField(model=Customer, lookup='id', representation='to_representaion', required=False)
+    # user_name = serializers.CharField(max_length=128, allow_blank=True, required=False)
+    # phone_number = serializers.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER'],
+    #                                 validators=[phone_number_validator, is_numeric_value], allow_blank=True, required=False)
+    # email = serializers.EmailField(max_length=MAX_LENGTHS['EMAIL'], allow_blank=True, required=False)
+    # address = serializers.CharField(max_length=MAX_LENGTHS['ADDRESS'], default=DEFAULTS['ADDRESS'], allow_blank=True, required=False)
     # class Meta:
     #     model = Orders
     #     fields = ('id', 'voucher', 'asset', 'order_lines', 'bill')
@@ -47,6 +53,8 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['company'] = order.company.id
         data['tax'] = order.company.tax if order.company.tax else 0
         data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
+        # customer = Customer.getcreate_customer(**validated_data)
+        # data['customer'] = customer
         serializer = BillCreateSerializer(data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot bill the order', code=400)

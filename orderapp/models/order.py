@@ -19,7 +19,6 @@ class Orders(BaseModel):
     company = models.ForeignKey(Company, on_delete=models.PROTECT, related_name='orders')
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name='orders', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='orders')
-    customer = models.ForeignKey('userapp.Customer', on_delete=models.SET_NULL, null=True, related_name='orders')
     status = models.CharField(max_length=MAX_LENGTHS['ORDER_STATUS'], choices=ORDER_STATUS_CHOICES, default=DEFAULTS['ORDER_STATUS'])
     extras = JSONField(blank=True, null=True)
     custom_discount_percentage = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
