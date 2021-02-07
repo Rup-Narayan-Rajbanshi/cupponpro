@@ -17,7 +17,7 @@ class Customer(BaseModel):
     @classmethod
     def getcreate_customer(cls, **kwargs):
         required_data = ['phone_number', 'name']
-        assert(set(required_data).issubset(kwargs))
+        assert(set(required_data).issubset(kwargs)),'Phone number and name is both required'
         optional_data = ['email', 'address','phone_number_ext']
         data_list = required_data + optional_data
         valid_data = dict()
