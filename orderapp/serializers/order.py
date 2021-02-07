@@ -15,6 +15,7 @@ from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
 from orderapp.serializers.order_line import OrderLineSerializer
 from userapp.models import User
+from userapp.models.customer import Customer
 from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import MAX_LENGTHS, DEFAULTS
 
@@ -93,6 +94,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     order_lines = OrderLineSerializer(many=True, required=True)
     price_details = serializers.SerializerMethodField()
     user  = DetailRelatedField(model=User, lookup='id', representation='to_representation')
+    customer = DetailRelatedField(model=Customer, lookup='phone_number', representation='to_representaion')
     user_name = serializers.CharField(max_length=128, allow_blank=True, required=False)
     phone_number = serializers.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER'],
                                     validators=[phone_number_validator, is_numeric_value], allow_blank=True, required=False)
@@ -102,7 +104,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     class Meta:
         model = Orders
         fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user_name', 'phone_number', 'email', 'address')
-        read_only_fields = ('user')
+        read_only_fields = ('user', 'customer')
+        write_only_fields = ('user_name','phone_number','email','address')
 
     def get_fields(self):
         fields = super().get_fields()
@@ -126,7 +129,6 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         }
 
     def validate(self, attrs):
-        request = self.context.get('request') 
         if self.instance:
             if hasattr(self.context['request'], 'company'):
                 if self.context['request'].company != self.instance.company:
@@ -144,10 +146,6 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             # user__companyuser__user__group__name__in=['sales', 'manager', 'owner', 'user']
         ).exists():
             raise ValidationError('Table already has an active order')
-        
-        if !self.instance:
-            customer = Customer.getCreate_customer(**attrs)
-            attrs['customer'] = customer
         return super().validate(attrs)
 
     def build_orderline_bulk_create_data(self, order, validated_order_line_data, voucher, served_products=None):
@@ -179,6 +177,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         from notifications.tasks import notify_company_staffs
         self.fields.pop('order_lines')
         self.fields.pop('voucher')
+        customer = Customer.getcreate_customer(**validated_data)
+        validated_data['customer'] = customer
         order_lines = validated_data.pop('order_lines')
         voucher = validated_data.pop('voucher', None)
         user = self.context['request'].user
