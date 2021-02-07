@@ -20,7 +20,6 @@ class AssetFilter(filters.FilterSet):
         qs = qs.filter(orders__status__in=[
             ORDER_STATUS['PROCESSING'], ORDER_STATUS['BILLABLE']])
         pending = []
-        print(qs[0].orders.all())
         for asset in qs:
             latest_order = asset.orders.order_by('-created_at').first()
             if latest_order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).filter(
