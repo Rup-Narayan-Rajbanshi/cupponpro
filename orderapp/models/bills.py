@@ -15,7 +15,7 @@ class Bills(BaseModel):
     service_charge = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     payable_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
-    paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
+    paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
     is_credit = models.BooleanField(default=False)
     invoice_number = models.CharField(max_length=8, editable=False)
     is_manual = models.BooleanField(default=False)
