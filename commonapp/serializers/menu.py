@@ -45,7 +45,7 @@ class MenuSerializer(serializers.ModelSerializer):
         data = list()
         request = self.context.get('request', None)
         name = request.GET.get('name') if request else ''
-        product_category_obj = ProductCategory.objects.filter(company=obj.id)
+        product_category_obj = ProductCategory.objects.filter(company=obj.id).order_by('-created_at')
         if name:
             product_category_obj = product_category_obj.filter(product__name__istartswith=name)
         for product_category in product_category_obj:
