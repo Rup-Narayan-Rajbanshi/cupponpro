@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from helpers.choices_variable import PRODUCT_CAT_TYPE_CHOICES
 from helpers.serializer_fields import DetailRelatedField
 from helpers.serializer import CustomModelSerializer
@@ -10,7 +11,7 @@ from django.db.models import Max
 
 
 class ProductCategorySerializer(CustomModelSerializer):
-    name = serializers.CharField(max_length=64, allow_null=True, required=False)
+    name = serializers.CharField(max_length=64)
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False)
     image = ImageFieldWithURL(allow_empty_file=False, required=False)
     parent = DetailRelatedField(model=ProductCategory, lookup='id', representation='to_representation', allow_null=True, required=False)
@@ -27,7 +28,11 @@ class ProductCategorySerializer(CustomModelSerializer):
             company = getattr(request, 'company', None)
             if company:
                 attrs['company'] = company
+            name_exists_validation = 'Name "{0}" already exists.'.format(attrs['name'])
             if self.instance:
+                is_name_exists = ProductCategory.objects.exclude(id=self.instance.id).filter(company=attrs['company'], name=attrs['name']).exists()
+                if is_name_exists:
+                    raise ValidationError({'name': name_exists_validation})
                 if 'parent' in attrs.keys():
                     if attrs['parent']!=None and self.instance.id == attrs['parent'].id:
                         raise serializers.ValidationError({'parent':'Product category cannot be parent of itself.'})
@@ -46,6 +51,9 @@ class ProductCategorySerializer(CustomModelSerializer):
                     if attrs['parent'].types != attrs['types']:
                         raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
             if not self.instance:
+                is_name_exists = ProductCategory.objects.filter(company=attrs['company'], name=attrs['name']).exists()
+                if is_name_exists:
+                    raise ValidationError({'name': name_exists_validation})
                 last_position = ProductCategory.objects.all().aggregate(Max('position'))
                 value_last_position = last_position['position__max']
                 attrs['position']=value_last_position + 1
