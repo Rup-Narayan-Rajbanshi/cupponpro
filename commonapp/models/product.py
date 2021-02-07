@@ -154,7 +154,7 @@ class Product(models.Model):
             "purchase_currency": self.purchase_currency,
             "total_price": self.total_price,
             "link": self.link,
-            'is_veg': self.is_veg
+            'types': self.types
         }
 
     def to_represent_minimal(self, request=None):
