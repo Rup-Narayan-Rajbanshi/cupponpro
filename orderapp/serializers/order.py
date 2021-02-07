@@ -95,7 +95,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     price_details = serializers.SerializerMethodField()
     user  = DetailRelatedField(model=User, lookup='id', representation='to_representation', required=False)
     customer = DetailRelatedField(model=Customer, lookup='id', representation='to_representaion', required=False)
-    user_name = serializers.CharField(max_length=128, allow_blank=True, required=False)
+    name = serializers.CharField(max_length=128, allow_blank=True, required=False)
     phone_number = serializers.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER'],
                                     validators=[phone_number_validator, is_numeric_value], allow_blank=True, required=False)
     email = serializers.EmailField(max_length=MAX_LENGTHS['EMAIL'], allow_blank=True, required=False)
@@ -177,8 +177,9 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         from notifications.tasks import notify_company_staffs
         self.fields.pop('order_lines')
         self.fields.pop('voucher')
-        customer = Customer.getcreate_customer(**validated_data)
-        validated_data['customer'] = customer
+        if 'phone_number' in validated_data.keys() or 'name' in validated_data.keys():
+            customer = Customer.getcreate_customer(**validated_data)
+            validated_data['customer'] = customer
         order_lines = validated_data.pop('order_lines')
         voucher = validated_data.pop('voucher', None)
         user = self.context['request'].user
