@@ -30,10 +30,10 @@ class ProductCategorySerializer(CustomModelSerializer):
                 attrs['company'] = company
             name_exists_validation = 'Name "{0}" already exists.'.format(attrs['name'])
             # ## not clear
-            # if 'parent'in attrs.keys() and 'types' in attrs.keys():
-            #     if attrs['parent']:
-            #         if attrs['parent'].types != attrs['types']:
-            #             raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
+            if 'parent'in attrs.keys() and 'types' in attrs.keys():
+                if attrs['parent']:
+                    if attrs['parent'].types != attrs['types']:
+                        raise serializers.ValidationError({'parent':'Type of sub category has to be same as its parent Product category.'})
             if self.instance:
                 ## this is PUT
                 is_name_exists = ProductCategory.objects.exclude(id=self.instance.id).filter(company=attrs['company'], name=attrs['name']).exists()
@@ -42,9 +42,9 @@ class ProductCategorySerializer(CustomModelSerializer):
                 if 'parent' in attrs.keys():
                     if attrs['parent']!=None and self.instance.id == attrs['parent'].id:
                         raise serializers.ValidationError({'parent':'Product category cannot be parent of itself.'})
-                    # if 'types' not in attrs.keys():
-                    #     if self.instance.types != attrs['parent']:
-                    #         raise serializers.ValidationError({'parent': 'Type of sub category has to be same as its parent Product category.'})
+                    if 'types' not in attrs.keys():
+                        if self.instance.types != attrs['parent'].types:
+                            raise serializers.ValidationError({'parent': 'Type of sub category has to be same as its parent Product category.'})
                 if self.instance.parent:
                     if 'types' in attrs.keys():
                         if self.instance.types != attrs['types']:
