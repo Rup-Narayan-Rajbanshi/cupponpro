@@ -295,10 +295,10 @@ class CompanyUserListView(generics.GenericAPIView):
         """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            company_user_obj = CompanyUser.objects.filter(company=company_obj[0])
+            company_user_obj = CompanyUser.objects.filter(company=company_obj[0],is_obsolete=False)
             # get user data from related company user data
             user_ids = [x.user.id for x in company_user_obj]
-            user_obj = User.objects.filter(id__in=user_ids).order_by('-id')
+            user_obj = User.objects.filter(id__in=user_ids, is_obsolete=False).order_by('-id')
             print("here")
             print(user_obj)
             page_size = request.GET.get('size', 10)

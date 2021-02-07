@@ -94,6 +94,7 @@ class User(AbstractBaseUser, Address):
     admin = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
+    is_obsolete = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     dob = models.DateField(null=True, blank=True)
     group = models.ManyToManyField(Group)

@@ -138,6 +138,7 @@ class CompanyUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     is_staff = models.BooleanField(default=True)
+    is_obsolete = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     is_qr_user = models.BooleanField(default=False)
 
