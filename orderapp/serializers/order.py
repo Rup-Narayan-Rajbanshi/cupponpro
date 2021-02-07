@@ -47,7 +47,7 @@ class OrderStatusSerializer(CustomModelSerializer):
 
 
 class TableOrderSerializer(OrderStatusSerializer):
-    payment_mode = serializers.ChoiceField(choices=PAYMENT_CHOICES, required=False)
+    payment_mode = serializers.ChoiceField(PAYMENT_CHOICES, required=False)
     custom_discount_percentage = serializers.CharField(validators=[is_numeric_value, is_percentage], required=False)
     voucher = DetailRelatedField(model=Voucher, lookup='id',
                                  representation='to_representation', required=False)
@@ -68,7 +68,6 @@ class TableOrderSerializer(OrderStatusSerializer):
             # ORDER_STATUS['CANCELLED']: [],
             # ORDER_STATUS['COMPLETED']: ['BILLABLE']
         }
-
         if self.instance.status in [ORDER_STATUS['CANCELLED'], ORDER_STATUS['COMPLETED']]:
             # instance = self.instance
             # if status not in allowed_status_change[instance.status]:

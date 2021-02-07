@@ -4,6 +4,7 @@ from django.db.models import Sum
 from commonapp.models.company import Company
 from helpers.models import BaseModel
 from orderapp.choice_variables import PAYMENT_CHOICES
+from orderapp.constants import DEFAULTS
 # from orderapp.constants import PAYMENT_MODES
 
 
@@ -11,7 +12,7 @@ class Bills(BaseModel):
     ## these options needs to be moved in helpers/constant and choices variable and letter should be UPPER CASE
     # Payment Modes
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
-    payment_mode = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default=PAYMENT_CHOICES[0])
+    payment_mode = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default=DEFAULTS['PAYMENT_CHOICES'])
     service_charge = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     payable_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)

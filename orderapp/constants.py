@@ -2,3 +2,7 @@ PAYMENT_MODES = {
     'CARD': 'CARD',
     'CASH': 'CASH'
 }
+
+DEFAULTS = {
+    'PAYMENT_CHOICES': 'CASH'
+}
