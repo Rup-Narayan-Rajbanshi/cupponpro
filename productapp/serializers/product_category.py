@@ -28,7 +28,7 @@ class ProductCategorySerializer(CustomModelSerializer):
             company = getattr(request, 'company', None)
             if company:
                 attrs['company'] = company
-            name_exists_validation = 'Name "{0}" already exists.'.format(attrs['name'])
+            name_exists_validation = 'Name "{0}" already exists.'.format(attrs.get('name', ''))
             # ## not clear
             # if 'parent'in attrs.keys() and 'types' in attrs.keys():
             #     if attrs['parent']:
