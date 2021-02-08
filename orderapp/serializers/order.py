@@ -15,6 +15,7 @@ from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
 from orderapp.serializers.order_line import OrderLineSerializer
 from userapp.models import User
+from userapp.models.customer import Customer
 from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import MAX_LENGTHS, DEFAULTS
 
@@ -177,9 +178,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         if voucher:
             validated_data['user'] = voucher.user
         validated_data['company'] = self.context['request'].company
-
         order = super().create(validated_data)
-
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
         # if order.lines.exclude(status__in='SERVED').count() == 0:

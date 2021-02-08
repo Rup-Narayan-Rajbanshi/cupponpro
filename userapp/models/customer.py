@@ -18,19 +18,20 @@ class Customer(BaseModel):
     def getcreate_customer(cls, **kwargs):
         customer = None
         phone_number = kwargs.get('phone_number')
+        name = kwargs.get('name')
         if phone_number:
-            required_data = ['phone_number', 'name']
-            assert(set(required_data).issubset(kwargs)),'Phone number and name is both required'
-            optional_data = ['email', 'address','phone_number_ext']
-            data_list = required_data + optional_data
-            valid_data = dict()
-            for data in data_list:
-                if data in kwargs:
-                    valid_data[data] = kwargs.get(data)
+            # optional_data = ['email', 'address','phone_number_ext']
+            # data_list = required_data + optional_data
+            # valid_data = dict()
+            # for data in data_list:
+            #     if data in kwargs:
+            #         valid_data[data] = kwargs.get(data)
             try:
                 customer = cls.objects.get(phone_number=phone_number)
             except:
-                customer = Customer.objects.create(valid_data)
+                name = kwargs.get('name')
+                assert(name != ''),'Phone number and name is both required to create customer'
+                customer = cls.objects.create(**kwargs)
         return customer
 
     def to_representation(self, request=None):
