@@ -111,7 +111,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     def get_price_details(self, obj):
         return {
-            'invoice_number':obj.bill.invoice_number,
+            'invoice_number':obj.bill.invoice_number if obj.bill else '',
             'discount': obj.discount_amount,
             'sub_total': obj.subtotal,
             'tax': obj.tax_amount,
