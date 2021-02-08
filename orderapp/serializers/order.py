@@ -91,12 +91,12 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
-    price_details = serializers.SerializerMethodField()
+    bill = serializers.SerializerMethodField()
     user  = DetailRelatedField(model=User, lookup='id', representation='to_representation', read_only=True)
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
+        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'bill', 'created_at', 'modified_at', 'user')
 
     def get_fields(self):
         fields = super().get_fields()
@@ -109,8 +109,9 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         lines = OrderLineSerializer(order.lines.all(), many=True)
         return lines.data
 
-    def get_price_details(self, obj):
+    def get_bill(self, obj):
         return {
+            'invoice_number':obj.invoice_number,
             'discount': obj.discount_amount,
             'sub_total': obj.subtotal,
             'tax': obj.tax_amount,
