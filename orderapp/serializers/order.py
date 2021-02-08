@@ -96,7 +96,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_detail', 'created_at', 'modified_at', 'user')
+        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
 
     def get_fields(self):
         fields = super().get_fields()
@@ -109,7 +109,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         lines = OrderLineSerializer(order.lines.all(), many=True)
         return lines.data
 
-    def get_price_detail(self, obj):
+    def get_price_details(self, obj):
         return {
             'invoice_number':obj.invoice_number,
             'discount': obj.discount_amount,
