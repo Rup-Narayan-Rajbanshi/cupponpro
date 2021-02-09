@@ -562,8 +562,8 @@ class CouponContentTypeField(DetailRelatedField):
             if isinstance(type(data), self._kwargs.get('model')):
                 return data
             data = COUPON_TYPE_MAPPER.get(data, COUPON_TYPE_MAPPER['all'])
-            # if not data:
-            #     return None
+            if not data:
+                return None
             return self.queryset.get(**{self.lookup: data})
         except ObjectDoesNotExist:
             _error_msg = "Object does not exist."
