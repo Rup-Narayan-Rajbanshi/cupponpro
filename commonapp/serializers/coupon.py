@@ -61,7 +61,7 @@ class CouponDetailSerializer(CouponSerializer):
         return content_object
 
     def get_images(self, obj):
-        coupon_type = obj.content_type.name
+        coupon_type = obj.content_type.name if obj.content_type else ''
         current_site = Site.objects.get_current()
         if coupon_type == 'category':
             try:
