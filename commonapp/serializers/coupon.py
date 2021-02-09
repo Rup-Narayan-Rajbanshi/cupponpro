@@ -23,6 +23,16 @@ class CouponSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         content_type = attrs.get('content_type')
         object_id = attrs.get('object_id')
+        request = self.context.get('request')
+        if request:
+            try:
+                company_user = request.user.company_user.all()
+                company = company_user[0].company
+            except:
+                company = None
+            if company:
+                attrs['company'] = company
+        
         if content_type and object_id:
             content_class = content_type.model_class()
             try:
