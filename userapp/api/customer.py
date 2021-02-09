@@ -18,8 +18,9 @@ class CustomerFromPhone(generics.GenericAPIView):
     serializer_class = CustomerSerializer
     permission_classes = (AllowAny, )
 
-    def get(self, request, phone_number):
+    def get(self, request):
         status = 200
+        phone_number = request.query_params.get('phone_number')
         if Customer.objects.filter(phone_number=phone_number):
             customer = Customer.objects.get(phone_number=phone_number)
             serializer = CustomerSerializer(customer, context={'request':request})

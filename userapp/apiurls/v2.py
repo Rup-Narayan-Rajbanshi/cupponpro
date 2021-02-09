@@ -16,5 +16,5 @@ urlpatterns = router.urls
 
 urlpatterns += [
     url(r"^user/verify-token/$", verify_otp_token, name="verify-token"),
-    path('customer/number/<str:phone_number>/', CustomerFromPhone.as_view(), name="get_customer_from_phone_number")
+    path('customer/verify', CustomerFromPhone.as_view(), name="get_customer_from_phone_number")
 ]
