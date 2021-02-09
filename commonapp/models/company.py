@@ -135,7 +135,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
 class CompanyUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='company_user')
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     is_staff = models.BooleanField(default=True)
     is_obsolete = models.BooleanField(default=False)
