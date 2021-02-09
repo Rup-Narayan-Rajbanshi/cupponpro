@@ -36,7 +36,7 @@ class BillListSerializer(CustomModelSerializer):
         return serializer.data
 
 class ManualBillSerializerCompany(CompanyTableOrderSerializer):
-    # customer = DetailRelatedField(model=Customer, lookup='id', representation='to_representation', required=False)
+    customer = DetailRelatedField(model=Customer, lookup='id', representation='to_representation', required=False)
     name = serializers.CharField(max_length=128, allow_blank=True, required=False)
     phone_number = serializers.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER'],
                                     validators=[phone_number_validator, is_numeric_value], allow_blank=True, required=False)
