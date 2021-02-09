@@ -57,8 +57,10 @@ class CouponListView(generics.GenericAPIView):
 
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
-        company = request.user.company_user.all().values_list('company', flat=True)[0]
-
+        try:
+            company = request.user.company_user.all().values_list('company', flat=True)[0] 
+        except:
+            company = None
         if coupon_type:
             coupon_obj = Coupon.objects.select_related('company').filter(**filter_kwargs,
                                                                          content_type__model=COUPON_TYPE_MAPPER[coupon_type]).order_by(
