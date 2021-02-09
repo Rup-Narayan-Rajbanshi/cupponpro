@@ -63,6 +63,7 @@ class CouponDetailSerializer(CouponSerializer):
     def get_images(self, obj):
         coupon_type = obj.content_type.name if obj.content_type else ''
         current_site = Site.objects.get_current()
+        images=None
         if coupon_type == 'category':
             try:
                 logo = current_site.domain + obj.company.logo.url
