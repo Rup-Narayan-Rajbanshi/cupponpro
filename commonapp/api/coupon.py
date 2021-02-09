@@ -20,7 +20,7 @@ class CouponTypeListView(generics.GenericAPIView):
         An endpoint for listing all coupon types.
         """
         coupon_type = {
-            'all': 'On all items',
+            'category': 'On all items',
             'productcategory': 'On item type',
             'product': 'On specific item'
         }
