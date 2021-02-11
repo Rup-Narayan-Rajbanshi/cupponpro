@@ -147,5 +147,6 @@ class OrderLines(BaseModel):
     def save(self, *args, **kwargs):
         self.discount = self.get_discount()
         self.discount_amount = self.get_discounted_amount()
+        self.rate = self.rate if self.rate else self.product.total_price
         self.total = self.get_line_total()
         return super().save(*args, **kwargs)
