@@ -58,9 +58,15 @@ class ProductCategorySerializer(CustomModelSerializer):
                     is_name_exists = ProductCategory.objects.filter(company=attrs['company'], name=attrs['name']).exists()
                     if is_name_exists:
                         raise ValidationError({'name': name_exists_validation})
-                last_position = ProductCategory.objects.all().aggregate(Max('position'))
-                value_last_position = last_position['position__max']
-                attrs['position']=value_last_position + 1
+                if 'position' in attrs:
+                    position_exist=ProductCategory.objects.filter(company=company,position=attrs['position'])
+                    if position_exist:
+                        raise ValidationError({'detail':'Position already exists'})
+                    attrs['position'] = attrs['position']
+                else:
+                    last_position = ProductCategory.objects.filter(company=company).aggregate(Max('position'))
+                    value_last_position = last_position['position__max']
+                    attrs['position'] = value_last_position + 1
         return super(ProductCategorySerializer, self).validate(attrs)
 
     def get_has_child(self, obj):
