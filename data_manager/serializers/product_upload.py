@@ -12,7 +12,7 @@ from helpers.serializer_fields import CharToNumericField
 from helpers.validators import xlsx_validator, is_numeric_value
 from helpers.misc import title_to_snake_case
 from helpers.serializer import CustomBaseSerializer, CustomModelSerializer
-
+from helpers.constants import PRODUCT_TYPE
 ALLOWED_PRODUCT_TABLE_FIELDS = [
     'product_code', 'name', 'link', 'product_category', 'brand_name', 'purchase_price',
     'purchase_currency', 'selling_price', 'selling_currency']
@@ -44,13 +44,19 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
         df.rename(columns={column_name: title_to_snake_case(column_name) for column_name in df.columns }, inplace=True)
         df['total_price'] = df['selling_price']
         valid_column = ['product_code', 'name', 'link', 'product_category', 'brand_name',
-       'purchase_price', 'purchase_currency', 'selling_price',
+       'purchase_price', 'purchase_currency', 'selling_price', 'types',
        'selling_currency', 'total_price']
 
         valid_column=list(set(valid_column))
         columns = list(set(df.columns))
         if not all(item in valid_column for item in columns):
             raise ValidationError({'detail': 'Invalid file format.'})
+
+        if 'types' in columns:
+            value = df['types'].unique()
+            for val in value:
+                if val not in list(PRODUCT_TYPE.keys()):
+                    raise ValidationError({'detail': 'Types only take VEG or NON-VEG as value. '})
 
         # Validate product category name
         code_qs = Product.objects.filter(product_code__in=set(df['product_code']), company=company)
