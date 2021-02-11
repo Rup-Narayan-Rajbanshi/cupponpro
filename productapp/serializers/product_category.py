@@ -61,8 +61,8 @@ class ProductCategorySerializer(CustomModelSerializer):
                 if 'position' in attrs:
                     position_exist=ProductCategory.objects.filter(company=company,position=attrs['position'])
                     if position_exist:
-                        raise ValidationError({'detail':'Position already exists'})
-                    attrs['position'] = attrs['position']
+                        raise ValidationError({'detail':'position already exists'})
+                    # attrs['position'] = attrs['position']
                 else:
                     last_position = ProductCategory.objects.filter(company=company).aggregate(Max('position'))
                     value_last_position = last_position['position__max']

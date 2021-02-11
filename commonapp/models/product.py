@@ -117,7 +117,7 @@ class Product(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=64)
     link = models.URLField(null=True, blank=True)
-    product_category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT)
+    product_category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
     brand_name = models.CharField(max_length=30, null=True, blank=True)
     purchase_price = models.PositiveIntegerField(default=0)
     purchase_currency = models.CharField(max_length=MAX_LENGTHS['CURRENCY_TYPE'], choices=CURRENCY_TYPE_CHOICES, default=DEFAULTS['CURRENCY_TYPE'])
