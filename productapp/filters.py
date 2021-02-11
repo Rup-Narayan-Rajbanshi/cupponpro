@@ -108,10 +108,10 @@ class ProductCategoryBaseFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
     parent = filters.CharFilter(field_name='parent__id')
     name = filters.CharFilter(field_name='name__istartswith')
-
+    types = filters.CharFilter(field_name='types')
     class Meta:
         model = ProductCategory
-        fields = ['name', 'company', 'parent']
+        fields = ['name', 'company', 'parent', 'types']
 
 
 class ProductCategoryFilter(ProductCategoryBaseFilter):
