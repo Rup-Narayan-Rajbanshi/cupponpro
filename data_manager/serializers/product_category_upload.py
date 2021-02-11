@@ -12,6 +12,7 @@ from helpers.misc import title_to_snake_case
 from helpers.serializer_fields import DetailRelatedField
 from helpers.validators import xlsx_validator
 from helpers.serializer import CustomBaseSerializer, CustomModelSerializer
+from helpers.constants import PRODUCT_CAT_TYPE
 
 ALLOWED_PRODUCT_CATEGORY_FIELDS = ['name', 'link', 'company']
 
@@ -46,6 +47,12 @@ class UploadExcelProductCategorySerializer(CustomBaseSerializer):
 
         if not all(item in valid_column for item in columns):
             raise ValidationError({'detail': 'Invalid file format.'})
+
+        if 'types' in columns:
+            value = df['types'].unique()
+            for val in value:
+                if val not in list(PRODUCT_CAT_TYPE.keys()):
+                    raise ValidationError({'detail': 'Types only take FOOD, BAR or COFFEE as value. '})
 
         # Replace nan with blank
         df = df.replace(np.nan, '', regex=True)
