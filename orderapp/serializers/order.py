@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from commonapp.models.company import Company
 from commonapp.models.asset import Asset
 from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order
@@ -89,6 +90,7 @@ class TableOrderSerializer(OrderStatusSerializer):
 
 class CompanyTableOrderSerializer(CustomModelSerializer):
     asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=True)
+    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False)
     voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
@@ -97,7 +99,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
+        fields = ('id', 'status', 'company', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
 
     def get_fields(self):
         fields = super().get_fields()

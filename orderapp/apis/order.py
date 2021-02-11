@@ -5,6 +5,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet
 from rest_framework import generics, status
+from django_filters.rest_framework import DjangoFilterBackend
 
 from commonapp.models.asset import Asset
 from commonapp.models.company import CompanyUser
@@ -19,6 +20,9 @@ from orderapp.models.order import Orders
 from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser
 from orderapp.serializers.order import OrderStatusSerializer, CompanyTableOrderSerializer, TableOrderSerializer, \
     UserOrderSerializerCompany, MasterQRSerializer
+from orderapp.filters import (
+    OrdersFilter
+    )
 
 
 class OrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
@@ -52,6 +56,8 @@ class TableOrderAPI(ModelViewSet):
     queryset = Orders.objects.all()
     permission_classes = [CompanyUserPermission]
     serializer_class = CompanyTableOrderSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = OrdersFilter
     pagination_class = FPagination
 
     def create(self, request, *args, **kwargs):
