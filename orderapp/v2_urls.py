@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework import routers
 
-from orderapp.apis.bill import BillCreateAPI, get_order_list, ManualBillCreateAPI, BillListAPI
+from orderapp.apis.bill import BillCreateAPI, get_order_list, ManualBillCreateAPI, BillAPI
 from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAPI, CalculateOrderAPI, UserOrderListAPI, \
     CustomerOrderAPI, MasterQROrderAPI, latest_asset_order
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
@@ -17,7 +17,7 @@ router.register(r"(?P<company_id>[0-9a-f-]+|)/master-qr-order", MasterQROrderAPI
 router.register(r"order-line", OrderLineAPI)
 router.register(r"update-order-line-status", OrderLineStatusUpdateAPI)
 router.register(r"create-bill", BillCreateAPI)
-router.register(r"bill", BillListAPI)
+router.register(r"bill", BillAPI)
 router.register(r"manual-bill-create", ManualBillCreateAPI)
 router.register(r"company-voucher", VoucherListAPI)
 router.register(r"assets", AssetListAPI)

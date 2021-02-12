@@ -16,7 +16,7 @@ class BillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
     serializer_class = BillCreateSerializer
     permission_classes = (CompanyUserPermission, )
 
-class BillListAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+class BillAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, GenericViewSet):
     queryset = Bills.objects.all().order_by('-created_at')
     serializer_class = BillListSerializer
     permission_classes = (CompanyUserPermission, )
