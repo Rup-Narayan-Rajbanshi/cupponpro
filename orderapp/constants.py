@@ -1,6 +1,7 @@
 PAYMENT_MODES = {
     'CARD': 'CARD',
-    'CASH': 'CASH'
+    'CASH': 'CASH',
+    'ONLINE_PAYMENT': 'ONLINE_PAYMENT'
 }
 
 DEFAULTS = {
