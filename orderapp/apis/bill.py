@@ -21,6 +21,22 @@ class BillAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
     serializer_class = BillListSerializer
     permission_classes = (CompanyUserPermission, )
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance:
+            instance.delete()
+            data={
+                'success': 1,
+                'message': 'Deleted one table order.'
+            }
+            return Response(data, status=200)
+        else:
+            data={
+                'success': 0,
+                'message': 'Bill does not exit.'
+            }
+            return Response(data, status=200)
+
 
 class ManualBillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
     queryset = Orders.objects.all().order_by('-created_at')
