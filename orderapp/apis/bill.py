@@ -24,6 +24,12 @@ class BillAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
     permission_classes = (CompanyUserPermission, )
     filter_class = BillFilter
 
+    def get_queryset(self):
+        company = getattr(self.request, 'company', None)
+        queryset = Bills.objects.filter(company=company).order_by('-created_at')
+        return queryset
+
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance:

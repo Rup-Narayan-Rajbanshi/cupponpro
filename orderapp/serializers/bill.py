@@ -11,6 +11,7 @@ from userapp.models.customer import Customer
 from userapp.serializers.user import UserDetailSerializer
 from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import DEFAULTS
+from commonapp.models.asset import Asset
 
 class BillCreateSerializer(CustomModelSerializer):
 
@@ -36,6 +37,7 @@ class BillListSerializer(CustomModelSerializer):
         return serializer.data
 
 class ManualBillSerializerCompany(CompanyTableOrderSerializer):
+    asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', allow_null=True, required=False)
     customer = DetailRelatedField(model=Customer, lookup='id', representation='to_representation', required=False)
     name = serializers.CharField(max_length=128, allow_blank=True, required=False)
     phone_number = serializers.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER'],
@@ -69,6 +71,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot bill the order', code=400)
         order.bill = serializer.save()
+        order.save()
         if first_line and first_line.voucher:
             order.user = first_line.voucher.user
         return order

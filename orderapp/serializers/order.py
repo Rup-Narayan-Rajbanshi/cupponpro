@@ -99,7 +99,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'company', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
+        fields = ('id', 'status', 'bill', 'company', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
 
     def get_fields(self):
         fields = super().get_fields()
@@ -133,14 +133,15 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                     raise ValidationError('Cannot update for another company')
             if self.instance.status in [ORDER_STATUS['CANCELLED'], ORDER_STATUS['COMPLETED']]:
                 raise ValidationError('Cannot update completed or cancelled order')
-        elif attrs['asset'].orders.filter(status__in=[
+        elif 'asset' in attrs.keys():
+            if attrs['asset'].orders.filter(status__in=[
             ORDER_STATUS['NEW_ORDER'],
             ORDER_STATUS['PROCESSING'],
             ORDER_STATUS['BILLABLE'],
             ORDER_STATUS['CONFIRMED']]
             # user__companyuser__user__group__name__in=['sales', 'manager', 'owner', 'user']
-        ).exists():
-            raise ValidationError('Table already has an active order')
+            ).exists():
+                raise ValidationError('Table already has an active order')
         return super().validate(attrs)
 
     def build_orderline_bulk_create_data(self, order, validated_order_line_data, voucher, served_products=None):
