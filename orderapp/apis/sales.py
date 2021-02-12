@@ -27,17 +27,19 @@ class GetSalesReportAPI(generics.ListAPIView):
         sales = dict()
         #splitting of bill by types:
         for bill in bills:
-            order = bill.orders.all()
-            if order:
-                orderline = order[0].lines.all()
-                for line in orderline:
-                    product = line.product
-                    if product.name not in sales.keys():
-                        sales[product.name] = dict()
-                    sales['Grand_total'] = sales['Grand_total'] + line.total if 'Grand_total' in sales.keys() else line.total
-                    sales[product.name]['Total sold quantity'] = sales[product.name]['Total sold quantity'] + line.quantity if 'Total sold quantity' in sales[product.name].keys() else line.quantity
-                    sales[product.name]['Selling price'] = product.selling_currency + str(product.total_price)
-                    sales[product.name]['Total price'] = sales[product.name]['Total price'] + line.total if 'Total price' in sales[product.name].keys() else line.total
+            orders = bill.orders.all()
+            if orders:
+                for order in orders:
+                    orderline = order.lines.all()
+                    if orderline:
+                        for line in orderline:
+                            product = line.product
+                            if product.name not in sales.keys():
+                                sales[product.name] = dict()
+                            sales['Grand_total'] = sales['Grand_total'] + line.total if 'Grand_total' in sales.keys() else line.total
+                            sales[product.name]['Total sold quantity'] = sales[product.name]['Total sold quantity'] + line.quantity if 'Total sold quantity' in sales[product.name].keys() else line.quantity
+                            sales[product.name]['Selling price'] = product.selling_currency + str(product.total_price)
+                            sales[product.name]['Total price'] = sales[product.name]['Total price'] + line.total if 'Total price' in sales[product.name].keys() else line.total
         data = {
             'sales': sales
             #'bar': sales_bar
