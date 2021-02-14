@@ -21,6 +21,39 @@ from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import MAX_LENGTHS, DEFAULTS
 
 
+class TableSalesSerializer(CustomModelSerializer):
+    qr = serializers.SerializerMethodField()
+    orders = serializers.SerializerMethodField()
+    sales = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Asset
+        fields = "__all__"
+
+    def get_qr(self, obj):
+        return {
+            'asset': obj.id,
+            'company': obj.company_id
+        }
+
+    def get_orders(self, obj):
+        serializer_context={'request':self.context.get('request')}
+        order_obj = obj.orders.filter(asset=obj,status=ORDER_STATUS['COMPLETED']).order_by('-created_at')
+        serializers=CompanyTableOrderSerializer(order_obj,many=True,context=serializer_context)
+        return serializers.data
+
+    def get_sales(self, obj):
+        order_obj = obj.orders.filter(asset=obj,status=ORDER_STATUS['COMPLETED']).order_by('-created_at')
+        orders_count = len(order_obj)
+        sales_total=0
+        for order in order_obj:
+            sales_total =+ order.grand_total
+        return {
+            'total_sales_count':orders_count,
+            'total_sales_price':sales_total,
+        }
+
+
 class OrderStatusSerializer(CustomModelSerializer):
     status = serializers.ChoiceField(ORDER_STATUS_CHOICES)
 
