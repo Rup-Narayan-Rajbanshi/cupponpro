@@ -8,7 +8,7 @@ from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order
 from helpers.serializer import CustomModelSerializer, CustomBaseSerializer
 from helpers.constants import ORDER_STATUS, ORDER_LINE_STATUS
-from helpers.choices_variable import ORDER_STATUS_CHOICES
+from helpers.choices_variable import ORDER_STATUS_CHOICES, ASSET_TYPE_CHOICES
 from helpers.serializer_fields import DetailRelatedField
 from helpers.validators import is_numeric_value, is_percentage
 from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CATEGORY
@@ -20,6 +20,14 @@ from userapp.models import User
 from userapp.models.customer import Customer
 from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import MAX_LENGTHS, DEFAULTS
+
+
+class TableSalesSerializer(CustomBaseSerializer):
+    id = serializers.UUIDField(read_only=True)
+    name = serializers.CharField(required=False)
+    asset_type = serializers.ChoiceField(choices=ASSET_TYPE_CHOICES)
+    number_of_sales = serializers.IntegerField(max_value=None, min_value=None)
+
 
 
 class OrderStatusSerializer(CustomModelSerializer):

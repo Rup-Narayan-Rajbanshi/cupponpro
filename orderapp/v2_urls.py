@@ -7,7 +7,7 @@ from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAP
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
 from orderapp.apis.table import AssetListAPI
 from orderapp.apis.voucher import VoucherListAPI, CustomerVoucherAPI
-from orderapp.apis.sales import GetSalesReportAPI
+from orderapp.apis.sales import GetSalesReportAPI, TableSalesAPI
 
 router = routers.SimpleRouter()
 router.register(r"table-change-status", TableOrderStatusAPI)
@@ -31,5 +31,7 @@ urlpatterns += {
     path('order-count', OrderCountAPI.as_view(), name='order_count'),
     path('calculate-order', CalculateOrderAPI.as_view(), name='calculate_order'),
     path('user-orders', UserOrderListAPI.as_view({'get': 'list'}), name='user_orders'),
-    path('get-sales-report/', GetSalesReportAPI.as_view(), name='get_sales_report')
+    path('get-sales-report/', GetSalesReportAPI.as_view(), name='get_sales_report'),
+    path('table-sales', TableSalesAPI.as_view(), name='table-sales'),
+
 }

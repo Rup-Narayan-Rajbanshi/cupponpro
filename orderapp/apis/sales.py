@@ -2,6 +2,15 @@ from rest_framework import generics
 from rest_framework.response import Response
 from orderapp.models.bills import Bills
 from orderapp.filters import SalesFilter
+from commonapp.models.asset import Asset
+from commonapp.models.company import CompanyUser
+from orderapp.models.order import Orders
+from helpers.paginations import FPagination
+from orderapp.serializers.order import TableSalesSerializer
+from helpers.constants import ORDER_STATUS
+from rest_framework import mixins
+from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
+from django.db.models import Count
 
 class GetSalesReportAPI(generics.ListAPIView):
     queryset = Bills.objects.all()
@@ -52,4 +61,18 @@ class GetSalesReportAPI(generics.ListAPIView):
         return Response(data, status=200)
 
 
+
+class TableSalesAPI(generics.ListAPIView):
+    queryset = Asset.objects.filter().order_by('-created_at')
+    permission_classes = [CompanyUserPermission | isCompanyManagerAndAllowAll]
+    serializer_class = TableSalesSerializer
+    pagination_class = FPagination
+
+    def get_queryset(self):
+        company_user = CompanyUser.objects.filter(user=self.request.user)[0]
+        asset = Asset.objects.filter(company=company_user.company).annotate(number_of_sales=Count('orders__bill'))
         
+        return asset
+
+
+   
