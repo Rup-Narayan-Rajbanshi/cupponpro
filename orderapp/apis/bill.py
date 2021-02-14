@@ -59,7 +59,6 @@ class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixin
         partial = kwargs.pop('partial', True)
         bill = self.get_object()
         order = Orders.objects.filter(bill=bill).first()
-        print(request.data)
         serializer = ManualBillSerializerCompany(instance=order, data=request.data, context={'request':request}, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
