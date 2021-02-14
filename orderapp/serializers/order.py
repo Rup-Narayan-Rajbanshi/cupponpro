@@ -8,7 +8,7 @@ from commonapp.models.coupon import Voucher
 from commonapp.models.order import Order
 from helpers.serializer import CustomModelSerializer, CustomBaseSerializer
 from helpers.constants import ORDER_STATUS, ORDER_LINE_STATUS
-from helpers.choices_variable import ORDER_STATUS_CHOICES
+from helpers.choices_variable import ORDER_STATUS_CHOICES, ASSET_TYPE_CHOICES
 from helpers.serializer_fields import DetailRelatedField
 from helpers.validators import is_numeric_value, is_percentage
 from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CATEGORY
@@ -21,37 +21,12 @@ from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import MAX_LENGTHS, DEFAULTS
 
 
-class TableSalesSerializer(CustomModelSerializer):
-    qr = serializers.SerializerMethodField()
-    orders = serializers.SerializerMethodField()
-    sales = serializers.SerializerMethodField()
+class TableSalesSerializer(CustomBaseSerializer):
+    id = serializers.UUIDField(read_only=True)
+    name = serializers.CharField(required=False)
+    asset_type = serializers.ChoiceField(choices=ASSET_TYPE_CHOICES)
+    number_of_sales = serializers.IntegerField(max_value=None, min_value=None)
 
-    class Meta:
-        model = Asset
-        fields = "__all__"
-
-    def get_qr(self, obj):
-        return {
-            'asset': obj.id,
-            'company': obj.company_id
-        }
-
-    def get_orders(self, obj):
-        serializer_context={'request':self.context.get('request')}
-        order_obj = obj.orders.filter(asset=obj,status=ORDER_STATUS['COMPLETED']).order_by('-created_at')
-        serializers=CompanyTableOrderSerializer(order_obj,many=True,context=serializer_context)
-        return serializers.data
-
-    def get_sales(self, obj):
-        order_obj = obj.orders.filter(asset=obj,status=ORDER_STATUS['COMPLETED']).order_by('-created_at')
-        orders_count = len(order_obj)
-        sales_total=0
-        for order in order_obj:
-            sales_total =+ order.grand_total
-        return {
-            'total_sales_count':orders_count,
-            'total_sales_price':sales_total,
-        }
 
 
 class OrderStatusSerializer(CustomModelSerializer):

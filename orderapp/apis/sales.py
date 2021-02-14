@@ -10,6 +10,7 @@ from orderapp.serializers.order import TableSalesSerializer
 from helpers.constants import ORDER_STATUS
 from rest_framework import mixins
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
+from django.db.models import Count
 
 class GetSalesReportAPI(generics.ListAPIView):
     queryset = Bills.objects.all()
@@ -69,8 +70,9 @@ class TableSalesAPI(generics.ListAPIView):
 
     def get_queryset(self):
         company_user = CompanyUser.objects.filter(user=self.request.user)[0]
-
-        return self.queryset.filter(company_id=company_user.company)
+        asset = Asset.objects.filter(company=company_user.company).annotate(number_of_sales=Count('orders__bill'))
+        
+        return asset
 
 
    

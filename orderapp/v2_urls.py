@@ -32,6 +32,6 @@ urlpatterns += {
     path('calculate-order', CalculateOrderAPI.as_view(), name='calculate_order'),
     path('user-orders', UserOrderListAPI.as_view({'get': 'list'}), name='user_orders'),
     path('get-sales-report/', GetSalesReportAPI.as_view(), name='get_sales_report'),
-    path('table-sales/', TableSalesAPI.as_view(), name='table-sales'),
+    path('table-sales', TableSalesAPI.as_view(), name='table-sales'),
 
 }
