@@ -12,6 +12,7 @@ from userapp.serializers.user import UserDetailSerializer
 from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import DEFAULTS
 from commonapp.models.asset import Asset
+from rest_framework.exceptions import ValidationError
 
 class BillCreateSerializer(CustomModelSerializer):
 
@@ -36,6 +37,7 @@ class BillListSerializer(CustomModelSerializer):
         serializer = CompanyTableOrderSerializer(obj.orders.all(), many=True, context=serializer_context)
         return serializer.data
 
+
 class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', allow_null=True, required=False)
     customer = DetailRelatedField(model=Customer, lookup='id', representation='to_representation', required=False)
@@ -44,22 +46,29 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
                                     validators=[phone_number_validator, is_numeric_value], allow_blank=True, required=False)
     email = serializers.EmailField(max_length=MAX_LENGTHS['EMAIL'], allow_blank=True, required=False)
     address = serializers.CharField(max_length=MAX_LENGTHS['ADDRESS'], allow_blank=True, required=False)
-    
-    class Meta:
-        model = Orders
-        fields = ('id', 'voucher', 'asset', 'order_lines', 'bill' ,'customer', 'name','phone_number', 'email', 'address')
+
+    class Meta(CompanyTableOrderSerializer.Meta):
+        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['customer', 'name','phone_number', 'email', 'address']
+        # fields = ('id', 'voucher', 'asset', 'order_lines', 'bill' ,'customer', 'name','phone_number', 'email', 'address')
+
+    def validate(self, attrs):
+        if self.instance:
+            bill = self.instance.bill
+            if bill.is_paid == "True":
+                raise ValidationError({'message': 'Cannot change with is paid True.'})
+        return super().validate(attrs)
 
     @transaction.atomic
     def create(self, validated_data):
         validated_data['status'] = ORDER_STATUS['BILLABLE']
         customer_data = dict()
-        if 'name' in validated_data.keys() or 'phone_number' in validated_data.keys():
+        if 'name' in validated_data or 'phone_number' in validated_data:
             customer_data['name'] = validated_data.pop('name', '')
             customer_data['phone_number'] = validated_data.pop('phone_number', '')
             customer_data['email'] = validated_data.pop('email', '')
             customer_data['address'] = validated_data.pop('address', DEFAULTS['ADDRESS'])
-        customer = Customer.getcreate_customer(**customer_data)
         order = super().create(validated_data)
+        customer = Customer.getcreate_customer(**customer_data)
         first_line = order.lines.first()
         data = dict()
         data['is_manual'] = True
@@ -70,6 +79,36 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         serializer = BillCreateSerializer(data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot bill the order', code=400)
+        order.bill = serializer.save()
+        order.save()
+        if first_line and first_line.voucher:
+            order.user = first_line.voucher.user
+        return order
+    
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        validated_data['status'] = ORDER_STATUS['BILLABLE']
+        customer_data = dict()
+        if 'name' in validated_data or 'phone_number' in validated_data:
+            customer_data['name'] = validated_data.pop('name', '')
+            customer_data['phone_number'] = validated_data.pop('phone_number', '')
+            customer_data['email'] = validated_data.pop('email', '')
+            customer_data['address'] = validated_data.pop('address', DEFAULTS['ADDRESS'])
+        order = super().update(instance, validated_data)
+        customer = Customer.getcreate_customer(**customer_data)
+        first_line = order.lines.first()
+        data = dict()
+        data['is_manual'] = validated_data['is_manual'] if 'is_manual' in validated_data else order.bill.is_manual
+        data['company'] = order.company.id
+        data['tax'] = order.company.tax if order.company.tax else 0
+        data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
+        data['customer'] = customer.id if customer else None
+        # print(validated_data['payment_mode'])
+        data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else order.bill.payment_mode
+        data['paid_amount'] = validated_data['paid_amount'] if 'paid_amount' in validated_data else order.bill.paid_amount
+        serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': self.context['request']})
+        if not serializer.is_valid():
+            raise serializers.ValidationError(detail='Cannot update bill. ', code=400)
         order.bill = serializer.save()
         order.save()
         if first_line and first_line.voucher:

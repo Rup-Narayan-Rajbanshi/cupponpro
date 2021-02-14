@@ -17,7 +17,7 @@ class BillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
     serializer_class = BillCreateSerializer
     permission_classes = (CompanyUserPermission, )
 
-class BillAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, GenericViewSet):
+class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, GenericViewSet):
     queryset = Bills.objects.all().order_by('-created_at')
     serializer_class = BillListSerializer
     pagination_class = FPagination
@@ -45,6 +45,26 @@ class BillAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
                 'message': 'Bill does not exit.'
             }
             return Response(data, status=200)
+    
+    def create(self, request, *args, **kwargs):
+        serializer = ManualBillSerializerCompany(data=request.data, context={'request':request})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        # order = super().create(request, *args, **kwargs)
+        # return order
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        bill = self.get_object()
+        order = Orders.objects.filter(bill=bill).first()
+        print(request.data)
+        serializer = ManualBillSerializerCompany(instance=order, data=request.data, context={'request':request}, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+        
 
 
 class ManualBillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):

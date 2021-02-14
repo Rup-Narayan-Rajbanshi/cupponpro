@@ -14,6 +14,7 @@ from helpers.validators import is_numeric_value, is_percentage
 from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CATEGORY
 from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
+from orderapp.models.bills import Bills
 from orderapp.serializers.order_line import OrderLineSerializer
 from userapp.models import User
 from userapp.models.customer import Customer
@@ -96,6 +97,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     order_lines = OrderLineSerializer(many=True, required=True)
     price_details = serializers.SerializerMethodField()
     user  = DetailRelatedField(model=User, lookup='id', representation='to_representation', read_only=True)
+    bill = DetailRelatedField(model=Bills, lookup='id', representation='order_representation',
+                                 read_only=True)
 
     class Meta:
         model = Orders
@@ -104,7 +107,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
         request = self.context['request']
-        if request and request.method == 'GET':
+        if request and request.method == 'GET' or request.method=='PUT':
             fields['order_lines'] = serializers.SerializerMethodField('lines')
         return fields
 
@@ -146,12 +149,19 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     def build_orderline_bulk_create_data(self, order, validated_order_line_data, voucher, served_products=None):
         bulk_create_data = list()
+        request = self.context.get('request')
+        company = getattr(request, 'company', None)
         for line in validated_order_line_data:
             new_quantity = int(line['quantity'])
             status = line.get('status', 'NEW')
+            product = line['product']
+            if voucher.company != company:
+                raise ValidationError({'detail': '{0} not found'.format(product.name)})
+            if product.company != company:
+                raise ValidationError({'detail': '{0} not found.'.format(product.name)})
             # if not status == ORDER_LINE_STATUS['CANCELLED']:
             order_line = OrderLines(order=order,
-                                    product=line['product'],
+                                    product=product,
                                     status=status,
                                     new=line.get('new', 0),
                                     cooking=line.get('cooking', 0),
@@ -219,14 +229,16 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         from notifications.tasks import notify_company_staffs
-        self.fields.pop('order_lines')
-        self.fields.pop('voucher')
-        order_lines = validated_data.pop('order_lines')
+        order_lines=None
+        if 'order_lines' in validated_data:
+            self.fields.pop('order_lines')
+            self.fields.pop('voucher')
+            order_lines = validated_data.pop('order_lines')
 
-        is_cancelled = self.check_for_cancelled_order(order_lines)
-        if is_cancelled:
-            instance.delete()
-            return instance
+            is_cancelled = self.check_for_cancelled_order(order_lines)
+            if is_cancelled:
+                instance.delete()
+                return instance
         voucher = validated_data.pop('voucher', None)
         user = self.context['request'].user
         validated_data['user'] = user
@@ -242,9 +254,10 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             #     served_products[str(line.product.id)] = line.quantity
             # else:
             line.delete(force_delete=True)
-        order_line_bulk_create_data = self.build_orderline_bulk_create_data(instance, order_lines, voucher,
-                                                                            served_products)
-        OrderLines.objects.bulk_create(order_line_bulk_create_data)
+        if order_lines:
+            order_line_bulk_create_data = self.build_orderline_bulk_create_data(instance, order_lines, voucher,
+                                                                                served_products)
+            OrderLines.objects.bulk_create(order_line_bulk_create_data)
         order = super().update(instance, validated_data)
         company = str(order.company.id)
         if order.asset:
