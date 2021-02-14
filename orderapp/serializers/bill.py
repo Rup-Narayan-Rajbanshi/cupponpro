@@ -13,6 +13,7 @@ from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import DEFAULTS
 from commonapp.models.asset import Asset
 from rest_framework.exceptions import ValidationError
+from orderapp.choice_variables import PAYMENT_CHOICES
 
 class BillCreateSerializer(CustomModelSerializer):
 
@@ -46,9 +47,12 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
                                     validators=[phone_number_validator, is_numeric_value], allow_blank=True, required=False)
     email = serializers.EmailField(max_length=MAX_LENGTHS['EMAIL'], allow_blank=True, required=False)
     address = serializers.CharField(max_length=MAX_LENGTHS['ADDRESS'], allow_blank=True, required=False)
+    payment_mode = serializers.ChoiceField(PAYMENT_CHOICES, required=False)
+    paid_amount = serializers.DecimalField(max_digits=20, decimal_places=6, required=False)
+    is_manual = serializers.BooleanField(required=False)
 
     class Meta(CompanyTableOrderSerializer.Meta):
-        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['customer', 'name','phone_number', 'email', 'address']
+        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
         # fields = ('id', 'voucher', 'asset', 'order_lines', 'bill' ,'customer', 'name','phone_number', 'email', 'address')
 
     def validate(self, attrs):
