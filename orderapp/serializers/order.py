@@ -115,7 +115,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
         request = self.context['request']
-        if request and request.method == 'GET' or request.method=='PUT':
+        if request and request.method == 'GET': #or request.method=='PUT':
             fields['order_lines'] = serializers.SerializerMethodField('lines')
         return fields
 

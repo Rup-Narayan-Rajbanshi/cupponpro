@@ -107,7 +107,6 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['tax'] = order.company.tax if order.company.tax else 0
         data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
         data['customer'] = customer.id if customer else None
-        # print(validated_data['payment_mode'])
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else order.bill.payment_mode
         data['paid_amount'] = validated_data['paid_amount'] if 'paid_amount' in validated_data else order.bill.paid_amount
         serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': self.context['request']})

@@ -32,6 +32,7 @@ class Customer(BaseModel):
                 name = kwargs.get('name')
                 assert(name != ''),'Phone number and name is both required to create customer'
                 customer = cls.objects.create(**kwargs)
+        assert(phone_number != ''),'Phone number and name is both required to create customer'
         return customer
 
     def to_representation(self, request=None):
