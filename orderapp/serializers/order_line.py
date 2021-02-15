@@ -35,6 +35,11 @@ class OrderLineUpdateSerializer(CustomModelSerializer):
         model = OrderLines
         fields = ['id', 'rate', 'quantity', 'status', 'discount_amount', 'total', 'product', 'order']
 
+    def validate(self, attrs):
+        if 'quantity' in attrs and int(attrs['quantity']) < 0:
+            raise ValidationError({"detail":"Quantity cannot be negative. "})
+        return attrs
+
     def create(self, validated_data):
         product = validated_data['product']
         validated_data['rate'] = float(product.total_price)
