@@ -6,7 +6,7 @@ from helpers.constants import ORDER_LINE_STATUS, ORDER_STATUS
 from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import DetailRelatedField
 from orderapp.models.order import OrderLines, Orders
-
+from rest_framework.exceptions import ValidationError
 
 class OrderLineSerializer(CustomModelSerializer):
     product = DetailRelatedField(model=Product, lookup='id', representation='to_representation')
@@ -20,6 +20,10 @@ class OrderLineSerializer(CustomModelSerializer):
         model = OrderLines
         fields = ['id', 'rate', 'quantity', 'status', 'discount_amount', 'total', 'product', 'new', 'cooking', 'served']
 
+    def validate(self, attrs):
+        if 'quantity' in attrs and int(attrs['quantity']) < 0:
+            raise ValidationError({"detail":"Quantity cannot be negative. "})
+        return attrs
 
 class OrderLineUpdateSerializer(CustomModelSerializer):
     product = DetailRelatedField(model=Product, lookup='id', representation='to_representation')
