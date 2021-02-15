@@ -98,7 +98,7 @@ class TableOrderSerializer(OrderStatusSerializer):
 
 
 class CompanyTableOrderSerializer(CustomModelSerializer):
-    asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=True)
+    asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=False)
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False)
     voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
                                  required=False, allow_null=True)
@@ -163,7 +163,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             new_quantity = int(line['quantity'])
             status = line.get('status', 'NEW')
             product = line['product']
-            if voucher.company != company:
+            if voucher and voucher.company != company:
                 raise ValidationError({'detail': '{0} not found'.format(product.name)})
             if product.company != company:
                 raise ValidationError({'detail': '{0} not found.'.format(product.name)})
