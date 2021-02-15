@@ -3,6 +3,7 @@ from django.db import models
 from helpers.models import BaseModel
 from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import MAX_LENGTHS, DEFAULTS
+from rest_framework.exceptions import ValidationError
 
 
 class Customer(BaseModel):
@@ -30,9 +31,11 @@ class Customer(BaseModel):
                 customer = cls.objects.get(phone_number=phone_number)
             except:
                 name = kwargs.get('name')
-                assert(name != ''),'Phone number and name is both required to create customer'
+                if name == '':
+                    raise ValidationError({'detail':'Phone number and name is both required to create customer.'})
                 customer = cls.objects.create(**kwargs)
-        assert(phone_number != ''),'Phone number and name is both required to create customer'
+        else:
+            raise ValidationError({'detail':'Phone number and name is both required to create customer.'})
         return customer
 
     def to_representation(self, request=None):
