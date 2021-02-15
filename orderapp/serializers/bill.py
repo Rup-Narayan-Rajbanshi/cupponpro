@@ -62,6 +62,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
                 raise ValidationError({'message': 'Cannot change with is paid True.'})
         return super().validate(attrs)
 
+
     @transaction.atomic
     def create(self, validated_data):
         validated_data['status'] = ORDER_STATUS['BILLABLE']

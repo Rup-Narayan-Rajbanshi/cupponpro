@@ -21,7 +21,7 @@ class OrderLineSerializer(CustomModelSerializer):
         fields = ['id', 'rate', 'quantity', 'status', 'discount_amount', 'total', 'product', 'new', 'cooking', 'served']
 
     def validate(self, attrs):
-        if 'quantity' in attrs and int(attrs['quantity']) < 0:
+        if 'quantity' in attrs and int(attrs['quantity']) <= 0:
             raise ValidationError({"detail":"Quantity cannot be negative. "})
         return attrs
 
