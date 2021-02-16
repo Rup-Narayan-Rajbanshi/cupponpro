@@ -29,10 +29,12 @@ class BillCreateSerializer(CustomModelSerializer):
              'paid_amount' : float(bill.paid_amount) + float(bill.ret_amount),
              'return_amount': bill.ret_amount,
              'credit_amount': bill.credit_amount,
-             'bill': bill
+             'bill': bill.id
          }
+        print(data)
         serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
+            print('here')
             serializer.save()
         return bill
 
