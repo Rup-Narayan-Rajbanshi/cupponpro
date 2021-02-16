@@ -24,7 +24,9 @@ class Bills(BaseModel):
     is_manual = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     custom_discount_percentage = models.PositiveIntegerField(default=0)
-
+    credit_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
+    ret_amount  = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
+    
     class Meta:
         ordering = ['-created_at']
 
@@ -45,8 +47,30 @@ class Bills(BaseModel):
             invoice_number = str(company_obj.invoice_counter)
             self.invoice_number = "0" * (8 - len(invoice_number)) + invoice_number
         self.payable_amount = self.get_grand_total()
-        self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
+        if self.instance:
+            if float(self.credit_amount) - float(self.paid_amount) < 0.0:
+                self.ret_amount = float(self.paid_amount) - float(self.credit_amount)
+                self.paid_amount = self.credit_amount
+            self.is_credit = self.is_credited(self.credit_amount, self.paid_amount)
+            self.credit_amount = self.credited_amount(self.credit_amount, self.paid_amount)
+        else:
+            if float(self.payable_amount) - float(self.paid_amount) < 0.0:
+                self.ret_amount = float(self.paid_amount) - float(self.payable_amount)
+                self.paid_amount = self.payable_amount
+            self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
+            self.credit_amount = self.credited_amount(self.payable_amount, self.paid_amount)
         return super(Bills, self).save(*args, **kwargs)
+        # saved_bills = super(Bills, self).save(*args, **kwargs)
+        # data={
+        #     'paid_amount' : float(self.paid_amount) + ret_amount,
+        #     'return_amount': ret_amount,
+        #     'credit_amount': self.credit_amount,
+        #     'bill': saved_bills
+        # }
+        # serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
+        # if serializer.is_valid():
+        #     serializer.save()
+        # return saved_bills
 
     def get_grand_total(self):
         if self.payable_amount:
@@ -85,14 +109,14 @@ class Bills(BaseModel):
         return subtotal - discount_amount
 
     def is_credited(self,payable_amount,paid_amount):
-        credited_amount = float(payable_amount) - float(paid_amount)
+        credited_amount = float(payable_amount) - float(paid_amount) 
         if credited_amount > 0:
             return True
         else :
             return False
-
-    def credicted_amount(self, payable_amount, paid_amount):
-        return payable_amount - paid_amount
+#fix it
+    def credited_amount(self, payable_amount, paid_amount):
+        return float(payable_amount) - float(paid_amount) 
         
 
     def to_representation(self, request=None):
@@ -125,3 +149,5 @@ class Bills(BaseModel):
             'is_credit':self.is_credit,
 
         }
+
+

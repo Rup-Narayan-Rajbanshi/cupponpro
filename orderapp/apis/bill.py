@@ -11,6 +11,14 @@ from orderapp.serializers.bill import BillCreateSerializer, ManualBillSerializer
 from permission import CompanyUserPermission
 from orderapp.filters import BillFilter
 
+class BIllUpdateAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
+    queryset = Bills.objects.all().order_by('-created_at')
+    serializer_class = BillCreateSerializer
+    permission_classes = (CompanyUserPermission, )
+
+    def update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return super(BIllUpdateAPI, self).update(request, *args, **kwargs)
 
 class BillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
     queryset = Bills.objects.all().order_by('-created_at')

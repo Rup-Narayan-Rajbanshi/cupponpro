@@ -14,6 +14,8 @@ from helpers.constants import DEFAULTS
 from commonapp.models.asset import Asset
 from rest_framework.exceptions import ValidationError
 from orderapp.choice_variables import PAYMENT_CHOICES
+from orderapp.serializers.transaction import TransactionHistoryBillSerializer
+
 
 class BillCreateSerializer(CustomModelSerializer):
 
@@ -22,7 +24,30 @@ class BillCreateSerializer(CustomModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        return super(BillCreateSerializer, self).create(validated_data)
+        bill =  super(BillCreateSerializer, self).create(validated_data)
+        data={
+             'paid_amount' : float(bill.paid_amount) + float(bill.ret_amount),
+             'return_amount': bill.ret_amount,
+             'credit_amount': bill.credit_amount,
+             'bill': bill
+         }
+        serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
+        if serializer.is_valid():
+            serializer.save()
+        return bill
+
+    def update(self, instance, validated_data):
+        bill =  super(BillCreateSerializer, self).update(instance, validated_data)
+        data={
+             'paid_amount' : float(bill.paid_amount) + float(bill.ret_amount),
+             'return_amount': bill.ret_amount,
+             'credit_amount': bill.credit_amount,
+             'bill': bill.id
+         }
+        serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
+        if serializer.is_valid():
+            serializer.save()
+        return bill
 
 class BillListSerializer(CustomModelSerializer):
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation')
