@@ -51,12 +51,16 @@ class Bills(BaseModel):
             if float(self.credit_amount) - float(self.paid_amount) < 0.0:
                 self.ret_amount = float(self.paid_amount) - float(self.credit_amount)
                 self.paid_amount = self.credit_amount
+            else:
+                self.ret_amount = 0.0
             self.is_credit = self.is_credited(self.credit_amount, self.paid_amount)
             self.credit_amount = self.credited_amount(self.credit_amount, self.paid_amount)
         else:
             if float(self.payable_amount) - float(self.paid_amount) < 0.0:
                 self.ret_amount = float(self.paid_amount) - float(self.payable_amount)
                 self.paid_amount = self.payable_amount
+            else:
+                self.ret_amount=0.0
             self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
             self.credit_amount = self.credited_amount(self.payable_amount, self.paid_amount)
         return super(Bills, self).save(*args, **kwargs)
