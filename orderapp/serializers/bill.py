@@ -22,6 +22,7 @@ class BillCreateSerializer(CustomModelSerializer):
     class Meta:
         model = Bills
         fields = "__all__"
+    
 
     def create(self, validated_data):
         bill =  super(BillCreateSerializer, self).create(validated_data)
@@ -31,10 +32,8 @@ class BillCreateSerializer(CustomModelSerializer):
              'credit_amount': bill.credit_amount,
              'bill': bill.id
          }
-        print(data)
         serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
         if serializer.is_valid(raise_exception=True):
-            print('here')
             serializer.save()
         return bill
 

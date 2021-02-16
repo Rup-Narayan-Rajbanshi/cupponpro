@@ -47,7 +47,7 @@ class Bills(BaseModel):
             invoice_number = str(company_obj.invoice_counter)
             self.invoice_number = "0" * (8 - len(invoice_number)) + invoice_number
         self.payable_amount = self.get_grand_total()
-        if self.pk:
+        if self._state.adding == False:
             if float(self.credit_amount) - float(self.paid_amount) < 0.0:
                 self.ret_amount = float(self.paid_amount) - float(self.credit_amount)
                 self.paid_amount = self.credit_amount
