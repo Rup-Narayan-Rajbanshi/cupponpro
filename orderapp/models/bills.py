@@ -60,23 +60,13 @@ class Bills(BaseModel):
             self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
             self.credit_amount = self.credited_amount(self.payable_amount, self.paid_amount)
         return super(Bills, self).save(*args, **kwargs)
-        # saved_bills = super(Bills, self).save(*args, **kwargs)
-        # data={
-        #     'paid_amount' : float(self.paid_amount) + ret_amount,
-        #     'return_amount': ret_amount,
-        #     'credit_amount': self.credit_amount,
-        #     'bill': saved_bills
-        # }
-        # serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
-        # if serializer.is_valid():
-        #     serializer.save()
-        # return saved_bills
+        
 
     def get_grand_total(self):
-        if self.payable_amount:
-            grand_total=float(self.payable_amount)
-        else:
-            grand_total = 0
+        # if self.payable_amount:
+        #     grand_total=float(self.payable_amount)
+        # else:
+        grand_total = 0
 
         for order in self.orders.all():
             taxed_amount = self.company.tax if self.company.tax else 0
