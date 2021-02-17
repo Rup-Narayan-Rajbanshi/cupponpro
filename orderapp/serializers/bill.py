@@ -79,7 +79,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     is_manual = serializers.BooleanField(required=False)
 
     class Meta(CompanyTableOrderSerializer.Meta):
-        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
+        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'custom_discount_amount', 'custom_discount_percentage', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
         # fields = ('id', 'voucher', 'asset', 'order_lines', 'bill' ,'customer', 'name','phone_number', 'email', 'address')
 
     def validate(self, attrs):
@@ -109,9 +109,15 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['tax'] = order.company.tax if order.company.tax else 0
         data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
         data['customer'] = customer.id if customer else None
+<<<<<<< HEAD
         data['payable_amount'] = self.get_grand_total(order) 
         data['paid_amount'] = paid_amount
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else 'CASH'
+=======
+        data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else 0
+        data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else 0
+
+>>>>>>> bugfixes/bill_servicecharge_discount
         serializer = BillCreateSerializer(data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot bill the order', code=400)
