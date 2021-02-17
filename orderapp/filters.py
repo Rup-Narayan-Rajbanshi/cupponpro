@@ -1,6 +1,7 @@
 from django_filters import rest_framework as filters
 from orderapp.models.order import Orders
 from rest_framework.exceptions import ValidationError
+from orderapp.models.transaction import TransactionHistoryBills
 
 class OrdersFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
@@ -37,9 +38,9 @@ class SalesFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
 
-    class meta:
+    class Meta:
         model = Bills
-        field = ['types', 'from_date', 'to_date']
+        fields = ['types', 'from_date', 'to_date']
 
 class BillFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
@@ -48,6 +49,13 @@ class BillFilter(filters.FilterSet):
     status = filters.BooleanFilter(field_name='is_paid')
     customer_name = filters.CharFilter(field_name='customer__name')
 
-    class meta:
+    class Meta:
         model = Bills
-        field = ['from_date','to_date','invoice_number','status','customer_name']
+        fields = ['from_date','to_date','invoice_number','status','customer_name']
+
+class TransactionFilter(filters.FilterSet):
+    bill = filters.UUIDFilter(field_name='bill')
+
+    class Meta:
+        model = TransactionHistoryBills
+        fields = ['bill']
