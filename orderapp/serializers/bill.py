@@ -15,6 +15,7 @@ from commonapp.models.asset import Asset
 from rest_framework.exceptions import ValidationError
 from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.serializers.transaction import TransactionHistoryBillSerializer
+from django.db.models import Sum
 
 
 class BillCreateSerializer(CustomModelSerializer):
@@ -107,6 +108,9 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['tax'] = order.company.tax if order.company.tax else 0
         data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
         data['customer'] = customer.id if customer else None
+        data['payable_amount'] = self.get_grand_total(order) 
+        data['paid_amount'] = validated_data['paid_amount'] if 'paid_amount' in validated_data else 0
+        data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else 'CASH'
         serializer = BillCreateSerializer(data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot bill the order', code=400)
@@ -136,6 +140,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['customer'] = customer.id if customer else None
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else order.bill.payment_mode
         data['paid_amount'] = validated_data['paid_amount'] if 'paid_amount' in validated_data else order.bill.paid_amount
+        data['payable_amount'] = self.get_grand_total(order) 
         serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot update bill. ', code=400)
@@ -144,3 +149,13 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         if first_line and first_line.voucher:
             order.user = first_line.voucher.user
         return order
+
+    def get_grand_total(self, order):
+        grand_total=0.0
+        taxed_amount = order.company.tax if order.company.tax else 0
+        service_charge_amount = order.company.service_charge if order.company.service_charge else 0
+        total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
+        taxed_amount = float(taxed_amount) / 100 * float(total)
+        service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0
+        grand_total = grand_total + total + taxed_amount + service_charge_amount
+        return grand_total

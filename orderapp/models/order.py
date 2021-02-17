@@ -48,6 +48,7 @@ class Orders(BaseModel):
             data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
             data['tax'] = order.company.tax if order.company.tax else 0
             data['custom_discount_percentage'] = custom_discount_percentage
+            data['grand_total'] = cls.get_grand_total(order)
             serializer = BillCreateSerializer(data=data, context={'request': request})
             if not serializer.is_valid():
                 raise APIException(detail='Cannot bill the order', code=400)
@@ -104,6 +105,17 @@ class Orders(BaseModel):
     @property
     def grand_total(self):
         return self.get_total + self.tax_amount + self.service_charge_amount
+
+    @staticmethod
+    def get_grand_total(order):
+        grand_total=0.0
+        taxed_amount = order.company.tax if order.company.tax else 0
+        service_charge_amount = order.company.service_charge if order.company.service_charge else 0
+        total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
+        taxed_amount = float(taxed_amount) / 100 * float(total)
+        service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0
+        grand_total = grand_total + total + taxed_amount + service_charge_amount
+        return grand_total
 
 
 class OrderLines(BaseModel):
