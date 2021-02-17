@@ -79,7 +79,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     is_manual = serializers.BooleanField(required=False)
 
     class Meta(CompanyTableOrderSerializer.Meta):
-        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'custom_discount_amount', 'custom_discount_percentage', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
+        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'is_service_charge', 'custom_discount_amount', 'custom_discount_percentage', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
         # fields = ('id', 'voucher', 'asset', 'order_lines', 'bill' ,'customer', 'name','phone_number', 'email', 'address')
 
     def validate(self, attrs):
@@ -111,10 +111,10 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['customer'] = customer.id if customer else None
         data['payable_amount'] = self.get_grand_total(order) 
         data['paid_amount'] = paid_amount
+        data['is_service_charge'] = validated_data.get('is_service_charge', True)
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else 'CASH'
         data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else 0
         data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else 0
-        print(data)
         serializer = BillCreateSerializer(data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot bill the order', code=400)
@@ -127,6 +127,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         validated_data['status'] = ORDER_STATUS['BILLABLE']
+        paid_amount = validated_data.pop('paid_amount',0.0)
         customer_data = dict()
         if 'name' in validated_data or 'phone_number' in validated_data:
             customer_data['name'] = validated_data.pop('name', '')
@@ -143,7 +144,8 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
         data['customer'] = customer.id if customer else None
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else order.bill.payment_mode
-        data['paid_amount'] = validated_data['paid_amount'] if 'paid_amount' in validated_data else order.bill.paid_amount
+        data['paid_amount'] = paid_amount
+        data['is_service_charge'] = validated_data.get('is_service_charge', True)
         data['payable_amount'] = self.get_grand_total(order) 
         data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else order.bill.custom_discount_percentage
         data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else order.bill.custom_discount_amount
@@ -162,7 +164,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
         total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
         taxed_amount = float(taxed_amount) / 100 * float(total)
-        service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0 #if is_service_charge else 0
+        service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0
         grand_total = grand_total + total + taxed_amount + service_charge_amount
         discount_amount = self.get_discount_amount(order, grand_total) 
         grand_total = grand_total - discount_amount

@@ -23,6 +23,8 @@ class Orders(BaseModel):
     extras = JSONField(blank=True, null=True)
     custom_discount_percentage = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     custom_discount_amount  = models.PositiveIntegerField(default = 0)
+    is_service_charge = models.BooleanField(default=True)
+
     class Meta:
         ordering = ['-created_at']
 
@@ -40,9 +42,11 @@ class Orders(BaseModel):
         status = v_data.get('status')
         custom_discount_percentage = v_data.get('custom_discount_percentage', 0)
         custom_discount_amount = v_data.get('custom_discount_amount', 0)
+        is_service_charge = v_data.get('is_service_charge', True)
         order.status = status
         order.custom_discount_percentage = custom_discount_percentage
         order.custom_discount_amount = custom_discount_amount
+        order.is_service_charge = is_service_charge
         order.save()
         if status == ORDER_STATUS['COMPLETED']:
             data = dict()
@@ -53,6 +57,7 @@ class Orders(BaseModel):
             data['payable_amount'] = cls.get_grand_total(order)
             data['custom_discount_amount'] = custom_discount_amount
             data['custom_discount_percentage'] = custom_discount_percentage
+            data['is_service_charge'] = is_service_charge
             serializer = BillCreateSerializer(data=data, context={'request': request})
             if not serializer.is_valid():
                 raise APIException(detail='Cannot bill the order', code=400)
@@ -94,7 +99,7 @@ class Orders(BaseModel):
     @property
     def service_charge_amount(self):
         service_charge = self.company.service_charge if self.company.service_charge else 0
-        return float(service_charge / 100) * float(self.get_total)
+        return float(service_charge / 100) * float(self.get_total) if self.is_service_charge else 0
 
     @property
     def tax_amount(self):
@@ -122,10 +127,7 @@ class Orders(BaseModel):
         service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0
         grand_total = grand_total + total + taxed_amount + service_charge_amount
         discount_amount = order.get_discount_amount(order, grand_total)
-        print(discount_amount)
-        print(grand_total)
         grand_total = grand_total - discount_amount
-        print(grand_total)
         return grand_total
 
     def get_discount_amount(self, order,  grand_total):

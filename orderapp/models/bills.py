@@ -15,7 +15,7 @@ class Bills(BaseModel):
     customer = models.ForeignKey('userapp.Customer', on_delete=models.SET_NULL, null=True, related_name='bills')
     payment_mode = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default=DEFAULTS['PAYMENT_CHOICES'])
     service_charge = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    # is_service_charge = models.BooleanField(default=True)
+    is_service_charge = models.BooleanField(default=True)
     tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     payable_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
     paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
@@ -78,7 +78,7 @@ class Bills(BaseModel):
             service_charge_amount = self.company.service_charge if self.company.service_charge else 0
             total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
             taxed_amount = float(taxed_amount) / 100 * float(total)
-            service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0
+            service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0
             grand_total = grand_total + total + taxed_amount + service_charge_amount
             discount_amount = self.get_discount_amount(grand_total)
             grand_total = grand_total - discount_amount
@@ -132,12 +132,13 @@ class Bills(BaseModel):
             'is_manual': self.is_manual,
             'invoice_number': self.invoice_number,
             'payment_mode': self.payment_mode,
-            'service_charge': self.service_charge,
+            'service_charge': self.service_charge if self.is_service_charge else 0,
             'tax': self.tax,
             'subtotal': self.get_subtotal(),
             'grand_total': self.get_grand_total(),
             'company': self.company.to_representation(),
             'custom_discount_percentage': self.custom_discount_percentage,
+            'custom_discount_amount': self.custom_discount_amount,
             'is_credit':self.is_credit,
 
         }
@@ -148,11 +149,12 @@ class Bills(BaseModel):
             'is_manual': self.is_manual,
             'invoice_number': self.invoice_number,
             'payment_mode': self.payment_mode,
-            'service_charge': self.service_charge,
+            'service_charge': self.service_charge if self.is_service_charge else 0,
             'tax': self.tax,
             'subtotal': self.get_subtotal(),
             'grand_total': self.get_grand_total(),
             'custom_discount_percentage': self.custom_discount_percentage,
+            'custom_discount_amount': self.custom_discount_amount,
             'is_credit':self.is_credit,
 
         }
