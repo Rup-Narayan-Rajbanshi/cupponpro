@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from rest_framework.authtoken.models import Token
-from userapp.models import User, PasswordResetToken, LoginToken, SignupToken
+from userapp.models import User, PasswordResetToken, LoginToken, SignupToken, OTPVerificationCode
 from userapp.models.subscription import Subscription
 
 class UserAdminForm(forms.ModelForm):
@@ -59,3 +59,4 @@ admin.site.register(SignupToken)
 admin.site.register(User, AdminUserapp)
 admin.site.register(Subscription, AdminSubscription)
 admin.site.unregister(Token)
+admin.site.register(OTPVerificationCode)

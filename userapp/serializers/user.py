@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'active', 'admin', 'password',\
             'confirm_password', 'image', 'full_name', 'country', 'state',\
-            'city', 'address', 'zip_code', 'group', 'company')
+            'dob','city', 'address', 'zip_code', 'group', 'company')
         read_only_fields = ('image', 'active', 'admin')
 
     def get_group(self, obj):
@@ -59,7 +59,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'active', 'admin',\
             'image', 'full_name', 'country', 'state', 'city', 'address',\
-            'zip_code', 'group', 'company')
+            'dob', 'zip_code', 'group', 'company')
         read_only_fields = ('image', 'active', 'admin', 'email')
 
     def get_group(self, obj):

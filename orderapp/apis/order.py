@@ -141,14 +141,17 @@ class CalculateOrderAPI(generics.GenericAPIView):
 
 
 class UserOrderListAPI(mixins.ListModelMixin, GenericViewSet):
-    queryset = Order.objects.all().order_by('-created_at')
+    queryset = Orders.objects.all().order_by('-created_at')
     permission_classes = (IsAuthenticated, )
     serializer_class = CompanyTableOrderSerializer
     pagination_class = FPagination
 
     def get_queryset(self):
         status = self.request.GET.get('status')
+        print(status)
         if status == 'ACTIVE':
+            print("inside status")
+            print(self.request.user)
             return self.queryset.filter(user=self.request.user,
                                         status__in=[
                                             ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'],
