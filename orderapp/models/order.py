@@ -50,11 +50,9 @@ class Orders(BaseModel):
             data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
             data['tax'] = order.company.tax if order.company.tax else 0
             data['custom_discount_percentage'] = custom_discount_percentage
-<<<<<<< HEAD
-            data['grand_total'] = cls.get_grand_total(order)
-=======
+            data['payable_amount'] = cls.get_grand_total(order)
             data['custom_discount_amount'] = custom_discount_amount
->>>>>>> bugfixes/bill_servicecharge_discount
+            data['custom_discount_percentage'] = custom_discount_percentage
             serializer = BillCreateSerializer(data=data, context={'request': request})
             if not serializer.is_valid():
                 raise APIException(detail='Cannot bill the order', code=400)
@@ -123,7 +121,21 @@ class Orders(BaseModel):
         taxed_amount = float(taxed_amount) / 100 * float(total)
         service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0
         grand_total = grand_total + total + taxed_amount + service_charge_amount
+        discount_amount = order.get_discount_amount(order, grand_total)
+        print(discount_amount)
+        print(grand_total)
+        grand_total = grand_total - discount_amount
+        print(grand_total)
         return grand_total
+
+    def get_discount_amount(self, order,  grand_total):
+        value = 0.0
+        if order.custom_discount_percentage:
+            custom_discount = float(float(order.custom_discount_percentage)/100) * float(grand_total)
+            value = value + custom_discount
+        if order.custom_discount_amount:
+            value = value + order.custom_discount_amount
+        return value
 
 
 class OrderLines(BaseModel):

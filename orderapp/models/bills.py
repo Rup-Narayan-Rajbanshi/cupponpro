@@ -24,14 +24,11 @@ class Bills(BaseModel):
     is_manual = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     custom_discount_percentage = models.PositiveIntegerField(default=0)
-<<<<<<< HEAD
     credit_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
     ret_amount  = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
     
-=======
     custom_discount_amount  = models.PositiveIntegerField(default = 0)
 
->>>>>>> bugfixes/bill_servicecharge_discount
     class Meta:
         ordering = ['-created_at']
 
@@ -81,15 +78,16 @@ class Bills(BaseModel):
             service_charge_amount = self.company.service_charge if self.company.service_charge else 0
             total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
             taxed_amount = float(taxed_amount) / 100 * float(total)
-            service_charge_amount = float(service_charge_amount) / 100 * float(total)
-            discount_amount = self.get_discount_amount() #if is_service_charge else 0
-            grand_total = grand_total + total + taxed_amount + service_charge_amount - discount_amount
+            service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0
+            grand_total = grand_total + total + taxed_amount + service_charge_amount
+            discount_amount = self.get_discount_amount(grand_total)
+            grand_total = grand_total - discount_amount
         return grand_total
 
-    def get_discount_amount():
+    def get_discount_amount(self, grand_total):
         value = 0.0
         if self.custom_discount_percentage:
-            custom_discount = float(self.custom_discount_percentage/100) * float(self.grand_total)
+            custom_discount = float(self.custom_discount_percentage/100) * float(grand_total)
             value = value + custom_discount
         if self.custom_discount_amount:
             value = value + self.custom_discount_amount

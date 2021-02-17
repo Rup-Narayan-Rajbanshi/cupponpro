@@ -109,15 +109,12 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['tax'] = order.company.tax if order.company.tax else 0
         data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
         data['customer'] = customer.id if customer else None
-<<<<<<< HEAD
         data['payable_amount'] = self.get_grand_total(order) 
         data['paid_amount'] = paid_amount
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else 'CASH'
-=======
         data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else 0
         data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else 0
-
->>>>>>> bugfixes/bill_servicecharge_discount
+        print(data)
         serializer = BillCreateSerializer(data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot bill the order', code=400)
@@ -148,6 +145,8 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else order.bill.payment_mode
         data['paid_amount'] = validated_data['paid_amount'] if 'paid_amount' in validated_data else order.bill.paid_amount
         data['payable_amount'] = self.get_grand_total(order) 
+        data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else order.bill.custom_discount_percentage
+        data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else order.bill.custom_discount_amount
         serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot update bill. ', code=400)
@@ -163,6 +162,17 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
         total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
         taxed_amount = float(taxed_amount) / 100 * float(total)
-        service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0
+        service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0 #if is_service_charge else 0
         grand_total = grand_total + total + taxed_amount + service_charge_amount
+        discount_amount = self.get_discount_amount(order, grand_total) 
+        grand_total = grand_total - discount_amount
         return grand_total
+
+    def get_discount_amount(self, order, grand_total):
+        value = 0.0
+        if order.custom_discount_percentage:
+            custom_discount = float(order.custom_discount_percentage/100) * float(grand_total)
+            value = value + custom_discount
+        if order.custom_discount_amount:
+            value = value + order.custom_discount_amount
+        return value
