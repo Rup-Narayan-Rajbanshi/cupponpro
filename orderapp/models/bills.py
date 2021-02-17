@@ -15,6 +15,7 @@ class Bills(BaseModel):
     customer = models.ForeignKey('userapp.Customer', on_delete=models.SET_NULL, null=True, related_name='bills')
     payment_mode = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default=DEFAULTS['PAYMENT_CHOICES'])
     service_charge = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    is_service_charge = models.BooleanField(default=True)
     tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     payable_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
     paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
@@ -23,6 +24,10 @@ class Bills(BaseModel):
     is_manual = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     custom_discount_percentage = models.PositiveIntegerField(default=0)
+    credit_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
+    ret_amount  = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
+    
+    custom_discount_amount  = models.PositiveIntegerField(default = 0)
 
     class Meta:
         ordering = ['-created_at']
@@ -43,24 +48,51 @@ class Bills(BaseModel):
             company_obj.save()
             invoice_number = str(company_obj.invoice_counter)
             self.invoice_number = "0" * (8 - len(invoice_number)) + invoice_number
-        self.payable_amount = self.get_grand_total()
-        self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
+        if self._state.adding == False:
+            if float(self.credit_amount) - float(self.paid_amount) < 0.0:
+                self.ret_amount = float(self.paid_amount) - float(self.credit_amount)
+                self.paid_amount = self.credit_amount
+            else:
+                self.ret_amount = 0.0
+            self.is_credit = self.is_credited(self.credit_amount, self.paid_amount)
+            self.credit_amount = self.credited_amount(self.credit_amount, self.paid_amount)
+        else:
+            if float(self.payable_amount) - float(self.paid_amount) < 0.0:
+                self.ret_amount = float(self.paid_amount) - float(self.payable_amount)
+                self.paid_amount = self.payable_amount
+            else:
+                self.ret_amount=0.0
+            self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
+            self.credit_amount = self.credited_amount(self.payable_amount, self.paid_amount)
         return super(Bills, self).save(*args, **kwargs)
+        
 
     def get_grand_total(self):
-        if self.payable_amount:
-            grand_total=float(self.payable_amount)
-        else:
-            grand_total = 0
+        # if self.payable_amount:
+        #     grand_total=float(self.payable_amount)
+        # else:
+        grand_total = 0
 
         for order in self.orders.all():
             taxed_amount = self.company.tax if self.company.tax else 0
             service_charge_amount = self.company.service_charge if self.company.service_charge else 0
             total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
             taxed_amount = float(taxed_amount) / 100 * float(total)
-            service_charge_amount = float(service_charge_amount) / 100 * float(total)
+            service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0
             grand_total = grand_total + total + taxed_amount + service_charge_amount
+            discount_amount = self.get_discount_amount(grand_total)
+            grand_total = grand_total - discount_amount
         return grand_total
+
+    def get_discount_amount(self, grand_total):
+        value = 0.0
+        if self.custom_discount_percentage:
+            custom_discount = float(self.custom_discount_percentage/100) * float(grand_total)
+            value = value + custom_discount
+        if self.custom_discount_amount:
+            value = value + self.custom_discount_amount
+        return value
+        
 
     def get_subtotal(self):
         subtotal = 0
@@ -84,14 +116,14 @@ class Bills(BaseModel):
         return subtotal - discount_amount
 
     def is_credited(self,payable_amount,paid_amount):
-        credited_amount = float(payable_amount) - float(paid_amount)
+        credited_amount = float(payable_amount) - float(paid_amount) 
         if credited_amount > 0:
             return True
         else :
             return False
-
-    def credicted_amount(self, payable_amount, paid_amount):
-        return payable_amount - paid_amount
+#fix it
+    def credited_amount(self, payable_amount, paid_amount):
+        return float(payable_amount) - float(paid_amount) 
         
 
     def to_representation(self, request=None):
@@ -100,12 +132,13 @@ class Bills(BaseModel):
             'is_manual': self.is_manual,
             'invoice_number': self.invoice_number,
             'payment_mode': self.payment_mode,
-            'service_charge': self.service_charge,
+            'service_charge': self.service_charge if self.is_service_charge else 0,
             'tax': self.tax,
             'subtotal': self.get_subtotal(),
             'grand_total': self.get_grand_total(),
             'company': self.company.to_representation(),
             'custom_discount_percentage': self.custom_discount_percentage,
+            'custom_discount_amount': self.custom_discount_amount,
             'is_credit':self.is_credit,
 
         }
@@ -116,11 +149,14 @@ class Bills(BaseModel):
             'is_manual': self.is_manual,
             'invoice_number': self.invoice_number,
             'payment_mode': self.payment_mode,
-            'service_charge': self.service_charge,
+            'service_charge': self.service_charge if self.is_service_charge else 0,
             'tax': self.tax,
             'subtotal': self.get_subtotal(),
             'grand_total': self.get_grand_total(),
             'custom_discount_percentage': self.custom_discount_percentage,
+            'custom_discount_amount': self.custom_discount_amount,
             'is_credit':self.is_credit,
 
         }
+
+

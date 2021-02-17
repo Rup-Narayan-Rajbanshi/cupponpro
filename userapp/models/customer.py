@@ -34,8 +34,6 @@ class Customer(BaseModel):
                 if name == '':
                     raise ValidationError({'detail':'Phone number and name is both required to create customer.'})
                 customer = cls.objects.create(**kwargs)
-        else:
-            raise ValidationError({'detail':'Phone number and name is both required to create customer.'})
         return customer
 
     def to_representation(self, request=None):

@@ -14,15 +14,42 @@ from helpers.constants import DEFAULTS
 from commonapp.models.asset import Asset
 from rest_framework.exceptions import ValidationError
 from orderapp.choice_variables import PAYMENT_CHOICES
+from orderapp.serializers.transaction import TransactionHistoryBillSerializer
+from django.db.models import Sum
+
 
 class BillCreateSerializer(CustomModelSerializer):
 
     class Meta:
         model = Bills
         fields = "__all__"
+    
 
     def create(self, validated_data):
-        return super(BillCreateSerializer, self).create(validated_data)
+        bill =  super(BillCreateSerializer, self).create(validated_data)
+        data={
+             'paid_amount' : float(bill.paid_amount) + float(bill.ret_amount),
+             'return_amount': bill.ret_amount,
+             'credit_amount': bill.credit_amount,
+             'bill': bill.id
+         }
+        serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return bill
+
+    def update(self, instance, validated_data):
+        bill =  super(BillCreateSerializer, self).update(instance, validated_data)
+        data={
+             'paid_amount' : float(bill.paid_amount) + float(bill.ret_amount),
+             'return_amount': bill.ret_amount,
+             'credit_amount': bill.credit_amount,
+             'bill': bill.id
+         }
+        serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
+        if serializer.is_valid():
+            serializer.save()
+        return bill
 
 class BillListSerializer(CustomModelSerializer):
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation')
@@ -52,7 +79,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     is_manual = serializers.BooleanField(required=False)
 
     class Meta(CompanyTableOrderSerializer.Meta):
-        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
+        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'is_service_charge', 'custom_discount_amount', 'custom_discount_percentage', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
         # fields = ('id', 'voucher', 'asset', 'order_lines', 'bill' ,'customer', 'name','phone_number', 'email', 'address')
 
     def validate(self, attrs):
@@ -67,6 +94,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     def create(self, validated_data):
         validated_data['status'] = ORDER_STATUS['BILLABLE']
         customer_data = dict()
+        paid_amount = validated_data.pop('paid_amount',0.0)
         if 'name' in validated_data or 'phone_number' in validated_data:
             customer_data['name'] = validated_data.pop('name', '')
             customer_data['phone_number'] = validated_data.pop('phone_number', '')
@@ -81,6 +109,12 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['tax'] = order.company.tax if order.company.tax else 0
         data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
         data['customer'] = customer.id if customer else None
+        data['payable_amount'] = self.get_grand_total(order) 
+        data['paid_amount'] = paid_amount
+        data['is_service_charge'] = validated_data.get('is_service_charge', True)
+        data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else 'CASH'
+        data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else 0
+        data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else 0
         serializer = BillCreateSerializer(data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot bill the order', code=400)
@@ -93,6 +127,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         validated_data['status'] = ORDER_STATUS['BILLABLE']
+        paid_amount = validated_data.pop('paid_amount',0.0)
         customer_data = dict()
         if 'name' in validated_data or 'phone_number' in validated_data:
             customer_data['name'] = validated_data.pop('name', '')
@@ -109,7 +144,11 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
         data['customer'] = customer.id if customer else None
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else order.bill.payment_mode
-        data['paid_amount'] = validated_data['paid_amount'] if 'paid_amount' in validated_data else order.bill.paid_amount
+        data['paid_amount'] = paid_amount
+        data['is_service_charge'] = validated_data.get('is_service_charge', True)
+        data['payable_amount'] = self.get_grand_total(order) 
+        data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else order.bill.custom_discount_percentage
+        data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else order.bill.custom_discount_amount
         serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot update bill. ', code=400)
@@ -118,3 +157,24 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         if first_line and first_line.voucher:
             order.user = first_line.voucher.user
         return order
+
+    def get_grand_total(self, order):
+        grand_total=0.0
+        taxed_amount = order.company.tax if order.company.tax else 0
+        service_charge_amount = order.company.service_charge if order.company.service_charge else 0
+        total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
+        taxed_amount = float(taxed_amount) / 100 * float(total)
+        service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0
+        grand_total = grand_total + total + taxed_amount + service_charge_amount
+        discount_amount = self.get_discount_amount(order, grand_total) 
+        grand_total = grand_total - discount_amount
+        return grand_total
+
+    def get_discount_amount(self, order, grand_total):
+        value = 0.0
+        if order.custom_discount_percentage:
+            custom_discount = float(order.custom_discount_percentage/100) * float(grand_total)
+            value = value + custom_discount
+        if order.custom_discount_amount:
+            value = value + order.custom_discount_amount
+        return value

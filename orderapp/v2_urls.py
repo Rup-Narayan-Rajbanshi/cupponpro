@@ -1,13 +1,14 @@
 from django.urls import path
 from rest_framework import routers
 
-from orderapp.apis.bill import BillCreateAPI, get_order_list, ManualBillCreateAPI, BillAPI
+from orderapp.apis.bill import BillCreateAPI, get_order_list, ManualBillCreateAPI, BillAPI, BIllUpdateAPI
 from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAPI, CalculateOrderAPI, UserOrderListAPI, \
     CustomerOrderAPI, MasterQROrderAPI, latest_asset_order
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
 from orderapp.apis.table import AssetListAPI
 from orderapp.apis.voucher import VoucherListAPI, CustomerVoucherAPI
 from orderapp.apis.sales import GetSalesReportAPI, TableSalesAPI
+from orderapp.apis.transaction import BillTransactionHistoryAPI
 
 router = routers.SimpleRouter()
 router.register(r"table-change-status", TableOrderStatusAPI)
@@ -22,6 +23,8 @@ router.register(r"manual-bill-create", ManualBillCreateAPI)
 router.register(r"company-voucher", VoucherListAPI)
 router.register(r"assets", AssetListAPI)
 router.register(r"customer-vouchers", CustomerVoucherAPI)
+router.register(r"update-bill", BIllUpdateAPI)
+router.register(r"transaction-history", BillTransactionHistoryAPI)
 
 urlpatterns = router.urls
 

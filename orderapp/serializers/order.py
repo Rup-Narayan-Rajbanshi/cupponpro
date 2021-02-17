@@ -67,7 +67,7 @@ class TableOrderSerializer(OrderStatusSerializer):
 
     class Meta:
         model = Orders
-        fields = ('status', 'payment_mode', 'custom_discount_percentage', 'voucher')
+        fields = ('status', 'payment_mode', 'custom_discount_percentage', 'custom_discount_amount', 'is_service_charge', 'voucher')
 
     def validate(self, attrs):
         # if not attrs.get('payment_mode') and attrs['status'] == ORDER_STATUS['COMPLETED']:
@@ -131,7 +131,8 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             'tax': obj.tax_amount,
             'service_charge': obj.service_charge_amount,
             'grand_total': float(obj.grand_total) - float(obj.discount_amount),
-            'custom_discount_percentage': obj.custom_discount_percentage
+            'custom_discount_percentage': obj.custom_discount_percentage,
+            'custom_discount_amount': obj.custom_discount_amount
         }
 
     def validate(self, attrs):
