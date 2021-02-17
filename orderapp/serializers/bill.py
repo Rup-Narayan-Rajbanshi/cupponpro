@@ -94,6 +94,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     def create(self, validated_data):
         validated_data['status'] = ORDER_STATUS['BILLABLE']
         customer_data = dict()
+        paid_amount = validated_data.pop('paid_amount',0.0)
         if 'name' in validated_data or 'phone_number' in validated_data:
             customer_data['name'] = validated_data.pop('name', '')
             customer_data['phone_number'] = validated_data.pop('phone_number', '')
@@ -109,7 +110,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
         data['customer'] = customer.id if customer else None
         data['payable_amount'] = self.get_grand_total(order) 
-        data['paid_amount'] = validated_data['paid_amount'] if 'paid_amount' in validated_data else 0
+        data['paid_amount'] = paid_amount
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else 'CASH'
         serializer = BillCreateSerializer(data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
