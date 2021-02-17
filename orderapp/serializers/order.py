@@ -16,6 +16,7 @@ from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.models.order import OrderLines, Orders
 from orderapp.models.bills import Bills
 from orderapp.serializers.order_line import OrderLineSerializer
+from commonapp.serializers.company import CompanySerializer
 from userapp.models import User
 from userapp.models.customer import Customer
 from helpers.validators import phone_number_validator, is_numeric_value
@@ -99,7 +100,8 @@ class TableOrderSerializer(OrderStatusSerializer):
 
 class CompanyTableOrderSerializer(CustomModelSerializer):
     asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=False)
-    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False)
+    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False,\
+                                read_only=True)
     voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
@@ -237,8 +239,10 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        print("test")
         from notifications.tasks import notify_company_staffs
         order_lines=None
+        # print(self.context['request'].company)
         if 'order_lines' in validated_data:
             self.fields.pop('order_lines')
             self.fields.pop('voucher')
