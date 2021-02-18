@@ -104,7 +104,7 @@ class Orders(BaseModel):
     @property
     def tax_amount(self):
         tax = self.company.tax if self.company.tax else 0
-        return float(tax / 100) * float(self.get_total)
+        return float(tax / 100) * float(float(self.get_total) + float(self.service_charge_amount))
 
     @property
     def get_total(self):
