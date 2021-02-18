@@ -50,6 +50,16 @@ class SellItemFilter(filters.FilterSet):
         model = Bills
         fields = ['product_category', 'from_date', 'to_date']
 
+class SellFilter(filters.FilterSet):
+    from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
+    to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
+    invoice_number = filters.CharFilter(field_name='invoice_number')
+    customer_name = filters.CharFilter(field_name='customer__name')
+
+    class Meta:
+        model = Bills
+        fields = ['from_date','to_date','invoice_number', 'customer_name']
+
 class BillFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')

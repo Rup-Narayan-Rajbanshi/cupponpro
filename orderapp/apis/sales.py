@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from orderapp.models.bills import Bills
-from orderapp.filters import SellItemFilter, ServiceChargeFilter #SellFilter
+from orderapp.filters import SellItemFilter, ServiceChargeFilter, SellFilter
 from commonapp.models.asset import Asset
 from commonapp.models.company import CompanyUser
 from orderapp.models.order import Orders
@@ -15,7 +15,7 @@ from django.db.models import Count
 
 class GetSellReport(generics.ListAPIView):
     queryset = Bills.objects.all().order_by('-created_at')
-    #filter_class = SellFilter
+    filter_class = SellFilter
 
     def list(self, request):
         try:
@@ -39,25 +39,40 @@ class GetSellReport(generics.ListAPIView):
             orders = bill.orders.all()
             if orders:
                 for order in orders:
-                    if order.created_at not in sales:
-                        sales[order.created_at]= dict()
-                    if 'invoice_number' not in sales[order.created_at]:
-                        sales[order.created_at]['invoice_number'] = [bill.invoice_number]
+                    if order.created_at.date() not in sales:
+                        sales[order.created_at.date()]= dict()
+                    sales[order.created_at.date()]['date'] = str(order.created_at.date())
+                    if 'invoice_number' not in sales[order.created_at.date()]:
+                        sales[order.created_at.date()]['invoice_number'] = [bill.invoice_number]
                     else:
-                        sales[order.created_at]['invoice_number'].append(bill.invoice_number) 
-                    if 'customer_name' not in sales[order.created_at]:
-                        sales[order.created_at]['customer_name'] = list()
-                        sales[order.created_at]['customer_name'].append(bill.customer.name) if bill.customer
+                        sales[order.created_at.date()]['invoice_number'].append(bill.invoice_number) 
+                    if 'customer_name' not in sales[order.created_at.date()]:
+                        sales[order.created_at.date()]['customer_name'] = list()
+                        if bill.customer:
+                            sales[order.created_at.date()]['customer_name'].append(bill.customer.name)
                     else:
-                        sales[order.created_at]['customer_name'].append(bill.customer.name) if bill.customer
-                    sales[order.created_at]['payment_method']=bill.payment_mode
-                    sales[order.created_at]['order_total']=Count(order.lines.all())
-                    sales[order.created_at]['tax']=bill.company.tax if bill.company.tax else 0
-                    sales[order.created_at]['service_charge']=order.service_charge
-                    sales[order.created_at]['discount']=order.discount_amount()
-                    sales[order.created_at]['total_amount']=bill.get_grand_total()
+                        if bill.customer:
+                            if bill.customer.name not in sales[order.created_at.date()]['customer_name']:
+                                sales[order.created_at.date()]['customer_name'].append(bill.customer.name)
+                    sales[order.created_at.date()]['payment_method']=bill.payment_mode
+                    sales[order.created_at.date()]['order_total']= sales[order.created_at.date()]['order_total'] + self.get_total_order(order) if 'order_total' in sales[order.created_at.date()] else self.get_total_order(order)
+                    sales[order.created_at.date()]['tax']=bill.company.tax if bill.company.tax else 0
+                    sales[order.created_at.date()]['service_charge']=sales[order.created_at.date()]['service_charge'] + order.service_charge_amount if 'service_charge' in sales[order.created_at.date()] else order.service_charge_amount
+                    sales[order.created_at.date()]['discount']=sales[order.created_at.date()]['discount'] + order.discount_amount if 'discount' in sales[order.created_at.date()] else order.discount_amount
+                    sales[order.created_at.date()]['total_amount']=sales[order.created_at.date()]['total_amount'] + order.get_grand_total(order) if 'total_amount' in sales[order.created_at.date()] else order.get_grand_total(order)
+
+        data = {
+            'total_records': len(sales),
+            'data': sales.values()
+        }
+        return Response(data, status=200)
                 
 
+    def get_total_order(self, order):
+        count = 0
+        for lines in order.lines.all():
+            count = count + 1
+        return count
 
 
 class GetServiceChargeAPI(generics.ListAPIView):
