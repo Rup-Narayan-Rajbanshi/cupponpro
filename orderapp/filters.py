@@ -33,14 +33,22 @@ class OrdersFilter(filters.FilterSet):
 
 from orderapp.models.bills import Bills
 
-class SalesFilter(filters.FilterSet):
-    types = filters.CharFilter(field_name='orders__lines__product__product_category__types')
+class ServiceChargeFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
 
     class Meta:
         model = Bills
-        fields = ['types', 'from_date', 'to_date']
+        fields = ['from_date', 'to_date']
+
+class SellItemFilter(filters.FilterSet):
+    product_category = filters.CharFilter(field_name='orders__lines__product__product_category__name')
+    from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
+    to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
+
+    class Meta:
+        model = Bills
+        fields = ['product_category', 'from_date', 'to_date']
 
 class BillFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')

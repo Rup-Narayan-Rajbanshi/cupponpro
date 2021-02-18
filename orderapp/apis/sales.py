@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from orderapp.models.bills import Bills
-from orderapp.filters import SalesFilter
+from orderapp.filters import SellItemFilter, ServiceChargeFilter #SellFilter
 from commonapp.models.asset import Asset
 from commonapp.models.company import CompanyUser
 from orderapp.models.order import Orders
@@ -12,9 +12,94 @@ from rest_framework import mixins
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
 from django.db.models import Count
 
-class GetSalesReportAPI(generics.ListAPIView):
-    queryset = Bills.objects.all()
-    filter_class = SalesFilter
+
+class GetSellReport(generics.ListAPIView):
+    queryset = Bills.objects.all().order_by('-created_at')
+    #filter_class = SellFilter
+
+    def list(self, request):
+        try:
+            company = request.user.company_user.all().values_list('company', flat=True)[0] 
+        except:
+            company = None
+
+        if not company:
+            data = {
+                'success': 0,
+                'message': 'User is not part of any company'
+            }
+            return Response(data, status=403)
+
+        bills_company = self.get_queryset().filter(company=company)
+        bills_types = self.filter_queryset(self.queryset)
+        bills = bills_types.intersection(bills_company)
+
+        sales = dict()
+        for bill in bills:
+            orders = bill.orders.all()
+            if orders:
+                for order in orders:
+                    if order.created_at not in sales:
+                        sales[order.created_at]= dict()
+                    if 'invoice_number' not in sales[order.created_at]:
+                        sales[order.created_at]['invoice_number'] = [bill.invoice_number]
+                    else:
+                        sales[order.created_at]['invoice_number'].append(bill.invoice_number) 
+                    if 'customer_name' not in sales[order.created_at]:
+                        sales[order.created_at]['customer_name'] = list()
+                        sales[order.created_at]['customer_name'].append(bill.customer.name) if bill.customer
+                    else:
+                        sales[order.created_at]['customer_name'].append(bill.customer.name) if bill.customer
+                    sales[order.created_at]['payment_method']=bill.payment_mode
+                    sales[order.created_at]['order_total']=Count(order.lines.all())
+                    sales[order.created_at]['tax']=bill.company.tax if bill.company.tax else 0
+                    sales[order.created_at]['service_charge']=order.service_charge
+                    sales[order.created_at]['discount']=order.discount_amount()
+                    sales[order.created_at]['total_amount']=bill.get_grand_total()
+                
+
+
+
+class GetServiceChargeAPI(generics.ListAPIView):
+    queryset = Bills.objects.all().order_by('-created_at')
+    filter_class = ServiceChargeFilter
+
+    def list(self, request):
+        try:
+            company = request.user.company_user.all().values_list('company', flat=True)[0] 
+        except:
+            company = None
+
+        if not company:
+            data = {
+                'success': 0,
+                'message': 'User is not part of any company'
+            }
+            return Response(data, status=403)
+
+        bills_company = self.get_queryset().filter(company=company)
+        bills_types = self.filter_queryset(self.queryset)
+        bills = bills_types.intersection(bills_company)
+
+        sales = dict()
+        for bill in bills:
+            orders = bill.orders.all()
+            if orders:
+                for order in orders:
+                    if str(order.id) not in sales:
+                        sales[str(order.id)]= dict()
+                    sales[str(order.id)]['id'] = order.id
+                    sales[str(order.id)]['service_charge'] = order.service_charge_amount
+        data = {
+            'total_records': len(sales),
+            'data': sales.values()
+        }
+        return Response(data, status=200)
+
+
+class GetSellItemReportAPI(generics.ListAPIView):
+    queryset = Bills.objects.all().order_by('-created_at')
+    filter_class = SellItemFilter
     
     def list(self, request):
 
@@ -29,12 +114,12 @@ class GetSalesReportAPI(generics.ListAPIView):
                 'message': 'User is not part of any company'
             }
             return Response(data, status=403)
+
         bills_company = self.get_queryset().filter(company=company)
         bills_types = self.filter_queryset(self.queryset)
         bills = bills_types.intersection(bills_company)
 
         sales = dict()
-        grand_total= 0.0
         #splitting of bill by types:
         for bill in bills:
             orders = bill.orders.all()
@@ -46,16 +131,13 @@ class GetSalesReportAPI(generics.ListAPIView):
                             product = line.product
                             if product.name not in sales.keys():
                                 sales[product.name] = dict()
-                            grand_total = grand_total + float(line.total)
-                            
                             #sales['Grand_total'] = sales['Grand_total'] + line.total if 'Grand_total' in sales.keys() else line.total
                             sales[product.name]['name'] = product.name
                             sales[product.name]['Total sold quantity'] = sales[product.name]['Total sold quantity'] + line.quantity if 'Total sold quantity' in sales[product.name].keys() else line.quantity
-                            sales[product.name]['Selling price'] = product.selling_currency + str(product.total_price)
                             sales[product.name]['Total price'] = sales[product.name]['Total price'] + line.total if 'Total price' in sales[product.name].keys() else line.total
         data = {
-            'data': sales.values(),
-            'Grand_total': grand_total
+            'total_records': len(sales),
+            'data': sales.values()
             #'bar': sales_bar
         }
         return Response(data, status=200)
