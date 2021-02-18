@@ -55,3 +55,4 @@ celery==5.0.2
 jsonfield==3.1.0
 pyfcm==1.4.9
 pandas==1.0.3
+ckeditor==6.0.0

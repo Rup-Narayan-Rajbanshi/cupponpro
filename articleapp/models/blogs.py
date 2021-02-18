@@ -3,12 +3,14 @@ import uuid
 from django.db import models
 from django.dispatch import receiver
 from helpers.models import BaseModel
+from ckeditor.fields import RichTextField
 
 class Blog(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='blogs/', null=True, blank=True)
-    description = models.TextField()
+    # description = models.TextField()
+    description = RichTextField(blank=True, null=True)
 
     class Meta:
         ordering = ['-created_at']
