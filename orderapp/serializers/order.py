@@ -162,12 +162,14 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         bulk_create_data = list()
         request = self.context.get('request')
         company = getattr(request, 'company', None)
+        if not company:
+            company = order.company
+        if voucher and (voucher.company != company):
+            raise ValidationError({'detail': '{0} not found (voucher)'.format(product.name)})
         for line in validated_order_line_data:
             new_quantity = int(line['quantity'])
             status = line.get('status', 'NEW')
             product = line['product']
-            if voucher and voucher.company != company:
-                raise ValidationError({'detail': '{0} not found (voucher)'.format(product.name)})
             if product.company != company:
                 raise ValidationError({'detail': '{0} not found.'.format(product.name)})
             # if not status == ORDER_LINE_STATUS['CANCELLED']:
@@ -239,7 +241,6 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        print("test")
         from notifications.tasks import notify_company_staffs
         order_lines=None
         # print(self.context['request'].company)
