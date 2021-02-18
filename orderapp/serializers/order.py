@@ -167,7 +167,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             status = line.get('status', 'NEW')
             product = line['product']
             if voucher and voucher.company != company:
-                raise ValidationError({'detail': '{0} not found'.format(product.name)})
+                raise ValidationError({'detail': '{0} not found (voucher)'.format(product.name)})
             if product.company != company:
                 raise ValidationError({'detail': '{0} not found.'.format(product.name)})
             # if not status == ORDER_LINE_STATUS['CANCELLED']:
