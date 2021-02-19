@@ -45,7 +45,8 @@ class GetSellReport(generics.ListAPIView):
                     if 'invoice_number' not in sales[order.created_at.date()]:
                         sales[order.created_at.date()]['invoice_number'] = [bill.invoice_number]
                     else:
-                        sales[order.created_at.date()]['invoice_number'].append(bill.invoice_number) 
+                        if bill.invoice_number not in sales[order.created_at.date()]['invoice_number']:
+                            sales[order.created_at.date()]['invoice_number'].append(bill.invoice_number) 
                     if 'customer_name' not in sales[order.created_at.date()]:
                         sales[order.created_at.date()]['customer_name'] = list()
                         if bill.customer:
@@ -54,7 +55,12 @@ class GetSellReport(generics.ListAPIView):
                         if bill.customer:
                             if bill.customer.name not in sales[order.created_at.date()]['customer_name']:
                                 sales[order.created_at.date()]['customer_name'].append(bill.customer.name)
-                    sales[order.created_at.date()]['payment_method']=bill.payment_mode
+                    if 'payment_method' not in sales[order.created_at.date()]:
+                        sales[order.created_at.date()]['payment_method'] = [bill.payment_mode]
+                    else:
+                        if bill.payment_mode not in sales[order.created_at.date()]['payment_method']:
+                            sales[order.created_at.date()]['payment_method'].append(bill.payment_mode)
+                    # sales[order.created_at.date()]['payment_method']=bill.payment_mode
                     sales[order.created_at.date()]['order_total']= sales[order.created_at.date()]['order_total'] + self.get_total_order(order) if 'order_total' in sales[order.created_at.date()] else self.get_total_order(order)
                     sales[order.created_at.date()]['tax']=bill.company.tax if bill.company.tax else 0
                     sales[order.created_at.date()]['service_charge']=sales[order.created_at.date()]['service_charge'] + order.service_charge_amount if 'service_charge' in sales[order.created_at.date()] else order.service_charge_amount
@@ -158,6 +164,40 @@ class GetSellItemReportAPI(generics.ListAPIView):
         return Response(data, status=200)
 
 
+class CreditReportAPI(generics.ListAPIView):
+    queryset = Bills.objects.all().order_by('-created_at')
+    filter_class = ServiceChargeFilter
+    
+    def list(self, request):
+
+        try:
+            company = request.user.company_user.all().values_list('company', flat=True)[0] 
+        except:
+            company = None
+
+        if not company:
+            data = {
+                'success': 0,
+                'message': 'User is not part of any company'
+            }
+            return Response(data, status=403)
+
+        bills_company = self.get_queryset().filter(company=company)
+        bills_types = self.filter_queryset(self.queryset)
+        bills = bills_types.intersection(bills_company)
+
+        sales = dict()
+        for bill in bills:
+            if bill.customer:
+                if bill.customer.name not in sales:
+                    sales[bill.customer.name] = dict()
+                sales[bill.customer.name]['name'] = bill.customer.name
+                sales[bill.customer.name]['credit_amount'] = sales[bill.customer.name]['credit_amount'] + bill.credit_amount if 'credit_amount' in sales[bill.customer.name] else bill.credit_amount
+        data = {
+            'total_records': len(sales),
+            'data': sales.values()
+        }
+        return Response(data, status=200)
 
 class TableSalesAPI(generics.ListAPIView):
     queryset = Asset.objects.filter().order_by('-created_at')

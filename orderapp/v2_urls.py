@@ -7,7 +7,7 @@ from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAP
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
 from orderapp.apis.table import AssetListAPI
 from orderapp.apis.voucher import VoucherListAPI, CustomerVoucherAPI
-from orderapp.apis.sales import GetSellItemReportAPI, TableSalesAPI, GetServiceChargeAPI, GetSellReport
+from orderapp.apis.sales import GetSellItemReportAPI, TableSalesAPI, GetServiceChargeAPI, GetSellReport, CreditReportAPI
 from orderapp.apis.transaction import BillTransactionHistoryAPI
 
 router = routers.SimpleRouter()
@@ -37,6 +37,7 @@ urlpatterns += {
     path('sell-item-report/', GetSellItemReportAPI.as_view(), name='sell_item_report'),
     path('table-sales', TableSalesAPI.as_view(), name='table-sales'),
     path('service-charge-report/', GetServiceChargeAPI.as_view(), name='service-charge-report'),
-    path('sell-report/', GetSellReport.as_view(), name='service-charge-report')
+    path('sell-report/', GetSellReport.as_view(), name='service-charge-report'),
+    path('credit-report/', CreditReportAPI.as_view(), name='credit-report')
 
 }
