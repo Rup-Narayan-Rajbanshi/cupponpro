@@ -27,28 +27,32 @@ class BillCreateSerializer(CustomModelSerializer):
 
     def create(self, validated_data):
         bill =  super(BillCreateSerializer, self).create(validated_data)
-        data={
-             'paid_amount' : float(bill.paid_amount) + float(bill.ret_amount),
-             'return_amount': bill.ret_amount,
-             'credit_amount': bill.credit_amount,
-             'bill': bill.id
-         }
-        serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
+        if float(bill.paid_amount) > 0.0:
+            data={
+                'paid_amount' : float(bill.paid_amount) + float(bill.ret_amount),
+                'return_amount': bill.ret_amount,
+                'credit_amount': bill.credit_amount,
+                'bill': bill.id,
+                'payment_mode': bill.payment_mode
+            }
+            serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
         return bill
 
     def update(self, instance, validated_data):
         bill =  super(BillCreateSerializer, self).update(instance, validated_data)
-        data={
-             'paid_amount' : float(bill.paid_amount) + float(bill.ret_amount),
-             'return_amount': bill.ret_amount,
-             'credit_amount': bill.credit_amount,
-             'bill': bill.id
-         }
-        serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
-        if serializer.is_valid():
-            serializer.save()
+        if float(bill.paid_amount) > 0.0:
+            data={
+                'paid_amount' : float(bill.paid_amount) + float(bill.ret_amount),
+                'return_amount': bill.ret_amount,
+                'credit_amount': bill.credit_amount,
+                'bill': bill.id,
+                'payment_mode': bill.payment_mode
+            }
+            serializer = TransactionHistoryBillSerializer(data=data, context={'request': self.context['request']})
+            if serializer.is_valid():
+                serializer.save()
         return bill
 
 class BillListSerializer(CustomModelSerializer):
