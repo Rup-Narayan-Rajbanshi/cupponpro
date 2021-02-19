@@ -193,11 +193,16 @@ class CreditReportAPI(generics.ListAPIView):
                     sales[bill.customer.name] = dict()
                 sales[bill.customer.name]['name'] = bill.customer.name
                 sales[bill.customer.name]['credit_amount'] = sales[bill.customer.name]['credit_amount'] + bill.credit_amount if 'credit_amount' in sales[bill.customer.name] else bill.credit_amount
+                sales[bill.customer.name]['paid_amount'] = sales[bill.customer.name]['paid_amount'] + self.get_paid_amount(bill) if 'paid_amount' in sales[bill.customer.name] else self.get_paid_amount(bill)
         data = {
             'total_records': len(sales),
             'data': sales.values()
         }
         return Response(data, status=200)
+
+    def get_paid_amount(self, bill):
+        total = float(bill.payable_amount) - float(bill.credit_amount)
+        return total
 
 class TableSalesAPI(generics.ListAPIView):
     queryset = Asset.objects.filter().order_by('-created_at')
