@@ -28,6 +28,7 @@ class TableSalesSerializer(CustomBaseSerializer):
     name = serializers.CharField(required=False)
     asset_type = serializers.ChoiceField(choices=ASSET_TYPE_CHOICES)
     number_of_sales = serializers.IntegerField(max_value=None, min_value=None)
+    order_total = serializers.DecimalField(max_digits=20, decimal_places=6)
 
 
 

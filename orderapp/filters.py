@@ -2,6 +2,7 @@ from django_filters import rest_framework as filters
 from orderapp.models.order import Orders
 from rest_framework.exceptions import ValidationError
 from orderapp.models.transaction import TransactionHistoryBills
+from commonapp.models.asset import Asset
 
 class OrdersFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
@@ -33,14 +34,41 @@ class OrdersFilter(filters.FilterSet):
 
 from orderapp.models.bills import Bills
 
-class SalesFilter(filters.FilterSet):
-    types = filters.CharFilter(field_name='orders__lines__product__product_category__types')
+class ServiceChargeFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
 
     class Meta:
         model = Bills
-        fields = ['types', 'from_date', 'to_date']
+        fields = ['from_date', 'to_date']
+
+class TableSalesFilter(filters.FilterSet):
+    from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
+    to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
+
+    class Meta:
+        model = Asset
+        fields = ['from_date', 'to_date']
+
+class SellItemFilter(filters.FilterSet):
+    product_category = filters.CharFilter(field_name='orders__lines__product__product_category__name')
+    from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
+    to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
+
+    class Meta:
+        model = Bills
+        fields = ['product_category', 'from_date', 'to_date']
+
+class SellFilter(filters.FilterSet):
+    from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
+    to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
+    invoice_number = filters.CharFilter(field_name='invoice_number')
+    customer_name = filters.CharFilter(field_name='customer__name')
+    payment_mode = filters.CharFilter(field_name='payment_mode')
+
+    class Meta:
+        model = Bills
+        fields = ['from_date','to_date','invoice_number', 'customer_name', 'payment_mode']
 
 class BillFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
