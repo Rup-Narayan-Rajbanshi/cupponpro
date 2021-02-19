@@ -2,6 +2,7 @@ from django_filters import rest_framework as filters
 from orderapp.models.order import Orders
 from rest_framework.exceptions import ValidationError
 from orderapp.models.transaction import TransactionHistoryBills
+from commonapp.models.asset import Asset
 
 class OrdersFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
@@ -39,6 +40,14 @@ class ServiceChargeFilter(filters.FilterSet):
 
     class Meta:
         model = Bills
+        fields = ['from_date', 'to_date']
+
+class TableSalesFilter(filters.FilterSet):
+    from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
+    to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
+
+    class Meta:
+        model = Asset
         fields = ['from_date', 'to_date']
 
 class SellItemFilter(filters.FilterSet):
