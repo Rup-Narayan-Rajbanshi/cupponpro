@@ -119,8 +119,10 @@ class GetServiceChargeAPI(generics.ListAPIView):
                 for order in orders:
                     if str(order.id) not in sales:
                         sales[str(order.id)]= dict()
-                    sales[str(order.id)]['id'] = order.id
+                    sales[str(order.id)]['order_id'] = order.id
+                    sales[str(order.id)]['date'] = bill.created_at.date()
                     sales[str(order.id)]['service_charge'] = order.service_charge_amount
+
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
         low_range = (page_number-1) * page_size
@@ -223,6 +225,8 @@ class CreditReportAPI(generics.ListAPIView):
                 sales[bill.customer.name]['name'] = bill.customer.name
                 sales[bill.customer.name]['credit_amount'] = sales[bill.customer.name]['credit_amount'] + bill.credit_amount if 'credit_amount' in sales[bill.customer.name] else bill.credit_amount
                 sales[bill.customer.name]['paid_amount'] = sales[bill.customer.name]['paid_amount'] + self.get_paid_amount(bill) if 'paid_amount' in sales[bill.customer.name] else self.get_paid_amount(bill)
+                sales[bill.customer.name]['total_amount'] = sales[bill.customer.name]['total_amount'] + bill.payable_amount if 'total_amount' in sales[bill.customer.name] else bill.payable_amount
+
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
         low_range = (page_number-1) * page_size
@@ -252,8 +256,8 @@ class TableSalesAPI(generics.ListAPIView):
 
     def get_queryset(self):
         company_user = CompanyUser.objects.filter(user=self.request.user)[0]
-        asset = Asset.objects.filter(company=company_user.company).annotate(number_of_sales=Count('orders__bill'), total_amount=Sum('orders__bill__payable_amount'))
-        
+        assets = Asset.objects.filter(company=company_user.company).annotate(number_of_sales=Count('orders__bill'), total_amount=Sum('orders__bill__payable_amount'))
+        asset = assets.exclude(number_of_sales=0)
         return asset
 
 
