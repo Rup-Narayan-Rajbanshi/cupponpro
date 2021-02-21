@@ -69,7 +69,7 @@ class GetSellReport(generics.ListAPIView):
 
         data = {
             'total_records': len(sales),
-            'data': sales.values()
+            'records': sales.values()
         }
         return Response(data, status=200)
                 
@@ -113,7 +113,7 @@ class GetServiceChargeAPI(generics.ListAPIView):
                     sales[str(order.id)]['service_charge'] = order.service_charge_amount
         data = {
             'total_records': len(sales),
-            'data': sales.values()
+            'records': sales.values()
         }
         return Response(data, status=200)
 
@@ -158,7 +158,7 @@ class GetSellItemReportAPI(generics.ListAPIView):
                             sales[product.name]['Total price'] = sales[product.name]['Total price'] + line.total if 'Total price' in sales[product.name].keys() else line.total
         data = {
             'total_records': len(sales),
-            'data': sales.values()
+            'records': sales.values()
             #'bar': sales_bar
         }
         return Response(data, status=200)
@@ -196,7 +196,7 @@ class CreditReportAPI(generics.ListAPIView):
                 sales[bill.customer.name]['paid_amount'] = sales[bill.customer.name]['paid_amount'] + self.get_paid_amount(bill) if 'paid_amount' in sales[bill.customer.name] else self.get_paid_amount(bill)
         data = {
             'total_records': len(sales),
-            'data': sales.values()
+            'records': sales.values()
         }
         return Response(data, status=200)
 
