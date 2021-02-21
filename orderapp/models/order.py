@@ -51,10 +51,11 @@ class Orders(BaseModel):
         if status == ORDER_STATUS['COMPLETED']:
             data = dict()
             data['company'] = order.company.id
-            data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
-            data['tax'] = order.company.tax if order.company.tax else 0
+            data['service_charge'] = self.service_charge_amount
             data['custom_discount_percentage'] = custom_discount_percentage
-            data['payable_amount'] = cls.get_grand_total(order)
+            payable_amount, tax = cls.get_grand_total(order)
+            data['payable_amount'] = payable_amount,
+            data['tax'] = tax
             data['custom_discount_amount'] = custom_discount_amount
             data['custom_discount_percentage'] = custom_discount_percentage
             data['is_service_charge'] = is_service_charge
@@ -90,16 +91,20 @@ class Orders(BaseModel):
         for line in self.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
             value = value + line.get_discounted_amount()
         if self.custom_discount_percentage:
-            custom_discount = float(self.custom_discount_percentage/100) * float(self.grand_total)
+            custom_discount = float(self.custom_discount_percentage/100) * float(self.get_total)
             value = value + custom_discount
         if self.custom_discount_amount:
             value = value + self.custom_discount_amount
         return value
+    
 
     @property
     def service_charge_amount(self):
         service_charge = self.company.service_charge if self.company.service_charge else 0
-        return float(service_charge / 100) * float(self.get_total) if self.is_service_charge else 0
+        total = self.get_total
+        discount = self.discount_amount
+        total = total - discount
+        return float(service_charge / 100) * float(total) if self.is_service_charge else 0
 
     @property
     def tax_amount(self):
@@ -123,12 +128,15 @@ class Orders(BaseModel):
         taxed_amount = order.company.tax if order.company.tax else 0
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
         total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
-        taxed_amount = float(taxed_amount) / 100 * float(total)
-        service_charge_amount = float(service_charge_amount) / 100 * float(total) #if is_service_charge else 0
-        grand_total = grand_total + total + taxed_amount + service_charge_amount
+        # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
+        grand_total = grand_total + total 
         discount_amount = order.get_discount_amount(order, grand_total)
         grand_total = grand_total - discount_amount
-        return grand_total
+        service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
+        grand_total = grand_total + service_charge_amount
+        taxed_amount = float(taxed_amount) / 100 * float(grand_total)
+        grand_total = grand_total + taxed_amount
+        return (grand_total, taxed_amount)
 
     def get_discount_amount(self, order,  grand_total):
         value = 0.0
@@ -153,6 +161,7 @@ class OrderLines(BaseModel):
     new = models.PositiveIntegerField(null=True, blank=True, default=0)
     cooking = models.PositiveIntegerField(null=True, blank=True, default=0)
     served = models.PositiveIntegerField(null=True, blank=True, default=0)
+    cancelled = models.PositiveIntegerField(null=True, blank=True, default=0)
 
     class Meta:
         ordering = ['-created_at']
@@ -179,8 +188,8 @@ class OrderLines(BaseModel):
         return (self.rate * self.quantity) - self.get_discounted_amount()
 
     def save(self, *args, **kwargs):
+        self.rate = self.rate if self.rate else self.product.total_price
         self.discount = self.get_discount()
         self.discount_amount = self.get_discounted_amount()
-        self.rate = self.rate if self.rate else self.product.total_price
         self.total = self.get_line_total()
         return super().save(*args, **kwargs)

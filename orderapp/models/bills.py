@@ -38,10 +38,7 @@ class Bills(BaseModel):
     # need to revise as well, reve this as possible
     def save(self, *args, **kwargs):
         ''' Registered User's information saved, or saved from UI input '''
-        if not self.service_charge:
-            self.service_charge = self.company.service_charge if self.company.service_charge else 0
-        if not self.tax:
-            self.tax = self.company.tax if self.company.tax else 0
+        
         if not self.invoice_number:
             company_obj = Company.objects.get(id=self.company_id)
             company_obj.invoice_counter += 1
@@ -77,11 +74,14 @@ class Bills(BaseModel):
             taxed_amount = self.company.tax if self.company.tax else 0
             service_charge_amount = self.company.service_charge if self.company.service_charge else 0
             total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
-            taxed_amount = float(taxed_amount) / 100 * float(total)
-            service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0
-            grand_total = grand_total + total + taxed_amount + service_charge_amount
+            # taxed_amount = float(taxed_amount) / 100 * float(total)
+            grand_total = grand_total + total 
             discount_amount = self.get_discount_amount(grand_total)
-            grand_total = grand_total - discount_amount
+            grand_total = grand_total - discount_amount 
+            service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0
+            grand_total = grand_total + service_charge_amount
+            taxed_amount = float(taxed_amount) / 100 * float(grand_total)
+            grand_total = grand_total + taxed_amount
         return grand_total
 
     def get_discount_amount(self, grand_total):

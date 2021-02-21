@@ -111,9 +111,11 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['is_manual'] = True
         data['company'] = order.company.id
         data['tax'] = order.company.tax if order.company.tax else 0
-        data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
+        data['service_charge'] = order.service_charge_amount if order.service_charge_amount else 0
         data['customer'] = customer.id if customer else None
-        data['payable_amount'] = self.get_grand_total(order) 
+        payable_amount , tax  = self.get_grand_total(order)
+        data['payable_amount'] = payable_amount 
+        data['tax'] = tax
         data['paid_amount'] = paid_amount
         data['is_service_charge'] = validated_data.get('is_service_charge', True)
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else 'CASH'
@@ -145,12 +147,14 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['is_manual'] = validated_data['is_manual'] if 'is_manual' in validated_data else order.bill.is_manual
         data['company'] = order.company.id
         data['tax'] = order.company.tax if order.company.tax else 0
-        data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
+        data['service_charge'] = order.service_charge_amount if order.service_charge_amount else 0
         data['customer'] = customer.id if customer else None
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else order.bill.payment_mode
         data['paid_amount'] = paid_amount
         data['is_service_charge'] = validated_data.get('is_service_charge', True)
-        data['payable_amount'] = self.get_grand_total(order) 
+        payable_amount , tax  = self.get_grand_total(order)
+        data['payable_amount'] = payable_amount 
+        data['tax'] = tax
         data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else order.bill.custom_discount_percentage
         data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else order.bill.custom_discount_amount
         serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': self.context['request']})
@@ -167,12 +171,15 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         taxed_amount = order.company.tax if order.company.tax else 0
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
         total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
-        taxed_amount = float(taxed_amount) / 100 * float(total)
-        service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0
-        grand_total = grand_total + total + taxed_amount + service_charge_amount
+        # taxed_amount = float(taxed_amount) / 100 * float(total)
+        grand_total = grand_total + total 
         discount_amount = self.get_discount_amount(order, grand_total) 
-        grand_total = grand_total - discount_amount
-        return grand_total
+        grand_total = grand_total - discount_amount 
+        service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0
+        grand_total = grand_total + service_charge_amount
+        taxed_amount = float(taxed_amount) / 100 * float(grand_total)
+        grand_total = grand_total + taxed_amount
+        return (grand_total, taxed_amount)
 
     def get_discount_amount(self, order, grand_total):
         value = 0.0

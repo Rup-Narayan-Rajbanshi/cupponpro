@@ -127,13 +127,14 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         return lines.data
 
     def get_price_details(self, obj):
+        grand_total, tax_amount = obj.get_grand_total(obj)
         return {
             'invoice_number':obj.bill.invoice_number if obj.bill else '',
             'discount': obj.discount_amount,
             'sub_total': obj.subtotal,
-            'tax': obj.tax_amount,
+            'tax': tax_amount,
             'service_charge': obj.service_charge_amount,
-            'grand_total': float(obj.grand_total) - float(obj.discount_amount),
+            'grand_total': grand_total,
             'custom_discount_percentage': obj.custom_discount_percentage,
             'custom_discount_amount': obj.custom_discount_amount
         }
