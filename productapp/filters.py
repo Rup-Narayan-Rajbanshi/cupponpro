@@ -122,3 +122,21 @@ class ProductCategoryFilter(ProductCategoryBaseFilter):
         if company:
             parent = parent.filter(company=company)
         return parent
+
+
+class ProductFilter(filters.FilterSet):
+    company = filters.CharFilter(field_name='company__id')
+    # name = filters.CharFilter(field_name='name__istartswith')
+
+    class Meta:
+        model = Product
+        fields = ['company',]
+
+
+class SpecialFoodFilter(ProductFilter):
+    @property
+    def qs(self):
+        parent = super(SpecialFoodFilter, self).qs
+        special_product = Product.objects.all().annotate(special_food=Count('lines').order_by('special_food'))
+        # content_type = ['productcategory']
+        return parent
