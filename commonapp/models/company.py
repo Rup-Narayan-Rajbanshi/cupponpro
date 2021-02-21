@@ -66,7 +66,10 @@ class Company(Address):
                 'latitude': self.latitude,
                 'longitude': self.longitude,
                 'pan_number': self.pan_number,
-                'phone_number': self.phone_number
+                'phone_number': self.phone_number,
+                'print_tax_invoice' : self.print_tax_invoice,
+                'print_pre_order_bill' : self.print_pre_order_bill,
+                'print_order' : self.print_order
             }
         return None
 
