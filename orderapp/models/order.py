@@ -48,7 +48,7 @@ class Orders(BaseModel):
         order.custom_discount_amount = custom_discount_amount
         order.is_service_charge = is_service_charge
         order.save()
-        if status == ORDER_STATUS['COMPLETED']:
+        if status == ORDER_STATUS['BILLABLE']:
             data = dict()
             data['company'] = order.company.id
             data['service_charge'] = order.company.service_charge if order.company.service_charge else 0
@@ -62,6 +62,11 @@ class Orders(BaseModel):
             if not serializer.is_valid():
                 raise APIException(detail='Cannot bill the order', code=400)
             order.bill = serializer.save()
+            order.save()
+
+        if status == ORDER_STATUS['COMPLETED']:
+            order.bill.is_paid = True
+            order.bill.save()
             order.save()
         return order
 

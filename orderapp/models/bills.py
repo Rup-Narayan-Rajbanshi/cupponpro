@@ -140,6 +140,7 @@ class Bills(BaseModel):
             'custom_discount_percentage': self.custom_discount_percentage,
             'custom_discount_amount': self.custom_discount_amount,
             'is_credit':self.is_credit,
+            'is_paid':self.is_paid,
 
         }
     
@@ -156,6 +157,7 @@ class Bills(BaseModel):
             'custom_discount_percentage': self.custom_discount_percentage,
             'custom_discount_amount': self.custom_discount_amount,
             'is_credit':self.is_credit,
+            'is_paid':self.is_paid,
 
         }
 
