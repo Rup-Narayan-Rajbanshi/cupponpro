@@ -213,7 +213,7 @@ class TableSalesAPI(generics.ListAPIView):
 
     def get_queryset(self):
         company_user = CompanyUser.objects.filter(user=self.request.user)[0]
-        asset = Asset.objects.filter(company=company_user.company).annotate(number_of_sales=Count('orders__bill'), order_total=Sum('orders__bill__payable_amount'))
+        asset = Asset.objects.filter(company=company_user.company).annotate(number_of_sales=Count('orders__bill'), total_amount=Sum('orders__bill__payable_amount'))
         
         return asset
 
