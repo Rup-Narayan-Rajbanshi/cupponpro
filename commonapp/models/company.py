@@ -42,9 +42,9 @@ class Company(Address):
     created_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)
     pan_number  = models.CharField(max_length=16, default='')
-    print_tax_invoice = models.BooleanField(default=False)
+    print_tax_invoice = models.BooleanField(default=True)
     print_pre_order_bill = models.BooleanField(default=False)
-    print_order = models.BooleanField(default=False)
+    print_order = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'company'
