@@ -68,7 +68,12 @@ class GetSellReport(generics.ListAPIView):
                     sales[order.created_at.date()]['total_amount']=sales[order.created_at.date()]['total_amount'] + order.get_grand_total(order) if 'total_amount' in sales[order.created_at.date()] else order.get_grand_total(order)
 
         data = {
+            'total_pages': 1,
             'total_records': len(sales),
+            'next': None,
+            'previous': None,
+            'record_range': [1, len(sales)],
+            'current_page': 1,
             'records': sales.values()
         }
         return Response(data, status=200)
@@ -112,7 +117,12 @@ class GetServiceChargeAPI(generics.ListAPIView):
                     sales[str(order.id)]['id'] = order.id
                     sales[str(order.id)]['service_charge'] = order.service_charge_amount
         data = {
+            'total_pages': 1,
             'total_records': len(sales),
+            'next': None,
+            'previous': None,
+            'record_range': [1, len(sales)],
+            'current_page': 1,
             'records': sales.values()
         }
         return Response(data, status=200)
@@ -154,12 +164,16 @@ class GetSellItemReportAPI(generics.ListAPIView):
                                 sales[product.name] = dict()
                             #sales['Grand_total'] = sales['Grand_total'] + line.total if 'Grand_total' in sales.keys() else line.total
                             sales[product.name]['name'] = product.name
-                            sales[product.name]['Total sold quantity'] = sales[product.name]['Total sold quantity'] + line.quantity if 'Total sold quantity' in sales[product.name].keys() else line.quantity
-                            sales[product.name]['Total price'] = sales[product.name]['Total price'] + line.total if 'Total price' in sales[product.name].keys() else line.total
+                            sales[product.name]['total_sold_quantity'] = sales[product.name]['total_sold_quantity'] + line.quantity if 'total_sold_quantity' in sales[product.name].keys() else line.quantity
+                            sales[product.name]['total_price'] = sales[product.name]['total_price'] + line.total if 'total_price' in sales[product.name].keys() else line.total
         data = {
+            'total_pages': 1,
             'total_records': len(sales),
+            'next': None,
+            'previous': None,
+            'record_range': [1, len(sales)],
+            'current_page': 1,
             'records': sales.values()
-            #'bar': sales_bar
         }
         return Response(data, status=200)
 
@@ -195,7 +209,12 @@ class CreditReportAPI(generics.ListAPIView):
                 sales[bill.customer.name]['credit_amount'] = sales[bill.customer.name]['credit_amount'] + bill.credit_amount if 'credit_amount' in sales[bill.customer.name] else bill.credit_amount
                 sales[bill.customer.name]['paid_amount'] = sales[bill.customer.name]['paid_amount'] + self.get_paid_amount(bill) if 'paid_amount' in sales[bill.customer.name] else self.get_paid_amount(bill)
         data = {
+            'total_pages': 1,
             'total_records': len(sales),
+            'next': None,
+            'previous': None,
+            'record_range': [1, len(sales)],
+            'current_page': 1,
             'records': sales.values()
         }
         return Response(data, status=200)
