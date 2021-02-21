@@ -10,7 +10,7 @@ class Document(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     name = models.CharField(max_length=50)
     document_number = models.CharField(max_length=50, null=True, blank=True)
-    document = models.FileField(upload_to="document/", validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])])
+    document = models.FileField(upload_to="document/", validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])], blank=True, null=True)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
 
