@@ -13,7 +13,7 @@ from productapp.serializers.product_category import (
 from productapp.filters import (
     ProductCategoryFilter
 )
-from permission import CompanyUserPermission, isAdmin, isCompanySalePersonAndAllowAll
+from permission import CompanyUserPermission, isAdmin, isCompanySalePersonAndAllowAll, publicReadOnly
 
 
 class ProductCategoryAPI(FAPIMixin, mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericViewSet):
@@ -22,7 +22,7 @@ class ProductCategoryAPI(FAPIMixin, mixins.CreateModelMixin, mixins.ListModelMix
     filter_backends = (DjangoFilterBackend,)
     filter_class = ProductCategoryFilter
     pagination_class = FPagination
-    permission_classes = ((CompanyUserPermission | isAdmin | isCompanySalePersonAndAllowAll),)
+    permission_classes = ((CompanyUserPermission | isAdmin | isCompanySalePersonAndAllowAll | publicReadOnly ),)
 
 
     def destroy(self, request, *args, **kwargs):
