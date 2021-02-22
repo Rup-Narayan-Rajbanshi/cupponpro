@@ -244,6 +244,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         from notifications.tasks import notify_company_staffs
+        asset = instance.asset 
         order_lines=None
         # print(self.context['request'].company)
         if 'order_lines' in validated_data:
@@ -277,7 +278,13 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         order = super().update(instance, validated_data)
         company = str(order.company.id)
         if order.asset:
-            message = 'Order has been updated at {0} {1}'.format(order.asset.asset_type, order.asset.name)
+            if order.asset == asset:
+                message = 'Order has been updated at {0} {1}'.format(order.asset.asset_type, order.asset.name)
+            else:
+                if asset:
+                    message = 'Order has been updated from {0} {1} to {2} {3}'.format(asset.asset_type, asset.name, order.asset.asset_type, order.asset.name)
+                else:
+                    message = 'Order has been updated to {0} {1}'.format(order.asset.asset_type, order.asset.name)        
         else:
             message = 'Order has been updated'
         payload = {

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet
 from rest_framework import generics, status
 from django_filters.rest_framework import DjangoFilterBackend
-
+from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CATEGORY
 from commonapp.models.asset import Asset
 from commonapp.models.company import CompanyUser
 from commonapp.models.coupon import Voucher
@@ -93,6 +93,25 @@ class TableOrderAPI(ModelViewSet):
             return Response(data, status=403)
 
         else:
+            company = str(instance.company.id) if instance.company else ''
+            from notifications.tasks import notify_company_staffs
+            user = getattr(request, 'user', None)
+            if instance.asset:
+                message = 'Order has been deleted at {0} {1}'.format(instance.asset.asset_type, instance.asset.name)
+            else:
+                message = 'Order has been deleted'
+            payload = {
+            'id': str(instance.id),
+            'category': NOTIFICATION_CATEGORY_NAME['ORDER_DELETED'],
+            'message': {
+                'en': message
+                }
+            }
+            try:
+                notify_company_staffs(
+                    company, NOTIFICATION_CATEGORY['ORDER_DELETED'], payload, asset=instance.asset, exclude_user=user)
+            except Exception as e:
+                pass
             self.perform_destroy(instance)
             data={
                 'success': 1,
