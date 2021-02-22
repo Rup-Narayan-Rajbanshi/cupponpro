@@ -51,19 +51,24 @@ class Orders(BaseModel):
         if status == ORDER_STATUS['BILLABLE']:
             data = dict()
             data['company'] = order.company.id
-            data['service_charge'] = self.service_charge_amount
+            data['service_charge'] = round(cls.service_charge_amount_static(order),2)
             data['custom_discount_percentage'] = custom_discount_percentage
             payable_amount, tax = cls.get_grand_total(order)
-            data['payable_amount'] = payable_amount,
+            payable_amount = round(payable_amount, 6)
+            data['payable_amount'] = payable_amount
             data['tax'] = tax
             data['custom_discount_amount'] = custom_discount_amount
             data['custom_discount_percentage'] = custom_discount_percentage
             data['is_service_charge'] = is_service_charge
             serializer = BillCreateSerializer(data=data, context={'request': request})
-            if not serializer.is_valid():
+            if not serializer.is_valid(raise_exception=True):
                 raise APIException(detail='Cannot bill the order', code=400)
             order.bill = serializer.save()
             order.save()
+            lines = order.lines.first()
+            if lines.voucher:
+                lines.voucher.is_redeem = True
+                lines.voucher.save()
 
         if status == ORDER_STATUS['COMPLETED']:
             if order.bill:
@@ -97,7 +102,7 @@ class Orders(BaseModel):
         for line in self.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
             value = value + line.get_discounted_amount()
         if self.custom_discount_percentage:
-            custom_discount = float(self.custom_discount_percentage/100) * float(self.get_total)
+            custom_discount = float(float(self.custom_discount_percentage)/100) * float(self.get_total)
             value = value + custom_discount
         if self.custom_discount_amount:
             value = value + self.custom_discount_amount
@@ -111,6 +116,14 @@ class Orders(BaseModel):
         discount = self.discount_amount
         total = total - discount
         return float(service_charge / 100) * float(total) if self.is_service_charge else 0
+
+    @staticmethod
+    def service_charge_amount_static(order):
+        service_charge = order.company.service_charge if order.company.service_charge else 0
+        total = order.get_total
+        discount = order.discount_amount
+        total = total - discount
+        return float(service_charge / 100) * float(total) if order.is_service_charge else 0
 
     @property
     def tax_amount(self):

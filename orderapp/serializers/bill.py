@@ -114,7 +114,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['service_charge'] = order.service_charge_amount if order.service_charge_amount else 0
         data['customer'] = customer.id if customer else None
         payable_amount , tax  = self.get_grand_total(order)
-        data['payable_amount'] = payable_amount 
+        data['payable_amount'] = round(payable_amount, 6) 
         data['tax'] = tax
         data['paid_amount'] = paid_amount
         data['is_service_charge'] = validated_data.get('is_service_charge', True)
@@ -128,6 +128,8 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         order.save()
         if first_line and first_line.voucher:
             order.user = first_line.voucher.user
+            first_line.voucher.is_redeem = True
+            first_line.voucher.save()
         return order
     
     @transaction.atomic
@@ -153,7 +155,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['paid_amount'] = paid_amount
         data['is_service_charge'] = validated_data.get('is_service_charge', True)
         payable_amount , tax  = self.get_grand_total(order)
-        data['payable_amount'] = payable_amount 
+        data['payable_amount'] = round(payable_amount, 6) 
         data['tax'] = tax
         data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else order.bill.custom_discount_percentage
         data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else order.bill.custom_discount_amount
@@ -164,6 +166,8 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         order.save()
         if first_line and first_line.voucher:
             order.user = first_line.voucher.user
+            first_line.voucher.is_redeem = True
+            first_line.voucher.save()
         return order
 
     def get_grand_total(self, order):
