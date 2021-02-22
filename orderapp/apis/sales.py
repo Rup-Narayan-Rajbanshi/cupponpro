@@ -12,6 +12,7 @@ from rest_framework import mixins
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
 from django.db.models import Count, Sum
 import math
+from collections import OrderedDict
 
 
 class GetSellReport(generics.ListAPIView):
@@ -66,7 +67,8 @@ class GetSellReport(generics.ListAPIView):
                     sales[order.created_at.date()]['tax']=bill.company.tax if bill.company.tax else 0
                     sales[order.created_at.date()]['service_charge']=sales[order.created_at.date()]['service_charge'] + order.service_charge_amount if 'service_charge' in sales[order.created_at.date()] else order.service_charge_amount
                     sales[order.created_at.date()]['discount']=sales[order.created_at.date()]['discount'] + order.discount_amount if 'discount' in sales[order.created_at.date()] else order.discount_amount
-                    sales[order.created_at.date()]['total_amount']=sales[order.created_at.date()]['total_amount'] + order.get_grand_total(order) if 'total_amount' in sales[order.created_at.date()] else order.get_grand_total(order)
+                    sales[order.created_at.date()]['total_amount']=sales[order.created_at.date()]['total_amount'] + order.get_grand_total_report(order) if 'total_amount' in sales[order.created_at.date()] else order.get_grand_total_report(order)
+        sales = OrderedDict(sorted(sales.items(), reverse=True))
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
         low_range = (page_number-1) * page_size
@@ -122,12 +124,14 @@ class GetServiceChargeAPI(generics.ListAPIView):
                     sales[str(order.id)]['order_id'] = order.id
                     sales[str(order.id)]['date'] = bill.created_at.date()
                     sales[str(order.id)]['service_charge'] = order.service_charge_amount
-
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
         low_range = (page_number-1) * page_size
         high_range = page_number * page_size
-        data = list(sales.values())[low_range:high_range]
+        sales_values = list(sales.values())
+        sales_values.sort(key=lambda item:item['date'], reverse=True)
+        data = sales_values[low_range:high_range]
+
         data = {
             'total_pages': math.ceil(len(sales)/page_size),
             'total_records': len(sales),

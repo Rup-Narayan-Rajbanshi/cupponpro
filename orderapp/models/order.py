@@ -157,6 +157,22 @@ class Orders(BaseModel):
         grand_total = grand_total + taxed_amount
         return (grand_total, taxed_amount)
 
+    @staticmethod
+    def get_grand_total_report(order):
+        grand_total=0.0
+        taxed_amount = order.company.tax if order.company.tax else 0
+        service_charge_amount = order.company.service_charge if order.company.service_charge else 0
+        total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
+        # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
+        grand_total = grand_total + total 
+        discount_amount = order.get_discount_amount(order, grand_total)
+        grand_total = grand_total - discount_amount
+        service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
+        grand_total = grand_total + service_charge_amount
+        taxed_amount = float(taxed_amount) / 100 * float(grand_total)
+        grand_total = grand_total + taxed_amount
+        return grand_total
+
     def get_discount_amount(self, order,  grand_total):
         value = 0.0
         if order.custom_discount_percentage:
