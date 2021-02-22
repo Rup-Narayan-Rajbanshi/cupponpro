@@ -73,7 +73,7 @@ class Bills(BaseModel):
         for order in self.orders.all():
             taxed_amount = self.company.tax if self.company.tax else 0
             service_charge_amount = self.company.service_charge if self.company.service_charge else 0
-            total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
+            total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED'].aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
             # taxed_amount = float(taxed_amount) / 100 * float(total)
             grand_total = grand_total + total 
             discount_amount = self.get_discount_amount(grand_total)
@@ -103,7 +103,7 @@ class Bills(BaseModel):
             voucher = None
         for order in self.orders.all():
             try:
-                total = float(order.lines.aggregate(order_total=Sum('total'))['order_total'])
+                total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED'].aggregate(order_total=Sum('total'))['order_total'])
                 subtotal = subtotal + total
             except:
                 subtotal = subtotal 
