@@ -107,12 +107,12 @@ class Bills(BaseModel):
                 subtotal = subtotal + total
             except:
                 subtotal = subtotal 
-        if voucher:
-            discount = voucher.coupon.discount
-            if voucher.coupon.discount_type == 'PERCENTAGE':
-                discount_amount = (discount/100) * subtotal
-            else:
-                discount_amount = discount
+        # if voucher:
+        #     discount = voucher.coupon.discount
+        #     if voucher.coupon.discount_type == 'PERCENTAGE':
+        #         discount_amount = (discount/100) * subtotal
+        #     else:
+        #         discount_amount = discount
         return subtotal - discount_amount
 
     def is_credited(self,payable_amount,paid_amount):
