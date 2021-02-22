@@ -61,7 +61,7 @@ class Orders(BaseModel):
             data['custom_discount_percentage'] = custom_discount_percentage
             data['is_service_charge'] = is_service_charge
             serializer = BillCreateSerializer(data=data, context={'request': request})
-            if not serializer.is_valid(raise_exception=True):
+            if not serializer.is_valid():
                 raise APIException(detail='Cannot bill the order', code=400)
             order.bill = serializer.save()
             order.save()
