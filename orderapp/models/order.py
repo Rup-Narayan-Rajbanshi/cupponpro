@@ -196,12 +196,15 @@ class OrderLines(BaseModel):
             discount = self.voucher.coupon.discount
             discount_type = self.voucher.coupon.discount_type
             if discount_type == DISCOUNT_TYPE['PERCENTAGE']:
-                return (discount / 100) * self.rate
+                return (discount / 100) * self.get_line_no_discount()
             return discount
         return 0
 
     def get_discounted_amount(self):
         return self.get_discount() * self.quantity
+
+    def line_total_no_discount(self):
+        return (self.rate * self.quantity)
 
     def get_line_total(self):
         return (self.rate * self.quantity) - self.get_discounted_amount()
