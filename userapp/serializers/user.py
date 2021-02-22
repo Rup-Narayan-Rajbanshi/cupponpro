@@ -86,15 +86,18 @@ class UserDetailSerializer(serializers.ModelSerializer):
             return None
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(required=False)
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
+    first_name = serializers.CharField(max_length=50, required=False)
     middle_name = serializers.CharField(max_length=50, required=False)
+    last_name = serializers.CharField(max_length=50, required=False)
     is_user = serializers.BooleanField(write_only=True)
     gender = serializers.ChoiceField(GENDER_CHOICES)
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
+        fields = ('id','full_name', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'password',\
             'confirm_password', 'is_user')
 
