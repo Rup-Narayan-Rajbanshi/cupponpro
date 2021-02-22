@@ -123,7 +123,7 @@ class Bills(BaseModel):
             return False
 #fix it
     def credited_amount(self, payable_amount, paid_amount):
-        return float(payable_amount) - float(paid_amount) 
+        return round(float(payable_amount) - float(paid_amount), 6) 
         
 
     def to_representation(self, request=None):
