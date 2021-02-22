@@ -51,7 +51,7 @@ class TableSalesFilter(filters.FilterSet):
         fields = ['from_date', 'to_date']
 
 class SellItemFilter(filters.FilterSet):
-    product_category = filters.CharFilter(field_name='orders__lines__product__product_category__name')
+    product_category = filters.CharFilter(field_name='orders__lines__product__product_category__id')
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
 
