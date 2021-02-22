@@ -66,9 +66,10 @@ class Orders(BaseModel):
             order.save()
 
         if status == ORDER_STATUS['COMPLETED']:
-            order.bill.is_paid = True
-            order.bill.save()
-            order.save()
+            if order.bill:
+                order.bill.is_paid = True 
+                order.bill.save()
+                order.save()
         return order
 
     def to_representation(self, request=None):
