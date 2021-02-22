@@ -6,6 +6,7 @@ from commonapp.models.image import Image
 from commonapp.models.company import CompanyUser
 from commonapp.models.product import Product, ProductCategory
 from commonapp.models.coupon import Coupon
+from django.db.models import Count
 
 
 class ImageBaseFilter(filters.FilterSet):
@@ -126,17 +127,17 @@ class ProductCategoryFilter(ProductCategoryBaseFilter):
 
 class ProductFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
-    # name = filters.CharFilter(field_name='name__istartswith')
 
     class Meta:
         model = Product
         fields = ['company',]
 
-
 class SpecialFoodFilter(ProductFilter):
     @property
     def qs(self):
         parent = super(SpecialFoodFilter, self).qs
-        special_product = Product.objects.all().annotate(special_food=Count('lines').order_by('special_food'))
-        # content_type = ['productcategory']
-        return parent
+        special_product = parent.annotate(special_food_count=Count('order_lines')).\
+                            order_by('-special_food_count')[:5]
+
+        return special_product
+
