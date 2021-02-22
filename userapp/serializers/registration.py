@@ -34,5 +34,14 @@ class UserRegisterSerializer(UserRegistrationSerializer):
 
     def create(self, validated_data):
         validated_data.pop('phone_number_ext', None)
+        full_name=validated_data.pop('full_name',None)
+        if full_name != None:
+            full_name_split=full_name.split(" ")
+            first_name = full_name_split[0]
+            validated_data['first_name']=first_name
+            last_name_str=""
+            for word in full_name_split[1:]:
+                last_name_str += word + " "
+            validated_data['last_name']=last_name_str
         user = User.register_user(**validated_data)
         return user
