@@ -36,7 +36,7 @@ class UserRegisterSerializer(UserRegistrationSerializer):
         validated_data.pop('phone_number_ext', None)
         full_name=validated_data.pop('full_name',None)
         if full_name != None:
-            full_name_split=full_name.split(" ")
+            full_name_split= [word for word in full_name.split(" ") if word]
             first_name = full_name_split[0]
             validated_data['first_name']=first_name
             last_name_str=""
