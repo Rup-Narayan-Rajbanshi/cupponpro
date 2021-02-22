@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = [
     'rest_framework_swagger',
     'rest_framework',
     'rest_framework.authtoken',
+    'ckeditor'
     ]
 
 # All apps developed at GreenGrowth goes here
