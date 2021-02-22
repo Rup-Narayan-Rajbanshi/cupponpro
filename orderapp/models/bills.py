@@ -68,7 +68,7 @@ class Bills(BaseModel):
         # if self.payable_amount:
         #     grand_total=float(self.payable_amount)
         # else:
-        grand_total = 0
+        grand_total = 0.0
 
         for order in self.orders.all():
             taxed_amount = self.company.tax if self.company.tax else 0
@@ -78,7 +78,7 @@ class Bills(BaseModel):
             grand_total = grand_total + total 
             discount_amount = self.get_discount_amount(grand_total)
             grand_total = grand_total - discount_amount 
-            service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0
+            service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
             grand_total = grand_total + service_charge_amount
             taxed_amount = float(taxed_amount) / 100 * float(grand_total)
             grand_total = grand_total + taxed_amount
