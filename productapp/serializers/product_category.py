@@ -10,12 +10,20 @@ from helpers.constants import DEFAULTS, MAX_LENGTHS
 from django.db.models import Max
 
 
+class ProductSubCategorySerializer(CustomModelSerializer):
+    
+    class Meta(CustomModelSerializer.Meta):
+        model = ProductCategory
+        fields = ['id','name', 'image','sub_type']
+
+
 class ProductCategorySerializer(CustomModelSerializer):
     name = serializers.CharField(max_length=64, required=False)
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False)
     image = ImageFieldWithURL(allow_empty_file=False, required=False)
     parent = DetailRelatedField(model=ProductCategory, lookup='id', representation='to_representation', allow_null=True, required=False)
     has_child = serializers.SerializerMethodField()
+    child = serializers.SerializerMethodField()
     types = serializers.ChoiceField(PRODUCT_CAT_TYPE_CHOICES, allow_blank = True, required = False)
     sub_type = serializers.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], allow_blank=True, default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], required=False)
 
@@ -73,6 +81,11 @@ class ProductCategorySerializer(CustomModelSerializer):
         has_child = ProductCategory.objects.filter(parent=obj).exists()
         return has_child
 
+    def get_child(self, obj):
+        child = ProductCategory.objects.filter(parent=obj)
+        serializer = ProductSubCategorySerializer(child,many=True)
+        return serializer.data
+    
     def rearrange_order(self, initial_position, final_position):
         change_order = initial_position - final_position
         if change_order > 0:

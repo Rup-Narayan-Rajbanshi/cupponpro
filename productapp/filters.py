@@ -119,9 +119,12 @@ class ProductCategoryFilter(ProductCategoryBaseFilter):
     @property
     def qs(self):
         parent = super(ProductCategoryFilter, self).qs
+        filter_by = self.request.GET.get('filter_by',None)
         company = getattr(self.request, 'company', None)
         if company:
             parent = parent.filter(company=company)
+        if filter_by == 'has_child':
+            parent = parent.filter(parent__isnull=True).order_by('position')
         return parent
 
 
