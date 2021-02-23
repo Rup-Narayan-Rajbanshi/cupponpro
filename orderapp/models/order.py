@@ -102,7 +102,8 @@ class Orders(BaseModel):
         for line in self.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
             value = value + line.get_discounted_amount()
         if self.custom_discount_percentage:
-            custom_discount = float(float(self.custom_discount_percentage)/100) * float(self.get_total)
+            total_for_discount = float(self.get_total) + float(self.service_charge_amount)
+            custom_discount = float(float(self.custom_discount_percentage)/100) * float(total_for_discount)
             value = value + custom_discount
         if self.custom_discount_amount:
             value = value + self.custom_discount_amount
@@ -113,16 +114,12 @@ class Orders(BaseModel):
     def service_charge_amount(self):
         service_charge = self.company.service_charge if self.company.service_charge else 0
         total = self.get_total
-        discount = self.discount_amount
-        total = total - discount
         return float(service_charge / 100) * float(total) if self.is_service_charge else 0
 
     @staticmethod
     def service_charge_amount_static(order):
         service_charge = order.company.service_charge if order.company.service_charge else 0
         total = order.get_total
-        discount = order.discount_amount
-        total = total - discount
         return float(service_charge / 100) * float(total) if order.is_service_charge else 0
 
     @property
@@ -149,12 +146,15 @@ class Orders(BaseModel):
         total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
         # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
         grand_total = grand_total + total 
-        discount_amount = order.get_discount_amount(order, grand_total)
-        grand_total = grand_total - discount_amount
         service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
         grand_total = grand_total + service_charge_amount
+        discount_amount = order.get_discount_amount(order, grand_total)
+        grand_total = grand_total - discount_amount
+        # service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
+        # grand_total = grand_total + service_charge_amount
         taxed_amount = float(taxed_amount) / 100 * float(grand_total)
-        grand_total = grand_total + taxed_amount
+        taxed_amount = round(taxed_amount, 2)
+        grand_total = round(grand_total + taxed_amount, 2)
         return (grand_total, taxed_amount)
 
     @staticmethod
@@ -165,12 +165,14 @@ class Orders(BaseModel):
         total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
         # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
         grand_total = grand_total + total 
+        service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0
+        grand_total = grand_total + service_charge_amount
         discount_amount = order.get_discount_amount(order, grand_total)
         grand_total = grand_total - discount_amount
-        service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
-        grand_total = grand_total + service_charge_amount
+        # service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
+        # grand_total = grand_total + service_charge_amount
         taxed_amount = float(taxed_amount) / 100 * float(grand_total)
-        grand_total = grand_total + taxed_amount
+        grand_total = round(grand_total + taxed_amount, 2)
         return grand_total
 
     def get_discount_amount(self, order,  grand_total):

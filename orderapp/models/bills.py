@@ -77,10 +77,12 @@ class Bills(BaseModel):
             total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
             # taxed_amount = float(taxed_amount) / 100 * float(total)
             grand_total = grand_total + total 
-            discount_amount = self.get_discount_amount(grand_total)
-            grand_total = grand_total - discount_amount 
             service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
             grand_total = grand_total + service_charge_amount
+            discount_amount = self.get_discount_amount(grand_total)
+            grand_total = grand_total - discount_amount 
+            # service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
+            # grand_total = grand_total + service_charge_amount
             taxed_amount = float(taxed_amount) / 100 * float(grand_total)
             grand_total = grand_total + taxed_amount
         return grand_total
