@@ -51,10 +51,11 @@ class Orders(BaseModel):
         if status == ORDER_STATUS['BILLABLE']:
             data = dict()
             data['company'] = order.company.id
-            data['service_charge'] = self.service_charge_amount
+            data['service_charge'] = round(cls.service_charge_amount_static(order),2)
             data['custom_discount_percentage'] = custom_discount_percentage
             payable_amount, tax = cls.get_grand_total(order)
-            data['payable_amount'] = payable_amount,
+            payable_amount = round(payable_amount, 6)
+            data['payable_amount'] = payable_amount
             data['tax'] = tax
             data['custom_discount_amount'] = custom_discount_amount
             data['custom_discount_percentage'] = custom_discount_percentage
@@ -64,11 +65,16 @@ class Orders(BaseModel):
                 raise APIException(detail='Cannot bill the order', code=400)
             order.bill = serializer.save()
             order.save()
+            lines = order.lines.first()
+            if lines.voucher:
+                lines.voucher.is_redeem = True
+                lines.voucher.save()
 
         if status == ORDER_STATUS['COMPLETED']:
-            order.bill.is_paid = True
-            order.bill.save()
-            order.save()
+            if order.bill:
+                order.bill.is_paid = True 
+                order.bill.save()
+                order.save()
         return order
 
     def to_representation(self, request=None):
@@ -96,7 +102,7 @@ class Orders(BaseModel):
         for line in self.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
             value = value + line.get_discounted_amount()
         if self.custom_discount_percentage:
-            custom_discount = float(self.custom_discount_percentage/100) * float(self.get_total)
+            custom_discount = float(float(self.custom_discount_percentage)/100) * float(self.get_total)
             value = value + custom_discount
         if self.custom_discount_amount:
             value = value + self.custom_discount_amount
@@ -110,6 +116,14 @@ class Orders(BaseModel):
         discount = self.discount_amount
         total = total - discount
         return float(service_charge / 100) * float(total) if self.is_service_charge else 0
+
+    @staticmethod
+    def service_charge_amount_static(order):
+        service_charge = order.company.service_charge if order.company.service_charge else 0
+        total = order.get_total
+        discount = order.discount_amount
+        total = total - discount
+        return float(service_charge / 100) * float(total) if order.is_service_charge else 0
 
     @property
     def tax_amount(self):
@@ -132,7 +146,7 @@ class Orders(BaseModel):
         grand_total=0.0
         taxed_amount = order.company.tax if order.company.tax else 0
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
-        total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
+        total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
         # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
         grand_total = grand_total + total 
         discount_amount = order.get_discount_amount(order, grand_total)
@@ -142,6 +156,22 @@ class Orders(BaseModel):
         taxed_amount = float(taxed_amount) / 100 * float(grand_total)
         grand_total = grand_total + taxed_amount
         return (grand_total, taxed_amount)
+
+    @staticmethod
+    def get_grand_total_report(order):
+        grand_total=0.0
+        taxed_amount = order.company.tax if order.company.tax else 0
+        service_charge_amount = order.company.service_charge if order.company.service_charge else 0
+        total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
+        # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
+        grand_total = grand_total + total 
+        discount_amount = order.get_discount_amount(order, grand_total)
+        grand_total = grand_total - discount_amount
+        service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
+        grand_total = grand_total + service_charge_amount
+        taxed_amount = float(taxed_amount) / 100 * float(grand_total)
+        grand_total = grand_total + taxed_amount
+        return grand_total
 
     def get_discount_amount(self, order,  grand_total):
         value = 0.0
@@ -182,12 +212,15 @@ class OrderLines(BaseModel):
             discount = self.voucher.coupon.discount
             discount_type = self.voucher.coupon.discount_type
             if discount_type == DISCOUNT_TYPE['PERCENTAGE']:
-                return (discount / 100) * self.rate
+                return (discount / 100) * self.get_line_no_discount()
             return discount
         return 0
 
     def get_discounted_amount(self):
         return self.get_discount() * self.quantity
+
+    def line_total_no_discount(self):
+        return (self.rate * self.quantity)
 
     def get_line_total(self):
         return (self.rate * self.quantity) - self.get_discounted_amount()

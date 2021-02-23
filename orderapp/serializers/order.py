@@ -166,7 +166,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         company = getattr(request, 'company', None)
         if not company:
             company = order.company
-        if voucher and (voucher.company != company):
+        if voucher and (voucher.coupon.company != company):
             raise ValidationError({'detail': '{0} not found (voucher)'.format(product.name)})
         for line in validated_order_line_data:
             new_quantity = int(line['quantity'])
