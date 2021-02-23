@@ -84,7 +84,6 @@ class ProductCategorySerializer(CustomModelSerializer):
     def get_child(self, obj):
         child = ProductCategory.objects.filter(parent=obj)
         serializer = ProductSubCategorySerializer(child,many=True)
-        print(serializer.data)
         return serializer.data
     
     def rearrange_order(self, initial_position, final_position):
