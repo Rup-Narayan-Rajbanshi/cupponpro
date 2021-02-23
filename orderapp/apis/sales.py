@@ -70,7 +70,11 @@ class GetSellReport(generics.ListAPIView):
                     sales[order.created_at.date()]['discount']=sales[order.created_at.date()]['discount'] + order.discount_amount if 'discount' in sales[order.created_at.date()] else order.discount_amount
                     sales[order.created_at.date()]['total_amount']=sales[order.created_at.date()]['total_amount'] + order.get_grand_total_report(order) if 'total_amount' in sales[order.created_at.date()] else order.get_grand_total_report(order)
                     total = total  + order.get_grand_total_report(order) 
-        sales = OrderedDict(sorted(sales.items(), reverse=True))
+        sorting_method = request.query_params.get('sort_by', 'desc')
+        if sorting_method == 'desc':
+            sales = OrderedDict(sorted(sales.items(), reverse=True))
+        else:
+            sales = OrderedDict(sorted(sales.items(), reverse=False))
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
         low_range = (page_number-1) * page_size
@@ -134,7 +138,11 @@ class GetServiceChargeAPI(generics.ListAPIView):
         low_range = (page_number-1) * page_size
         high_range = page_number * page_size
         sales_values = list(sales.values())
-        sales_values.sort(key=lambda item:item['date'], reverse=True)
+        sorting_method = request.query_params.get('sort_by', 'desc')
+        if sorting_method == 'desc':
+            sales_values.sort(key=lambda item:item['date'], reverse=True)
+        else:
+            sales_values.sort(key=lambda item:item['date'], reverse=False)
         data = sales_values[low_range:high_range]
 
         data = {
