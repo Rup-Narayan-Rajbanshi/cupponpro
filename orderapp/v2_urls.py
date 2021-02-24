@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from orderapp.apis.bill import BillCreateAPI, get_order_list, ManualBillCreateAPI, BillAPI, BIllUpdateAPI
 from orderapp.apis.order import OrderCountAPI, TableOrderAPI, TableOrderStatusAPI, CalculateOrderAPI, UserOrderListAPI, \
-    CustomerOrderAPI, MasterQROrderAPI, latest_asset_order
+    CustomerOrderAPI, MasterQROrderAPI, latest_asset_order, TableOrderOrderlineUpdateAPI
 from orderapp.apis.order_line import OrderLineAPI, OrderLineStatusUpdateAPI
 from orderapp.apis.table import AssetListAPI
 from orderapp.apis.voucher import VoucherListAPI, CustomerVoucherAPI
@@ -25,6 +25,7 @@ router.register(r"assets", AssetListAPI)
 router.register(r"customer-vouchers", CustomerVoucherAPI)
 router.register(r"update-bill", BIllUpdateAPI)
 router.register(r"transaction-history", BillTransactionHistoryAPI)
+router.register(r"update-line-status", TableOrderOrderlineUpdateAPI)
 
 urlpatterns = router.urls
 

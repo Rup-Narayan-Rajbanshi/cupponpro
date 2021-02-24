@@ -23,6 +23,47 @@ from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import MAX_LENGTHS, DEFAULTS
 
 
+class TableOrderOrderlineUpdateSerializer(CustomBaseSerializer):
+    line_status = serializers.ChoiceField(ORDER_LINE_STATUS)
+
+    class Meta:
+        model = Orders
+        field = ('line_status')
+    
+    def validate(self, attrs):
+        # if not attrs.get('payment_mode') and attrs['status'] == ORDER_STATUS['COMPLETED']:
+        #     raise ValidationError('Please enter payment mode')
+        status = attrs['line_status']
+        allowed_status_change = {
+            # ORDER_STATUS['NEW_ORDER']: [ORDER_STATUS['CONFIRMED'], ORDER_STATUS['CANCELLED']],
+            # ORDER_STATUS['CONFIRMED']: [ORDER_STATUS['PROCESSING']],
+            # ORDER_STATUS['PROCESSING']: [ORDER_STATUS['BILLABLE']],
+            # ORDER_STATUS['BILLABLE']: [],
+            # ORDER_STATUS['CANCELLED']: [],
+            # ORDER_STATUS['COMPLETED']: ['BILLABLE']
+        }
+        if self.instance.status in [ORDER_STATUS['CANCELLED'], ORDER_STATUS['COMPLETED']]:
+            # instance = self.instance
+            # if status not in allowed_status_change[instance.status]:
+            raise ValidationError({'detail': 'Cannot change status from {} to {}.'.format(self.instance.status, status)})
+        return attrs
+    
+    def update(self, instance, validated_data):
+        line_status = validated_data.get('line_status')
+        request = self.context.get('request')
+        types = request.query_params.get('types', None)
+        if types:
+            for lines in instance.lines.all():
+                if lines.product.product_category.types == types:
+                    lines.update(status = line_status)
+                    lines.save()
+        else:
+            for lines in instance.lines.all():
+                lines.update(status = line_status)
+                lines.save()
+        instance.save()
+        return instance
+
 class TableSalesSerializer(CustomBaseSerializer):
     id = serializers.UUIDField(read_only=True)
     name = serializers.CharField(required=False)
