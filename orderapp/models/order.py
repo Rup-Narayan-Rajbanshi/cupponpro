@@ -66,7 +66,7 @@ class Orders(BaseModel):
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
                     raise serializer.ValidationError(detail='Cannot update bill. ', code=400)
-            else
+            else:
                 serializer = BillCreateSerializer(data=data, context={'request': request})
                 if not serializer.is_valid():
                     raise APIException(detail='Cannot bill the order', code=400)
