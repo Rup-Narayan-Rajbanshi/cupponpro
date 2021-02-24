@@ -63,6 +63,7 @@ class Orders(BaseModel):
             data['custom_discount_percentage'] = custom_discount_percentage
             data['is_service_charge'] = is_service_charge
             if order.bill:
+                data['credit_amount'] = payable_amount
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
                     raise serializer.ValidationError(detail='Cannot update bill. ', code=400)
