@@ -107,10 +107,11 @@ class TableOrderSerializer(OrderStatusSerializer):
     custom_discount_percentage = serializers.CharField(validators=[is_numeric_value, is_percentage], required=False)
     voucher = DetailRelatedField(model=Voucher, lookup='id',
                                  representation='to_representation', required=False)
+    paid_amount = serializers.DecimalField(max_digits=20, decimal_places=6, required=False)
 
     class Meta:
         model = Orders
-        fields = ('status', 'payment_mode', 'custom_discount_percentage', 'custom_discount_amount', 'is_service_charge', 'voucher')
+        fields = ('status', 'payment_mode', 'custom_discount_percentage', 'custom_discount_amount', 'is_service_charge', 'voucher','paid_amount')
 
     def validate(self, attrs):
         # if not attrs.get('payment_mode') and attrs['status'] == ORDER_STATUS['COMPLETED']:
