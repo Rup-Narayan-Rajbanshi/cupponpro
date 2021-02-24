@@ -9,7 +9,7 @@ from commonapp.models.company import Company
 from commonapp.models.product import Product, ProductCategory
 from commonapp.serializers.coupon import CouponSerializer, VoucherSerializer, CouponDetailSerializer
 from helpers.constants import COUPON_TYPE_MAPPER
-from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
+from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll ,publicReadOnly
 from datetime import datetime
 
 class CouponTypeListView(generics.GenericAPIView):
@@ -37,7 +37,7 @@ class CouponTypeListView(generics.GenericAPIView):
 
 
 class CouponListView(generics.GenericAPIView):
-    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isAdminOrReadOnly]
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | isAdminOrReadOnly | publicReadOnly]
     serializer_class = CouponSerializer
 
     def get(self, request):
@@ -54,13 +54,13 @@ class CouponListView(generics.GenericAPIView):
         filter_kwargs = {'{key}{lookup}'.format(
             key=key, lookup='__icontains'
             ): value for key, value in request.GET.items() if key in filter_fields}
-
+    
         page_size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         try:
             company = request.user.company_user.all().values_list('company', flat=True)[0] 
         except:
-            company = None
+            company = request.GET.get('company',None)
         if coupon_type:
             coupon_obj = Coupon.objects.select_related('company').filter(**filter_kwargs,
                                                                          content_type__model=COUPON_TYPE_MAPPER[coupon_type]).order_by(
@@ -69,6 +69,7 @@ class CouponListView(generics.GenericAPIView):
                     sort_by=sort_by
                 ))
         else:
+            print('here')
             coupon_obj = Coupon.objects.select_related('company').filter(**filter_kwargs).order_by('{order_by}{sort_by}'.format(
                 order_by=order_by,
                 sort_by=sort_by

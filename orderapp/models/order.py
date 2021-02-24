@@ -43,6 +43,7 @@ class Orders(BaseModel):
         custom_discount_percentage = v_data.get('custom_discount_percentage', 0)
         custom_discount_amount = v_data.get('custom_discount_amount', 0)
         is_service_charge = v_data.get('is_service_charge', True)
+        paid_amount = v_data.get('paid_amount', 0.0)
         order.status = status
         order.custom_discount_percentage = custom_discount_percentage
         order.custom_discount_amount = custom_discount_amount
@@ -57,12 +58,19 @@ class Orders(BaseModel):
             payable_amount = round(payable_amount, 6)
             data['payable_amount'] = payable_amount
             data['tax'] = tax
+            data['paid_amount'] = paid_amount
             data['custom_discount_amount'] = custom_discount_amount
             data['custom_discount_percentage'] = custom_discount_percentage
             data['is_service_charge'] = is_service_charge
-            serializer = BillCreateSerializer(data=data, context={'request': request})
-            if not serializer.is_valid():
-                raise APIException(detail='Cannot bill the order', code=400)
+            if order.bill:
+                data['credit_amount'] = payable_amount
+                serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
+                if not serializer.is_valid():
+                    raise serializer.ValidationError(detail='Cannot update bill. ', code=400)
+            else:
+                serializer = BillCreateSerializer(data=data, context={'request': request})
+                if not serializer.is_valid():
+                    raise APIException(detail='Cannot bill the order', code=400)
             order.bill = serializer.save()
             order.save()
             lines = order.lines.first()
@@ -72,8 +80,16 @@ class Orders(BaseModel):
 
         if status == ORDER_STATUS['COMPLETED']:
             if order.bill:
-                order.bill.is_paid = True 
-                order.bill.save()
+                data = dict()
+                if paid_amount > 0.0:
+                    data['paid_amount'] = paid_amount
+                else:
+                    data['paid_amount'] = order.bill.credit_amount
+                data['is_paid'] = True 
+                serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
+                if not serializer.is_valid():
+                    raise serializer.ValidationError(detail='Cannot update bill. ', code=400)
+                order.bill = serializer.save()
                 order.save()
         return order
 

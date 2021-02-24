@@ -17,18 +17,40 @@ from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
-from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser
+from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser, isCompanySalePersonAndAllowAll
 from orderapp.serializers.order import OrderStatusSerializer, CompanyTableOrderSerializer, TableOrderSerializer, \
-    UserOrderSerializerCompany, MasterQRSerializer
+    UserOrderSerializerCompany, MasterQRSerializer, TableOrderOrderlineUpdateSerializer
 from orderapp.filters import (
     OrdersFilter
     )
 
+class TableOrderOrderlineUpdateAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
+    queryset = Orders.objects.all()
+    serializer_class = TableOrderOrderlineUpdateSerializer
+    permission_classes = (CompanyUserPermission, )
+
+    def update(self, request ,*args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+        data = {
+            'success': 1,
+            'message': 'Successfully updated.'
+        }
+        return Response(data , status =200)
 
 class OrderStatusAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
     queryset = Order.objects.all().order_by('-created_at')
     serializer_class = OrderStatusSerializer
-    permission_classes = (CompanyUserPermission, )
+    permission_classes = (CompanyUserPermission)
+
 
 
 class OrderCountAPI(generics.GenericAPIView):
