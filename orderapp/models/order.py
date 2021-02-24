@@ -62,9 +62,14 @@ class Orders(BaseModel):
             data['custom_discount_amount'] = custom_discount_amount
             data['custom_discount_percentage'] = custom_discount_percentage
             data['is_service_charge'] = is_service_charge
-            serializer = BillCreateSerializer(data=data, context={'request': request})
-            if not serializer.is_valid():
-                raise APIException(detail='Cannot bill the order', code=400)
+            if order.bill:
+                serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
+                if not serializer.is_valid():
+                    raise serializer.ValidationError(detail='Cannot update bill. ', code=400)
+            else
+                serializer = BillCreateSerializer(data=data, context={'request': request})
+                if not serializer.is_valid():
+                    raise APIException(detail='Cannot bill the order', code=400)
             order.bill = serializer.save()
             order.save()
             lines = order.lines.first()
@@ -79,9 +84,6 @@ class Orders(BaseModel):
                     data['paid_amount'] = paid_amount
                 else:
                     data['paid_amount'] = order.bill.credit_amount
-                data['custom_discount_percentage'] = custom_discount_percentage
-                data['custom_discount_amount'] = custom_discount_amount
-                data['is_service_charge'] = is_service_charge
                 data['is_paid'] = True 
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
