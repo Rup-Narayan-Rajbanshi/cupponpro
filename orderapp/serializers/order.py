@@ -248,7 +248,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             validated_data['user'] = None
         if voucher:
             validated_data['user'] = voucher.user
-        validated_data['company'] = self.context['request'].company
+        validated_data['company'] = Company.objects.get(id=self.context['view'].kwargs.get('company_id'))
         order = super().create(validated_data)
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
