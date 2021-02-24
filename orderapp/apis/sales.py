@@ -271,17 +271,69 @@ class CreditReportAPI(generics.ListAPIView):
         return total
 
 class TableSalesAPI(generics.ListAPIView):
-    queryset = Asset.objects.filter().order_by('-created_at')
+    queryset = Asset.objects.all().order_by('-created_at')
     permission_classes = [CompanyUserPermission | isCompanyManagerAndAllowAll]
-    serializer_class = TableSalesSerializer
-    pagination_class = FPagination
     filter_class = TableSalesFilter
 
-    def get_queryset(self):
-        company_user = CompanyUser.objects.filter(user=self.request.user)[0]
-        assets = Asset.objects.filter(company=company_user.company).annotate(number_of_sales=Count('orders__bill'), total_amount=Sum('orders__bill__payable_amount'))
-        asset = assets.exclude(number_of_sales=0)
-        return asset
+    def list(self, request):
+
+        try:
+            company = request.user.company_user.all().values_list('company', flat=True)[0] 
+        except:
+            company = None
+
+        if not company:
+            data = {
+                'success': 0,
+                'message': 'User is not part of any company'
+            }
+            return Response(data, status=403)
+
+        asset_company = self.get_queryset().filter(company=company)
+        asset_date = self.filter_queryset(self.queryset)
+        assets = asset_date.intersection(asset_company)
+
+        sales = dict()
+        total = 0.0
+        for asset in assets:
+            orders = asset.orders.all()
+            if orders:
+                for order in orders:
+                    if order.bill:
+                        if str(asset.id) not in sales:
+                            sales[str(asset.id)] = dict()
+                        sales[str(asset.id)]['name'] = asset.name
+                        sales[str(asset.id)]['asset_type'] = asset.asset_type
+                        sales[str(asset.id)]['number_of_sales'] = sales[str(asset.id)]['number_of_sales'] + 1 if 'number_of_sales' in sales[str(asset.id)] else 1
+                        if order.bill.payable_amount:
+                            sales[str(asset.id)]['total_amount'] = sales[str(asset.id)]['total_amount'] + order.bill.payable_amount if 'total_amount' in sales[str(asset.id)] else order.bill.payable_amount
+                            total = total + order.bill.payable_amount
+                        else:
+                            sales[str(asset.id)]['total_amount'] = sales[str(asset.id)]['total_amount'] + 0.0 if 'total_amount' in sales[str(asset.id)] else 0.0
+
+        page_number = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('size', 10))
+        low_range = (page_number-1) * page_size
+        high_range = page_number * page_size
+        sales_values = list(sales.values())
+        sorting_method = request.query_params.get('sort_by', 'desc')
+        if sorting_method == 'desc':
+            sales_values.sort(key=lambda item:item['asset_type'], reverse=True)
+        else:
+            sales_values.sort(key=lambda item:item['asset_type'], reverse=False)
+        data = sales_values[low_range:high_range]
+        data = {
+            'total_pages': math.ceil(len(sales)/page_size),
+            'total_records': len(sales),
+            'next': page_number + 1 if page_number + 1 <=math.ceil(len(sales)/page_size) else None,
+            'previous': page_number - 1 if page_number - 1 > 0 else None,
+            'record_range': [low_range + 1, len(data)+low_range],
+            'current_page': page_number,
+            'records': data,
+            'grand_total_amount': total
+        }
+        return Response(data, status=200)
+
 
 
    
