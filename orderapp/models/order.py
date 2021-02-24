@@ -79,6 +79,9 @@ class Orders(BaseModel):
                     data['paid_amount'] = paid_amount
                 else:
                     data['paid_amount'] = order.bill.credit_amount
+                data['custom_discount_percentage'] = custom_discount_percentage
+                data['custom_discount_amount'] = custom_discount_amount
+                data['is_service_charge'] = is_service_charge
                 data['is_paid'] = True 
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
