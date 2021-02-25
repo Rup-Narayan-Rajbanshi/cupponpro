@@ -33,6 +33,10 @@ services:
         restart: unless-stopped
         networks:
         - cuppon-pro-net
+        volumes:
+        - "~/.mq/mnesia:/var/lib/rabbitmq/mnesia/"
+        - "~/.mq/hosts/hostname:/etc/hostname"
+        - "~/.mq/hosts/hosts:/etc/hosts"
 
     celery:
         env_file: "env/${ENV}.env"
