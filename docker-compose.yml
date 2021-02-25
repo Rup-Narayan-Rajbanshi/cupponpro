@@ -33,6 +33,8 @@ services:
         restart: unless-stopped
         networks:
         - cuppon-pro-net
+        volumes:
+        - 'rabbitmqstats_data:/bitnami'
 
     celery:
         env_file: "env/${ENV}.env"
@@ -60,3 +62,4 @@ networks:
 volumes:
     persist_volume:
     media_volume:
+    rabbitmqstats_data:
