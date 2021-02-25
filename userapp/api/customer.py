@@ -4,10 +4,12 @@ from userapp.serializers.customer import CustomerSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from helpers.paginations import FPagination
+from userapp.filters import CustomerFilter
 
 class CustomerAPI(ModelViewSet):
     queryset = Customer.objects.all().order_by('name')
     serializer_class = CustomerSerializer
+    filter_class = CustomerFilter
     pagination_class = FPagination
     permission_classes = (AllowAny, )
 
