@@ -8,12 +8,11 @@ from userapp.models import User
 
 class VoucherListSerializer(CustomModelSerializer):
     coupon = DetailRelatedField(model=Coupon, lookup='id', representation='to_representation')
-    user = DetailRelatedField(model=User, lookup='id', representation='to_representation')
     used_date = serializers.DateTimeField(required=False)
 
     class Meta:
         model = Voucher
-        fields = ('id', 'is_redeem', 'used_date', 'coupon', 'user')
+        fields = ('id', 'is_redeem', 'used_date', 'coupon')
 
     def get_description(self, obj):
         return obj.coupon.description

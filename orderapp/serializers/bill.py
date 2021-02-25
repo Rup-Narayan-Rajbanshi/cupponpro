@@ -59,10 +59,16 @@ class BillListSerializer(CustomModelSerializer):
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation')
     order = serializers.SerializerMethodField()
     customer = DetailRelatedField(model=Customer, lookup='id', representation='to_representation', required=False)
+    total_discount = serializers.SerializerMethodField()
 
     class Meta:
         model = Bills
         fields = "__all__"
+
+    def get_total_discount(self, obj):
+        order = obj.orders.first()
+        if order:
+            return order.discount_amount
 
     def get_order(self, obj):
         serializer_context = {'request': self.context.get('request')}
@@ -81,10 +87,16 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     payment_mode = serializers.ChoiceField(PAYMENT_CHOICES, required=False)
     paid_amount = serializers.DecimalField(max_digits=20, decimal_places=6, required=False)
     is_manual = serializers.BooleanField(required=False)
+    total_discount = serializers.SerializerMethodField()
 
     class Meta(CompanyTableOrderSerializer.Meta):
-        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'is_service_charge', 'custom_discount_amount', 'custom_discount_percentage', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
+        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'is_service_charge', 'custom_discount_amount', 'custom_discount_percentage','total_discount', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
         # fields = ('id', 'voucher', 'asset', 'order_lines', 'bill' ,'customer', 'name','phone_number', 'email', 'address')
+
+    def get_total_discount(self, obj):
+        if obj:
+            return obj.discount_amount
+        
 
     def validate(self, attrs):
         if self.instance:

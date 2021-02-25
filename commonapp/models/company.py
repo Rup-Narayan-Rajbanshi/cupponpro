@@ -69,7 +69,8 @@ class Company(Address):
                 'phone_number': self.phone_number,
                 'print_tax_invoice' : self.print_tax_invoice,
                 'print_pre_order_bill' : self.print_pre_order_bill,
-                'print_order' : self.print_order
+                'print_order' : self.print_order,
+                'service_charge': self.service_charge
             }
         return None
 

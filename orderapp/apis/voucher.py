@@ -35,13 +35,5 @@ class CustomerVoucherAPI(mixins.ListModelMixin, GenericViewSet):
         is_redeem = self.request.query_params.get('is_redeem', False)
         qs1 = self.queryset.filter(
             is_redeem=is_redeem,
-            user=self.request.user)
-        try:
-            company = self.request.user.company_user.all().values_list('company', flat=True)[0] 
-        except:
-            company = None
-        if company:
-            qs2 = self.queryset.filter(coupon__company__id=company) 
-            qs = qs1.intersection(qs2)
-            return qs      
+            user=self.request.user)   
         return qs1
