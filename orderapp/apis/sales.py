@@ -306,8 +306,8 @@ class TableSalesAPI(generics.ListAPIView):
                         sales[str(asset.id)]['asset_type'] = asset.asset_type
                         sales[str(asset.id)]['number_of_sales'] = sales[str(asset.id)]['number_of_sales'] + 1 if 'number_of_sales' in sales[str(asset.id)] else 1
                         if order.bill.payable_amount:
-                            sales[str(asset.id)]['total_amount'] = sales[str(asset.id)]['total_amount'] + order.bill.payable_amount if 'total_amount' in sales[str(asset.id)] else order.bill.payable_amount
-                            total = total + order.bill.payable_amount
+                            sales[str(asset.id)]['total_amount'] = sales[str(asset.id)]['total_amount'] + float(order.bill.payable_amount) if 'total_amount' in sales[str(asset.id)] else float(order.bill.payable_amount)
+                            total = total + float(order.bill.payable_amount)
                         else:
                             sales[str(asset.id)]['total_amount'] = sales[str(asset.id)]['total_amount'] + 0.0 if 'total_amount' in sales[str(asset.id)] else 0.0
 
