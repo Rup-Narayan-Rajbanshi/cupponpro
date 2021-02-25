@@ -128,6 +128,27 @@ class ProductCategoryFilter(ProductCategoryBaseFilter):
         return parent
 
 
+class MenuBaseFilter(filters.FilterSet):
+    company = filters.CharFilter(field_name='company__id')
+    parent = filters.CharFilter(field_name='parent__id')
+    name = filters.CharFilter(field_name='name__istartswith')
+    types = filters.CharFilter(field_name='types')
+    class Meta:
+        model = ProductCategory
+        fields = ['name', 'company', 'parent', 'types']
+
+
+class MenuFilter(MenuBaseFilter):
+    @property
+    def qs(self):
+        parent = super(MenuFilter, self).qs
+        filter_by = self.request.GET.get('filter_by',None)
+        company = getattr(self.request, 'company', None)
+        if company:
+            parent = parent.filter(company=company, parent__isnull=True).order_by('position')
+        return parent
+
+
 class ProductFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
 
