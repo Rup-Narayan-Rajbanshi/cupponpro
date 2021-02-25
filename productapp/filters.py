@@ -142,7 +142,6 @@ class MenuFilter(MenuBaseFilter):
     @property
     def qs(self):
         parent = super(MenuFilter, self).qs
-        filter_by = self.request.GET.get('filter_by',None)
         company = getattr(self.request, 'company', None)
         if company:
             parent = parent.filter(company=company, parent__isnull=True).order_by('position')
