@@ -34,7 +34,7 @@ services:
         networks:
         - cuppon-pro-net
         volumes:
-        - 'rabbitmqstats_data:/bitnami'
+        - 'rabbitmqstats:/bitnami'
 
     celery:
         env_file: "env/${ENV}.env"
