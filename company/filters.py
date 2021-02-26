@@ -4,6 +4,32 @@ from django_filters import rest_framework as filters
 from userapp.models import User
 from commonapp.models.company import FavouriteCompany, CompanyUser, Company
 from company.models import Partner
+from company.models.likes import Like
+from rest_framework.response import Response
+
+class CompanyLikeBaseFilter(filters.FilterSet):
+    user = filters.CharFilter(field_name='user__id')
+    company = filters.CharFilter(field_name='company__id')
+
+    class Meta:
+        model = Like
+        fields = "__all__"
+
+
+class UserLikeStatus(CompanyLikeBaseFilter):
+    @property
+    def qs(self):
+        parent = super(UserLikeStatus, self).qs
+        # company = getattr(self.request, 'company', None)
+        user = getattr(self.request, 'user', None)
+        if user.group.filter(name="admin").exists():
+            parent = parent
+        elif user.group.filter(name = 'owner').exists():
+            company_user_obj = CompanyUser.objects.filter(user=user)[0]
+            parent = parent.filter(company=company_user_obj.company)
+        else:
+            parent = parent.filter(user=user)
+        return parent
 
 
 class FavouriteCompanyBaseFilter(filters.FilterSet):
