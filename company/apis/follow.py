@@ -3,6 +3,7 @@ from helpers.paginations import FPagination
 from rest_framework.permissions import IsAuthenticated
 from helpers.api_mixins import FAPIMixin
 from company.models.follow import Follows
+from company.models.likes import Like
 from company.serializers.follow import FollowSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -68,11 +69,11 @@ class GetLikeAndFollowAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
         data = dict()
         if company:
             follow_query = Follows.objects.filter(company=company, user=user)
-            # like_query = Like.objects.filter(company=company, user=user)
-            # if like_query:
-            #     data['like_status'] = True
-            # else:
-            #     data['like_status'] = False
+            like_query = Like.objects.filter(company=company, user=user)
+            if like_query:
+                data['like_status'] = True
+            else:
+                data['like_status'] = False
             if follow_query:
                 data['follow_status'] = True
             else:
