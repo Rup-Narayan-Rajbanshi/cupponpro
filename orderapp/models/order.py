@@ -58,15 +58,14 @@ class Orders(BaseModel):
             data = dict()
             data['company'] = order.company.id
             data['service_charge'] = round(cls.service_charge_amount_static(order),2)
-            data['custom_discount_percentage'] = custom_discount_percentage
             payable_amount, tax = cls.get_grand_total(order)
             payable_amount = round(payable_amount, 6)
             data['payable_amount'] = payable_amount
             data['tax'] = tax
             data['paid_amount'] = paid_amount
-            data['custom_discount_amount'] = custom_discount_amount
-            data['custom_discount_percentage'] = custom_discount_percentage
-            data['is_service_charge'] = is_service_charge
+            data['custom_discount_amount'] = order.custom_discount_amount
+            data['custom_discount_percentage'] = order.custom_discount_percentage
+            data['is_service_charge'] = order.is_service_charge
             if order.bill:
                 data['credit_amount'] = payable_amount
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
