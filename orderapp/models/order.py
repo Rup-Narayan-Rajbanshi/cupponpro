@@ -45,13 +45,18 @@ class Orders(BaseModel):
         is_service_charge = v_data.get('is_service_charge', True)
         paid_amount = v_data.get('paid_amount', 0.0)
         order.status = status
-        order.custom_discount_percentage = custom_discount_percentage
-        order.custom_discount_amount = custom_discount_amount
-        order.is_service_charge = is_service_charge
+        if order.bill:
+            order.custom_discount_percentage = custom_discount_percentage if 'custom_discount_percentage' in v_data else order.custom_dicount_percentage
+            order.custom_discount_amount = custom_discount_amount if 'custom_discount_amount' in v_data else order.custom_dicount_amount
+            order.is_service_charge = is_service_charge if 'is_service_charge' in v_data else order.is_service_charge
+        else:
+            order.custom_discount_percentage = custom_discount_percentage 
+            order.custom_discount_amount = custom_discount_amount 
+            order.is_service_charge = is_service_charge
         order.save()
         if status == ORDER_STATUS['BILLABLE']:
             data = dict()
-            data['company'] = order.company.id
+            data['company'] = order.company
             data['service_charge'] = round(cls.service_charge_amount_static(order),2)
             data['custom_discount_percentage'] = custom_discount_percentage
             payable_amount, tax = cls.get_grand_total(order)
