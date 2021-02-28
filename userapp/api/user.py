@@ -186,6 +186,14 @@ class UpdateUser(generics.GenericAPIView):
                 if 'image' in request.data and not request.data['image']:
                     serializer.exclude_fields(['image'])
                 if serializer.is_valid():
+                    full_name = serializer.validated_data.pop('full_name',None)
+                    if full_name != None:
+                        full_name_split = [word for word in full_name.split(" ") if word]
+                        first_name = full_name_split[0]
+                        last_name_str=""
+                        for word in full_name_split[1:]:
+                            last_name_str += word + " "
+                        serializer.save(first_name=first_name,last_name=last_name_str)
                     serializer.save()
                     data = {
                         'success': 1,
