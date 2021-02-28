@@ -9,7 +9,7 @@ from commonapp.models.company import Company
 
 class LikeSerializer(CustomModelSerializer):
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation')
-    user = DetailRelatedField(model=User, lookup='id', representation='to_representation')
+    user = DetailRelatedField(model=User, lookup='id', representation='to_representation',required=False)
 
 
     class Meta:
@@ -18,7 +18,8 @@ class LikeSerializer(CustomModelSerializer):
 
     def validate(self, attrs):
         company = attrs['company']
-        user = attrs['user']
+        user = self.context['request'].user
+        attrs['user']= user
         like_exists=Like.objects.filter(user=user,company=company).exists()
         if like_exists:
             raise ValidationError({'message': 'User has already liked this company'})
