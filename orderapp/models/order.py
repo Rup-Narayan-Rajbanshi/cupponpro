@@ -50,13 +50,13 @@ class Orders(BaseModel):
             order.custom_discount_amount = custom_discount_amount if 'custom_discount_amount' in v_data else order.custom_dicount_amount
             order.is_service_charge = is_service_charge if 'is_service_charge' in v_data else order.is_service_charge
         else:
-            order.custom_discount_percentage = custom_discount_percentage 
-            order.custom_discount_amount = custom_discount_amount 
+            order.custom_discount_percentage = custom_discount_percentage
+            order.custom_discount_amount = custom_discount_amount
             order.is_service_charge = is_service_charge
         order.save()
         if status == ORDER_STATUS['BILLABLE']:
             data = dict()
-            data['company'] = order.company
+            data['company'] = order.company.id
             data['service_charge'] = round(cls.service_charge_amount_static(order),2)
             data['custom_discount_percentage'] = custom_discount_percentage
             payable_amount, tax = cls.get_grand_total(order)
@@ -90,7 +90,7 @@ class Orders(BaseModel):
                     data['paid_amount'] = paid_amount
                 else:
                     data['paid_amount'] = order.bill.credit_amount
-                data['is_paid'] = True 
+                data['is_paid'] = True
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
                     raise serializer.ValidationError(detail='Cannot update bill. ', code=400)
@@ -129,7 +129,7 @@ class Orders(BaseModel):
         if self.custom_discount_amount:
             value = value + self.custom_discount_amount
         return value
-    
+
 
     @property
     def service_charge_amount(self):
@@ -166,7 +166,7 @@ class Orders(BaseModel):
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
         total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
         # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
-        grand_total = grand_total + total 
+        grand_total = grand_total + total
         service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
         grand_total = grand_total + service_charge_amount
         discount_amount = order.get_discount_amount(order, grand_total)
@@ -185,7 +185,7 @@ class Orders(BaseModel):
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
         total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
         # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
-        grand_total = grand_total + total 
+        grand_total = grand_total + total
         service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0
         grand_total = grand_total + service_charge_amount
         discount_amount = order.get_discount_amount(order, grand_total)
