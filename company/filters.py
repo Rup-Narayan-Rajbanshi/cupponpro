@@ -16,11 +16,10 @@ class CompanyLikeBaseFilter(filters.FilterSet):
         fields = "__all__"
 
 
-class UserLikeStatus(CompanyLikeBaseFilter):
+class LikeFilter(CompanyLikeBaseFilter):
     @property
     def qs(self):
         parent = super(UserLikeStatus, self).qs
-        # company = getattr(self.request, 'company', None)
         user = getattr(self.request, 'user', None)
         if user.group.filter(name="admin").exists():
             parent = parent
