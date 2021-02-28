@@ -9,7 +9,7 @@ from rest_framework.exceptions import ValidationError
 
 class FollowSerializer(CustomModelSerializer):
     user = DetailRelatedField(model=User, lookup='id', representation='to_representation', required=False)
-    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False)
+    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=True)
 
     class Meta:
         model = Follows

@@ -72,11 +72,15 @@ class GetLikeAndFollowAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
             like_query = Like.objects.filter(company=company, user=user)
             if like_query:
                 data['like_status'] = True
+                data['like_id'] = like_query[0].id
             else:
                 data['like_status'] = False
+                data['like_id'] = None
             if follow_query:
                 data['follow_status'] = True
+                data['follow_id'] = follow_query[0].id
             else:
                 data['follow_status'] = False
+                data['follow_id'] = None
         return Response(data, status=200)
     
