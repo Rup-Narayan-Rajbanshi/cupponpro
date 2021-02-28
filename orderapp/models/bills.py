@@ -17,7 +17,7 @@ class Bills(BaseModel):
     payment_mode = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default=DEFAULTS['PAYMENT_CHOICES'])
     service_charge = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     is_service_charge = models.BooleanField(default=True)
-    tax = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    tax = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     payable_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
     paid_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
     is_credit = models.BooleanField(default=False)
