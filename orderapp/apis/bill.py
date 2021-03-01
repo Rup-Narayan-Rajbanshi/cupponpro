@@ -34,7 +34,15 @@ class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixin
 
     def get_queryset(self):
         company = getattr(self.request, 'company', None)
-        queryset = Bills.objects.filter(company=company).order_by('-created_at')
+        sort_by = self.request.query_params.get('sort_by', None)
+        if sort_by:
+            order_by = self.request.query_params.get('order_by', 'desc')
+            if order_by == 'asc':
+                queryset = Bills.objects.filter(company=company).order_by(sort_by)
+            else:
+                queryset = Bills.objects.filter(company=company).order_by('-' + sort_by)
+        else:
+            queryset = Bills.objects.filter(company=company).order_by('-created_at')
         return queryset
 
 
