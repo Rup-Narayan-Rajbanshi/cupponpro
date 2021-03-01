@@ -191,21 +191,22 @@ class ChangeUserProfilePictureSerializer(serializers.ModelSerializer):
 #     """
 #     Serializer for user's profile picture change endpoint.
 #     """
-#     account_id = ImageFieldWithURL(allow_empty_file=True)
+#     token = ImageFieldWithURL(allow_empty_file=True)
 #     account_type = serializers.ChoiceField()
 
 #     class Meta:
 #         class = UserSocial
-#         fields = ('token',)
+#         fields = ('token', 'account_type')
 
 #     def validate(self, attrs):
 #         return attrs
 
 #     def create(self, validated_data):
+#         token = validated_data.pop('token')  
+#         validated_data['account_id'] = token['id']
 #         usersocial = super().create(self, validated_data)
 #         data = dict()
-#         token = validated_data['account_id']
-#         data['first_name'] = token['name']
+#         data['name'] = token['name']
 #         data['email'] = token['email']
 #         data['phone_number'] = token['phone_number']
 #         serializer = UserRegistrationSerializer(data, context=self.context['request'])
