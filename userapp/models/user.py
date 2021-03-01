@@ -13,6 +13,7 @@ from project.settings.base import EMAIL_HOST_USER
 from commonapp.models.address import Address
 from helpers.app_helpers import url_builder
 from helpers.constants import OTP_TYPES, OTP_STATUS_TYPES
+# from helpers.models import BaseModel
 
 
 class UserManager(BaseUserManager):
@@ -378,3 +379,10 @@ def auto_send_signup_token_email(sender, instance, **kwargs):
 
     except sender.DoesNotExist:
         return False
+
+
+# class UserSocial(BaseModel):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     account_type = models.CharField()
+#     account_id = models.CharField()
+
