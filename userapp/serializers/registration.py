@@ -6,6 +6,7 @@ from helpers.constants import OTP_STATUS_TYPES, OTP_HEADER
 from helpers.exceptions import (
     InvalidRequestException
 )
+from userapp.helpers import split_full_name
 
 
 class UserRegisterSerializer(UserRegistrationSerializer):
@@ -36,12 +37,9 @@ class UserRegisterSerializer(UserRegistrationSerializer):
         validated_data.pop('phone_number_ext', None)
         full_name=validated_data.pop('full_name',None)
         if full_name != None:
-            full_name_split= [word for word in full_name.split(" ") if word]
-            first_name = full_name_split[0]
-            validated_data['first_name']=first_name
-            last_name_str=""
-            for word in full_name_split[1:]:
-                last_name_str += word + " "
-            validated_data['last_name']=last_name_str
+            full_name_dict = split_full_name(full_name)
+            validated_data['first_name']=full_name_dict['first_name']
+            validated_data['middle_name']=full_name_dict['middle_name']
+            validated_data['last_name']=full_name_dict['last_name']
         user = User.register_user(**validated_data)
         return user
