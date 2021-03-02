@@ -8,11 +8,34 @@ from userapp.models import User
 from userapp.serializers.registration import (
     UserRegisterSerializer
 )
+from userapp.serializers.registration import SocialAccountSerializer
+from userapp.models.user import SocialAccount
 
 
 class UserRegisterAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
     serializer_class = UserRegisterSerializer
     queryset = User.objects.all()
+    permission_classes = (AllowAny, )
+
+    def create(self, request, *args, **kwargs):
+        serializer = super().create(request, *args, **kwargs)
+        phone_number = serializer.data.get('phone_number')
+        # generate JWT token for immediate login
+        user_obj = User.objects.get(phone_number=phone_number)
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+        payload = jwt_payload_handler(user_obj)
+        token = jwt_encode_handler(payload)
+        data = {
+            'success': 1,
+            'data': serializer.data,
+            'token': token
+        }
+        return Response(data=data, status=status.HTTP_201_CREATED)
+
+class SocialAccountRegisterAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
+    serializer_class = SocialAccountSerializer
+    queryset = SocialAccount.objects.all()
     permission_classes = (AllowAny, )
 
     def create(self, request, *args, **kwargs):

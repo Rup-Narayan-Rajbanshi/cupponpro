@@ -3,7 +3,7 @@ from django.conf.urls import url
 from rest_framework import routers
 from django.urls import path
 from userapp.api.verification import SendVerificationCodeAPI, VerifyVerificationCodeAPI, verify_otp_token
-from userapp.api.registration import UserRegisterAPI
+from userapp.api.registration import UserRegisterAPI, SocialAccountRegisterAPI
 from userapp.api.customer import CustomerAPI, CustomerFromPhone
 
 router = routers.SimpleRouter()
@@ -11,6 +11,7 @@ router.register(r"user/send-verification-code", SendVerificationCodeAPI)
 router.register(r"user/verify-verification-code", VerifyVerificationCodeAPI)
 router.register(r"user/register", UserRegisterAPI)
 router.register(r"customer", CustomerAPI)
+router.register(f"user/social-register", SocialAccountRegisterAPI)
 
 urlpatterns = router.urls
 

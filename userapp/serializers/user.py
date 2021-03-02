@@ -6,7 +6,6 @@ from helpers.serializer_fields import ImageFieldWithURL
 from helpers.choices_variable import GENDER_CHOICES
 from commonapp.models.document import Document
 
-
 class UserGroupSerializer(serializers.ModelSerializer):
     new_group = serializers.IntegerField(default=None)
     class Meta:
@@ -187,30 +186,3 @@ class ChangeUserProfilePictureSerializer(serializers.ModelSerializer):
         model = User
         fields = ('image',)
 
-# class UserSocialSerializer(serializers.ModelSerializer):
-#     """
-#     Serializer for user's profile picture change endpoint.
-#     """
-#     token = ImageFieldWithURL(allow_empty_file=True)
-#     account_type = serializers.ChoiceField()
-
-#     class Meta:
-#         class = UserSocial
-#         fields = ('token', 'account_type')
-
-#     def validate(self, attrs):
-#         return attrs
-
-#     def create(self, validated_data):
-#         token = validated_data.pop('token')  
-#         validated_data['account_id'] = token['id']
-#         usersocial = super().create(self, validated_data)
-#         data = dict()
-#         data['name'] = token['name']
-#         data['email'] = token['email']
-#         data['phone_number'] = token['phone_number']
-#         serializer = UserRegistrationSerializer(data, context=self.context['request'])
-#         if serializer.is_valid():
-#             usersocial.user = serializer.save()
-#             usersocial.save()
-#         return usersocial

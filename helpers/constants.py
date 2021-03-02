@@ -49,6 +49,11 @@ PRODUCT_TYPE = {
     'NON-VEG': 'NON-VEG',
 }
 
+ACCOUNT_TYPE = {
+    'GOOGLE': 'GOOGLE',
+    'FACEBOOK': 'FACEBOOK'
+}
+
 
 DEFAULTS = {
     'PHONE_NUMBER_EXT': '977',
@@ -61,7 +66,8 @@ DEFAULTS = {
     'PRODUCT_CAT_TYPE': PRODUCT_CAT_TYPE['FOOD'],
     'PRODUCT_TYPE': '',
     'PRODUCT_CAT_SUB_TYPE': '',
-    'ADDRESS': ''
+    'ADDRESS': '',
+    'ACCOUNT_TYPE': 'GOOGLE'
 }
 
 MAX_LENGTHS = {
@@ -105,6 +111,7 @@ COUPON_TYPE_MAPPER = {
     'productcategory': 'productcategory',
     'all': None
 }
+
 
 TIME_EARLY_THRESHOLD = 30           # unit = minute
 RESEND_COUNTDOWN = 1                # unit = minute

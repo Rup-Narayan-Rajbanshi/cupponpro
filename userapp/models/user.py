@@ -13,7 +13,10 @@ from project.settings.base import EMAIL_HOST_USER
 from commonapp.models.address import Address
 from helpers.app_helpers import url_builder
 from helpers.constants import OTP_TYPES, OTP_STATUS_TYPES
-# from helpers.models import BaseModel
+from helpers.constants import DEFAULTS, MAX_LENGTHS
+from helpers.validators import is_numeric_value
+from helpers.models import BaseModel
+from helpers.choices_variable import ACCOUNT_TYPE_CHOICES
 
 
 class UserManager(BaseUserManager):
@@ -170,7 +173,7 @@ class User(AbstractBaseUser, Address):
         user_group, _ = Group.objects.get_or_create(name='user')
         user_obj.group.add(user_group)
         if not kwargs.get('is_user'):
-            owner_groregister_userup, _ = Group.objects.get_or_create(name='owner')
+            owner_group, _ = Group.objects.get_or_create(name='owner')
             user_obj.group.add(owner_group)
         user_obj.gender = kwargs['gender']
         user_obj.save()
@@ -381,8 +384,16 @@ def auto_send_signup_token_email(sender, instance, **kwargs):
         return False
 
 
-# class UserSocial(BaseModel):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     account_type = models.CharField()
-#     account_id = models.CharField()
+class SocialAccount(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    account_type = models.CharField(max_length=10, choices=ACCOUNT_TYPE_CHOICES, default=DEFAULTS['ACCOUNT_TYPE'])
+    account_id = models.CharField(max_length = 50, unique=True)
+    email = models.EmailField(max_length=50)
+    phone_number = models.CharField(max_length=15, \
+        validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")], blank=True, null=True)
+    phone_number_ext = models.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER_EXT'],
+                                        default=DEFAULTS['PHONE_NUMBER_EXT'], validators=[is_numeric_value, ])
+    dob = models.DateField(null=True, blank=True)
+    is_phone_verified = models.BooleanField(default=True)
+
 
