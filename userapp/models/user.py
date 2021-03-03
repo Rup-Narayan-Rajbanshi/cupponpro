@@ -405,4 +405,7 @@ class SocialAccount(BaseModel):
     dob = models.DateField(null=True, blank=True)
     is_phone_verified = models.BooleanField(default=True)
 
+    def __str__(self):
+        return str(self.first_name) + ' ' + str(self.last_name)
+
 
