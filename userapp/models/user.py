@@ -385,9 +385,18 @@ def auto_send_signup_token_email(sender, instance, **kwargs):
 
 
 class SocialAccount(BaseModel):
+    first_name = models.CharField(max_length=50,\
+        validators=[RegexValidator(
+            regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
+            )], null=True)
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=50,\
+        validators=[RegexValidator(
+            regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
+            )],null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     account_type = models.CharField(max_length=10, choices=ACCOUNT_TYPE_CHOICES, default=DEFAULTS['ACCOUNT_TYPE'])
-    account_id = models.CharField(max_length = 50, unique=True)
+    account_id = models.CharField(max_length = 50)
     email = models.EmailField(max_length=50)
     phone_number = models.CharField(max_length=15, \
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")], blank=True, null=True)

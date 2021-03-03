@@ -32,6 +32,7 @@ class VerifyVerificationCodeAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewS
 
     def create(self, request, *args, **kwargs):
         serializer = super().create(request, *args, **kwargs)
+        # print(serializer.data.get('type'))
         data = {
             'token': serializer.data.get('token')
         }

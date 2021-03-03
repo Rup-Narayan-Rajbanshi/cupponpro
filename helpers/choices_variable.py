@@ -22,7 +22,8 @@ OTP_STATUS_CHOICES = (
 OTP_TYPE_CHOICES = (
     (OTP_TYPES['USER_REGISTER'], 'User Registration'),
     (OTP_TYPES['RESET_PASSWORD'], 'Reset Password'),
-    (OTP_TYPES['CHANGE_PHONE_NUMBER'], 'Change Phone number')
+    (OTP_TYPES['CHANGE_PHONE_NUMBER'], 'Change Phone number'),
+    (OTP_TYPES['SOCIAL_LOGIN'], 'Social Login')
 )
 
 CURRENCY_TYPE_CHOICES = (

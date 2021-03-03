@@ -89,7 +89,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     first_name = serializers.CharField(max_length=50, required=False)
-    middle_name = serializers.CharField(max_length=50, required=False)
+    middle_name = serializers.CharField(max_length=50, required=False, allow_blank=True)
     last_name = serializers.CharField(max_length=50, required=False)
     is_user = serializers.BooleanField(write_only=True)
     gender = serializers.ChoiceField(GENDER_CHOICES)
