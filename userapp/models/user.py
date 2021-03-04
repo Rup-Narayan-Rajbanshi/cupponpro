@@ -429,9 +429,8 @@ class SocialAccount(BaseModel):
         password = make_rand_username()
         account_id = kwargs.get('account_id')
         account_type = kwargs.get('account_type')
-        instance = cls.objects.filter(account_id=account_id, account_type=account_type).first()
+        account = cls.objects.filter(account_id=account_id, account_type=account_type).first()
         user = User.objects.filter(email=email).first()
-        account = instance
         data = {'email':email, 'first_name':first_name, 'last_name': last_name, 'middle_name':middle_name,
                 'password':password,
                 'phone_number':phone_number,
