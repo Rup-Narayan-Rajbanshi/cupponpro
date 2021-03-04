@@ -17,6 +17,8 @@ from helpers.constants import DEFAULTS, MAX_LENGTHS
 from helpers.validators import is_numeric_value
 from helpers.models import BaseModel
 from helpers.choices_variable import ACCOUNT_TYPE_CHOICES
+from helpers.misc import make_rand_username
+from rest_framework.exceptions import ValidationError
 
 
 class UserManager(BaseUserManager):
@@ -160,8 +162,7 @@ class User(AbstractBaseUser, Address):
 
     @classmethod
     @transaction.atomic
-    def register_user(cls, **kwargs):
-        from userapp.models import OTPVerificationCode
+    def create_user_instance(cls ,**kwargs):
         user_obj = User.objects.create_user(
             first_name=kwargs['first_name'],
             middle_name=kwargs.get('middle_name', ''),
@@ -177,6 +178,13 @@ class User(AbstractBaseUser, Address):
             user_obj.group.add(owner_group)
         user_obj.gender = kwargs['gender']
         user_obj.save()
+        return user_obj
+
+    @classmethod
+    @transaction.atomic
+    def register_user(cls, **kwargs):
+        from userapp.models import OTPVerificationCode
+        user_obj = cls.create_user_instance(**kwargs)
         OTPVerificationCode.objects.filter(phone_number=kwargs['phone_number'], type=OTP_TYPES['USER_REGISTER']).update(status=OTP_STATUS_TYPES['EXPIRED'])
         return user_obj
 
@@ -407,5 +415,48 @@ class SocialAccount(BaseModel):
 
     def __str__(self):
         return str(self.first_name) + ' ' + str(self.last_name)
+
+
+    @classmethod
+    @transaction.atomic
+    def create_user_account(cls, **kwargs):
+        first_name = kwargs.get('first_name', '')
+        gender = kwargs.pop('gender')
+        email = kwargs.get('email', None)
+        last_name = kwargs.get('last_name', '')
+        middle_name = kwargs.get('middle_name', '')
+        phone_number = kwargs.get('phone_number',None)
+        password = make_rand_username()
+        account_id = kwargs.get('account_id')
+        account_type = kwargs.get('account_type')
+        instance = cls.objects.filter(account_id=account_id, account_type=account_type).first()
+        user = User.objects.filter(email=email).first()
+        account = instance
+        data = {'email':email, 'first_name':first_name, 'last_name': last_name, 'middle_name':middle_name,
+                'password':password,
+                'phone_number':phone_number,
+                'gender':gender,'is_user':True}
+        if not account:
+            if not user:
+                try:
+                    user = User.create_user_instance(**data)
+                    kwargs['user'] = user
+                    account = cls.objects.create(**kwargs)
+                except:
+                    kwargs['is_phone_verified'] = False
+                    account = cls.objects.create(**kwargs)
+            else:
+                raise ValidationError({'User email already exists'})
+        else:
+            kwargs.pop('account_id', None)
+            kwargs.pop('account_type', None)
+            if not user:
+                try:
+                    user = User.create_user_instance(**data)
+                    kwargs['user'] = user
+                except:
+                    kwargs['is_phone_verified'] = False
+            account.update(**kwargs)
+        return account
 
 
