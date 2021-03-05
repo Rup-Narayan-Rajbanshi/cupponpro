@@ -169,7 +169,7 @@ class User(AbstractBaseUser, Address):
         user_group, _ = Group.objects.get_or_create(name='user')
         user_obj.group.add(user_group)
         if not kwargs.get('is_user'):
-            owner_groregister_userup, _ = Group.objects.get_or_create(name='owner')
+            owner_group, _ = Group.objects.get_or_create(name='owner')
             user_obj.group.add(owner_group)
         user_obj.gender = kwargs['gender']
         user_obj.save()
