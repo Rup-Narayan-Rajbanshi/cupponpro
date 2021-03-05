@@ -16,7 +16,36 @@ DATABASES = {
     }
 }
 
+ENABLE_DEBUG_TOOLBAR = False
+
 try:
     from .local_settings import *
 except Exception as e:
     pass
+
+
+if ENABLE_DEBUG_TOOLBAR:
+    MIDDLEWARE += (
+        'qinspect.middleware.QueryInspectMiddleware',
+    )
+    if 'loggers' in LOGGING:
+        LOGGING['loggers'] = {
+            'qinspect': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            }
+        }
+    QUERY_INSPECT_ENABLED = True
+    QUERY_INSPECT_LOG_QUERIES = True
+    # QUERY_INSPECT_LOG_TRACEBACKS = True
+
+
+if DEBUG:
+    INTERNAL_IPS = ('127.0.0.1',)
+    MIDDLEWARE += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )    
+    INSTALLED_APPS += (
+        'debug_toolbar',
+    )
