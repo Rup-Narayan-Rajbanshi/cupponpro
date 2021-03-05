@@ -109,8 +109,7 @@ class Orders(BaseModel):
 
     @property
     def subtotal(self):
-        subtotal = self.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']
-                                      ).aggregate(order_total=Sum('total'))['order_total']
+        subtotal = self.lines.aggregate(order_total=Sum('total'))['order_total']
         if subtotal:
             return float(subtotal)
         else:
@@ -119,7 +118,7 @@ class Orders(BaseModel):
     @property
     def discount_amount(self):
         value = 0.0
-        for line in self.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
+        for line in self.lines:
             value = value + line.get_discounted_amount()
         if self.custom_discount_percentage:
             total_for_discount = float(self.get_total) + float(self.service_charge_amount)
@@ -150,7 +149,7 @@ class Orders(BaseModel):
     @property
     def get_total(self):
         value = 0.0
-        for line in self.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']):
+        for line in self.lines:
             value = value + line.get_line_total()
         return float(value)
 
@@ -163,7 +162,7 @@ class Orders(BaseModel):
         grand_total=0.0
         taxed_amount = order.company.tax if order.company.tax else 0
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
-        total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
+        total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
         # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
         grand_total = grand_total + total
         service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
@@ -182,7 +181,7 @@ class Orders(BaseModel):
         grand_total=0.0
         taxed_amount = order.company.tax if order.company.tax else 0
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
-        total = float(order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total']) if order.lines.exclude(status=ORDER_LINE_STATUS['CANCELLED']).aggregate(order_total=Sum('total'))['order_total'] else 0
+        total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines..aggregate(order_total=Sum('total'))['order_total'] else 0
         # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
         grand_total = grand_total + total
         service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0
@@ -239,13 +238,13 @@ class OrderLines(BaseModel):
         return 0
 
     def get_discounted_amount(self):
-        return self.get_discount() * self.quantity
+        return self.get_discount() * (self.quantity-self.cancelled)
 
     def line_total_no_discount(self):
-        return (self.rate * self.quantity)
+        return (self.rate * (self.served-self.cancelled))
 
     def get_line_total(self):
-        return (self.rate * self.quantity) - self.get_discounted_amount()
+        return (self.rate * (self.quantity - self.cancelled)) - self.get_discounted_amount()
 
     def save(self, *args, **kwargs):
         self.rate = self.rate if self.rate else self.product.total_price
