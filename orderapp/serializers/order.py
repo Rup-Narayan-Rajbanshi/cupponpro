@@ -223,6 +223,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                                     new=line.get('new', 0),
                                     cooking=line.get('cooking', 0),
                                     served=line.get('served', 0),
+                                    cancelled=line.get('cancelled', 0),
                                     quantity=new_quantity,
                                     rate=float(line['product'].total_price),
                                     voucher=voucher)

@@ -109,7 +109,7 @@ class Orders(BaseModel):
 
     @property
     def subtotal(self):
-        subtotal = self.lines.aggregate(order_total=Sum('total'))['order_total']
+        subtotal = self.lines.all().aggregate(order_total=Sum('total'))['order_total']
         if subtotal:
             return float(subtotal)
         else:
@@ -118,7 +118,7 @@ class Orders(BaseModel):
     @property
     def discount_amount(self):
         value = 0.0
-        for line in self.lines:
+        for line in self.lines.all():
             value = value + line.get_discounted_amount()
         if self.custom_discount_percentage:
             total_for_discount = float(self.get_total) + float(self.service_charge_amount)
@@ -149,7 +149,7 @@ class Orders(BaseModel):
     @property
     def get_total(self):
         value = 0.0
-        for line in self.lines:
+        for line in self.lines.all():
             value = value + line.get_line_total()
         return float(value)
 
@@ -162,7 +162,7 @@ class Orders(BaseModel):
         grand_total=0.0
         taxed_amount = order.company.tax if order.company.tax else 0
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
-        total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
+        total = float(order.lines.all().aggregate(order_total=Sum('total'))['order_total']) if order.lines.all().aggregate(order_total=Sum('total'))['order_total'] else 0
         # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
         grand_total = grand_total + total
         service_charge_amount = float(service_charge_amount) / 100 * float(grand_total) if order.is_service_charge else 0
@@ -181,7 +181,7 @@ class Orders(BaseModel):
         grand_total=0.0
         taxed_amount = order.company.tax if order.company.tax else 0
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
-        total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines..aggregate(order_total=Sum('total'))['order_total'] else 0
+        total = float(order.lines.all().aggregate(order_total=Sum('total'))['order_total']) if order.lines.all().aggregate(order_total=Sum('total'))['order_total'] else 0
         # taxed_amount = float(taxed_amount) / 100 * float(total) #if is_service_charge else 0
         grand_total = grand_total + total
         service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0

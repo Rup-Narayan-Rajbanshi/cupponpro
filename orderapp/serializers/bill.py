@@ -186,7 +186,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         grand_total=0.0
         taxed_amount = order.company.tax if order.company.tax else 0
         service_charge_amount = order.company.service_charge if order.company.service_charge else 0
-        total = float(order.lines.aggregate(order_total=Sum('total'))['order_total']) if order.lines.aggregate(order_total=Sum('total'))['order_total'] else 0
+        total = float(order.lines.all().aggregate(order_total=Sum('total'))['order_total']) if order.lines.all().aggregate(order_total=Sum('total'))['order_total'] else 0
         grand_total = grand_total + total 
         service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0
         grand_total = grand_total + service_charge_amount
