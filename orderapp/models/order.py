@@ -241,7 +241,7 @@ class OrderLines(BaseModel):
         return self.get_discount() * (self.quantity-self.cancelled)
 
     def line_total_no_discount(self):
-        return (self.rate * (self.served-self.cancelled))
+        return (self.rate * (self.quantity-self.cancelled))
 
     def get_line_total(self):
         return (self.rate * (self.quantity - self.cancelled)) - self.get_discounted_amount()
