@@ -421,7 +421,7 @@ class SocialAccount(BaseModel):
     @transaction.atomic
     def create_user_account(cls, **kwargs):
         first_name = kwargs.get('first_name', '')
-        gender = kwargs.pop('gender')
+        gender = kwargs.pop('gender', 'M')
         email = kwargs.get('email', None)
         last_name = kwargs.get('last_name', '')
         middle_name = kwargs.get('middle_name', '')
@@ -453,6 +453,7 @@ class SocialAccount(BaseModel):
                 try:
                     user = User.create_user_instance(**data)
                     kwargs['user'] = user
+                    kwargs['is_phone_verified'] = True
                 except:
                     kwargs['is_phone_verified'] = False
             account.update(**kwargs)
