@@ -20,3 +20,18 @@ def send_otp(text, phone_number):
                   "for verification because of {1}".format(phone_number, response.text)
         print(message)
     return False, message
+
+
+def split_full_name(full_name):
+    full_name_dict = dict()
+    full_name_list = [word for word in full_name.split(" ") if word]
+    first_name = full_name_list[0]
+    last_name = full_name_list[-1]
+    middle_name_list = full_name_list[1:-1]
+    middle_name=""
+    for word in middle_name_list:
+        middle_name += word + " "
+    full_name_dict['first_name']=first_name
+    full_name_dict['middle_name']=middle_name
+    full_name_dict['last_name']=last_name
+    return full_name_dict

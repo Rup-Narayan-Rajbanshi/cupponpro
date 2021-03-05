@@ -14,6 +14,7 @@ class UserGroupSerializer(serializers.ModelSerializer):
         read_only_fields = ('group', )
 
 class UserSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(required=False)
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     middle_name = serializers.CharField(max_length=50, allow_null=True, allow_blank=True)
@@ -23,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'middle_name', 'last_name', 'gender',\
+        fields = ('id','full_name', 'first_name', 'middle_name', 'last_name', 'gender',\
             'email', 'phone_number', 'active', 'admin', 'password',\
             'confirm_password', 'image', 'full_name', 'country', 'state',\
             'dob','city', 'address', 'zip_code', 'group', 'company')

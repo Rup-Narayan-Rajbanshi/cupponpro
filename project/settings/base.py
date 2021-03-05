@@ -38,7 +38,6 @@ INTERNAL_APPS = [
 
 THIRD_PARTY_APPS = [
     'corsheaders',
-    'debug_toolbar',
     'django_extensions',
     'django_filters',
     'rest_framework_swagger',
@@ -76,7 +75,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -198,5 +196,19 @@ OTP_SPARROW = {
         "from": config('SPARROW_SENDER', 'Demo'),
         "to": "",
         "text": ""
+    }
+}
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'loggers': {
     }
 }

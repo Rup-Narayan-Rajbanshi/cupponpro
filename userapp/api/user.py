@@ -14,6 +14,7 @@ from userapp.models.verifications import OTPVerificationCode
 from userapp.models.subscription import Subscription
 from notifications.models.notification import Notification , Device 
 from permission import isAdmin, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
+from userapp.helpers import split_full_name
 
 class GroupListView(generics.GenericAPIView):
     serializer_class = GroupSerializer
@@ -186,6 +187,12 @@ class UpdateUser(generics.GenericAPIView):
                 if 'image' in request.data and not request.data['image']:
                     serializer.exclude_fields(['image'])
                 if serializer.is_valid():
+                    full_name = serializer.validated_data.pop('full_name',None)
+                    if full_name != None:
+                        full_name_dict = split_full_name(full_name)
+                        serializer.save(first_name=full_name_dict['first_name'],\
+                                        middle_name=full_name_dict['middle_name'],\
+                                        last_name=full_name_dict['last_name'])
                     serializer.save()
                     data = {
                         'success': 1,
