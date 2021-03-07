@@ -3,6 +3,9 @@ from orderapp.models.order import Orders
 from rest_framework.exceptions import ValidationError
 from orderapp.models.transaction import TransactionHistoryBills
 from commonapp.models.asset import Asset
+from commonapp.models.coupon import Coupon
+from django.db.models import Max
+from django.utils import timezone
 
 class OrdersFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
@@ -87,3 +90,20 @@ class TransactionFilter(filters.FilterSet):
     class Meta:
         model = TransactionHistoryBills
         fields = ['bill']
+
+class CouponFilter(filters.FilterSet):
+    company = filters.CharFilter(field_name='company__id')
+    class Meta:
+        model = Coupon
+        fields = "__all__"
+        
+class HighestDiscountCouponFilter(CouponFilter):
+    @property
+    def qs(self):
+        parent = super(HighestDiscountCouponFilter, self).qs
+        parent = parent.filter(expiry_date__gte=timezone.now())
+        status = self.request.GET.get('status',None)
+        if status == 'max_discount':
+            parent = parent.annotate(highest_discount=Max('discount')).order_by('-highest_discount')[:1]
+        return parent
+
