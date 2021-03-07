@@ -13,6 +13,7 @@ from helpers.exceptions import (
     InvalidTokenException,
     InvalidRequestException
 )
+from rest_framework.exceptions import ValidationError
 from userapp.models import User, OTPVerificationCode
 from helpers.choices_variable import OTP_TYPE_CHOICES
 from helpers.constants import (
@@ -42,6 +43,7 @@ class SendOTPSerializer(CustomBaseSerializer):
         max_length=MAX_LENGTHS['PHONE_NUMBER'],
         validators=[phone_number_validator, is_numeric_value]
     )
+    email = serializers.EmailField(max_length=50, required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = None
@@ -51,16 +53,18 @@ class SendOTPSerializer(CustomBaseSerializer):
         phone_number_ext = attrs.get('phone_number_ext', DEFAULTS['PHONE_NUMBER_EXT'])
         phone_number = attrs['phone_number']
         otp_type = attrs['type']
-
+        if otp_type == OTP_TYPES['SOCIAL_LOGIN']:
+            if not 'email' in attrs:
+                raise ValidationError({"Email is required."})
         try:
             self.user = User.objects.get(
                 phone_number=phone_number
             )
         except User.DoesNotExist:
-            if otp_type != OTP_TYPES['USER_REGISTER']:
+            if otp_type != OTP_TYPES['USER_REGISTER'] and otp_type != OTP_TYPES['SOCIAL_LOGIN']:
                 raise PhoneNumberNotFoundException()
         else:
-            if otp_type == OTP_TYPES['USER_REGISTER']:
+            if otp_type == OTP_TYPES['USER_REGISTER'] or otp_type == OTP_TYPES['SOCIAL_LOGIN']:
                 raise PhoneNumberExistsException()
 
         now = timezone.now()
@@ -101,6 +105,7 @@ class VerifyOTPSerializer(CustomBaseSerializer):
         allow_null=True,
         allow_blank=True
     )
+    email = serializers.EmailField(max_length=50, required=False)
 
     def __init__(self, *args, **kwargs):
         self.otp_verification_code = None
@@ -111,9 +116,11 @@ class VerifyOTPSerializer(CustomBaseSerializer):
         is_invalid = False
         tries = 0
         phone_number = attrs.get('phone_number', None)
-        phone_number_ext = attrs.get('phone_number_ext', None)
         code = attrs.get('code', None)
         otp_type = attrs.get('type')
+        if otp_type == 'SOCIAL_LOGIN':
+            if not 'email' in attrs:
+                raise ValidationError({"Email is required."})
         token = None
         request = self.context.get('request')
         if request:
@@ -125,10 +132,10 @@ class VerifyOTPSerializer(CustomBaseSerializer):
         try:
             self.user = User.objects.get(phone_number=phone_number)
         except Exception as e:
-            if otp_type != OTP_TYPES['USER_REGISTER']:
+            if otp_type != OTP_TYPES['USER_REGISTER'] and otp_type != OTP_TYPES['SOCIAL_LOGIN']:
                 is_invalid = True
         else:
-            if otp_type == OTP_TYPES['USER_REGISTER']:
+            if otp_type == OTP_TYPES['USER_REGISTER'] or otp_type == OTP_TYPES['SOCIAL_LOGIN']:
                 is_invalid = True
         if not is_invalid:
             self.otp_verification_code = OTPVerificationCode.objects.filter(

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import Group
 from rest_framework.exceptions import ValidationError
 from .user import UserRegistrationSerializer
 from userapp.models import User, OTPVerificationCode
@@ -6,6 +7,9 @@ from helpers.constants import OTP_STATUS_TYPES, OTP_HEADER
 from helpers.exceptions import (
     InvalidRequestException
 )
+from userapp.models.user import SocialAccount
+from django.db import transaction
+from helpers.choices_variable import ACCOUNT_TYPE_CHOICES, GENDER_CHOICES
 from userapp.helpers import split_full_name
 
 
@@ -43,3 +47,45 @@ class UserRegisterSerializer(UserRegistrationSerializer):
             validated_data['last_name']=full_name_dict['last_name']
         user = User.register_user(**validated_data)
         return user
+
+class SocialAccountSerializer(serializers.ModelSerializer):
+
+    """
+    Serializer for user's profile picture change endpoint.
+    """
+    account_id = serializers.CharField(max_length=50)
+    account_type = serializers.ChoiceField(ACCOUNT_TYPE_CHOICES)
+    email = serializers.EmailField(max_length=50)
+    first_name = serializers.CharField(max_length=50, required=False)
+    gender = serializers.ChoiceField(GENDER_CHOICES, default='M')
+    last_name = serializers.CharField(max_length=50, required=False)
+
+    class Meta:
+        model = SocialAccount
+        fields = ('account_id', 'account_type', 'dob', 'email', 'first_name', 'gender', 'is_phone_verified', 'last_name', 'middle_name', 'phone_number_ext', 'phone_number')
+
+    def validate(self, attrs):
+        social_account = SocialAccount.objects.filter(email=attrs['email']).first()
+        if not social_account:
+            user = User.objects.filter(email=attrs['email']).first()
+            if user:
+                raise ValidationError('User with email already exists')   
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = SocialAccount.create_user_account(**validated_data)
+        return user
+       
+
+
+
+#  if not usersocial.phone_number:
+#             usersocial.is_phone_verified = False
+#             usersocial.save()
+#             return usersocial
+#         is_phone_number_exists = User.objects.filter(phone_number = usersocial.phone_number).exists()
+#         if is_phone_number_exists:
+#             usersocial.is_phone_verified = False
+#             usersocial.save()
+#             return usersocial

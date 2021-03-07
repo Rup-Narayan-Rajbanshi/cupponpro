@@ -35,7 +35,8 @@ ASSET_TYPE = {
 OTP_TYPES = {
     'USER_REGISTER': 'USER_REGISTER',
     'RESET_PASSWORD': 'RESET_PASSWORD',
-    'CHANGE_PHONE_NUMBER': 'CHANGE_PHONE_NUMBER'
+    'CHANGE_PHONE_NUMBER': 'CHANGE_PHONE_NUMBER',
+    'SOCIAL_LOGIN': 'SOCIAL_LOGIN'
 }
 
 PRODUCT_CAT_TYPE = {
@@ -47,6 +48,11 @@ PRODUCT_CAT_TYPE = {
 PRODUCT_TYPE = {
     'VEG': 'VEG',
     'NON-VEG': 'NON-VEG',
+}
+
+ACCOUNT_TYPE = {
+    'GOOGLE': 'GOOGLE',
+    'FACEBOOK': 'FACEBOOK'
 }
 
 
@@ -61,7 +67,8 @@ DEFAULTS = {
     'PRODUCT_CAT_TYPE': PRODUCT_CAT_TYPE['FOOD'],
     'PRODUCT_TYPE': '',
     'PRODUCT_CAT_SUB_TYPE': '',
-    'ADDRESS': ''
+    'ADDRESS': '',
+    'ACCOUNT_TYPE': 'GOOGLE'
 }
 
 MAX_LENGTHS = {
@@ -105,6 +112,7 @@ COUPON_TYPE_MAPPER = {
     'productcategory': 'productcategory',
     'all': None
 }
+
 
 TIME_EARLY_THRESHOLD = 30           # unit = minute
 RESEND_COUNTDOWN = 1                # unit = minute

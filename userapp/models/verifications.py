@@ -31,6 +31,7 @@ class OTPVerificationCode(BaseModel):
     type = models.CharField(max_length=MAX_LENGTHS['OTP_TYPES'], choices=OTP_TYPE_CHOICES, default=DEFAULTS['OTP_TYPES'])
     status = models.PositiveSmallIntegerField(choices=OTP_STATUS_CHOICES, default=OTP_STATUS_TYPES['INACTIVE'])
     tries = models.PositiveIntegerField(default=0)
+    email = models.EmailField(max_length=50, null=True, blank=True)
 
     @staticmethod
     def generate_unique_otp_code():
@@ -53,7 +54,8 @@ class OTPVerificationCode(BaseModel):
     def send_otp(cls, user, **kwargs):
         from userapp.tasks import send_otp_task
         kwargs['phone_number_ext'] = kwargs.get('phone_number_ext', DEFAULTS['PHONE_NUMBER_EXT'])
-        filter_from_kwargs = ['type', 'phone_number_ext', 'phone_number']
+        kwargs['email'] = kwargs.get('email', '')
+        filter_from_kwargs = ['type', 'phone_number_ext', 'phone_number', 'email']
         assert len(set(filter_from_kwargs) - set(kwargs.keys())) == 0, "Provide all required keyword arguments."
         kwargs = {key: value for key, value in kwargs.items() if key in filter_from_kwargs}
 

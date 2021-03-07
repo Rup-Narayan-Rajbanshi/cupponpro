@@ -13,6 +13,12 @@ from project.settings.base import EMAIL_HOST_USER
 from commonapp.models.address import Address
 from helpers.app_helpers import url_builder
 from helpers.constants import OTP_TYPES, OTP_STATUS_TYPES
+from helpers.constants import DEFAULTS, MAX_LENGTHS
+from helpers.validators import is_numeric_value
+from helpers.models import BaseModel
+from helpers.choices_variable import ACCOUNT_TYPE_CHOICES
+from helpers.misc import make_rand_username
+from rest_framework.exceptions import ValidationError
 
 
 class UserManager(BaseUserManager):
@@ -156,8 +162,7 @@ class User(AbstractBaseUser, Address):
 
     @classmethod
     @transaction.atomic
-    def register_user(cls, **kwargs):
-        from userapp.models import OTPVerificationCode
+    def create_user_instance(cls ,**kwargs):
         user_obj = User.objects.create_user(
             first_name=kwargs['first_name'],
             middle_name=kwargs.get('middle_name', ''),
@@ -173,6 +178,13 @@ class User(AbstractBaseUser, Address):
             user_obj.group.add(owner_group)
         user_obj.gender = kwargs['gender']
         user_obj.save()
+        return user_obj
+
+    @classmethod
+    @transaction.atomic
+    def register_user(cls, **kwargs):
+        from userapp.models import OTPVerificationCode
+        user_obj = cls.create_user_instance(**kwargs)
         OTPVerificationCode.objects.filter(phone_number=kwargs['phone_number'], type=OTP_TYPES['USER_REGISTER']).update(status=OTP_STATUS_TYPES['EXPIRED'])
         return user_obj
 
@@ -378,3 +390,73 @@ def auto_send_signup_token_email(sender, instance, **kwargs):
 
     except sender.DoesNotExist:
         return False
+
+
+class SocialAccount(BaseModel):
+    first_name = models.CharField(max_length=50,\
+        validators=[RegexValidator(
+            regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
+            )], null=True)
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=50,\
+        validators=[RegexValidator(
+            regex="((?=.*[a-z])(?=.*[A-Z]))|((?=.*[A-Z])(?=.*[a-z]))|(?=.*[a-z])|(?=.*[A-Z])"
+            )],null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    account_type = models.CharField(max_length=10, choices=ACCOUNT_TYPE_CHOICES, default=DEFAULTS['ACCOUNT_TYPE'])
+    account_id = models.CharField(max_length = 50)
+    email = models.EmailField(max_length=50)
+    phone_number = models.CharField(max_length=15, \
+        validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")], blank=True, null=True)
+    phone_number_ext = models.CharField(max_length=MAX_LENGTHS['PHONE_NUMBER_EXT'],
+                                        default=DEFAULTS['PHONE_NUMBER_EXT'], validators=[is_numeric_value, ])
+    dob = models.DateField(null=True, blank=True)
+    is_phone_verified = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.first_name) + ' ' + str(self.last_name)
+
+
+    @classmethod
+    @transaction.atomic
+    def create_user_account(cls, **kwargs):
+        first_name = kwargs.get('first_name', '')
+        gender = kwargs.pop('gender', 'M')
+        email = kwargs.get('email', None)
+        last_name = kwargs.get('last_name', '')
+        middle_name = kwargs.get('middle_name', '')
+        phone_number = kwargs.get('phone_number',None)
+        password = make_rand_username()
+        account_id = kwargs.get('account_id')
+        account_type = kwargs.get('account_type')
+        account = cls.objects.filter(account_id=account_id, account_type=account_type).first()
+        user = User.objects.filter(email=email).first()
+        data = {'email':email, 'first_name':first_name, 'last_name': last_name, 'middle_name':middle_name,
+                'password':password,
+                'phone_number':phone_number,
+                'gender':gender,'is_user':True}
+        if not account:
+            if not user:
+                try:
+                    user = User.create_user_instance(**data)
+                    kwargs['user'] = user
+                    account = cls.objects.create(**kwargs)
+                except:
+                    kwargs['is_phone_verified'] = False
+                    account = cls.objects.create(**kwargs)
+            else:
+                raise ValidationError({'User email already exists'})
+        else:
+            kwargs.pop('account_id', None)
+            kwargs.pop('account_type', None)
+            if not user:
+                try:
+                    user = User.create_user_instance(**data)
+                    kwargs['user'] = user
+                    kwargs['is_phone_verified'] = True
+                except:
+                    kwargs['is_phone_verified'] = False
+            account.update(**kwargs)
+        return account
+
+
