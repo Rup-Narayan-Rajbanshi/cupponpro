@@ -41,7 +41,7 @@ class DealOfDayFilter(CouponBaseFilter):
         content_type = ['product', 'productcategory']
         return parent.filter(expiry_date__gt=datetime.now().date(),
                                 content_type__model__in=content_type,
-                                company__affilated_companies__isnull=False
+                                company__is_affiliate=True
                             )
 
 
@@ -52,7 +52,7 @@ class TrendingCouponFilter(CouponBaseFilter):
         content_type = ['productcategory']
         return parent.filter(expiry_date__gt=datetime.now().date(),
                                 content_type__model__in=content_type,
-                                company__affilated_companies__isnull=False
+                                company__is_affiliate=True
                             )
 
 
@@ -63,7 +63,7 @@ class RecentCouponFilter(CouponBaseFilter):
         content_type = ['product']
         return parent.filter(expiry_date__gt=datetime.now().date(),
                                 content_type__model__in=content_type,
-                                company__affilated_companies__isnull=True
+                                company__is_affiliate=False
                             )
 
 
@@ -101,7 +101,7 @@ class LocalBusinessCouponFilter(CouponBaseFilter):
             parent = parent.filter(company__category__name__iexact=category)
         content_type = ['product']
         return parent.filter(expiry_date__gt=datetime.now().date(),
-                                company__affilated_companies__isnull=True
+                                company__is_affiliate=False
                             )
 
 

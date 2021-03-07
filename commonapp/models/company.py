@@ -45,6 +45,12 @@ class Company(Address):
     print_tax_invoice = models.BooleanField(default=True)
     print_pre_order_bill = models.BooleanField(default=False)
     print_order = models.BooleanField(default=True)
+    #affiliate addition
+    url = models.TextField(null=True, blank=True)
+    discount_code = models.CharField(max_length=50, null=True, blank=True)
+    discount = models.PositiveIntegerField(default=0)
+    count = models.PositiveIntegerField(default=0)
+    deal_of_the_day = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'company'
@@ -70,7 +76,8 @@ class Company(Address):
                 'print_tax_invoice' : self.print_tax_invoice,
                 'print_pre_order_bill' : self.print_pre_order_bill,
                 'print_order' : self.print_order,
-                'service_charge': self.service_charge
+                'service_charge': self.service_charge,
+                'is_affiliate': self.is_affiliate
             }
         return None
 
@@ -111,6 +118,7 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     if instance.logo_icon:
         if os.path.isfile(instance.logo_icon.path):
             os.remove(instance.logo_icon.path)
+    
 
 @receiver(models.signals.pre_save, sender=Company)
 def auto_delete_file_on_change(sender, instance, **kwargs):

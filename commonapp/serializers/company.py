@@ -9,6 +9,7 @@ from commonapp.serializers.image import ImageDetailSerializer
 from commonapp.serializers.links import SocialLinkSerializer
 from userapp.models.user import User
 
+
 class CompanySerializer(serializers.ModelSerializer):
     logo = ImageFieldWithURL(allow_empty_file=True)
     logo_icon = ImageFieldWithURL(allow_empty_file=True)

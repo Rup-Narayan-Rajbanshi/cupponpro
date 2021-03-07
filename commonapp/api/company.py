@@ -57,6 +57,9 @@ class CompanyListView(generics.GenericAPIView):
             company_obj = company_obj.filter(name__istartswith=search)
         if filter_by == 'top_rated':
             company_obj = company_obj.order_by('-rating', '-id')
+        is_affiliate = request.query_params.get('is_affiliate',None)
+        if is_affiliate != None:
+            company_obj = company_obj.filter(is_affiliate=is_affiliate)
         paginator = Paginator(company_obj, page_size)
         page_obj = paginator.get_page(page_number)
         serializer = CompanySerializer(page_obj, many=True,\
