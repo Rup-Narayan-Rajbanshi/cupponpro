@@ -57,7 +57,7 @@ class Orders(BaseModel):
         if status == ORDER_STATUS['BILLABLE']:
             data = dict()
             data['company'] = order.company.id
-            data['service_charge'] = round(cls.service_charge_amount_static(order),2)
+            data['service_charge'] = round(cls.service_charge_amount_static(order),2) if order.is_service_charge else 0
             payable_amount, tax = cls.get_grand_total(order)
             payable_amount = round(payable_amount, 6)
             data['payable_amount'] = payable_amount

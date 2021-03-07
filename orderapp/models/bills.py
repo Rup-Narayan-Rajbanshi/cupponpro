@@ -132,6 +132,7 @@ class Bills(BaseModel):
             'is_manual': self.is_manual,
             'invoice_number': self.invoice_number,
             'payment_mode': self.payment_mode,
+            'is_service_charge': self.is_service_charge,
             'service_charge': self.service_charge if self.is_service_charge else 0,
             'tax': self.tax,
             'subtotal': self.get_subtotal(),
