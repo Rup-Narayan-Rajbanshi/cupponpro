@@ -16,7 +16,7 @@ class OrderLineSerializer(CustomModelSerializer):
     cooking = serializers.IntegerField(required=False)
     served = serializers.IntegerField(required=False)
     cancelled = serializers.IntegerField(required=False)
-    customer_comment = serializers.CharField(required=False)
+    customer_comment = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = OrderLines
