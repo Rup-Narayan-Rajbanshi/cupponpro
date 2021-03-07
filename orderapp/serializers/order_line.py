@@ -16,10 +16,11 @@ class OrderLineSerializer(CustomModelSerializer):
     cooking = serializers.IntegerField(required=False)
     served = serializers.IntegerField(required=False)
     cancelled = serializers.IntegerField(required=False)
+    customer_comment = serializers.CharField(required=False)
 
     class Meta:
         model = OrderLines
-        fields = ['id', 'rate', 'quantity', 'status', 'discount_amount', 'total', 'product', 'new', 'cooking', 'served', 'cancelled']
+        fields = ['id', 'rate', 'quantity', 'status', 'discount_amount', 'total', 'product', 'new', 'cooking', 'served', 'cancelled','customer_comment',]
 
     def validate(self, attrs):
         if 'quantity' in attrs and int(attrs['quantity']) <= 0:

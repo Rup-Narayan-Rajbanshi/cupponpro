@@ -16,7 +16,7 @@ from helpers.constants import ORDER_STATUS
 from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
 from orderapp.models.bills import Bills
-from orderapp.models.order import Orders
+from orderapp.models.order import Orders, OrderLines
 from permission import CompanyUserPermission, isCompanyManagerAndAllowAll, isUser, isCompanySalePersonAndAllowAll
 from orderapp.serializers.order import OrderStatusSerializer, CompanyTableOrderSerializer, TableOrderSerializer, \
     UserOrderSerializerCompany, MasterQRSerializer, TableOrderOrderlineUpdateSerializer
@@ -189,10 +189,8 @@ class UserOrderListAPI(mixins.ListModelMixin, GenericViewSet):
 
     def get_queryset(self):
         status = self.request.GET.get('status')
-        print(status)
+        print(self.request.user)
         if status == 'ACTIVE':
-            print("inside status")
-            print(self.request.user)
             return self.queryset.filter(user=self.request.user,
                                         status__in=[
                                             ORDER_STATUS['NEW_ORDER'], ORDER_STATUS['CONFIRMED'],
@@ -207,8 +205,21 @@ class CustomerOrderAPI(ModelViewSet):
     pagination_class = FPagination
 
     def create(self, request, *args, **kwargs):
-        created_response = super().create(request, *args, **kwargs)
-        return Response(created_response.data, status=200)
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            order = Orders.objects.get(id=serializer.data['id'])
+            order_lines = OrderLines.objects.filter(order__id=order.id)
+            for order_line in order_lines:
+                for item in request.data['order_lines']:
+                    if str(order_line.product.id) == str(item['product']):
+                        order_line.customer_comment = item['customer_comment']
+                        order_line.save()
+            data = {
+                'success': 1,
+                'data': serializer.data
+            }
+        return Response(data, status=200)
 
 
 class MasterQROrderAPI(ModelViewSet):
