@@ -1,8 +1,14 @@
+from django.db.models import Max
 from django_filters import rest_framework as filters
-from orderapp.models.order import Orders
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError
-from orderapp.models.transaction import TransactionHistoryBills
+
 from commonapp.models.asset import Asset
+from commonapp.models.coupon import Coupon
+from orderapp.models.bills import Bills
+from orderapp.models.order import Orders
+from orderapp.models.transaction import TransactionHistoryBills
+
 
 class OrdersFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
@@ -19,7 +25,7 @@ class OrdersFilter(filters.FilterSet):
     class Meta:
         model = Orders
         fields = ['company','status','from_date','to_date']
-    
+
     @property
     def qs(self):
         parent = super(OrdersFilter, self).qs
@@ -32,7 +38,6 @@ class OrdersFilter(filters.FilterSet):
                 raise ValidationError({'detail':'From Date must be smaller than To Date'})
         return parent.filter(company=company)
 
-from orderapp.models.bills import Bills
 
 class ServiceChargeFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
@@ -42,6 +47,7 @@ class ServiceChargeFilter(filters.FilterSet):
         model = Bills
         fields = ['from_date', 'to_date']
 
+
 class TableSalesFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='orders__bill__created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='orders__bill__created_at__date', lookup_expr='lte')
@@ -49,6 +55,7 @@ class TableSalesFilter(filters.FilterSet):
     class Meta:
         model = Asset
         fields = ['from_date', 'to_date']
+
 
 class SellItemFilter(filters.FilterSet):
     product_category = filters.CharFilter(field_name='orders__lines__product__product_category__id')
@@ -58,6 +65,7 @@ class SellItemFilter(filters.FilterSet):
     class Meta:
         model = Bills
         fields = ['product_category', 'from_date', 'to_date']
+
 
 class SellFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
@@ -70,6 +78,7 @@ class SellFilter(filters.FilterSet):
         model = Bills
         fields = ['from_date','to_date','invoice_number', 'customer_name', 'payment_mode']
 
+
 class BillFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
@@ -81,9 +90,28 @@ class BillFilter(filters.FilterSet):
         model = Bills
         fields = ['from_date','to_date','invoice_number','status','customer_name']
 
+
 class TransactionFilter(filters.FilterSet):
     bill = filters.UUIDFilter(field_name='bill')
 
     class Meta:
         model = TransactionHistoryBills
         fields = ['bill']
+
+
+class CouponFilter(filters.FilterSet):
+    company = filters.CharFilter(field_name='company__id')
+    class Meta:
+        model = Coupon
+        fields = "__all__"
+
+
+class HighestDiscountCouponFilter(CouponFilter):
+    @property
+    def qs(self):
+        parent = super(HighestDiscountCouponFilter, self).qs
+        parent = parent.filter(expiry_date__gte=timezone.now())
+        status = self.request.GET.get('status',None)
+        if status == 'max_discount':
+            parent = parent.annotate(highest_discount=Max('discount')).order_by('-highest_discount')[:1]
+        return parent

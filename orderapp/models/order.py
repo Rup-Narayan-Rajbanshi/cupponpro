@@ -214,6 +214,7 @@ class OrderLines(BaseModel):
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=ORDER_LINE_STATUS_CHOICES, default=DEFAULTS['ORDER_LINE_STATUS'])
+    customer_comment = models.CharField(max_length=250,null=True, blank=True)
     new = models.PositiveIntegerField(null=True, blank=True, default=0)
     cooking = models.PositiveIntegerField(null=True, blank=True, default=0)
     served = models.PositiveIntegerField(null=True, blank=True, default=0)
