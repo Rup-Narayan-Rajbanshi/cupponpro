@@ -1,8 +1,8 @@
 import uuid
 from django.db import models
 from commonapp.models.bill import Bill
-from commonapp.models.product import Product
-from commonapp.models.coupon import Voucher
+from productapp.models.product import Product
+from productapp.models.coupon import Voucher
 from commonapp.models.order import OrderLine
 
 

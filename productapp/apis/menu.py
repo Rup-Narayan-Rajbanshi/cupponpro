@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
-from commonapp.models.product import ProductCategory
+from productapp.models.product import ProductCategory
 from productapp.serializers.menu import (
     MenuSerializer
 )

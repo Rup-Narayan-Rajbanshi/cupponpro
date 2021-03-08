@@ -2,7 +2,7 @@ from datetime import datetime
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from commonapp.models.bill import Bill
-from commonapp.models.coupon import Voucher
+from productapp.models.coupon import Voucher
 from commonapp.models.salesitem import SalesItem
 from commonapp.models.order import OrderLine
 from commonapp.serializers.coupon import VoucherSerializer

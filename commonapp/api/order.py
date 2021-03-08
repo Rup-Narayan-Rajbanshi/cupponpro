@@ -4,9 +4,9 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from commonapp.models.company import Company
-from commonapp.models.coupon import Voucher
+from productapp.models.coupon import Voucher
 from commonapp.models.order import Order, OrderLine
-from commonapp.models.product import Product
+from productapp.models.product import Product
 from commonapp.serializers.bill import BillUserDetailSerializer
 from commonapp.serializers.order import OrderSerializer, OrderSaveSerializer,OrderLineSerializer
 from userapp.models.user import User

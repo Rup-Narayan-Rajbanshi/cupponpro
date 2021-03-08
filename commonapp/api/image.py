@@ -2,9 +2,9 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
 from rest_framework import generics
 from commonapp.models.company import Company
-from commonapp.models.coupon import Coupon
+from productapp.models.coupon import Coupon
 from commonapp.models.image import Image
-from commonapp.models.product import Product
+from productapp.models.product import Product
 from commonapp.serializers.image import ImageSerializer, ImageDetailSerializer
 from permission import isCompanyOwnerAndAllowAll, isAdminOrReadOnly
 from helper import isCompanyUser

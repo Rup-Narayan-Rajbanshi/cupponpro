@@ -17,7 +17,7 @@ from commonapp.api.image import CompanyImageListView, CompanyImageDetailView, Co
 from commonapp.api.links import SocialLinkListView, SocialLinkDetailView, SocialLinkMassUpdateView
 from commonapp.api.menu import MenuListView
 from commonapp.api.order import OrderListView, OrderDetailView, ActiveOrderListView, OrderToBillView, OrderUserDetailView, OrderLineVerifyView
-from commonapp.api.product import (
+from productapp.apis.product import (
     CompanyBulkQuantityListView,
     CompanyBulkQuantityDetailView,
     CompanyProductListView,

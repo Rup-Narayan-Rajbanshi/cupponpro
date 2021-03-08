@@ -2,8 +2,8 @@ from django.core.paginator import Paginator
 from rest_framework import generics
 from rest_framework.response import Response
 from commonapp.models.company import Company, CompanyUser
-from commonapp.models.product import BulkQuantity, Product, ProductCategory
-from commonapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
+from productapp.models.product import BulkQuantity, Product, ProductCategory
+from productapp.serializers.product import BulkQuantitySerializer, ProductSerializer, ProductCategorySerializer
 from permission import isAdminOrReadOnly, isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, publicReadOnly, isCompanySalePersonAndAllowAll
 from commonapp.app_helper import custom_paginator
 

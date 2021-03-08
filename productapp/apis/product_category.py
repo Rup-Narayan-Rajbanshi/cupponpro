@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
 from helpers.constants import COUPON_TYPE_DISPLAY_MAPPER
-from commonapp.models.product import ProductCategory
+from productapp.models.product import ProductCategory
 from productapp.serializers.product_category import (
     ProductCategorySerializer
 )

@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError
 from helpers.serializer_fields import DetailRelatedField
-from commonapp.models.coupon import Coupon, Voucher
+from productapp.models.coupon import Coupon, Voucher
 from commonapp.models.image import Image
 from userapp.models import User
 from helpers.serializer_fields import LowertoUpperChoiceField, CouponContentTypeField

@@ -4,8 +4,8 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from commonapp.models.bill import Bill
-from commonapp.models.coupon import Coupon, Voucher
-from commonapp.models.product import Product
+from productapp.models.coupon import Coupon, Voucher
+from productapp.models.product import Product
 from commonapp.models.order import Order
 from commonapp.serializers.bill import BillSerializer, BillSaveSerializer, BillUserDetailSerializer
 from userapp.models.user import User

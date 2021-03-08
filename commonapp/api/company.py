@@ -10,7 +10,7 @@ from userapp.models.user import User
 from userapp.serializers.user import UserDetailSerializer
 from permission import isCompanyOwnerAndAllowAll, publicReadOnly
 from helper import isCompanyUser
-from commonapp.models.coupon import Coupon
+from productapp.models.coupon import Coupon
 from commonapp.serializers.coupon import CouponSerializer, CouponDetailSerializer
 from django.db.models import (
     F,

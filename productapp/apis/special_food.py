@@ -1,9 +1,9 @@
 from rest_framework.viewsets import GenericViewSet, mixins
-from commonapp.serializers.product import ProductSerializer
+from productapp.serializers.product import ProductSerializer
 from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin
 from productapp.filters import SpecialFoodFilter
-from commonapp.models.product import Product
+from productapp.models.product import Product
 from permission import publicReadOnly
 
 class SpecialFoodAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):

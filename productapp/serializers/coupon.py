@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from helpers.validators import is_alphanumeric_with_exception
 from helpers.serializer_fields import DetailRelatedField, LowertoUpperChoiceField, CouponContentTypeField
 from helpers.serializer import CustomModelSerializer
-from commonapp.models.coupon import Coupon
+from productapp.models.coupon import Coupon
 from commonapp.models.company import Company
 from helpers.choices_variable import DISCOUNT_CHOICES
 from commonapp.models.image import Image

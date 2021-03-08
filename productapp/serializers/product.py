@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from helpers.serializer_fields import ImageFieldWithURL
-from commonapp.models.product import BulkQuantity, Product, ProductCategory
+from productapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.serializers.image import ImageDetailSerializer
 from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_TYPE_CHOICES
 

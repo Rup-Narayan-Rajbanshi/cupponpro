@@ -4,8 +4,8 @@ from helpers.choices_variable import PRODUCT_CAT_TYPE_CHOICES
 from helpers.serializer_fields import DetailRelatedField
 from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import ImageFieldWithURL
-from commonapp.models.product import ProductCategory, Product
-from commonapp.serializers.product import ProductSerializer
+from productapp.models.product import ProductCategory, Product
+from productapp.serializers.product import ProductSerializer
 from commonapp.models.company import Company
 from helpers.constants import DEFAULTS, MAX_LENGTHS
 

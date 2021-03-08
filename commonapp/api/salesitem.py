@@ -4,8 +4,8 @@ from rest_framework import permissions
 from helpers.constants import DISCOUNT_TYPE
 from commonapp.models.bill import Bill
 from commonapp.models.company import Company
-from commonapp.models.coupon import Voucher
-from commonapp.models.product import Product
+from productapp.models.coupon import Voucher
+from productapp.models.product import Product
 from commonapp.models.salesitem import SalesItem
 from commonapp.serializers.bill import BillSerializer
 from commonapp.serializers.salesitem import SalesItemSerializer

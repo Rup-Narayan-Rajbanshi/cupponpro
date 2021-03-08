@@ -5,8 +5,8 @@ from django.db import models, transaction
 from commonapp.models.asset import Asset
 from commonapp.models.bill import Bill
 from commonapp.models.company import Company
-from commonapp.models.coupon import Voucher
-from commonapp.models.product import Product
+from productapp.models.coupon import Voucher
+from productapp.models.product import Product
 from userapp.models.user import User
 from helpers.constants import MAX_LENGTHS, DEFAULTS, ORDER_STATUS
 from helpers.choices_variable import ORDER_STATUS_CHOICES, ORDER_LINE_STATUS, ORDER_LINE_STATUS_CHOICES
