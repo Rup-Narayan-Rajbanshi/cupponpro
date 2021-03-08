@@ -110,8 +110,16 @@ class HighestDiscountCouponFilter(CouponFilter):
     @property
     def qs(self):
         parent = super(HighestDiscountCouponFilter, self).qs
-        parent = parent.filter(expiry_date__gte=timezone.now())
         status = self.request.GET.get('status',None)
         if status == 'max_discount':
-            parent = parent.annotate(highest_discount=Max('discount')).order_by('-highest_discount')[:1]
-        return parent
+            coupon = parent.filter(discount_type='PERCENTAGE',
+                                expiry_date__gte=timezone.now()
+                                ).annotate(highest_discount=Max('discount')).order_by('-highest_discount')[:1]
+            if coupon:
+                return coupon
+            else:
+                return parent.filter(discount_type='FLAT',
+                                expiry_date__gte=timezone.now()
+                                ).annotate(highest_discount=Max('discount')).order_by('-highest_discount')[:1]
+
+        return parent.filter(expiry_date__gte=timezone.now())
