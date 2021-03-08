@@ -3,7 +3,7 @@ import pandas as pd
 from django.db import transaction
 from rest_framework import serializers
 
-from commonapp.models.product import Product, ProductCategory
+from productapp.models.product import Product, ProductCategory
 from rest_framework.exceptions import ValidationError
 from data_manager.exception import DuplicateNameException, ProductCategoryNotExistException, \
     ProductCodeAlreadyExistException

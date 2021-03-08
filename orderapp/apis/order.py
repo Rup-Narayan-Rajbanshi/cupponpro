@@ -9,9 +9,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CATEGORY
 from commonapp.models.asset import Asset
 from commonapp.models.company import CompanyUser
-from commonapp.models.coupon import Voucher
+from productapp.models.coupon import Voucher
 from commonapp.models.order import Order
-from commonapp.models.product import Product
+from productapp.models.product import Product
 from helpers.constants import ORDER_STATUS
 from helpers.paginations import FPagination
 from helpers.api_mixins import FAPIMixin

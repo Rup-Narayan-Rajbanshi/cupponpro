@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from commonapp.models.coupon import Voucher, Coupon
+from productapp.models.coupon import Voucher, Coupon
 from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import DetailRelatedField
 from userapp.models import User

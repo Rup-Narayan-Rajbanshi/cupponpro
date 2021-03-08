@@ -4,8 +4,8 @@ from django_filters import rest_framework as filters
 from django.db.models import Q
 from commonapp.models.image import Image
 from commonapp.models.company import CompanyUser
-from commonapp.models.product import Product, ProductCategory
-from commonapp.models.coupon import Coupon
+from productapp.models.product import Product, ProductCategory
+from productapp.models.coupon import Coupon
 from django.db.models import Count
 
 

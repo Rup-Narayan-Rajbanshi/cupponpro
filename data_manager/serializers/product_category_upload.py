@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from commonapp.models.company import Company
 from rest_framework.exceptions import ValidationError
-from commonapp.models.product import ProductCategory
+from productapp.models.product import ProductCategory
 from data_manager.exception import DuplicateNameException, ProductCategoryAlreadyExistException
 from data_manager.helpers import create_or_update_from_dataframe
 from helpers.misc import title_to_snake_case

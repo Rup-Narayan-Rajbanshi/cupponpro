@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from commonapp.models.product import Product
+from productapp.models.product import Product
 from helpers.choices_variable import ORDER_LINE_STATUS_CHOICES
 from helpers.constants import ORDER_LINE_STATUS, ORDER_STATUS
 from helpers.serializer import CustomModelSerializer

@@ -2,7 +2,7 @@ from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import GenericViewSet
 
-from commonapp.models.coupon import Coupon
+from productapp.models.coupon import Coupon
 from helpers.api_mixins import FAPIMixin
 from helpers.paginations import FPagination
 from orderapp.filters import HighestDiscountCouponFilter

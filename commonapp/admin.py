@@ -6,13 +6,13 @@ from commonapp.models.asset import Asset
 from commonapp.models.bill import Bill
 from commonapp.models.category import Category, SubCategory
 from commonapp.models.company import Company, CompanyUser, FavouriteCompany
-from commonapp.models.coupon import Coupon, Voucher
+from productapp.models.coupon import Coupon, Voucher
 from commonapp.models.document import Document
 from commonapp.models.facility import Facility
 from commonapp.models.image import Image
 from commonapp.models.order import Order, OrderLine
 from commonapp.models.links import SocialLink
-from commonapp.models.product import BulkQuantity, Product, ProductCategory
+from productapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.models.rating import Rating
 from commonapp.models.salesitem import SalesItem
 

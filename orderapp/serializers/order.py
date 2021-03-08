@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 
 from commonapp.models.company import Company
 from commonapp.models.asset import Asset
-from commonapp.models.coupon import Voucher
+from productapp.models.coupon import Voucher
 from commonapp.models.order import Order
 from helpers.serializer import CustomModelSerializer, CustomBaseSerializer
 from helpers.constants import ORDER_STATUS, ORDER_LINE_STATUS

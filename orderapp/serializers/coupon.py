@@ -2,7 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError
-from commonapp.models.coupon import Coupon
+from productapp.models.coupon import Coupon
 from userapp.models import User
 from helpers.serializer_fields import LowertoUpperChoiceField, CouponContentTypeField
 from helpers.constants import DISCOUNT_TYPE

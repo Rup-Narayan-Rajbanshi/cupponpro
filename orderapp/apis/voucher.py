@@ -3,7 +3,7 @@ from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from commonapp.models.coupon import Voucher
+from productapp.models.coupon import Voucher
 from helpers.api_mixins import FAPIMixin
 from helpers.paginations import FPagination
 from orderapp.serializers.voucher import VoucherListSerializer

@@ -6,8 +6,8 @@ from rest_framework.exceptions import APIException
 from helpers.models import BaseModel
 from commonapp.models.asset import Asset
 from commonapp.models.company import Company
-from commonapp.models.coupon import Voucher
-from commonapp.models.product import Product
+from productapp.models.coupon import Voucher
+from productapp.models.product import Product
 from orderapp.models.bills import Bills
 from userapp.models.user import User
 from helpers.constants import MAX_LENGTHS, DEFAULTS, ORDER_STATUS, DISCOUNT_TYPE, ORDER_LINE_STATUS

@@ -4,7 +4,7 @@ from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from commonapp.models.asset import Asset
-from commonapp.models.coupon import Coupon
+from productapp.models.coupon import Coupon
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
 from orderapp.models.transaction import TransactionHistoryBills

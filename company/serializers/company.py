@@ -6,7 +6,7 @@ from commonapp.serializers.company import CompanySerializer
 from helpers.constants import DISCOUNT_TYPE
 from commonapp.models.company import Company, FavouriteCompany
 from commonapp.models.category import Category, SubCategory
-from commonapp.models.coupon import Coupon
+from productapp.models.coupon import Coupon
 from userapp.models import User
 
 
