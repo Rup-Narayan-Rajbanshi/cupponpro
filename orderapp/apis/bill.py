@@ -26,7 +26,7 @@ class BillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
     permission_classes = (CompanyUserPermission, )
 
 class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, GenericViewSet):
-    queryset = Bills.objects.all().order_by('-created_at')
+    queryset = Bills.objects.all().order_by('-created_at', 'is_paid')
     serializer_class = BillListSerializer
     pagination_class = FPagination
     permission_classes = (CompanyUserPermission, )
