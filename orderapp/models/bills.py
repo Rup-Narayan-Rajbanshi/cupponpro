@@ -46,22 +46,29 @@ class Bills(BaseModel):
             company_obj.save()
             invoice_number = str(company_obj.invoice_counter)
             self.invoice_number = "0" * (8 - len(invoice_number)) + invoice_number
-        if self._state.adding == False:
-            if float(self.credit_amount) - float(self.paid_amount) < 0.0:
-                self.ret_amount = float(self.paid_amount) - float(self.credit_amount)
-                self.paid_amount = self.credit_amount
-            else:
-                self.ret_amount = 0.0
-            self.is_credit = self.is_credited(self.credit_amount, self.paid_amount)
-            self.credit_amount = self.credited_amount(self.credit_amount, self.paid_amount)
+        if float(self.payable_amount) - float(self.paid_amount) < 0.0:
+            self.ret_amount = float(self.paid_amount) - float(self.payable_amount)
+            self.paid_amount = self.payable_amount
         else:
-            if float(self.payable_amount) - float(self.paid_amount) < 0.0:
-                self.ret_amount = float(self.paid_amount) - float(self.payable_amount)
-                self.paid_amount = self.payable_amount
-            else:
-                self.ret_amount=0.0
-            self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
-            self.credit_amount = self.credited_amount(self.payable_amount, self.paid_amount)
+            self.ret_amount=0.0
+        self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
+        self.credit_amount = self.credited_amount(self.payable_amount, self.paid_amount)
+        # if self._state.adding == False:
+        #     if float(self.credit_amount) - float(self.paid_amount) < 0.0:
+        #         self.ret_amount = float(self.paid_amount) - float(self.credit_amount)
+        #         self.paid_amount = self.credit_amount
+        #     else:
+        #         self.ret_amount = 0.0
+        #     self.is_credit = self.is_credited(self.credit_amount, self.paid_amount)
+        #     self.credit_amount = self.credited_amount(self.credit_amount, self.paid_amount)
+        # else:
+        #     if float(self.payable_amount) - float(self.paid_amount) < 0.0:
+        #         self.ret_amount = float(self.paid_amount) - float(self.payable_amount)
+        #         self.paid_amount = self.payable_amount
+        #     else:
+        #         self.ret_amount=0.0
+        #     self.is_credit = self.is_credited(self.payable_amount, self.paid_amount)
+        #     self.credit_amount = self.credited_amount(self.payable_amount, self.paid_amount)
         return super(Bills, self).save(*args, **kwargs)
         
 
