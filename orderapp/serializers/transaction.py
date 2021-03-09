@@ -12,7 +12,29 @@ class TransactionHistoryBillSerializer(CustomModelSerializer):
     return_amount = serializers.DecimalField(max_digits=20, decimal_places=6, required=True)
     credit_amount = serializers.DecimalField(max_digits=20, decimal_places=6, required=True)
     payment_mode = serializers.ChoiceField(PAYMENT_CHOICES, default=DEFAULTS['PAYMENT_CHOICES'], required=False)
+    customer = serializers.SerializerMethodField()
+    asset = serializers.SerializerMethodField()
 
     class Meta:
         model = TransactionHistoryBills
         fields = '__all__'
+
+    def get_customer(self, obj):
+        try:
+            customer = obj.bill.customer
+        except:
+            customer=None
+        data = dict()
+        if customer:
+            data={'id':customer.id, 'name':customer.name}
+        return data
+
+    def get_asset(self, obj):
+        try:
+            asset = obj.bill.orders.first().asset
+        except:
+            asset = None
+        data={}
+        if asset:
+            data={'id': asset.id, 'name':asset.name}
+        return data
