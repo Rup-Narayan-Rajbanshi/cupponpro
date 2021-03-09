@@ -43,7 +43,7 @@ class BillCreateSerializer(CustomModelSerializer):
 
     def update(self, instance, validated_data):
         paid_amount = validated_data.get('paid_amount', 0.0)
-        validated_data['paid_amount'] = paid_amount + float(instance.paid_amount)
+        validated_data['paid_amount'] = float(paid_amount) + float(instance.paid_amount)
         bill =  super(BillCreateSerializer, self).update(instance, validated_data)
         if float(paid_amount) > 0.0:
             data={
