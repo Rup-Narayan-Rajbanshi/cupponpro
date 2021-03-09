@@ -44,6 +44,7 @@ class Orders(BaseModel):
         custom_discount_amount = v_data.get('custom_discount_amount', 0)
         is_service_charge = v_data.get('is_service_charge', True)
         paid_amount = v_data.get('paid_amount', 0.0)
+        payment_mode = v_data.pop('payment_mode', 'CASH')
         order.status = status
         if order.bill:
             order.custom_discount_percentage = custom_discount_percentage if 'custom_discount_percentage' in v_data else order.custom_discount_percentage
@@ -66,6 +67,7 @@ class Orders(BaseModel):
             data['custom_discount_amount'] = order.custom_discount_amount
             data['custom_discount_percentage'] = order.custom_discount_percentage
             data['is_service_charge'] = order.is_service_charge
+            data['payment_mode'] = payment_mode
             if order.bill:
                 data['credit_amount'] = payable_amount
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
