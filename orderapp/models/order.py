@@ -91,6 +91,7 @@ class Orders(BaseModel):
                     data['paid_amount'] = order.bill.credit_amount
                     data['is_paid'] = True
                 else:
+                    #data['paid_amount'] = order.bill.paid_amount
                     data['is_paid'] = False if order.bill.credit_amount > 0.0 else True
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
