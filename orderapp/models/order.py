@@ -87,11 +87,11 @@ class Orders(BaseModel):
         if status == ORDER_STATUS['COMPLETED']:
             if order.bill:
                 data = dict()
-                if paid_amount > 0.0:
-                    data['paid_amount'] = paid_amount
-                else:
+                if not order.bill.paid_amount > 0.0:
                     data['paid_amount'] = order.bill.credit_amount
-                data['is_paid'] = True
+                    data['is_paid'] = True
+                else:
+                    data['is_paid'] = False if order.bill.credit_amount > 0.0 else True
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
                     raise serializer.ValidationError(detail='Cannot update bill. ', code=400)
