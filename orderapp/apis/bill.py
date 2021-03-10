@@ -42,7 +42,7 @@ class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixin
             else:
                 queryset = Bills.objects.filter(company=company).order_by('-' + sort_by)
         else:
-            queryset = Bills.objects.filter(company=company).order_by('-created_at')
+            queryset = Bills.objects.filter(company=company).order_by('-created_at', 'is_paid')
         return queryset
 
 
