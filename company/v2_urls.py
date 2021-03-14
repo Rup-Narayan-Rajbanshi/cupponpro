@@ -5,9 +5,11 @@ from company.apis.company import FavouriteCompanyUserAPI, UserFavouriteCompanyAP
 from company.apis.partner import PartnerAPI
 from company.apis.vouchers import UserVoucherListAPI
 from company.apis.like import CompanyLikeAPI
+from company.apis.advertisement import AdvertisementAPI
 
 router = routers.SimpleRouter()
 router.register(r"like", CompanyLikeAPI)
+router.register(r"advertisement", AdvertisementAPI)
 
 urlpatterns = router.urls
 

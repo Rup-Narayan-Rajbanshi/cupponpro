@@ -55,6 +55,11 @@ ACCOUNT_TYPE = {
     'FACEBOOK': 'FACEBOOK'
 }
 
+POSITION = {
+    'TOP':'TOP',
+    'BOTTOM':'BOTTOM'
+}
+
 
 DEFAULTS = {
     'PHONE_NUMBER_EXT': '977',
@@ -68,7 +73,8 @@ DEFAULTS = {
     'PRODUCT_TYPE': '',
     'PRODUCT_CAT_SUB_TYPE': '',
     'ADDRESS': '',
-    'ACCOUNT_TYPE': 'GOOGLE'
+    'ACCOUNT_TYPE': 'GOOGLE',
+    'POSITION': 'TOP'
 }
 
 MAX_LENGTHS = {
@@ -118,3 +124,5 @@ TIME_EARLY_THRESHOLD = 30           # unit = minute
 RESEND_COUNTDOWN = 1                # unit = minute
 OTP_VERIFY_MAX_TRIES = 3
 ORDER_SCAN_COOLDOWN = 3             # in minute
+
+
