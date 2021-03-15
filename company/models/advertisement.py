@@ -13,6 +13,7 @@ class Advertisement(BaseModel):
     image = models.ImageField(upload_to='advertisement/', null=True, blank=True)
     description = RichTextField(blank=True, null=True)
     position = models.CharField(max_length=10, choices=POSITION_CHOICES, default=DEFAULTS['POSITION'])
+    link = models.URLField(blank=True,null=True)
 
     class Meta:
         db_table = 'advertisement'
