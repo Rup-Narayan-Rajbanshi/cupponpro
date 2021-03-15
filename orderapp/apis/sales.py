@@ -10,7 +10,7 @@ from orderapp.serializers.order import TableSalesSerializer
 from helpers.constants import ORDER_STATUS
 from rest_framework import mixins
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, F
 import math
 from collections import OrderedDict
 
@@ -101,7 +101,7 @@ class GetSellReport(generics.ListAPIView):
 
 
 class GetServiceChargeAPI(generics.ListAPIView):
-    queryset = Bills.objects.all().order_by('-created_at')
+    queryset = Orders.objects.all().order_by('-created_at')
     filter_class = ServiceChargeFilter
 
     def list(self, request):
@@ -117,42 +117,40 @@ class GetServiceChargeAPI(generics.ListAPIView):
             }
             return Response(data, status=403)
 
-        bills_company = self.get_queryset().filter(company=company)
-        bills_types = self.filter_queryset(self.queryset)
-        bills = bills_types.intersection(bills_company)
-
-        sales = dict()
-        total = 0.0
-        for bill in bills:
-            orders = bill.orders.all()
-            if orders:
-                for order in orders:
-                    if str(order.id) not in sales:
-                        sales[str(order.id)]= dict()
-                    sales[str(order.id)]['order_id'] = order.id
-                    sales[str(order.id)]['date'] = bill.created_at.date()
-                    sales[str(order.id)]['service_charge'] = order.service_charge_amount
-                    total = total + order.service_charge_amount
+        orders_company = self.get_queryset().filter(company=company)
+        orders_types = self.filter_queryset(self.queryset)
+        orders_all = orders_types.intersection(orders_company)
+        
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
         low_range = (page_number-1) * page_size
         high_range = page_number * page_size
-        sales_values = list(sales.values())
         sorting_method = request.query_params.get('sort_by', 'desc')
         if sorting_method == 'desc':
-            sales_values.sort(key=lambda item:item['date'], reverse=True)
+            orders = orders_all.order_by('-created_at')[low_range:high_range]
         else:
-            sales_values.sort(key=lambda item:item['date'], reverse=False)
-        data = sales_values[low_range:high_range]
+            orders = orders_all.order_by('created_at')[low_range:high_range]
+
+        sales = dict()
+        total = 0.0
+        for order in orders:
+            if str(order.id) not in sales:
+                sales[str(order.id)]= dict()
+            sales[str(order.id)]['order_id'] = order.id
+            sales[str(order.id)]['date'] = order.created_at.date()
+            sales[str(order.id)]['service_charge'] = order.service_charge_amount
+            total = float(total) + float(order.service_charge_amount)
+        # total = bills_all.aggregate(Sum('service_charge'))
+        sales_values = list(sales.values())
 
         data = {
-            'total_pages': math.ceil(len(sales)/page_size),
-            'total_records': len(sales),
-            'next': page_number + 1 if page_number + 1 <=math.ceil(len(sales)/page_size) else None,
+            'total_pages': math.ceil(len(orders_all)/page_size),
+            'total_records': len(orders_all),
+            'next': page_number + 1 if page_number + 1 <=math.ceil(len(orders_all)/page_size) else None,
             'previous': page_number - 1 if page_number - 1 > 0 else None,
-            'record_range': [low_range + 1, len(data)+low_range],
+            'record_range': [low_range + 1, len(sales_values)+low_range],
             'current_page': page_number,
-            'records': data,
+            'records': sales_values,
             'total_service_charge': total
         }
         return Response(data, status=200)

@@ -44,7 +44,7 @@ class ServiceChargeFilter(filters.FilterSet):
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
 
     class Meta:
-        model = Bills
+        model = Orders
         fields = ['from_date', 'to_date']
 
 
