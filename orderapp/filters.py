@@ -48,6 +48,15 @@ class ServiceChargeFilter(filters.FilterSet):
         fields = ['from_date', 'to_date']
 
 
+class CreditFilter(filters.FilterSet):
+    from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
+    to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
+
+    class Meta:
+        model = Bills
+        fields = ['from_date', 'to_date']
+
+
 class TableSalesFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='orders__bill__created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='orders__bill__created_at__date', lookup_expr='lte')
@@ -63,19 +72,19 @@ class SellItemFilter(filters.FilterSet):
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
 
     class Meta:
-        model = Bills
+        model = Orders
         fields = ['product_category', 'from_date', 'to_date']
 
 
 class SellFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
-    invoice_number = filters.CharFilter(field_name='invoice_number')
-    customer_name = filters.CharFilter(field_name='customer__name')
-    payment_mode = filters.CharFilter(field_name='payment_mode')
+    invoice_number = filters.CharFilter(field_name='bill__invoice_number')
+    customer_name = filters.CharFilter(field_name='bill__customer__name')
+    payment_mode = filters.CharFilter(field_name='bill__payment_mode')
 
     class Meta:
-        model = Bills
+        model = Orders
         fields = ['from_date','to_date','invoice_number', 'customer_name', 'payment_mode']
 
 
