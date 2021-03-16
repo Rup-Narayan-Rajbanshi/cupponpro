@@ -79,12 +79,12 @@ class SellItemFilter(filters.FilterSet):
 class SellFilter(filters.FilterSet):
     from_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='gte')
     to_date = filters.DateTimeFilter(field_name='created_at__date', lookup_expr='lte')
-    invoice_number = filters.CharFilter(field_name='bill__invoice_number')
-    customer_name = filters.CharFilter(field_name='bill__customer__name')
-    payment_mode = filters.CharFilter(field_name='bill__payment_mode')
+    invoice_number = filters.CharFilter(field_name='invoice_number')
+    customer_name = filters.CharFilter(field_name='customer__name')
+    payment_mode = filters.CharFilter(field_name='payment_mode')
 
     class Meta:
-        model = Orders
+        model = Bills
         fields = ['from_date','to_date','invoice_number', 'customer_name', 'payment_mode']
 
 

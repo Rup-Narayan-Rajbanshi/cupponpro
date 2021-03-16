@@ -37,56 +37,42 @@ class GetSellReport(generics.ListAPIView):
 
         bills_company = self.get_queryset().filter(company=company)
         bills_types = self.filter_queryset(self.queryset)
-        bills = bills_types.intersection(bills_company)
 
-        sales = dict()
-        total = 0.0
-        for bill in bills:
-            orders = bill.orders.all()
-            if orders:
-                for order in orders:
-                    if order.created_at.date() not in sales:
-                        sales[order.created_at.date()]= dict()
-                    sales[order.created_at.date()]['date'] = str(order.created_at.date())
-                    if 'invoice_number' not in sales[order.created_at.date()]:
-                        sales[order.created_at.date()]['invoice_number'] = [bill.invoice_number]
-                    else:
-                        if bill.invoice_number not in sales[order.created_at.date()]['invoice_number']:
-                            sales[order.created_at.date()]['invoice_number'].append(bill.invoice_number) 
-                    if 'customer_name' not in sales[order.created_at.date()]:
-                        sales[order.created_at.date()]['customer_name'] = list()
-                        if bill.customer:
-                            sales[order.created_at.date()]['customer_name'].append(bill.customer.name)
-                    else:
-                        if bill.customer:
-                            if bill.customer.name not in sales[order.created_at.date()]['customer_name']:
-                                sales[order.created_at.date()]['customer_name'].append(bill.customer.name)
-                    if 'payment_method' not in sales[order.created_at.date()]:
-                        sales[order.created_at.date()]['payment_method'] = [bill.payment_mode]
-                    else:
-                        if bill.payment_mode not in sales[order.created_at.date()]['payment_method']:
-                            sales[order.created_at.date()]['payment_method'].append(bill.payment_mode)
-                    # sales[order.created_at.date()]['payment_method']=bill.payment_mode
-                    sales[order.created_at.date()]['order_total']= sales[order.created_at.date()]['order_total'] + self.get_total_order(order) if 'order_total' in sales[order.created_at.date()] else self.get_total_order(order)
-                    sales[order.created_at.date()]['tax']=bill.company.tax if bill.company.tax else 0
-                    sales[order.created_at.date()]['service_charge']=sales[order.created_at.date()]['service_charge'] + order.service_charge_amount if 'service_charge' in sales[order.created_at.date()] else order.service_charge_amount
-                    sales[order.created_at.date()]['discount']=sales[order.created_at.date()]['discount'] + order.discount_amount if 'discount' in sales[order.created_at.date()] else order.discount_amount
-                    sales[order.created_at.date()]['total_amount']=sales[order.created_at.date()]['total_amount'] + order.get_grand_total_report(order) if 'total_amount' in sales[order.created_at.date()] else order.get_grand_total_report(order)
-                    total = total  + order.get_grand_total_report(order) 
-        sorting_method = request.query_params.get('sort_by', 'desc')
-        if sorting_method == 'desc':
-            sales = OrderedDict(sorted(sales.items(), reverse=True))
-        else:
-            sales = OrderedDict(sorted(sales.items(), reverse=False))
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
         low_range = (page_number-1) * page_size
         high_range = page_number * page_size
-        data = list(sales.values())[low_range:high_range]
+
+        sorting_method = request.query_params.get('sort_by', 'desc')
+        if sorting_method == 'desc':
+            bills_all = bills_types.intersection(bills_company)
+            bills = bills_all.order_by('-created_at')[low_range:high_range]
+        else:
+            bills_all = bills_types.intersection(bills_company)
+            bills = bills_all.order_by('created_at')[low_range:high_range]
+        
+
+        sales = dict()
+        total = 0.0
+        for bill in bills:
+            if bill.invoice_number not in sales:
+                sales[bill.invoice_number] = dict()
+            sales[bill.invoice_number]['date'] = str(bill.created_at.date())
+            sales[bill.invoice_number]['invoice_number'] = bill.invoice_number
+            sales[bill.invoice_number]['customer_name'] = bill.customer.name if bill.customer else ''
+            sales[bill.invoice_number]['payment_method'] = bill.payment_mode
+            sales[bill.invoice_number]['order_total'] = self.get_total_order(bill.orders.first())
+            sales[bill.invoice_number]['tax'] = bill.company.tax if bill.company.tax else 0
+            sales[bill.invoice_number]['service_charge'] = bill.service_charge
+            sales[bill.invoice_number]['discount'] = bill.orders.first().discount_amount
+            sales[bill.invoice_number]['total_amount'] = bill.payable_amount if bill.payable_amount else 0.0
+            total = float(total) + float(sales[bill.invoice_number]['total_amount'])
+
+        data = list(sales.values())
         data = {
-            'total_pages': math.ceil(len(sales)/page_size),
-            'total_records': len(sales),
-            'next': page_number + 1 if page_number + 1 <=math.ceil(len(sales)/page_size) else None,
+            'total_pages': math.ceil(len(bills_all)/page_size),
+            'total_records': len(bills_all),
+            'next': page_number + 1 if page_number + 1 <=math.ceil(len(bills_all)/page_size) else None,
             'previous': page_number - 1 if page_number - 1 > 0 else None,
             'record_range': [low_range + 1, len(data)+low_range],
             'current_page': page_number,
@@ -190,6 +176,7 @@ class GetSellItemReportAPI(generics.ListAPIView):
         total = 0.0
         #splitting of bill by types:
         products_all = Product.objects.filter(order_lines__order__in=orders).distinct()
+        print(len(products_all))
         products = products_all[low_range:high_range]
         for product in products:
             sales[product.name] = dict()
@@ -198,18 +185,6 @@ class GetSellItemReportAPI(generics.ListAPIView):
             sales[product.name]['total_price'] = product.order_lines.all().aggregate(Sum('total'))['total__sum']
             total = float(total) + float(sales[product.name]['total_price'])
 
-        # for order in orders:
-        #     orderline = order.lines.all()
-        #     if orderline:
-        #         for line in orderline:
-        #             product = line.product
-        #             if product.name not in sales.keys():
-        #                 sales[product.name] = dict()
-        #             #sales['Grand_total'] = sales['Grand_total'] + line.total if 'Grand_total' in sales.keys() else line.total
-        #             sales[product.name]['name'] = product.name
-        #             sales[product.name]['total_sold_quantity'] = sales[product.name]['total_sold_quantity'] + line.quantity if 'total_sold_quantity' in sales[product.name].keys() else line.quantity
-        #             sales[product.name]['total_price'] = sales[product.name]['total_price'] + line.total if 'total_price' in sales[product.name].keys() else line.total
-        #             total = total + float(line.total)
         data = list(sales.values())
         data = {
             'total_pages': math.ceil(len(products_all)/page_size),
