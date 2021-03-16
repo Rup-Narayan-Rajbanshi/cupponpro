@@ -209,12 +209,12 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         if not company:
             company = order.company
         if voucher and (voucher.coupon.company != company):
-            raise ValidationError({'detail': '{0} not found (voucher)'.format(product.name)})
+            raise ValidationError({'detail': 'voucher not found (voucher)'})
         for line in validated_order_line_data:
             new_quantity = int(line['quantity'])
             status = line.get('status', 'NEW')
             product = line['product']
-            if product.company != company:
+            if str(product.company.id) != str(company.id):
                 raise ValidationError({'detail': '{0} not found.'.format(product.name)})
             # if not status == ORDER_LINE_STATUS['CANCELLED']:
             order_line = OrderLines(order=order,
