@@ -58,9 +58,9 @@ class GetSellReport(generics.ListAPIView):
             if bill.invoice_number not in sales:
                 sales[bill.invoice_number] = dict()
             sales[bill.invoice_number]['date'] = str(bill.created_at.date())
-            sales[bill.invoice_number]['invoice_number'] = bill.invoice_number
-            sales[bill.invoice_number]['customer_name'] = bill.customer.name if bill.customer else ''
-            sales[bill.invoice_number]['payment_method'] = bill.payment_mode
+            sales[bill.invoice_number]['invoice_number'] = [bill.invoice_number]
+            sales[bill.invoice_number]['customer_name'] = [bill.customer.name] if bill.customer else []
+            sales[bill.invoice_number]['payment_method'] = [bill.payment_mode]
             sales[bill.invoice_number]['order_total'] = self.get_total_order(bill.orders.first())
             sales[bill.invoice_number]['tax'] = bill.company.tax if bill.company.tax else 0
             sales[bill.invoice_number]['service_charge'] = bill.service_charge
