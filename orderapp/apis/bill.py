@@ -10,6 +10,7 @@ from orderapp.models.order import Orders
 from orderapp.serializers.bill import BillCreateSerializer, ManualBillSerializerCompany, BillListSerializer
 from permission import CompanyUserPermission
 from orderapp.filters import BillFilter
+from django.utils import timezone
 
 class BIllUpdateAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
     queryset = Bills.objects.all().order_by('-created_at')
@@ -35,14 +36,25 @@ class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixin
     def get_queryset(self):
         company = getattr(self.request, 'company', None)
         sort_by = self.request.query_params.get('sort_by', None)
-        if sort_by:
-            order_by = self.request.query_params.get('order_by', 'desc')
-            if order_by == 'asc':
-                queryset = Bills.objects.filter(company=company).order_by(sort_by)
+        group = self.request.user.group.all().first().name
+        if group == 'sales':
+            if sort_by:
+                order_by = self.request.query_params.get('order_by', 'desc')
+                if order_by == 'asc':
+                    queryset = Bills.objects.filter(company=company, created_at__date=timezone.now().date()).order_by(sort_by)
+                else:
+                    queryset = Bills.objects.filter(company=company, created_at__date=timezone.now().date()).order_by('-' + sort_by)
             else:
-                queryset = Bills.objects.filter(company=company).order_by('-' + sort_by)
+                queryset = Bills.objects.filter(company=company, created_at__date=timezone.now().date()).order_by('-created_at', 'is_paid')
         else:
-            queryset = Bills.objects.filter(company=company).order_by('-created_at', 'is_paid')
+            if sort_by:
+                order_by = self.request.query_params.get('order_by', 'desc')
+                if order_by == 'asc':
+                    queryset = Bills.objects.filter(company=company).order_by(sort_by)
+                else:
+                    queryset = Bills.objects.filter(company=company).order_by('-' + sort_by)
+            else:
+                queryset = Bills.objects.filter(company=company).order_by('-created_at', 'is_paid')
         return queryset
 
 
