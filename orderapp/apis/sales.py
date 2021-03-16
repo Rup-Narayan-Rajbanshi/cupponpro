@@ -64,7 +64,7 @@ class GetSellReport(generics.ListAPIView):
             sales[bill.invoice_number]['order_total'] = self.get_total_order(bill.orders.first())
             sales[bill.invoice_number]['tax'] = bill.company.tax if bill.company.tax else 0
             sales[bill.invoice_number]['service_charge'] = bill.service_charge
-            sales[bill.invoice_number]['discount'] = bill.orders.first().discount_amount
+            sales[bill.invoice_number]['discount'] = bill.orders.first().discount_amount if bill.orders.first() else 0.0
             sales[bill.invoice_number]['total_amount'] = bill.payable_amount if bill.payable_amount else 0.0
             total = float(total) + float(sales[bill.invoice_number]['total_amount'])
 
