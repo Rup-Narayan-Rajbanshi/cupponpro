@@ -206,6 +206,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         bulk_create_data = list()
         request = self.context.get('request')
         company = getattr(request, 'company', None)
+        print('here')
         if not company:
             company = order.company
         if voucher and (voucher.coupon.company != company):
@@ -215,7 +216,6 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             status = line.get('status', 'NEW')
             product = line['product']
             if str(product.company.id) != str(company.id):
-                print('here')
                 print(product.company.id)
                 print(company.id)
                 raise ValidationError({'detail': '{0} not found.'.format(product.name)})
