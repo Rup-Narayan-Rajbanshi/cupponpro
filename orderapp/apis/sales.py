@@ -19,7 +19,7 @@ from django.db.models.functions import Coalesce
 
 
 class GetSellReport(generics.ListAPIView):
-    queryset = Orders.objects.all().order_by('-created_at')
+    queryset = Bills.objects.all().order_by('-created_at')
     filter_class = SellFilter
 
     def list(self, request):
@@ -35,72 +35,58 @@ class GetSellReport(generics.ListAPIView):
             }
             return Response(data, status=403)
 
-        
+        bills_company = self.get_queryset().filter(company=company)
+        bills_types = self.filter_queryset(self.queryset)
+        bills = bills_types.intersection(bills_company)
 
-        orders_company = self.get_queryset().filter(company=company)
-        orders_types = self.filter_queryset(self.queryset)
-        orders_all = orders_types.intersection(orders_company)
-
+        sales = dict()
+        total = 0.0
+        for bill in bills:
+            orders = bill.orders.all()
+            if orders:
+                for order in orders:
+                    if order.created_at.date() not in sales:
+                        sales[order.created_at.date()]= dict()
+                    sales[order.created_at.date()]['date'] = str(order.created_at.date())
+                    if 'invoice_number' not in sales[order.created_at.date()]:
+                        sales[order.created_at.date()]['invoice_number'] = [bill.invoice_number]
+                    else:
+                        if bill.invoice_number not in sales[order.created_at.date()]['invoice_number']:
+                            sales[order.created_at.date()]['invoice_number'].append(bill.invoice_number) 
+                    if 'customer_name' not in sales[order.created_at.date()]:
+                        sales[order.created_at.date()]['customer_name'] = list()
+                        if bill.customer:
+                            sales[order.created_at.date()]['customer_name'].append(bill.customer.name)
+                    else:
+                        if bill.customer:
+                            if bill.customer.name not in sales[order.created_at.date()]['customer_name']:
+                                sales[order.created_at.date()]['customer_name'].append(bill.customer.name)
+                    if 'payment_method' not in sales[order.created_at.date()]:
+                        sales[order.created_at.date()]['payment_method'] = [bill.payment_mode]
+                    else:
+                        if bill.payment_mode not in sales[order.created_at.date()]['payment_method']:
+                            sales[order.created_at.date()]['payment_method'].append(bill.payment_mode)
+                    # sales[order.created_at.date()]['payment_method']=bill.payment_mode
+                    sales[order.created_at.date()]['order_total']= sales[order.created_at.date()]['order_total'] + self.get_total_order(order) if 'order_total' in sales[order.created_at.date()] else self.get_total_order(order)
+                    sales[order.created_at.date()]['tax']=bill.company.tax if bill.company.tax else 0
+                    sales[order.created_at.date()]['service_charge']=sales[order.created_at.date()]['service_charge'] + order.service_charge_amount if 'service_charge' in sales[order.created_at.date()] else order.service_charge_amount
+                    sales[order.created_at.date()]['discount']=sales[order.created_at.date()]['discount'] + order.discount_amount if 'discount' in sales[order.created_at.date()] else order.discount_amount
+                    sales[order.created_at.date()]['total_amount']=sales[order.created_at.date()]['total_amount'] + order.get_grand_total_report(order) if 'total_amount' in sales[order.created_at.date()] else order.get_grand_total_report(order)
+                    total = total  + order.get_grand_total_report(order) 
         sorting_method = request.query_params.get('sort_by', 'desc')
+        if sorting_method == 'desc':
+            sales = OrderedDict(sorted(sales.items(), reverse=True))
+        else:
+            sales = OrderedDict(sorted(sales.items(), reverse=False))
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
         low_range = (page_number-1) * page_size
         high_range = page_number * page_size
-
-        date_all = orders_all.order_by('-created_at__date').values('created_at__date').distinct()
-
-        if sorting_method == 'desc':
-            dates = date_all[low_range:high_range]
-            date_list = [date['created_at__date'] for date in dates]
-            orders = order_all.filter(created_at__date__in=date_list)
-            
-            
-        else:
-            dates = orders_all.order_by('created_at__date').values_list('created_at__date').distinct()[low_range:high_range]
-            date_list = [date['created_at__date'] for date in dates]
-            
-
-        sales = dict()
-        total = 0.0
-        
-        for order in orders:
-            if order.created_at.date() not in sales:
-                sales[order.created_at.date()]= dict()
-            sales[order.created_at.date()]['date'] = str(order.created_at.date())
-            if 'invoice_number' not in sales[order.created_at.date()]:
-                sales[order.created_at.date()]['invoice_number'] = [order.bill.invoice_number] if order.bill else list()
-            else:
-                if order.bill:
-                    if order.bill.invoice_number not in sales[order.created_at.date()]['invoice_number']:
-                        sales[order.created_at.date()]['invoice_number'].append(order.bill.invoice_number) 
-            if 'customer_name' not in sales[order.created_at.date()]:
-                sales[order.created_at.date()]['customer_name'] = list()
-                if order.bill:
-                    if order.bill.customer:
-                        sales[order.created_at.date()]['customer_name'].append(order.bill.customer.name)
-            else:
-                if order.bill:
-                    if order.bill.customer:
-                        if order.bill.customer.name not in sales[order.created_at.date()]['customer_name']:
-                            sales[order.created_at.date()]['customer_name'].append(order.bill.customer.name)
-            if 'payment_method' not in sales[order.created_at.date()]:
-                sales[order.created_at.date()]['payment_method'] = [order.bill.payment_mode] if order.bill else list()
-            else:
-                if order.bill:
-                    if order.bill.payment_mode not in sales[order.created_at.date()]['payment_method']:
-                        sales[order.created_at.date()]['payment_method'].append(order.bill.payment_mode)
-            # sales[order.created_at.date()]['payment_method']=bill.payment_mode
-            sales[order.created_at.date()]['order_total']= sales[order.created_at.date()]['order_total'] + self.get_total_order(order) if 'order_total' in sales[order.created_at.date()] else self.get_total_order(order)
-            sales[order.created_at.date()]['tax']=order.company.tax if order.company.tax else 0
-            sales[order.created_at.date()]['service_charge']=sales[order.created_at.date()]['service_charge'] + order.service_charge_amount if 'service_charge' in sales[order.created_at.date()] else order.service_charge_amount
-            sales[order.created_at.date()]['discount']=sales[order.created_at.date()]['discount'] + order.discount_amount if 'discount' in sales[order.created_at.date()] else order.discount_amount
-            sales[order.created_at.date()]['total_amount']=sales[order.created_at.date()]['total_amount'] + order.get_grand_total_report(order) if 'total_amount' in sales[order.created_at.date()] else order.get_grand_total_report(order)
-            total = total  + order.get_grand_total_report(order) 
-        data = list(sales.values())
+        data = list(sales.values())[low_range:high_range]
         data = {
-            'total_pages': math.ceil(len(date_all)/page_size),
-            'total_records': len(date_all),
-            'next': page_number + 1 if page_number + 1 <=math.ceil(len(date_all)/page_size) else None,
+            'total_pages': math.ceil(len(sales)/page_size),
+            'total_records': len(sales),
+            'next': page_number + 1 if page_number + 1 <=math.ceil(len(sales)/page_size) else None,
             'previous': page_number - 1 if page_number - 1 > 0 else None,
             'record_range': [low_range + 1, len(data)+low_range],
             'current_page': page_number,
