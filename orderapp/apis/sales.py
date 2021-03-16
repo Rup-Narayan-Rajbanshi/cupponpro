@@ -35,6 +35,8 @@ class GetSellReport(generics.ListAPIView):
             }
             return Response(data, status=403)
 
+        
+
         orders_company = self.get_queryset().filter(company=company)
         orders_types = self.filter_queryset(self.queryset)
         orders_all = orders_types.intersection(orders_company)
@@ -45,16 +47,18 @@ class GetSellReport(generics.ListAPIView):
         low_range = (page_number-1) * page_size
         high_range = page_number * page_size
 
-        date_all = [orders_all.order_by('-created_at').values_list('created_at').distinct()]
-
+        date_all = orders_all.order_by('-created_at__date').values('created_at__date').distinct()
 
         if sorting_method == 'desc':
-            date = date_all[low_range:high_range]
-            orders = orders_all.filter(created_at__in=date).distinct()
+            dates = date_all[low_range:high_range]
+            date_list = [date['created_at__date'] for date in dates]
+            orders = order_all.filter(created_at__date__in=date_list)
+            
             
         else:
-            date = [orders_all.order_by('created_at').values_list('created_at').distinct()][low_range:high_range]
-            orders = orders_all.filter(created_at__in=date).distinct()
+            dates = orders_all.order_by('created_at__date').values_list('created_at__date').distinct()[low_range:high_range]
+            date_list = [date['created_at__date'] for date in dates]
+            
 
         sales = dict()
         total = 0.0
@@ -92,7 +96,7 @@ class GetSellReport(generics.ListAPIView):
             sales[order.created_at.date()]['discount']=sales[order.created_at.date()]['discount'] + order.discount_amount if 'discount' in sales[order.created_at.date()] else order.discount_amount
             sales[order.created_at.date()]['total_amount']=sales[order.created_at.date()]['total_amount'] + order.get_grand_total_report(order) if 'total_amount' in sales[order.created_at.date()] else order.get_grand_total_report(order)
             total = total  + order.get_grand_total_report(order) 
-        data = list(sales.values())[low_range:high_range]
+        data = list(sales.values())
         data = {
             'total_pages': math.ceil(len(date_all)/page_size),
             'total_records': len(date_all),
