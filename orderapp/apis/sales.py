@@ -10,11 +10,12 @@ from orderapp.serializers.order import TableSalesSerializer
 from helpers.constants import ORDER_STATUS
 from rest_framework import mixins
 from permission import isCompanyManagerAndAllowAll, CompanyUserPermission
-from django.db.models import Count, Sum, F
+from django.db.models import Count, Sum, F, FloatField, Value
 import math
 from collections import OrderedDict
 from productapp.models.product import Product
 from userapp.models.customer import Customer
+from django.db.models.functions import Coalesce
 
 
 class GetSellReport(generics.ListAPIView):
@@ -263,7 +264,6 @@ class CreditReportAPI(generics.ListAPIView):
         high_range = page_number * page_size
         
         customer_required = customer_list[low_range:high_range]
-        print(customer_required)
         customers_all = Customer.objects.filter(id__in=customer_list).distinct()
         customers = Customer.objects.filter(id__in=customer_required).distinct()
 
@@ -299,11 +299,12 @@ class TableSalesAPI(generics.ListAPIView):
     queryset = Asset.objects.all().order_by('-created_at')
     permission_classes = [CompanyUserPermission | isCompanyManagerAndAllowAll]
     filter_class = TableSalesFilter
+    serializer_class = TableSalesSerializer
+    pagination_class = FPagination
 
-    def list(self, request):
-
+    def get_queryset(self):
         try:
-            company = request.user.company_user.all().values_list('company', flat=True)[0] 
+            company = self.request.user.company_user.all().values_list('company', flat=True)[0] 
         except:
             company = None
 
@@ -313,51 +314,25 @@ class TableSalesAPI(generics.ListAPIView):
                 'message': 'User is not part of any company'
             }
             return Response(data, status=403)
+        queryset = Asset.objects.filter(company=company).annotate(number_of_sales=Count('orders__bill'), total_amount=Coalesce(Sum(F('orders__bill__payable_amount'),output_field=FloatField()),Value(0)))
+        queryset = queryset.filter(number_of_sales__gt = 0.0)
+        return queryset
 
-        asset_company = self.get_queryset().filter(company=company)
-        asset_date = self.filter_queryset(self.queryset)
-        assets = asset_date.intersection(asset_company)
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
 
-        sales = dict()
-        total = 0.0
-        for asset in assets:
-            orders = asset.orders.all()
-            if orders:
-                for order in orders:
-                    if order.bill:
-                        if str(asset.id) not in sales:
-                            sales[str(asset.id)] = dict()
-                        sales[str(asset.id)]['name'] = asset.name
-                        sales[str(asset.id)]['asset_type'] = asset.asset_type
-                        sales[str(asset.id)]['number_of_sales'] = sales[str(asset.id)]['number_of_sales'] + 1 if 'number_of_sales' in sales[str(asset.id)] else 1
-                        if order.bill.payable_amount:
-                            sales[str(asset.id)]['total_amount'] = sales[str(asset.id)]['total_amount'] + float(order.bill.payable_amount) if 'total_amount' in sales[str(asset.id)] else float(order.bill.payable_amount)
-                            total = total + float(order.bill.payable_amount)
-                        else:
-                            sales[str(asset.id)]['total_amount'] = sales[str(asset.id)]['total_amount'] + 0.0 if 'total_amount' in sales[str(asset.id)] else 0.0
-
-        page_number = int(request.query_params.get('page', 1))
-        page_size = int(request.query_params.get('size', 10))
-        low_range = (page_number-1) * page_size
-        high_range = page_number * page_size
-        sales_values = list(sales.values())
-        sorting_method = request.query_params.get('sort_by', 'desc')
-        if sorting_method == 'desc':
-            sales_values.sort(key=lambda item:item['asset_type'], reverse=True)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            grand_total=queryset.aggregate(grand_total_amount=Coalesce(Sum(F('orders__bill__payable_amount'), output_field=FloatField()), Value(0)))['grand_total_amount']
+            response = self.get_paginated_response(serializer.data)
+            response.data.update({'grand_total_amount':grand_total})
+            return response
         else:
-            sales_values.sort(key=lambda item:item['asset_type'], reverse=False)
-        data = sales_values[low_range:high_range]
-        data = {
-            'total_pages': math.ceil(len(sales)/page_size),
-            'total_records': len(sales),
-            'next': page_number + 1 if page_number + 1 <=math.ceil(len(sales)/page_size) else None,
-            'previous': page_number - 1 if page_number - 1 > 0 else None,
-            'record_range': [low_range + 1, len(data)+low_range],
-            'current_page': page_number,
-            'records': data,
-            'grand_total_amount': total
-        }
-        return Response(data, status=200)
+            serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+   
 
 
 
