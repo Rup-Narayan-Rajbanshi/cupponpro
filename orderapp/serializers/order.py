@@ -215,6 +215,9 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
             status = line.get('status', 'NEW')
             product = line['product']
             if str(product.company.id) != str(company.id):
+                print('here')
+                print(product.company.id)
+                print(company.id)
                 raise ValidationError({'detail': '{0} not found.'.format(product.name)})
             # if not status == ORDER_LINE_STATUS['CANCELLED']:
             order_line = OrderLines(order=order,
