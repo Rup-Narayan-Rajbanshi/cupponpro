@@ -84,9 +84,10 @@ class GetSellReport(generics.ListAPIView):
 
     def get_total_order(self, order):
         count = 0
-        if order.lines:
-            for lines in order.lines.all():
-                count = count + 1
+        if order:
+            if order.lines:
+                for lines in order.lines.all():
+                    count = count + 1
         return count
 
 
