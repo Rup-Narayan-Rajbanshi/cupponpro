@@ -3,7 +3,7 @@ from helpers.serializer import CustomModelSerializer
 from company.models.follow import Follows
 from helpers.serializer_fields import DetailRelatedField
 from userapp.models.user import User
-from commonapp.models.company import Company
+from company.models.company import Company
 from rest_framework.exceptions import ValidationError
 
 

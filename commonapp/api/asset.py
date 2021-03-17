@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import permissions
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from commonapp.serializers.asset import AssetSerializer
 from helper import isCompanyUser
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll, publicReadOnly

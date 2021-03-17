@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from commonapp.serializers.asset import AssetSerializer
 from helpers.api_mixins import FAPIMixin
 from helpers.constants import ORDER_STATUS, ORDER_LINE_STATUS

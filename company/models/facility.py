@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from commonapp.models.company import Company
+from company.models.company import Company
 
 class Facility(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)

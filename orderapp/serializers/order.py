@@ -2,8 +2,8 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from commonapp.models.company import Company
-from commonapp.models.asset import Asset
+from company.models.company import Company
+from company.models.asset import Asset
 from productapp.models.coupon import Voucher
 from commonapp.models.order import Order
 from helpers.serializer import CustomModelSerializer, CustomBaseSerializer

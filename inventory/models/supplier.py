@@ -1,5 +1,5 @@
 from django.db import models
-from commonapp.models.company import Company
+from company.models.company import Company
 from helpers.models import BaseModel
 
 

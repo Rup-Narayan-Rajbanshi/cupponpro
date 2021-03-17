@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from commonapp.models.document import Document
+from company.models.document import Document
 
 class DocumentSerializer(serializers.ModelSerializer):
 

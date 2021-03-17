@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 from helpers.serializer_fields import DetailRelatedField
 from helpers.serializer import CustomModelSerializer
 from helpers.constants import ORDER_STATUS, ORDER_SCAN_COOLDOWN
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from commonapp.models.order import Order
 from orderapp.models.order_scan_log import OrderScanLog
 from helpers.exceptions import OrderScanCooldownException

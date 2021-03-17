@@ -1,9 +1,9 @@
 from django.db import models, transaction
 
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from helpers.models import BaseModel
 from userapp.models import User
-from commonapp.models.company import CompanyUser
+from company.models.company import CompanyUser
 from jsonfield import JSONField
 from rest_framework.exceptions import APIException
 from notifications.exceptions import DeviceException

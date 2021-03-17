@@ -4,8 +4,8 @@ from django.db.models import Sum
 from rest_framework.exceptions import APIException
 
 from helpers.models import BaseModel
-from commonapp.models.asset import Asset
-from commonapp.models.company import Company
+from company.models.asset import Asset
+from company.models.company import Company
 from productapp.models.coupon import Voucher
 from productapp.models.product import Product
 from orderapp.models.bills import Bills

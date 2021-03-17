@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import generics
-from commonapp.models.company import Company, CompanyUser
-from commonapp.models.links import SocialLink
+from company.models.company import Company, CompanyUser
+from company.models.links import SocialLink
 from commonapp.serializers.links import SocialLinkSerializer
 from permission import isCompanyOwnerAndAllowAll
 

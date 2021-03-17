@@ -2,18 +2,18 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from commonapp.models.affiliate import AffiliateLink
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from commonapp.models.bill import Bill
 from commonapp.models.category import Category, SubCategory
-from commonapp.models.company import Company, CompanyUser, FavouriteCompany
+from company.models.company import Company, CompanyUser, FavouriteCompany
 from productapp.models.coupon import Coupon, Voucher
-from commonapp.models.document import Document
-from commonapp.models.facility import Facility
+from company.models.document import Document
+from company.models.facility import Facility
 from commonapp.models.image import Image
 from commonapp.models.order import Order, OrderLine
-from commonapp.models.links import SocialLink
+from company.models.links import SocialLink
 from productapp.models.product import BulkQuantity, Product, ProductCategory
-from commonapp.models.rating import Rating
+from company.models.rating import Rating
 from commonapp.models.salesitem import SalesItem
 
 

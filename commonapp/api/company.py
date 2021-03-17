@@ -4,7 +4,7 @@ from django.core.paginator import Paginator
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import generics
-from commonapp.models.company import Company, CompanyUser, FavouriteCompany
+from company.models.company import Company, CompanyUser, FavouriteCompany
 from commonapp.serializers.company import CompanySerializer, FavouriteCompanySerializer, ChangeCompanyEmailSerializer
 from userapp.models.user import User
 from userapp.serializers.user import UserDetailSerializer

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from helpers.constants import ORDER_LINE_STATUS, ORDER_STATUS
 from notifications.models import Notification
 

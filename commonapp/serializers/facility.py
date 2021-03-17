@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from commonapp.models.facility import Facility
+from company.models.facility import Facility
 
 class FacilitySerializer(serializers.ModelSerializer):
 

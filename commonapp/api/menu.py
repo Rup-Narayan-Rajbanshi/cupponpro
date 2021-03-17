@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import generics
-from commonapp.models.company import Company
+from company.models.company import Company
 from commonapp.serializers.menu import MenuSerializer
 from permission import publicReadOnly
 

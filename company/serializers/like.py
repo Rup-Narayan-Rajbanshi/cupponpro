@@ -4,7 +4,7 @@ from helpers.serializer import CustomModelSerializer, CustomBaseSerializer
 from helpers.serializer_fields import DetailRelatedField
 from company.models.likes import  Like
 from userapp.models import User
-from commonapp.models.company import Company
+from company.models.company import Company
 
 
 class LikeSerializer(CustomModelSerializer):

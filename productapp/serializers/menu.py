@@ -6,7 +6,7 @@ from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import ImageFieldWithURL
 from productapp.models.product import ProductCategory, Product
 from productapp.serializers.product import ProductSerializer
-from commonapp.models.company import Company
+from company.models.company import Company
 from helpers.constants import DEFAULTS, MAX_LENGTHS
 
 

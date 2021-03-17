@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 from helpers.serializer_fields import DetailRelatedField
 from django.db import transaction
 from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CATEGORY
-from commonapp.models.company import Company
+from company.models.company import Company
 
 
 

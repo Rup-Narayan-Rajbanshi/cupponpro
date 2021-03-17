@@ -1,5 +1,5 @@
 from userapp.models.user import User
-from commonapp.models.company import Company, CompanyUser
+from company.models.company import Company, CompanyUser
 
 def isCompanyUser(user_id, company_id):
     # user_obj = User.objects.filter(id=user_id)

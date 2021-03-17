@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from helpers.paginations import FPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from helpers.api_mixins import FAPIMixin
-from commonapp.models.company import FavouriteCompany, Company
+from company.models.company import FavouriteCompany, Company
 from company.serializers.company import FavouriteCompanySerializer, LocalBusinessSerializer
 from company.filters import FavouriteCompanyUserFilter, UserFavouriteCompanyFilter, LocalBusinessFilter
 from permission import isCompanyOwnerAndAllowAll

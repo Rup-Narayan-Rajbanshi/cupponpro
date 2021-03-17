@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 from helpers.serializer_fields import ImageFieldWithURL
 from django.contrib.contenttypes.models import ContentType
 from commonapp.models.image import Image
-from commonapp.models.company import CompanyUser
+from company.models.company import CompanyUser
 
 
 class ImageSerializer(serializers.ModelSerializer):

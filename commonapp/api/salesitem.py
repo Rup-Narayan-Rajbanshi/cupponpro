@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from helpers.constants import DISCOUNT_TYPE
 from commonapp.models.bill import Bill
-from commonapp.models.company import Company
+from company.models.company import Company
 from productapp.models.coupon import Voucher
 from productapp.models.product import Product
 from commonapp.models.salesitem import SalesItem

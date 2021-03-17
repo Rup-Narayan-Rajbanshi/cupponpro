@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
-from commonapp.models.asset import Asset
-from commonapp.models.company import CompanyUser, Company
+from company.models.asset import Asset
+from company.models.company import CompanyUser, Company
 
 
 class isAdminOrReadOnly(permissions.BasePermission):

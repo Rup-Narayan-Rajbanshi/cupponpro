@@ -3,7 +3,7 @@ from datetime import datetime
 from django_filters import rest_framework as filters
 from django.db.models import Q
 from commonapp.models.image import Image
-from commonapp.models.company import CompanyUser
+from company.models.company import CompanyUser
 from productapp.models.product import Product, ProductCategory
 from productapp.models.coupon import Coupon
 from django.db.models import Count

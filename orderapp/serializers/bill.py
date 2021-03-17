@@ -6,12 +6,12 @@ from helpers.serializer import CustomModelSerializer
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
 from orderapp.serializers.order import CompanyTableOrderSerializer
-from commonapp.models.company import Company
+from company.models.company import Company
 from userapp.models.customer import Customer
 from userapp.serializers.user import UserDetailSerializer
 from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import DEFAULTS, ORDER_LINE_STATUS
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from rest_framework.exceptions import ValidationError
 from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.serializers.transaction import TransactionHistoryBillSerializer

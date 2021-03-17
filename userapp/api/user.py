@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
-from commonapp.models.company import Company, CompanyUser, FavouriteCompany
+from company.models.company import Company, CompanyUser, FavouriteCompany
 from userapp.serializers.user import UserSerializer, UserDetailSerializer, UserRegistrationSerializer,\
     CompanyUserRegistrationSerializer, ChangePasswordSerializer, PasswordResetTokenSerializer,\
     ResetPasswordSerializer, GroupSerializer, UserGroupSerializer, SignupTokenSerializer, VerifyPasswordSerializer,\

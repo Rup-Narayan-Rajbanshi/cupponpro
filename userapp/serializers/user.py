@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth.models import Group
-from commonapp.models.company import CompanyUser
+from company.models.company import CompanyUser
 from userapp.models.user import User, PasswordResetToken, LoginToken, SignupToken
 from helpers.serializer_fields import ImageFieldWithURL
 from helpers.choices_variable import GENDER_CHOICES
-from commonapp.models.document import Document
+from company.models.document import Document
 
 class UserGroupSerializer(serializers.ModelSerializer):
     new_group = serializers.IntegerField(default=None)

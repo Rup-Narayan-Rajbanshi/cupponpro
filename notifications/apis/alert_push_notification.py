@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CATEGORY
 from notifications.tasks import notify_company_staffs
 

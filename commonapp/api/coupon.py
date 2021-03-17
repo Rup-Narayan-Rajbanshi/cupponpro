@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from commonapp.models.category import Category
 from productapp.models.coupon import Coupon, Voucher
-from commonapp.models.company import Company
+from company.models.company import Company
 from productapp.models.product import Product, ProductCategory
 from commonapp.serializers.coupon import CouponSerializer, VoucherSerializer, CouponDetailSerializer
 from helpers.constants import COUPON_TYPE_MAPPER

@@ -2,8 +2,8 @@ from rest_framework import generics
 from rest_framework.response import Response
 from orderapp.models.bills import Bills
 from orderapp.filters import SellItemFilter, ServiceChargeFilter, SellFilter, TableSalesFilter, CreditFilter
-from commonapp.models.asset import Asset
-from commonapp.models.company import CompanyUser
+from company.models.asset import Asset
+from company.models.company import CompanyUser
 from orderapp.models.order import Orders
 from helpers.paginations import FPagination
 from orderapp.serializers.order import TableSalesSerializer

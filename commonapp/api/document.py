@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from commonapp.models.company import Company
-from commonapp.models.document import Document
+from company.models.company import Company
+from company.models.document import Document
 from commonapp.serializers.document import DocumentSerializer
 from permission import isCompanyOwnerAndAllowAll, isCompanyManagerAndAllowAll
 

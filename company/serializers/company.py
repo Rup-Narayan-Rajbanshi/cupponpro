@@ -4,7 +4,7 @@ from helpers.serializer import CustomModelSerializer, CustomBaseSerializer
 from helpers.serializer_fields import DetailRelatedField
 from commonapp.serializers.company import CompanySerializer
 from helpers.constants import DISCOUNT_TYPE
-from commonapp.models.company import Company, FavouriteCompany
+from company.models.company import Company, FavouriteCompany
 from commonapp.models.category import Category, SubCategory
 from productapp.models.coupon import Coupon
 from userapp.models import User

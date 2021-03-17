@@ -2,9 +2,9 @@ from rest_framework import serializers
 from helpers.serializer_fields import DetailRelatedField
 from helpers.serializer_fields import ImageFieldWithURL
 from commonapp.models.category import Category, SubCategory
-from commonapp.models.company import Company, FavouriteCompany
-from commonapp.models.links import SocialLink
-from commonapp.models.rating import Rating
+from company.models.company import Company, FavouriteCompany
+from company.models.links import SocialLink
+from company.models.rating import Rating
 from commonapp.serializers.image import ImageDetailSerializer
 from commonapp.serializers.links import SocialLinkSerializer
 from userapp.models.user import User

@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from commonapp.models.company import Company
+from company.models.company import Company
 from helpers.choices_variable import ASSET_TYPE_CHOICES
 from helpers.constants import ASSET_TYPE
 

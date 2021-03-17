@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from helpers.serializer_fields import DetailRelatedField
-from commonapp.models.rating import Rating
-from commonapp.models.company import Company
+from company.models.rating import Rating
+from company.models.company import Company
 
 
 class RatingSerializer(serializers.ModelSerializer):

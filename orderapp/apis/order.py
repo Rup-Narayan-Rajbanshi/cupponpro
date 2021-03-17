@@ -7,8 +7,8 @@ from rest_framework.viewsets import GenericViewSet, mixins, ModelViewSet
 from rest_framework import generics, status
 from django_filters.rest_framework import DjangoFilterBackend
 from notifications.constants import NOTIFICATION_CATEGORY_NAME, NOTIFICATION_CATEGORY
-from commonapp.models.asset import Asset
-from commonapp.models.company import CompanyUser
+from company.models.asset import Asset
+from company.models.company import CompanyUser
 from productapp.models.coupon import Voucher
 from commonapp.models.order import Order
 from productapp.models.product import Product

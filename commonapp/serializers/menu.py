@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from helpers.serializer_fields import ImageFieldWithURL
-from commonapp.models.company import Company
+from company.models.company import Company
 from productapp.models.product import Product, ProductCategory
 from commonapp.models.order import Order
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from commonapp.serializers.order import OrderSerializer
 from commonapp.serializers.image import ImageDetailSerializer
 

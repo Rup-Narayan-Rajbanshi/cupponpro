@@ -2,7 +2,7 @@ from rest_framework import serializers
 from helpers.serializer import CustomModelSerializer
 from inventory.models.supplier import Supplier
 from rest_framework.exceptions import ValidationError
-from commonapp.models.company import Company
+from company.models.company import Company
 from helpers.serializer_fields import DetailRelatedField
 
 

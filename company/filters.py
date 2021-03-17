@@ -2,7 +2,7 @@ import math
 from django.db.models import Q
 from django_filters import rest_framework as filters
 from userapp.models import User
-from commonapp.models.company import FavouriteCompany, CompanyUser, Company
+from company.models.company import FavouriteCompany, CompanyUser, Company
 from company.models import Partner
 from company.models.likes import Like
 from rest_framework.response import Response

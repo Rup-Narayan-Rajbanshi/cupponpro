@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.dispatch import receiver
 from commonapp.models.image import Image
-from commonapp.models.company import Company
+from company.models.company import Company
 from helpers.app_helpers import url_builder, content_file_name
 from helpers.constants import DEFAULTS, MAX_LENGTHS, DISCOUNT_TYPE
 from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_CAT_TYPE_CHOICES, PRODUCT_TYPE_CHOICES

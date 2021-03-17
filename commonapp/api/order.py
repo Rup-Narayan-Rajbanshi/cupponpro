@@ -3,7 +3,7 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from commonapp.models.company import Company
+from company.models.company import Company
 from productapp.models.coupon import Voucher
 from commonapp.models.order import Order, OrderLine
 from productapp.models.product import Product

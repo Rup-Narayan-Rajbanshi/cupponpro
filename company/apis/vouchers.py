@@ -2,7 +2,7 @@ from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import GenericViewSet
 
-from commonapp.models.company import Company
+from company.models.company import Company
 from productapp.models.coupon import Voucher
 from commonapp.serializers.coupon import VoucherSerializer
 from helpers.paginations import FPagination

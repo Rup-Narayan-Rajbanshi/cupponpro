@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from commonapp.models.links import SocialLink
+from company.models.links import SocialLink
 
 class SocialLinkSerializer(serializers.ModelSerializer):
 

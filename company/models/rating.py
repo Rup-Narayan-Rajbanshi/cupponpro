@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from commonapp.models.company import Company
+from company.models.company import Company
 from userapp.models.user import User
 
 class Rating(models.Model):

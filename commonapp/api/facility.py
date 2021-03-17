@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import generics
-from commonapp.models.company import Company
-from commonapp.models.facility import Facility
+from company.models.company import Company
+from company.models.facility import Facility
 from commonapp.serializers.facility import FacilitySerializer
 
 class CompanyFacilityListView(generics.GenericAPIView):

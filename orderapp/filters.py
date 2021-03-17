@@ -3,7 +3,7 @@ from django_filters import rest_framework as filters
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from productapp.models.coupon import Coupon
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders

@@ -5,7 +5,7 @@ from helpers.serializer_fields import DetailRelatedField
 from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import ImageFieldWithURL
 from productapp.models.product import ProductCategory
-from commonapp.models.company import Company
+from company.models.company import Company
 from helpers.constants import DEFAULTS, MAX_LENGTHS
 from django.db.models import Max
 

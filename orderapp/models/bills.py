@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Sum
 
-from commonapp.models.company import Company
+from company.models.company import Company
 from helpers.models import BaseModel
 from orderapp.choice_variables import PAYMENT_CHOICES
 # from orderapp.constants import PAYMENT_MODES

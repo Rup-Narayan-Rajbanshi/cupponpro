@@ -2,7 +2,7 @@ import xlwt
 import shortuuid
 from rest_framework.decorators import api_view, permission_classes
 from django.http import HttpResponse
-from commonapp.models.asset import Asset
+from company.models.asset import Asset
 from permission import isAdmin
 
 

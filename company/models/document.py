@@ -2,7 +2,7 @@ import os
 import uuid
 from django.core.validators import FileExtensionValidator
 from django.db import models
-from commonapp.models.company import Company
+from company.models.company import Company
 from commonapp.models.image import Image
 from django.dispatch import receiver
 
