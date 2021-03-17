@@ -40,8 +40,9 @@ class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixin
     def get_queryset(self):
         company = getattr(self.request, 'company', None)
         sort_by = self.request.query_params.get('sort_by', None)
-        group = self.request.user.group.all().first().name
-        if group == 'sales':
+        groups = self.request.user.group.all()
+        group_list = [group.name for group in groups]
+        if 'sales' in group_list:
             if sort_by:
                 order_by = self.request.query_params.get('order_by', 'desc')
                 if order_by == 'asc':
