@@ -81,6 +81,17 @@ class Company(Address):
             }
         return None
 
+
+    def inventory_representation(self, request=None):
+        if self:
+            logo = url_builder(self.logo, request)
+            logo_icon = url_builder(self.logo_icon, request)
+            return {
+                'id': self.id,
+                'name': self.name,
+            }
+        return None
+
     def save(self, *args, **kwargs):
         ''' On save, create key '''
         if not self.key:

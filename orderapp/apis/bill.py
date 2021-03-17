@@ -21,10 +21,14 @@ class BIllUpdateAPI(FAPIMixin, mixins.UpdateModelMixin, GenericViewSet):
         kwargs['partial'] = True
         return super(BIllUpdateAPI, self).update(request, *args, **kwargs)
 
+        
+
 class BillCreateAPI(FAPIMixin, mixins.CreateModelMixin, GenericViewSet):
     queryset = Bills.objects.all().order_by('-created_at')
     serializer_class = BillCreateSerializer
     permission_classes = (CompanyUserPermission, )
+
+
 
 class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, GenericViewSet):
     queryset = Bills.objects.all().order_by('-created_at', 'is_paid')

@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from data_manager.serializers.product_upload import UploadExcelProductSerializer
 from data_manager.serializers.product_category_upload import UploadExcelProductCategorySerializer
 from permission import CompanyUserPermission
+from data_manager.serializers.inventory import UploadExcelSupplierSerializer, UploadExcelStockSerializer
 
 
 @api_view(["POST"])
@@ -34,4 +35,35 @@ def product_category_data_upload(request):
     serializer.save(serializer.validated_data)
     return Response(
         {"detail": "Successfully uploaded product category data from the excel sheet"},
+        status=status.HTTP_200_OK)
+
+
+
+@api_view(["POST"])
+@permission_classes((CompanyUserPermission,))
+@renderer_classes([JSONRenderer])
+def stock_data_upload(request):
+    data = {"upload_file": request.data.get('upload_file')}
+    serializer = UploadExcelStockSerializer(
+        data=data, context={"request": request})
+    serializer.is_valid(raise_exception=True)
+    serializer.save(serializer.validated_data)
+    return Response(
+        {"detail": "Successfully uploaded stock data from the excel sheet"},
+        status=status.HTTP_200_OK)
+
+
+
+
+@api_view(["POST"])
+@permission_classes((CompanyUserPermission,))
+@renderer_classes([JSONRenderer])
+def supplier_data_upload(request):
+    data = {"upload_file": request.data.get('upload_file')}
+    serializer = UploadExcelSupplierSerializer(
+        data=data, context={"request": request})
+    serializer.is_valid(raise_exception=True)
+    serializer.save(serializer.validated_data)
+    return Response(
+        {"detail": "Successfully uploaded supplier data from the excel sheet"},
         status=status.HTTP_200_OK)
