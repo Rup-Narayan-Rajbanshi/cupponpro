@@ -52,7 +52,7 @@ class MenuSerializer(serializers.ModelSerializer):
             menu = dict()
             menu['category_name'] = product_category.name
             products = list()
-            product_obj = Product.objects.filter(product_category=product_category, status='ACTIVE').order_by('name')
+            product_obj = Product.objects.filter(product_category=product_category, company=obj.id, status='ACTIVE').order_by('name')
             if name:
                 product_obj = product_obj.filter(name__istartswith=name)
             for each_product in product_obj:
