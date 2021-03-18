@@ -53,7 +53,7 @@ class Orders(BaseModel):
         else:
             order.custom_discount_percentage = custom_discount_percentage
             order.custom_discount_amount = custom_discount_amount
-            order.is_service_charge = is_service_charge
+            order.is_service_charge = is_service_charge if 'is_service_charge' in v_data else order.is_service_charge
         order.save()
         if status == ORDER_STATUS['BILLABLE']:
             data = dict()
