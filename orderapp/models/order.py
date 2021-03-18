@@ -87,6 +87,8 @@ class Orders(BaseModel):
         if status == ORDER_STATUS['COMPLETED']:
             if order.bill:
                 data = dict()
+                if 'payment_mode' in v_data:
+                    data['payment_mode'] = payment_mode
                 if not order.bill.paid_amount > 0.0:
                     data['paid_amount'] = order.bill.credit_amount
                     data['is_paid'] = True
