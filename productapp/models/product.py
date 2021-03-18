@@ -9,14 +9,13 @@ from company.models.company import Company
 from helpers.app_helpers import url_builder, content_file_name
 from helpers.constants import DEFAULTS, MAX_LENGTHS, DISCOUNT_TYPE
 from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_CAT_TYPE_CHOICES, PRODUCT_TYPE_CHOICES
+from helpers.models import BaseModel
 
 
-class BulkQuantity(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
+class BulkQuantity(BaseModel):
     name = models.CharField(max_length=30, unique=True)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'bulk_quantity'
@@ -26,8 +25,7 @@ class BulkQuantity(models.Model):
         return self.name
 
 
-class ProductCategory(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
+class ProductCategory(BaseModel):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='subcategory', null=True)
     name = models.CharField(max_length=64)
     link = models.URLField(null=True, blank=True)
@@ -37,7 +35,6 @@ class ProductCategory(models.Model):
     types = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_TYPE'], choices=PRODUCT_CAT_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_TYPE'])
     sub_type = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], null=True)
     position = models.PositiveIntegerField(default=0, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     
     class Meta:
@@ -101,7 +98,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                 os.remove(old_file.path)
 
 
-class Product(models.Model):
+class Product(BaseModel):
     # Null = None
     # Male = "M"
     # Female = "F"
@@ -112,8 +109,6 @@ class Product(models.Model):
     #     (Female, 'Female'),
     #     (Unisex, 'Unisex'),
     # ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     product_code = models.CharField(max_length=10)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=64)
@@ -132,7 +127,7 @@ class Product(models.Model):
     # gender = models.CharField(max_length=6, choices=GENDER, default=Null, null=True, blank=True) # usable for clothing and similar category
     images = GenericRelation(Image)
     status = models.CharField(max_length=MAX_LENGTHS['PRODUCT_STATUS'], choices=PRODUCT_STATUS_CHOICES, default=DEFAULTS['PRODUCT_STATUS'])
-    created_at = models.DateTimeField(auto_now_add=True)
+    
 
     class Meta:
         db_table = 'product'
