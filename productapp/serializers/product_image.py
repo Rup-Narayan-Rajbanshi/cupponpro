@@ -5,9 +5,10 @@ from helpers.serializer_fields import ImageFieldWithURL
 from django.contrib.contenttypes.models import ContentType
 from commonapp.models.image import Image
 from company.models.company import CompanyUser
+from helpers.serializer import CustomModelSerializer
 
 
-class ImageSerializer(serializers.ModelSerializer):
+class ImageSerializer(CustomModelSerializer):
     image = ImageFieldWithURL(allow_empty_file=False)
     content_type = serializers.SerializerMethodField()
     content_object = serializers.SerializerMethodField()
