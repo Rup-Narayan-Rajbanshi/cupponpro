@@ -223,7 +223,6 @@ class CreditReportAPI(generics.ListAPIView):
         bills_types = self.filter_queryset(self.queryset)
         bills_all = bills_types.intersection(bills_company)
         customer_list = bills_all.order_by('customer').values_list('customer').distinct()
-        print(customer_list)
 
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
