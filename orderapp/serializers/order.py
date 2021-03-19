@@ -155,7 +155,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'bill', 'company', 'voucher', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
+        fields = ('id', 'status', 'bill', 'company', 'voucher', 'is_service_charge' 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
 
     def get_fields(self):
         fields = super().get_fields()

@@ -93,7 +93,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     total_discount = serializers.SerializerMethodField()
 
     class Meta(CompanyTableOrderSerializer.Meta):
-        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'is_service_charge', 'custom_discount_amount', 'custom_discount_percentage','total_discount', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
+        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'custom_discount_amount', 'custom_discount_percentage','total_discount', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
         # fields = ('id', 'voucher', 'asset', 'order_lines', 'bill' ,'customer', 'name','phone_number', 'email', 'address')
 
     def get_total_discount(self, obj):
