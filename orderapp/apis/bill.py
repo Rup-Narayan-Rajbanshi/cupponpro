@@ -86,7 +86,7 @@ class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixin
                     'success': 0,
                     'message': 'Bill does not exit.'
                 }
-            return Response(data, status=status)
+        return Response(data, status=status)
     
     def create(self, request, *args, **kwargs):
         serializer = ManualBillSerializerCompany(data=request.data, context={'request':request})
