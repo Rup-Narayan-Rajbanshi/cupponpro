@@ -65,19 +65,28 @@ class BillAPI(FAPIMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixin
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance:
-            instance.delete()
-            data={
-                'success': 1,
-                'message': 'Deleted one table order.'
-            }
-            return Response(data, status=200)
-        else:
-            data={
+        status = 200
+        groups = self.request.user.group.all().values_list('name', flat=True)
+        if 'sales' in groups:
+            status = 400
+            data = {
                 'success': 0,
-                'message': 'Bill does not exit.'
+                'message': 'Sales cannot delete bill'
             }
-            return Response(data, status=200)
+        else:
+            if instance:
+                instance.delete()
+                data={
+                    'success': 1,
+                    'message': 'Deleted one table order.'
+                }
+                return Response(data, status=200)
+            else:
+                data={
+                    'success': 0,
+                    'message': 'Bill does not exit.'
+                }
+            return Response(data, status=status)
     
     def create(self, request, *args, **kwargs):
         serializer = ManualBillSerializerCompany(data=request.data, context={'request':request})
