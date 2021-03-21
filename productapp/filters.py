@@ -1,12 +1,13 @@
 import math
 from datetime import datetime
 from django_filters import rest_framework as filters
-from django.db.models import Q
+from django.db.models import Q, Max
 from commonapp.models.image import Image
 from company.models.company import CompanyUser
 from productapp.models.product import Product, ProductCategory
 from productapp.models.coupon import Coupon
 from django.db.models import Count
+from django.utils import timezone
 
 
 class ImageBaseFilter(filters.FilterSet):
@@ -163,4 +164,75 @@ class SpecialFoodFilter(ProductFilter):
                             order_by('-special_food_count')[:5]
 
         return special_product
+
+
+class CouponFilter(filters.FilterSet):
+    company = filters.CharFilter(field_name='company__id')
+    class Meta:
+        model = Coupon
+        fields = "__all__"
+
+
+class HighestDiscountCouponFilter(CouponFilter):
+    @property
+    def qs(self):
+        parent = super(HighestDiscountCouponFilter, self).qs
+        status = self.request.GET.get('status',None)
+        if status == 'max_discount':
+            coupon = parent.filter(discount_type='PERCENTAGE',
+                                expiry_date__gte=timezone.now()
+                                ).annotate(highest_discount=Max('discount')).order_by('-highest_discount')[:1]
+            if coupon:
+                return coupon
+            else:
+                return parent.filter(discount_type='FLAT',
+                                expiry_date__gte=timezone.now()
+                                ).annotate(highest_discount=Max('discount')).order_by('-highest_discount')[:1]
+
+        return parent.filter(expiry_date__gte=timezone.now())
+
+
+class GlobalCouponFilter(filters.FilterSet):
+    company = filters.CharFilter(field_name='company__id')
+    name = filters.CharFilter(field_name='name',lookup_expr='icontains')
+    discount_type = filters.CharFilter(field_name='discount_type',lookup_expr='icontains')
+    discount = filters.RangeFilter(field_name='discount')
+   
+    class Meta:
+        model = Coupon
+        fields = "__all__"
+
+    @property
+    def qs(self):
+        parent = super(GlobalCouponFilter, self).qs
+        q = self.request.GET.get('q',None)
+        category = self.request.GET.get('category',None)
+
+        order_by_fields = ['created_at', 'low_to_high', 'high_to_low']
+        order_by = self.request.GET.get('order_by') if self.request.GET.get('order_by') in order_by_fields else 'id'
+        if order_by == 'low_to_high':
+           order_by='discount'
+        elif order_by == 'high_to_low':
+            order_by='-discount'
+
+        if q:
+            product_obj_ids= Product.objects.filter(name__icontains=q).values_list('id',flat=True)
+            
+            product_category_obj_ids= ProductCategory.objects.filter(name__icontains=q).values_list('id',flat=True)
+
+            parent = parent.filter(Q(company__name__icontains=q)|
+                                    Q(object_id__in=product_obj_ids)|
+                                    Q(object_id__in=product_category_obj_ids)
+                                    )
+        elif q == '':
+            raise ValidationError({'detail': 'No search input given'})
+         
+        if category:
+            parent = parent.filter(object_id=category)
+
+        coupons = parent
+        coupons = coupons.filter(expiry_date__gte=timezone.now()).order_by('{order_by}'.format(order_by=order_by))
+
+        return coupons
+
 

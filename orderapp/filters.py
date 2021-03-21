@@ -106,29 +106,3 @@ class TransactionFilter(filters.FilterSet):
     class Meta:
         model = TransactionHistoryBills
         fields = ['bill']
-
-
-class CouponFilter(filters.FilterSet):
-    company = filters.CharFilter(field_name='company__id')
-    class Meta:
-        model = Coupon
-        fields = "__all__"
-
-
-class HighestDiscountCouponFilter(CouponFilter):
-    @property
-    def qs(self):
-        parent = super(HighestDiscountCouponFilter, self).qs
-        status = self.request.GET.get('status',None)
-        if status == 'max_discount':
-            coupon = parent.filter(discount_type='PERCENTAGE',
-                                expiry_date__gte=timezone.now()
-                                ).annotate(highest_discount=Max('discount')).order_by('-highest_discount')[:1]
-            if coupon:
-                return coupon
-            else:
-                return parent.filter(discount_type='FLAT',
-                                expiry_date__gte=timezone.now()
-                                ).annotate(highest_discount=Max('discount')).order_by('-highest_discount')[:1]
-
-        return parent.filter(expiry_date__gte=timezone.now())

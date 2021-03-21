@@ -9,7 +9,6 @@ from orderapp.apis.table import AssetListAPI
 from orderapp.apis.voucher import VoucherListAPI, CustomerVoucherAPI
 from orderapp.apis.sales import GetSellItemReportAPI, TableSalesAPI, GetServiceChargeAPI, GetSellReport, CreditReportAPI
 from orderapp.apis.transaction import BillTransactionHistoryAPI
-from orderapp.apis.coupon import SpecialCouponAPI
 
 router = routers.SimpleRouter()
 router.register(r"table-change-status", TableOrderStatusAPI)
@@ -27,8 +26,6 @@ router.register(r"customer-vouchers", CustomerVoucherAPI)
 router.register(r"update-bill", BIllUpdateAPI)
 router.register(r"transaction-history", BillTransactionHistoryAPI)
 router.register(r"update-line-status", TableOrderOrderlineUpdateAPI)
-
-router.register(r"coupon", SpecialCouponAPI)
 
 
 urlpatterns = router.urls
