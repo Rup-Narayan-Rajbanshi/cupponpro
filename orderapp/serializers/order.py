@@ -21,6 +21,7 @@ from userapp.models import User
 from userapp.models.customer import Customer
 from helpers.validators import phone_number_validator, is_numeric_value
 from helpers.constants import MAX_LENGTHS, DEFAULTS
+from django.db.models import Sum
 
 
 class TableOrderOrderlineUpdateSerializer(CustomBaseSerializer):
@@ -255,6 +256,12 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         OrderLines.objects.bulk_create(order_line_bulk_create_data)
         # if order.lines.exclude(status__in='SERVED').count() == 0:
         #     order.update(status=ORDER_STATUS['BILLABLE'])
+        payable_amount, tax = self.get_grand_total(order)
+        payable_amount = round(payable_amount, 6)
+        order.payable_amount = payable_amount
+        order.tax = tax
+        order.service_charge = round(order.service_charge_amount,2)  if order.is_service_charge else 0
+        order.save()
         if notify:
             company = str(order.company.id)
             if order.asset:
@@ -319,6 +326,12 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
                                                                                 served_products)
             OrderLines.objects.bulk_create(order_line_bulk_create_data)
         order = super().update(instance, validated_data)
+        payable_amount, tax = self.get_grand_total(order)
+        payable_amount = round(payable_amount, 6)
+        order.payable_amount = payable_amount
+        order.tax = tax
+        order.service_charge = round(order.service_charge_amount,2)  if order.service_charge_amount else 0
+        order.save()
         company = str(order.company.id)
         if order.asset:
             if order.asset == asset:
@@ -343,6 +356,31 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         except Exception as e:
             pass
         return order
+
+    def get_grand_total(self, order):
+        grand_total=0.0
+        taxed_amount = order.company.tax if order.company.tax else 0
+        service_charge_amount = order.company.service_charge if order.company.service_charge else 0
+        total = float(order.lines.all().aggregate(order_total=Sum('total'))['order_total']) if order.lines.all().aggregate(order_total=Sum('total'))['order_total'] else 0
+        print(total)
+        grand_total = grand_total + total 
+        service_charge_amount = float(service_charge_amount) / 100 * float(total) if order.is_service_charge else 0 #if is_service_charge else 0
+        grand_total = grand_total + service_charge_amount
+        discount_amount = self.get_discount_amount(order, grand_total) 
+        grand_total = grand_total - discount_amount 
+        taxed_amount = float(taxed_amount) / 100 * float(grand_total)
+        taxed_amount = round(taxed_amount, 2)
+        grand_total = round(grand_total + taxed_amount, 2)
+        return (grand_total, taxed_amount)
+
+    def get_discount_amount(self, order, grand_total):
+        value = 0.0
+        if order.custom_discount_percentage:
+            custom_discount = float(order.custom_discount_percentage/100) * float(grand_total)
+            value = value + custom_discount
+        if order.custom_discount_amount:
+            value = value + order.custom_discount_amount
+        return value
 
 
 class UserOrderSerializerCompany(CompanyTableOrderSerializer):

@@ -24,6 +24,10 @@ class Orders(BaseModel):
     custom_discount_percentage = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     custom_discount_amount  = models.PositiveIntegerField(default = 0)
     is_service_charge = models.BooleanField(default=True)
+    service_charge = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    tax = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    payable_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
+
 
     class Meta:
         ordering = ['-created_at']
@@ -55,12 +59,17 @@ class Orders(BaseModel):
             order.custom_discount_amount = custom_discount_amount
             order.is_service_charge = is_service_charge if 'is_service_charge' in v_data else order.is_service_charge
         order.save()
+        payable_amount, tax = cls.get_grand_total(order)
+        payable_amount = round(payable_amount, 6)
+        order.payable_amount = payable_amount
+        order.tax = tax
+        service_charge_get = round(cls.service_charge_amount_static(order),2) if order.is_service_charge else 0
+        order.service_charge = service_charge_get
+        order.save()
         if status == ORDER_STATUS['BILLABLE']:
             data = dict()
             data['company'] = order.company.id
-            data['service_charge'] = round(cls.service_charge_amount_static(order),2) if order.is_service_charge else 0
-            payable_amount, tax = cls.get_grand_total(order)
-            payable_amount = round(payable_amount, 6)
+            data['service_charge'] = service_charge_get
             data['payable_amount'] = payable_amount
             data['tax'] = tax
             data['paid_amount'] = paid_amount
