@@ -320,6 +320,16 @@ class CompanyProductDetailView(generics.GenericAPIView):
                     serializer = ProductSerializer(instance=product_obj[0],\
                         data=request.data, context={'request':request})
                     if serializer.is_valid():
+                        tag = request.data['tag']
+                        tag_list = tag.split(',')
+                        
+                        tag_list_titile_case = [word.title() for word in tag_list]
+                        print(tag_list_titile_case)
+                        # serializer.tag = tag_list_titile_case
+                        
+                        # string = 'test-tag'
+                        # print(string.capitalize())
+                        # print(tag.capitalize())
                         serializer.save()
                         data = {
                             'success': 1,

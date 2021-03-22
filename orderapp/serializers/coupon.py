@@ -9,7 +9,6 @@ from helpers.constants import DISCOUNT_TYPE
 from helpers.choices_variable import DISCOUNT_CHOICES
 
 
-
 class CouponSerializer(serializers.ModelSerializer):
     discount_type = LowertoUpperChoiceField(DISCOUNT_CHOICES)
     content_type = CouponContentTypeField(model=ContentType, allow_null=True, lookup='model', representation='to_representation')

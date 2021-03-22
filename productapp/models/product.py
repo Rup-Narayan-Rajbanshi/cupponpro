@@ -4,6 +4,9 @@ import uuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.dispatch import receiver
+from django.core.validators import RegexValidator
+from django.utils.translation import gettext as _
+
 from commonapp.models.image import Image
 from company.models.company import Company
 from helpers.app_helpers import url_builder, content_file_name
@@ -127,7 +130,9 @@ class Product(BaseModel):
     # gender = models.CharField(max_length=6, choices=GENDER, default=Null, null=True, blank=True) # usable for clothing and similar category
     images = GenericRelation(Image)
     status = models.CharField(max_length=MAX_LENGTHS['PRODUCT_STATUS'], choices=PRODUCT_STATUS_CHOICES, default=DEFAULTS['PRODUCT_STATUS'])
-    
+    tag = models.CharField(max_length=30,
+                                    validators=[RegexValidator(regex=r'^[\'a-zA-Z0-9\s,-]*$',
+                                    message=_("Allowed characters are - , ' and alphanumeric characters"),),], null=True, blank=True)
 
     class Meta:
         db_table = 'product'

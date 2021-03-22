@@ -37,6 +37,8 @@ class CompanyImageListView(generics.GenericAPIView):
         """
         An endpoint for creating vendor's image.
         """
+        print(request.user.id)
+        print(company_id)
         if isCompanyUser(request.user.id, company_id):
             request_data = request.data
             request_data['object_id'] = company_id

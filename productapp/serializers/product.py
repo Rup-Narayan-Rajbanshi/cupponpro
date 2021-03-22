@@ -28,3 +28,30 @@ class ProductSerializer(CustomModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
+
+    # def validate(self, attrs):
+    #     print(attrs)
+    #     tags = attrs.get('tag')
+    #     print(tags)
+
+
+        # content_type = attrs.get('content_type')
+        # object_id = attrs.get('object_id')
+        # request = self.context.get('request')
+        # if request:
+        #     try:
+        #         company_user = request.user.company_user.all()
+        #         company = company_user[0].company
+        #     except:
+        #         company = None
+        #     if company:
+        #         attrs['company'] = company
+        
+        # if content_type and object_id:
+        #     content_class = content_type.model_class()
+        #     try:
+        #         object = content_class.objects.get(id=object_id)
+        #     except ObjectDoesNotExist:
+        #         raise ValidationError({'object_id': 'Object does not exist.'})
+        # return attrs
+
