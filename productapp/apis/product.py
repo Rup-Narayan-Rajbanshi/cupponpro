@@ -259,7 +259,6 @@ class CompanyProductListView(generics.GenericAPIView):
         """
         if str(company_id) == str(request.data['company']):
             tag = request.data['tag']
-            print(tag)
             tag_title_case = tag.title()
             request.data._mutable = True
             request.data['tag'] = tag_title_case

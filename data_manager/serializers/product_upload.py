@@ -45,7 +45,9 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
         df['total_price'] = df['selling_price']
         valid_column = ['product_code', 'name', 'link', 'product_category', 'brand_name',
        'purchase_price', 'purchase_currency', 'selling_price', 'types',
-       'selling_currency', 'total_price']
+       'selling_currency', 'total_price', 'tag']
+
+
 
         valid_column=list(set(valid_column))
         columns = list(set(df.columns))
@@ -66,7 +68,9 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
 
         # Validate Product Data
         product_data = df.to_dict('records')
+       
         serializer = ProductSerializer(data=product_data, many=True)
+       
         serializer.is_valid(raise_exception=True)
 
         # Validate product category name
@@ -92,6 +96,8 @@ class UploadExcelProductSerializer(CustomBaseSerializer):
         duplicates = df[df['name'].duplicated() == True]
 
         df['purchase_price'] = df['purchase_price'].apply(lambda x: int(x) if x else 0)
+
+        df['tag'] = df['tag'].apply(lambda x: x.title())
 
         # Name duplication validation
         duplicate_list = duplicates[duplicates['name'].duplicated() == False]['name'].tolist()
