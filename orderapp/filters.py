@@ -110,6 +110,7 @@ class TransactionFilter(filters.FilterSet):
 
 class CouponFilter(filters.FilterSet):
     company = filters.CharFilter(field_name='company__id')
+    category = filters.CharFilter(field_name='company__category__name',lookup_expr = 'iexact')
     class Meta:
         model = Coupon
         fields = "__all__"
