@@ -75,7 +75,7 @@ class OrderCountAPI(generics.GenericAPIView):
 
 
 class TableOrderAPI(ModelViewSet):
-    queryset = Orders.objects.select_related('bill', 'company').all()
+    queryset = Orders.objects.select_related('bills', 'company').all()
     permission_classes = [CompanyUserPermission]
     serializer_class = CompanyTableOrderSerializer
     filter_backends = (DjangoFilterBackend,)

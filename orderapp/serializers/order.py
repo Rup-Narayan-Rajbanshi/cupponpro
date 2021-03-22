@@ -151,12 +151,21 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     order_lines = OrderLineSerializer(many=True, required=True)
     price_details = serializers.SerializerMethodField()
     user  = DetailRelatedField(model=User, lookup='id', representation='to_representation', read_only=True)
-    bill = DetailRelatedField(model=Bills, lookup='id', representation='order_representation',
-                                 read_only=True)
+    bill = serializers.SerializerMethodField()
 
     class Meta:
         model = Orders
         fields = ('id', 'status', 'bill', 'company', 'voucher', 'is_service_charge', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
+
+    def get_bill(self, obj):
+        try:
+            obj.bills
+        except Bills.DoesNotExist:
+            return None
+        return {'id': obj.bills.id, 'invoice_number': obj.bills.invoice_number, 'is_credit': obj.bills.is_credit, 'is_paid': obj.bills.is_paid,
+                    'grand_total': obj.bills.get_grand_total(), 'subtotal': obj.bills.get_subtotal(), 'payment_mode': obj.bills.payment_mode,
+                    'service_charge': obj.bills.service_charge if obj.bills.is_service_charge else 0, 'tax': obj.bills.tax}
+
 
     def get_fields(self):
         fields = super().get_fields()
@@ -171,8 +180,12 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     def get_price_details(self, obj):
         grand_total, tax_amount = obj.get_grand_total(obj)
+        try:
+            invoice_number = obj.bills.invoice_number
+        except Bills.DoesNotExist:
+            invoice_number = ''
         return {
-            'invoice_number':obj.bill.invoice_number if obj.bill else '',
+            'invoice_number': invoice_number,
             'discount': obj.discount_amount,
             'sub_total': obj.subtotal,
             'tax': tax_amount,
