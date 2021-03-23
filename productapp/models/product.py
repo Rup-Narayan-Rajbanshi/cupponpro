@@ -38,6 +38,9 @@ class ProductCategory(BaseModel):
     types = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_TYPE'], choices=PRODUCT_CAT_TYPE_CHOICES, default=DEFAULTS['PRODUCT_CAT_TYPE'])
     sub_type = models.CharField(max_length=MAX_LENGTHS['PRODUCT_CAT_SUB_TYPE'], default=DEFAULTS['PRODUCT_CAT_SUB_TYPE'], null=True)
     position = models.PositiveIntegerField(default=0, blank=True)
+    tag = models.TextField(validators=[RegexValidator(regex=r'^[\'a-zA-Z0-9\s,-]*$',
+                            message=_("Allowed characters are - , ' and alphanumeric characters"),),], null=True, blank=True)
+
 
     
     class Meta:

@@ -40,7 +40,7 @@ class UploadExcelProductCategorySerializer(CustomBaseSerializer):
                   inplace=True)
 
         valid_column = ['parent', 'name', 'link', 'company', 'image',
-       'token', 'types', 'sub_type', 'position']
+       'token', 'types', 'sub_type', 'position','tag']
 
         valid_column=list(set(valid_column))
         columns = list(set(df.columns))
@@ -75,6 +75,9 @@ class UploadExcelProductCategorySerializer(CustomBaseSerializer):
 
         df.rename(columns=lambda x: x.strip(), inplace=True)
         duplicates = df[df['name'].duplicated() == True]
+
+        #change tags to title case
+        df['tag'] = df['tag'].apply(lambda x: x.title())
 
         # Name duplication validation
         duplicate_list = duplicates[duplicates['name'].duplicated() == False]['name'].tolist()
