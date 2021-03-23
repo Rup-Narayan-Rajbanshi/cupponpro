@@ -323,6 +323,7 @@ class CompanyProductDetailView(generics.GenericAPIView):
                 if product_obj:
                     tag = request.data['tag']
                     tag_titile_case = tag.title()
+                    request.data._mutable = True
                     request.data['tag'] = tag_titile_case
                     serializer = ProductSerializer(instance=product_obj[0],\
                         data=request.data, context={'request':request})
