@@ -39,9 +39,10 @@ class ProductCategorySerializer(CustomModelSerializer):
             name_exists_validation = 'Name "{0}" already exists.'.format(attrs.get('name', ''))
 
             #change tags to title case
-            tag = attrs['tag']
-            tag_title_case = tag.title()
-            attrs['tag'] = tag_title_case
+            if 'tag' in attrs:
+                tag = attrs['tag']
+                tag_title_case = tag.title()
+                attrs['tag'] = tag_title_case
 
             # ## not clear
             if 'parent'in attrs.keys() and 'types' in attrs.keys():

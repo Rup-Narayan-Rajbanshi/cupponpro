@@ -258,10 +258,11 @@ class CompanyProductListView(generics.GenericAPIView):
         An endpoint for creating vendor's product.
         """
         if str(company_id) == str(request.data['company']):
-            tag = request.data['tag']
-            tag_title_case = tag.title()
-            request.data._mutable = True
-            request.data['tag'] = tag_title_case
+            if 'tag' in request.data:
+                tag = request.data['tag']
+                tag_title_case = tag.title()
+                request.data._mutable = True
+                request.data['tag'] = tag_title_case
             serializer = ProductSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
@@ -321,10 +322,13 @@ class CompanyProductDetailView(generics.GenericAPIView):
             if company_obj:
                 product_obj = Product.objects.filter(id=product_id, company=company_obj[0])
                 if product_obj:
-                    tag = request.data['tag']
-                    tag_titile_case = tag.title()
-                    request.data._mutable = True
-                    request.data['tag'] = tag_titile_case
+                    # print(request.data)
+                    # print(request.data['tag'])
+                    if 'tag' in request.data:
+                        tag = request.data['tag']
+                        tag_titile_case = tag.title()
+                        request.data._mutable = True
+                        request.data['tag'] = tag_titile_case
                     serializer = ProductSerializer(instance=product_obj[0],\
                         data=request.data, context={'request':request})
                     if serializer.is_valid():

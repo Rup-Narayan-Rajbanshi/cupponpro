@@ -77,7 +77,9 @@ class UploadExcelProductCategorySerializer(CustomBaseSerializer):
         duplicates = df[df['name'].duplicated() == True]
 
         #change tags to title case
-        df['tag'] = df['tag'].apply(lambda x: x.title())
+        # print(df)
+        if 'tag' in columns:
+            df['tag'] = df['tag'].apply(lambda x: x.title())
 
         # Name duplication validation
         duplicate_list = duplicates[duplicates['name'].duplicated() == False]['name'].tolist()
