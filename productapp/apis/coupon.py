@@ -96,12 +96,11 @@ class RelatedCouponCategoryAPI(generics.GenericAPIView):
         data=dict()
         q = request.GET.get('q','')
 
-        related_category_dict = dict()
         related_company_dict = dict()
         discount_range = dict()
 
-        product_obj_ids = Product.objects.filter(name__icontains=q).values_list('id',flat=True)
-        category_obj_ids = ProductCategory.objects.filter(name__icontains=q).values_list('id',flat=True)
+        product_obj_ids = Product.objects.filter(tag__icontains=q).values_list('id',flat=True)
+        category_obj_ids = ProductCategory.objects.filter(tag__icontains=q).values_list('id',flat=True)
         global_search_coupon = Coupon.objects.filter(Q(company__name__icontains=q)|
                                                     Q(object_id__in=product_obj_ids)|
                                                     Q(object_id__in=category_obj_ids)
@@ -113,19 +112,17 @@ class RelatedCouponCategoryAPI(generics.GenericAPIView):
 
         coupons_object_ids = global_search_coupon.values_list('object_id',flat=True)
 
-        related_category_dict= ProductCategory.objects.filter(id__in=coupons_object_ids).values('id', 'name')
+        related_category_dict = ProductCategory.objects.filter(id__in=coupons_object_ids).values('id', 'name')
 
-        max_discount = global_search_coupon.filter(expiry_date__gte=timezone.now()).aggregate((Max('discount')))
-        discount_range['max']=max_discount['discount__max']
-        min_discount = global_search_coupon.filter(expiry_date__gte=timezone.now()).aggregate((Min('discount')))
-        discount_range['min']=min_discount['discount__min']
+        discount = global_search_coupon.filter(expiry_date__gte=timezone.now()).aggregate(Max('discount'),Min('discount'))
+        discount_range['max'] = discount['discount__max']
+        discount_range['min'] = discount['discount__min']
 
         data = {
             'success': 1,
             'category':related_category_dict,
             'companies': related_company_dict,
             'max_discount': discount_range
-
         }
 
         return Response(data, status=200)

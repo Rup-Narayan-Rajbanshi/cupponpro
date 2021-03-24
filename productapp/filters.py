@@ -216,9 +216,9 @@ class GlobalCouponFilter(filters.FilterSet):
             order_by='-discount'
 
         if q:
-            product_obj_ids= Product.objects.filter(name__icontains=q).values_list('id',flat=True)
+            product_obj_ids= Product.objects.filter(tag__icontains=q).values_list('id',flat=True)
             
-            product_category_obj_ids= ProductCategory.objects.filter(name__icontains=q).values_list('id',flat=True)
+            product_category_obj_ids= ProductCategory.objects.filter(tag__icontains=q).values_list('id',flat=True)
 
             parent = parent.filter(Q(company__name__icontains=q)|
                                     Q(object_id__in=product_obj_ids)|
