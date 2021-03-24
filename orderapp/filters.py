@@ -58,8 +58,8 @@ class CreditFilter(filters.FilterSet):
 
 
 class TableSalesFilter(filters.FilterSet):
-    from_date = filters.DateTimeFilter(field_name='orders__bill__created_at__date', lookup_expr='gte')
-    to_date = filters.DateTimeFilter(field_name='orders__bill__created_at__date', lookup_expr='lte')
+    from_date = filters.DateTimeFilter(field_name='orders__created_at__date', lookup_expr='gte')
+    to_date = filters.DateTimeFilter(field_name='orders__created_at__date', lookup_expr='lte')
 
     class Meta:
         model = Asset

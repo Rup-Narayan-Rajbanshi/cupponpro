@@ -280,7 +280,7 @@ class TableSalesAPI(generics.ListAPIView):
                 'message': 'User is not part of any company'
             }
             return Response(data, status=403)
-        queryset = Asset.objects.filter(company=company).annotate(number_of_sales=Count('orders__bill'), total_amount=Coalesce(Sum(F('orders__bill__payable_amount'),output_field=FloatField()),Value(0)))
+        queryset = Asset.objects.filter(company=company).annotate(number_of_sales=Count('orders'), total_amount=Coalesce(Sum(F('orders__payable_amount'),output_field=FloatField()),Value(0)))
         queryset = queryset.filter(number_of_sales__gt = 0.0)
         return queryset
 
@@ -290,7 +290,7 @@ class TableSalesAPI(generics.ListAPIView):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            grand_total=queryset.aggregate(grand_total_amount=Coalesce(Sum(F('orders__bill__payable_amount'), output_field=FloatField()), Value(0)))['grand_total_amount']
+            grand_total=queryset.aggregate(grand_total_amount=Coalesce(Sum(F('orders__payable_amount'), output_field=FloatField()), Value(0)))['grand_total_amount']
             response = self.get_paginated_response(serializer.data)
             response.data.update({'grand_total_amount':grand_total})
             return response

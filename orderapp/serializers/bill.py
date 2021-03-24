@@ -69,13 +69,13 @@ class BillListSerializer(CustomModelSerializer):
         fields = "__all__"
 
     def get_total_discount(self, obj):
-        order = obj.orders.first()
+        order = obj.order
         if order:
             return order.discount_amount
 
     def get_order(self, obj):
         serializer_context = {'request': self.context.get('request')}
-        serializer = CompanyTableOrderSerializer(obj.orders.all(), many=True, context=serializer_context)
+        serializer = CompanyTableOrderSerializer(obj.order, context=serializer_context)
         return serializer.data
 
 
@@ -128,6 +128,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         customer = Customer.getcreate_customer(**customer_data)
         first_line = order.lines.first()
         data = dict()
+        data['order'] = order.id
         data['is_manual'] = True
         data['company'] = order.company.id
         data['tax'] = order.company.tax if order.company.tax else 0
@@ -143,7 +144,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         serializer = BillCreateSerializer(data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot bill the order', code=400)
-        order.bill = serializer.save()
+        serializer.save()
         order.save()
         if first_line and first_line.voucher:
             order.user = first_line.voucher.user
@@ -170,6 +171,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         customer = Customer.getcreate_customer(**customer_data)
         first_line = order.lines.first()
         data = dict()
+        data['order'] = order.id
         data['is_manual'] = validated_data['is_manual'] if 'is_manual' in validated_data else order.bill.is_manual
         data['company'] = order.company.id
         data['tax'] = order.company.tax if order.company.tax else 0
@@ -182,10 +184,10 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
         data['tax'] = tax
         data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else order.bill.custom_discount_percentage
         data['custom_discount_amount'] = validated_data['custom_discount_amount'] if 'custom_discount_amount' in validated_data else order.bill.custom_discount_amount
-        serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': self.context['request']})
+        serializer = BillCreateSerializer(instance=order.bills, data=data, context={'request': self.context['request']})
         if not serializer.is_valid():
             raise serializers.ValidationError(detail='Cannot update bill. ', code=400)
-        order.bill = serializer.save()
+        serializer.save()
         order.save()
         if first_line and first_line.voucher:
             order.user = first_line.voucher.user

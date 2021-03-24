@@ -8,14 +8,12 @@ from company.models.asset import Asset
 from company.models.company import Company
 from productapp.models.coupon import Voucher
 from productapp.models.product import Product
-from orderapp.models.bills import Bills
 from userapp.models.user import User
 from helpers.constants import MAX_LENGTHS, DEFAULTS, ORDER_STATUS, DISCOUNT_TYPE, ORDER_LINE_STATUS
 from helpers.choices_variable import ORDER_STATUS_CHOICES, ORDER_LINE_STATUS_CHOICES
 
 
 class Orders(BaseModel):
-    bill = models.ForeignKey(Bills, on_delete=models.SET_NULL, null=True, related_name='orders')
     company = models.ForeignKey(Company, on_delete=models.PROTECT, related_name='orders')
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name='orders', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='orders')
@@ -50,14 +48,10 @@ class Orders(BaseModel):
         paid_amount = v_data.get('paid_amount', 0.0)
         payment_mode = v_data.pop('payment_mode', 'CASH')
         order.status = status
-        if order.bill:
-            order.custom_discount_percentage = custom_discount_percentage if 'custom_discount_percentage' in v_data else order.custom_discount_percentage
-            order.custom_discount_amount = custom_discount_amount if 'custom_discount_amount' in v_data else order.custom_discount_amount
-            order.is_service_charge = is_service_charge if 'is_service_charge' in v_data else order.is_service_charge
-        else:
-            order.custom_discount_percentage = custom_discount_percentage
-            order.custom_discount_amount = custom_discount_amount
-            order.is_service_charge = is_service_charge if 'is_service_charge' in v_data else order.is_service_charge
+        order.custom_discount_percentage = custom_discount_percentage if 'custom_discount_percentage' in v_data else order.custom_discount_percentage
+        order.custom_discount_amount = custom_discount_amount if 'custom_discount_amount' in v_data else order.custom_discount_amount
+        order.is_service_charge = is_service_charge if 'is_service_charge' in v_data else order.is_service_charge
+
         order.save()
         payable_amount, tax = cls.get_grand_total(order)
         payable_amount = round(payable_amount, 6)
@@ -68,6 +62,7 @@ class Orders(BaseModel):
         order.save()
         if status == ORDER_STATUS['BILLABLE']:
             data = dict()
+            data['order'] = order.id
             data['company'] = order.company.id
             data['service_charge'] = service_charge_get
             data['payable_amount'] = payable_amount
@@ -77,38 +72,47 @@ class Orders(BaseModel):
             data['custom_discount_percentage'] = order.custom_discount_percentage
             data['is_service_charge'] = order.is_service_charge
             data['payment_mode'] = payment_mode
-            if order.bill:
+            try:
+                has_bill = order.bills is not None
+            except:
+                has_bill = False
+            if has_bill:
                 data['credit_amount'] = payable_amount
-                serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
+                serializer = BillCreateSerializer(instance=order.bills, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
                     raise APIException(detail='Cannot update bill. ', code=400)
             else:
                 serializer = BillCreateSerializer(data=data, context={'request': request})
                 if not serializer.is_valid():
                     raise APIException(detail='Cannot bill the order', code=400)
-            order.bill = serializer.save()
-            order.save()
+            serializer.save()
             lines = order.lines.first()
             if lines.voucher:
                 lines.voucher.is_redeem = True
                 lines.voucher.save()
 
         if status == ORDER_STATUS['COMPLETED']:
-            if order.bill:
+            try:
+                has_bill = order.bills is not None
+            except:
+                has_bill = False
+            if has_bill:
                 data = dict()
+                data['order'] = order.id
                 if 'payment_mode' in v_data:
                     data['payment_mode'] = payment_mode
-                if not order.bill.paid_amount > 0.0:
-                    data['paid_amount'] = order.bill.credit_amount
+                data['paid_amouont'] = paid_amount if 'paid_amount' in v_data else 0
+                if not order.bills.paid_amount > 0.0:
+                    data['paid_amount'] = order.bills.credit_amount
                     data['is_paid'] = True
                 else:
                     #data['paid_amount'] = order.bill.paid_amount
-                    data['is_paid'] = False if order.bill.credit_amount > 0.0 else True
-                serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
+                    data['is_paid'] = False if order.bills.credit_amount > 0.0 else True
+                print(data)
+                serializer = BillCreateSerializer(instance=order.bills, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
                     raise serializer.ValidationError(detail='Cannot update bill. ', code=400)
-                order.bill = serializer.save()
-                order.save()
+                serializer.save()
         return order
 
     def to_representation(self, request=None):
