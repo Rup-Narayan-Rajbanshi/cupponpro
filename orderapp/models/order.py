@@ -79,11 +79,11 @@ class Orders(BaseModel):
             if has_bill:
                 data['credit_amount'] = payable_amount
                 serializer = BillCreateSerializer(instance=order.bills, data=data, context={'request': request}, partial=True)
-                if not serializer.is_valid():
+                if not serializer.is_valid(raise_exception=True):
                     raise APIException(detail='Cannot update bill. ', code=400)
             else:
                 serializer = BillCreateSerializer(data=data, context={'request': request})
-                if not serializer.is_valid():
+                if not serializer.is_valid(raise_exception=True):
                     raise APIException(detail='Cannot bill the order', code=400)
             serializer.save()
             lines = order.lines.first()
