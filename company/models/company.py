@@ -12,6 +12,7 @@ from django.dispatch import receiver
 from userapp.models import User
 from helpers.app_helpers import url_builder, content_file_name
 from helpers.validators import image_validator
+from helpers.models import BaseModel
 
 
 class Company(Address):
@@ -159,13 +160,11 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                 os.remove(old_logo_icon.path)
 
 
-class CompanyUser(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
+class CompanyUser(BaseModel):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='company_user')
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     is_staff = models.BooleanField(default=True)
     is_obsolete = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
     is_qr_user = models.BooleanField(default=False)
 
     class Meta:
@@ -181,12 +180,10 @@ class CompanyUser(models.Model):
     #     Group.ob
 
 
-class FavouriteCompany(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
+class FavouriteCompany(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     is_favourite = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'favourite_company'

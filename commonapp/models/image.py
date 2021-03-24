@@ -7,7 +7,7 @@ import os
 class Image(models.Model):
 
     def get_upload_path(self, filename):
-        return '{}/{}'.format(self.content_type.model_class().__name__.lower(), filename)
+        return '{}/{}'.format(self.content_type, filename)
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=True)
     image = models.ImageField(upload_to=get_upload_path)

@@ -93,7 +93,7 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
     total_discount = serializers.SerializerMethodField()
 
     class Meta(CompanyTableOrderSerializer.Meta):
-        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'is_service_charge', 'custom_discount_amount', 'custom_discount_percentage','total_discount', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
+        fields = list(CompanyTableOrderSerializer.Meta.fields) + ['payment_mode', 'custom_discount_amount', 'custom_discount_percentage','total_discount', 'paid_amount', 'is_manual','customer', 'name','phone_number', 'email', 'address']
         # fields = ('id', 'voucher', 'asset', 'order_lines', 'bill' ,'customer', 'name','phone_number', 'email', 'address')
 
     def get_total_discount(self, obj):
@@ -120,15 +120,19 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
             customer_data['email'] = validated_data.pop('email', '')
             customer_data['address'] = validated_data.pop('address', DEFAULTS['ADDRESS'])
         order = super().create(validated_data)
+        payable_amount , tax  = self.get_grand_total(order)
+        service_charge_get = round(order.service_charge_amount,2)  if order.is_service_charge else 0
+        order.payable_amount = round(payable_amount, 6)
+        order.tax = tax
+        order.service_charge = service_charge_get
         customer = Customer.getcreate_customer(**customer_data)
         first_line = order.lines.first()
         data = dict()
         data['is_manual'] = True
         data['company'] = order.company.id
         data['tax'] = order.company.tax if order.company.tax else 0
-        data['service_charge'] = round(order.service_charge_amount,2)  if order.service_charge_amount else 0
+        data['service_charge'] = service_charge_get
         data['customer'] = customer.id if customer else None
-        payable_amount , tax  = self.get_grand_total(order)
         data['payable_amount'] = round(payable_amount, 6) 
         data['tax'] = tax
         data['paid_amount'] = paid_amount
@@ -158,18 +162,22 @@ class ManualBillSerializerCompany(CompanyTableOrderSerializer):
             customer_data['email'] = validated_data.pop('email', '')
             customer_data['address'] = validated_data.pop('address', DEFAULTS['ADDRESS'])
         order = super().update(instance, validated_data)
+        payable_amount , tax  = self.get_grand_total(order)
+        service_charge_get = round(order.service_charge_amount,2)  if order.service_charge_amount else 0
+        order.payable_amount = round(payable_amount, 6)
+        order.tax = tax
+        order.service_charge = service_charge_get
         customer = Customer.getcreate_customer(**customer_data)
         first_line = order.lines.first()
         data = dict()
         data['is_manual'] = validated_data['is_manual'] if 'is_manual' in validated_data else order.bill.is_manual
         data['company'] = order.company.id
         data['tax'] = order.company.tax if order.company.tax else 0
-        data['service_charge'] = round(order.service_charge_amount,2) if order.service_charge_amount else 0
+        data['service_charge'] = service_charge_get
         data['customer'] = customer.id if customer else None
         data['payment_mode'] = validated_data['payment_mode'] if 'payment_mode' in validated_data else order.bill.payment_mode
         data['paid_amount'] = paid_amount
         data['is_service_charge'] = validated_data.get('is_service_charge', True)
-        payable_amount , tax  = self.get_grand_total(order)
         data['payable_amount'] = round(payable_amount, 6) 
         data['tax'] = tax
         data['custom_discount_percentage'] = validated_data['custom_discount_percentage'] if 'custom_discount_percentage' in validated_data else order.bill.custom_discount_percentage

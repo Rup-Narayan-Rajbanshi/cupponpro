@@ -24,6 +24,10 @@ class Orders(BaseModel):
     custom_discount_percentage = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
     custom_discount_amount  = models.PositiveIntegerField(default = 0)
     is_service_charge = models.BooleanField(default=True)
+    service_charge = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    tax = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    payable_amount = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=False, default=0)
+
 
     class Meta:
         ordering = ['-created_at']
@@ -53,14 +57,19 @@ class Orders(BaseModel):
         else:
             order.custom_discount_percentage = custom_discount_percentage
             order.custom_discount_amount = custom_discount_amount
-            order.is_service_charge = is_service_charge
+            order.is_service_charge = is_service_charge if 'is_service_charge' in v_data else order.is_service_charge
+        order.save()
+        payable_amount, tax = cls.get_grand_total(order)
+        payable_amount = round(payable_amount, 6)
+        order.payable_amount = payable_amount
+        order.tax = tax
+        service_charge_get = round(cls.service_charge_amount_static(order),2) if order.is_service_charge else 0
+        order.service_charge = service_charge_get
         order.save()
         if status == ORDER_STATUS['BILLABLE']:
             data = dict()
             data['company'] = order.company.id
-            data['service_charge'] = round(cls.service_charge_amount_static(order),2) if order.is_service_charge else 0
-            payable_amount, tax = cls.get_grand_total(order)
-            payable_amount = round(payable_amount, 6)
+            data['service_charge'] = service_charge_get
             data['payable_amount'] = payable_amount
             data['tax'] = tax
             data['paid_amount'] = paid_amount
@@ -72,7 +81,7 @@ class Orders(BaseModel):
                 data['credit_amount'] = payable_amount
                 serializer = BillCreateSerializer(instance=order.bill, data=data, context={'request': request}, partial=True)
                 if not serializer.is_valid():
-                    raise serializer.ValidationError(detail='Cannot update bill. ', code=400)
+                    raise APIException(detail='Cannot update bill. ', code=400)
             else:
                 serializer = BillCreateSerializer(data=data, context={'request': request})
                 if not serializer.is_valid():
@@ -87,6 +96,8 @@ class Orders(BaseModel):
         if status == ORDER_STATUS['COMPLETED']:
             if order.bill:
                 data = dict()
+                if 'payment_mode' in v_data:
+                    data['payment_mode'] = payment_mode
                 if not order.bill.paid_amount > 0.0:
                     data['paid_amount'] = order.bill.credit_amount
                     data['is_paid'] = True
