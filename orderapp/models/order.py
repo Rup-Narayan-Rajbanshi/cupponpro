@@ -19,7 +19,7 @@ class Orders(BaseModel):
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='orders')
     status = models.CharField(max_length=MAX_LENGTHS['ORDER_STATUS'], choices=ORDER_STATUS_CHOICES, default=DEFAULTS['ORDER_STATUS'])
     extras = JSONField(blank=True, null=True)
-    custom_discount_percentage = models.DecimalField(max_digits=20, decimal_places=6, blank=True, null=True)
+    custom_discount_percentage = models.DecimalField(max_digits=20, decimal_places=6, default=0)
     custom_discount_amount  = models.PositiveIntegerField(default = 0)
     is_service_charge = models.BooleanField(default=True)
     service_charge = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
