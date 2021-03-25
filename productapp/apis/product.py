@@ -215,7 +215,7 @@ class CompanyProductListView(generics.GenericAPIView):
         filter_fields = ['name', 'code', 'product_category', 'status']
         sort_by_fields = ['name', 'code', 'product_category', 'selling_price', 'status']
 
-        sort_by = request.GET.get('sort_by') if request.GET.get('sort_by') in sort_by_fields else 'id'
+        sort_by = request.GET.get('sort_by') if request.GET.get('sort_by') in sort_by_fields else 'name'
         
         if sort_by == 'code':
             sort_by = 'product_code'
