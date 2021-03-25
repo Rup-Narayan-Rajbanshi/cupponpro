@@ -133,3 +133,29 @@ class SpecialCouponAPI(mixins.ListModelMixin, GenericViewSet):
     serializer_class = CouponSerializer
     filter_class = HighestDiscountCouponFilter
     permission_classes = [AllowAny ]
+
+
+class TagsAPI(generics.GenericAPIView):
+    permission_classes = (AllowAny, )
+
+    def get(self, request):
+        data=dict()
+        q = request.GET.get('q','')
+
+        product_tags = Product.objects.filter(tag__icontains=q).values_list('tag',flat=True).distinct()
+        product_tags = ' '.join([str(elem) for elem in product_tags])
+        product_tags = product_tags.replace(","," ")
+
+        product_category_tags = ProductCategory.objects.filter(tag__icontains=q).values_list('tag',flat=True).distinct()
+        product_category_tags = ' '.join([str(elem) for elem in product_category_tags])
+        product_category_tags = product_category_tags.replace(","," ")
+        
+        tags = product_tags + " " + product_category_tags
+        tags = tags.split(" ")
+        tags = set([tag.strip() for tag in tags if tag])
+        # tags = set([tag.strip() for tag in tags])
+
+        tag_list = filter(lambda a: q.title() in a.title(), tags)
+        data['tags'] = list(sorted(tag_list, key = len))[:10]
+
+        return Response(data, status=200)
