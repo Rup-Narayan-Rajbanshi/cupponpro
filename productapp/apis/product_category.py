@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from helpers.paginations import FPagination
+from helpers.paginations import FPagination, FMaxPagination
 from helpers.api_mixins import FAPIMixin
 from helpers.constants import COUPON_TYPE_DISPLAY_MAPPER
 from productapp.models.product import ProductCategory
@@ -21,7 +21,7 @@ class ProductCategoryAPI(FAPIMixin, mixins.CreateModelMixin, mixins.ListModelMix
     serializer_class = ProductCategorySerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = ProductCategoryFilter
-    pagination_class = FPagination
+    pagination_class = FMaxPagination
     permission_classes = ((CompanyUserPermission | isAdmin | isCompanySalePersonAndAllowAll | publicReadOnly ),)
 
 
