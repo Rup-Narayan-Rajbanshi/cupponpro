@@ -143,19 +143,15 @@ class TagsAPI(generics.GenericAPIView):
         q = request.GET.get('q','')
 
         product_tags = Product.objects.filter(tag__icontains=q).values_list('tag',flat=True).distinct()
-        product_tags = ' '.join([str(elem) for elem in product_tags])
-        product_tags = product_tags.replace(","," ")
+        product_tags = ','.join([str(elem) for elem in product_tags])
 
         product_category_tags = ProductCategory.objects.filter(tag__icontains=q).values_list('tag',flat=True).distinct()
-        product_category_tags = ' '.join([str(elem) for elem in product_category_tags])
-        product_category_tags = product_category_tags.replace(","," ")
+        product_category_tags = ','.join([str(elem) for elem in product_category_tags])
         
-        tags = product_tags + " " + product_category_tags
-        tags = tags.split(" ")
-        tags = set([tag.strip() for tag in tags if tag])
-        # tags = set([tag.strip() for tag in tags])
-
-        tag_list = filter(lambda a: q.title() in a.title(), tags)
-        data['tags'] = list(sorted(tag_list, key = len))[:10]
+        tags = product_tags + product_category_tags
+        tags = [x.strip() for x in tags.split(",")]
+        tags = [x for x in tags if x]
+       
+        data['tags'] = list(sorted(tags, key = len))[:10]
 
         return Response(data, status=200)
