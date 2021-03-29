@@ -20,8 +20,8 @@ class ProductCategorySerializer(CustomModelSerializer):
 
 class ProductSerializer(CustomModelSerializer):
     images = ImageDetailSerializer(many=True, read_only=True)
-    purchase_currency = serializers.ChoiceField(CURRENCY_TYPE_CHOICES)
-    selling_currency = serializers.ChoiceField(CURRENCY_TYPE_CHOICES)
+    purchase_currency = serializers.ChoiceField(CURRENCY_TYPE_CHOICES, required=False)
+    selling_currency = serializers.ChoiceField(CURRENCY_TYPE_CHOICES, required=False)
     status = serializers.ChoiceField(PRODUCT_STATUS_CHOICES)
     types = serializers.ChoiceField(PRODUCT_TYPE_CHOICES, allow_blank=True, required=False)
 
