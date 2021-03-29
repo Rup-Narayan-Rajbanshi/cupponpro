@@ -21,3 +21,15 @@ class DeliveryPartnerSerializer(CustomModelSerializer):
     class Meta(CustomModelSerializer.Meta):
         model = DeliveryPartner
 
+    def validate(self, attrs):
+        request = self.context.get('request')
+        if request:
+            try:
+                company_user = request.user.company_user.all()
+                company = company_user[0].company
+            except:
+                company = None
+            if company:
+                attrs['company'] = company
+        return attrs
+
