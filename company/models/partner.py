@@ -8,6 +8,7 @@ from helpers.validators import is_alphanumeric_with_exception
 from helpers.app_helpers import content_file_name, url_builder
 from helpers.models import BaseModel
 from django.core.validators import RegexValidator
+from company.models.company import Company
 
 
 class Partner(BaseModel):
@@ -67,6 +68,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
 
 class DeliveryPartner(BaseModel):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=32, validators=[is_alphanumeric_with_exception])
     commission = models.DecimalField(max_digits=6, decimal_places=3, blank=True, default=0)
     logo = models.ImageField(upload_to=content_file_name)
