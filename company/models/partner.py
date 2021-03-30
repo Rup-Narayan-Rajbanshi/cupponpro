@@ -71,7 +71,7 @@ class DeliveryPartner(BaseModel):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=32, validators=[is_alphanumeric_with_exception])
     commission = models.DecimalField(max_digits=6, decimal_places=3, blank=True, default=0)
-    logo = models.ImageField(upload_to=content_file_name)
+    logo = models.ImageField(upload_to=content_file_name, null=True, blank=True)
     phone_number = models.CharField(max_length=15, unique=True, null=True, \
         validators=[RegexValidator(regex=r"^(\+?[\d]{2,3}\-?)?[\d]{8,10}$")])
 

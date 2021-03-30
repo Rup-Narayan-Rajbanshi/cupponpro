@@ -6,6 +6,7 @@ from rest_framework.exceptions import APIException
 from helpers.models import BaseModel
 from company.models.asset import Asset
 from company.models.company import Company
+from company.models.partner import DeliveryPartner
 from productapp.models.coupon import Voucher
 from productapp.models.product import Product
 from userapp.models.user import User
@@ -14,6 +15,7 @@ from helpers.choices_variable import ORDER_STATUS_CHOICES, ORDER_LINE_STATUS_CHO
 
 
 class Orders(BaseModel):
+    takeaway = models.ForeignKey(DeliveryPartner, on_delete=models.CASCADE, related_name='orders', null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.PROTECT, related_name='orders')
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name='orders', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='orders')

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from company.models.company import Company
+from company.models.partner import DeliveryPartner
 from company.models.asset import Asset
 from productapp.models.coupon import Voucher
 from commonapp.models.order import Order
@@ -146,6 +147,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=False)
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False,\
                                 read_only=True)
+    takeaway = DetailRelatedField(model=DeliveryPartner, lookup='id', representation='to_representation', required=False)
     voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
@@ -155,7 +157,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ('id', 'status', 'bill', 'company', 'voucher', 'is_service_charge', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user')
+        fields = ('id', 'status', 'bill', 'company', 'voucher', 'is_service_charge', 'asset', 'order_lines', 'price_details', 'created_at', 'modified_at', 'user', 'takeaway')
 
     def get_bill(self, obj):
         try:
@@ -264,6 +266,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
         if voucher:
             validated_data['user'] = voucher.user
         validated_data['company'] = self.context['request'].company
+        print(validated_data)
         order = super().create(validated_data)
         order_line_bulk_create_data = self.build_orderline_bulk_create_data(order, order_lines, voucher)
         OrderLines.objects.bulk_create(order_line_bulk_create_data)

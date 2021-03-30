@@ -16,7 +16,7 @@ class PartnerSerializer(CustomModelSerializer):
 
 
 class DeliveryPartnerSerializer(CustomModelSerializer):
-    logo = ImageFieldWithURL()
+    logo = ImageFieldWithURL(required=False)
 
     class Meta(CustomModelSerializer.Meta):
         model = DeliveryPartner
