@@ -147,7 +147,7 @@ class CompanyTableOrderSerializer(CustomModelSerializer):
     asset = DetailRelatedField(model=Asset, lookup='id', representation='to_representation', required=False)
     company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False,\
                                 read_only=True)
-    takeaway = DetailRelatedField(model=DeliveryPartner, lookup='id', representation='to_representation', required=False)
+    takeaway = DetailRelatedField(model=DeliveryPartner, lookup='id', representation='to_representation', allow_null=True, required=False)
     voucher = DetailRelatedField(model=Voucher, lookup='id', representation='to_representation',
                                  required=False, allow_null=True)
     order_lines = OrderLineSerializer(many=True, required=True)
