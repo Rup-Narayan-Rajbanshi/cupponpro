@@ -19,7 +19,7 @@ class CompanyImageListView(generics.GenericAPIView):
         """
         company_obj = Company.objects.filter(id=company_id)
         if company_obj:
-            image_obj = Image.objects.filter(object_id=company_obj[0].id, content_type=ContentType.objects.get(model='company').id)
+            image_obj = Image.objects.filter(object_id=company_obj[0].id, content_type=ContentType.objects.filter(model='company').first().id)
             serializer = ImageDetailSerializer(image_obj, many=True, context={'request':request})
             data = {
                 'success': 1,
@@ -42,7 +42,7 @@ class CompanyImageListView(generics.GenericAPIView):
         if isCompanyUser(request.user.id, company_id):
             request_data = request.data
             request_data['object_id'] = company_id
-            request_data['content_type'] = ContentType.objects.get(model='company').id
+            request_data['content_type'] = ContentType.objects.get(model='company').first().id
             serializer = ImageSerializer(data=request_data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
@@ -72,7 +72,7 @@ class CompanyImageDetailView(generics.GenericAPIView):
         """
         An endpoint for getting vendor's image detail.
         """
-        image_obj = Image.objects.filter(id=image_id, object_id=company_id, content_type=ContentType.objects.get(model='company').id)
+        image_obj = Image.objects.filter(id=image_id, object_id=company_id, content_type=ContentType.objects.get(model='company').first().id)
         if image_obj:
             serializer = ImageDetailSerializer(image_obj[0], context={'request':request})
             data = {
@@ -92,7 +92,7 @@ class CompanyImageDetailView(generics.GenericAPIView):
         An endpoint for updating vendor's image detail.
         """
         if isCompanyUser(request.user.id, company_id):
-            image_obj = Image.objects.filter(id=image_id, object_id=company_id, content_type=ContentType.objects.get(model='company').id)
+            image_obj = Image.objects.filter(id=image_id, object_id=company_id, content_type=ContentType.objects.get(model='company').first().id)
             if image_obj:
                 serializer = ImageDetailSerializer(instance=image_obj[0], data=request.data, context={'request':request})
                 if serializer.is_valid():
