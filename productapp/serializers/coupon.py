@@ -32,7 +32,7 @@ class CouponSerializer(CustomModelSerializer):
         coupon_type = obj.content_type.name
         images = list()
         request = self.context.get('request')
-        if coupon_type == 'category':
+        if coupon_type == 'company':
             if obj.company:
                 logo = url_builder(obj.company.logo, request)
                 images = [logo]
