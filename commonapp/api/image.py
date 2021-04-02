@@ -42,7 +42,7 @@ class CompanyImageListView(generics.GenericAPIView):
         if isCompanyUser(request.user.id, company_id):
             request_data = request.data
             request_data['object_id'] = company_id
-            request_data['content_type'] = ContentType.objects.get(model='company').first().id
+            request_data['content_type'] = ContentType.objects.filter(model='company').first().id
             serializer = ImageSerializer(data=request_data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
