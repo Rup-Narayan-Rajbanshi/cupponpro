@@ -213,8 +213,9 @@ class CustomerOrderAPI(ModelViewSet):
             for order_line in order_lines:
                 for item in request.data['order_lines']:
                     if str(order_line.product.id) == str(item['product']):
-                        order_line.customer_comment = item['customer_comment']
-                        order_line.save()
+                        if order_line.customer_comment:
+                            order_line.customer_comment = item['customer_comment']
+                            order_line.save()
             data = {
                 'success': 1,
                 'data': serializer.data
