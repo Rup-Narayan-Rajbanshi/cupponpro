@@ -25,7 +25,7 @@ class FavouriteCompanySerializer(CustomModelSerializer):
 class LocalBusinessSerializer(CompanySerializer):
     author = DetailRelatedField(model=User, lookup='id', representation='to_representation', read_only=True)
     discount = serializers.SerializerMethodField()
-    images = serializers.SerializerMethodField()
+    # images = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
@@ -38,8 +38,8 @@ class LocalBusinessSerializer(CompanySerializer):
             coupon = Coupon.objects.filter(company=obj, discount_type=DISCOUNT_TYPE['FLAT']).order_by('-discount').first()
         return coupon.to_representation() if coupon else 0
 
-    def get_images(self,obj):
-        image_obj = Image.objects.filter(object_id=obj.id, content_type=ContentType.objects.filter(model='company').first().id)
-        serializer = ImageDetailSerializer(image_obj, many=True)
-        return serializer.data
+    # def get_images(self,obj):
+    #     image_obj = Image.objects.filter(object_id=obj.id, content_type__model='company')
+    #     serializer = ImageDetailSerializer(image_obj, many=True)
+    #     return serializer.data
        

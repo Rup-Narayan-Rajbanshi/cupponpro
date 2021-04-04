@@ -4,10 +4,11 @@ from productapp.models.coupon import Voucher, Coupon
 from helpers.serializer import CustomModelSerializer
 from helpers.serializer_fields import DetailRelatedField
 from userapp.models import User
+from productapp.serializers.coupon import CouponSerializer
 
 
 class VoucherListSerializer(CustomModelSerializer):
-    coupon = DetailRelatedField(model=Coupon, lookup='id', representation='to_representation')
+    coupon = serializers.SerializerMethodField()
     used_date = serializers.DateTimeField(required=False)
 
     class Meta:
@@ -16,3 +17,9 @@ class VoucherListSerializer(CustomModelSerializer):
 
     def get_description(self, obj):
         return obj.coupon.description
+
+    def get_coupon(self, obj):
+        coupon = obj.coupon
+        serializer = CouponSerializer(coupon, context={'request': self.context['request']})
+        print(serializers)
+        return serializer.data
