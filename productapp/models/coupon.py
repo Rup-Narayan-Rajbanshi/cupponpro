@@ -88,7 +88,11 @@ class Voucher(BaseModel):
             }
             uuid4 = shortuuid.ShortUUID().random(length=4)
             coupon_content_type = self.coupon.content_type.model
-            coupon_type_token = self.coupon.content_object.token if self.coupon.content_object else ''
+            try:
+                coupon_type_token = self.coupon.content_object.token 
+            except:
+                coupon_type_token = ''
+
             discount = self.coupon.discount
             discount = "0" + str(discount)
             discount = discount[-2:]

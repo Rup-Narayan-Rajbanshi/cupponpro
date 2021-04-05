@@ -110,7 +110,7 @@ class TransactionFilter(filters.FilterSet):
 
 
 class CustomerVoucherFilter(filters.FilterSet):
-    company = filters.CharFilter(field_name='coupon__company__id',)
+    company = filters.CharFilter(field_name='coupon__company__id')
 
     class Meta:
         model = Voucher
