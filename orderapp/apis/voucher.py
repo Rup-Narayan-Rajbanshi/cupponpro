@@ -8,6 +8,7 @@ from helpers.api_mixins import FAPIMixin
 from helpers.paginations import FPagination
 from orderapp.serializers.voucher import VoucherListSerializer
 from permission import CompanyUserPermission, isUser
+from orderapp.filters import CustomerVoucherFilter
 
 
 class VoucherListAPI(FAPIMixin, mixins.ListModelMixin, GenericViewSet):
@@ -29,11 +30,19 @@ class CustomerVoucherAPI(mixins.ListModelMixin, GenericViewSet):
     queryset = Voucher.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = VoucherListSerializer
+    filter_class = CustomerVoucherFilter
     pagination_class = FPagination
 
-    def get_queryset(self):
-        is_redeem = self.request.query_params.get('is_redeem', False)
-        qs1 = self.queryset.filter(
-            is_redeem=is_redeem,
-            user=self.request.user)   
-        return qs1
+    # def get_queryset(self):
+    #     company = self.request.GET.get('company',None)
+    #     print(company)
+    #     is_redeem = self.request.query_params.get('is_redeem', False)
+    #     qs1 = self.queryset.filter(
+    #         is_redeem=is_redeem,
+    #         user=self.request.user)
+        # if company:
+        #     qs1 = self.queryset.filter(
+        #         is_redeem=is_redeem,
+        #         user=self.request.user,
+        #         coupon__company__id=company)
+        # return qs1

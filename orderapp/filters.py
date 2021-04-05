@@ -8,6 +8,7 @@ from productapp.models.coupon import Coupon
 from orderapp.models.bills import Bills
 from orderapp.models.order import Orders
 from orderapp.models.transaction import TransactionHistoryBills
+from productapp.models.coupon import Voucher
 
 
 class OrdersFilter(filters.FilterSet):
@@ -106,3 +107,16 @@ class TransactionFilter(filters.FilterSet):
     class Meta:
         model = TransactionHistoryBills
         fields = ['bill']
+
+
+class CustomerVoucherFilter(filters.FilterSet):
+    company = filters.CharFilter(field_name='coupon__company__id',)
+
+    class Meta:
+        model = Voucher
+        fields = ['company']
+
+    @property
+    def qs(self):
+        parent = super(CustomerVoucherFilter, self).qs
+        return parent.filter(user=self.request.user, is_redeem=False)
