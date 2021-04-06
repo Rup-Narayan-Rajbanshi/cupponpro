@@ -119,4 +119,10 @@ class CustomerVoucherFilter(filters.FilterSet):
     @property
     def qs(self):
         parent = super(CustomerVoucherFilter, self).qs
-        return parent.filter(user=self.request.user, is_redeem=False)
+        phone_number = self.request.GET.get('phone_number',None)
+        if phone_number:
+            parent = parent.filter(user__phone_number=phone_number,is_redeem=False)
+        else:
+            parent = parent.filter(user=self.request.user, is_redeem=False)
+
+        return parent
