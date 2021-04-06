@@ -60,6 +60,7 @@ class UserFavouriteCompanyFilter(FavouriteCompanyBaseFilter):
 class CompanyBaseFilter(filters.FilterSet):
     author = filters.CharFilter(field_name='user__id')
     category = filters.CharFilter(field_name='category__name', lookup_expr='icontains')
+    name = filters.CharFilter(field_name='name',lookup_expr='icontains')
 
     class Meta:
         model = Company
