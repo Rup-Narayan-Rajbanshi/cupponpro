@@ -206,7 +206,10 @@ class CustomerOrderAPI(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
+        status=400
+        if serializer.is_valid(raise_exception=True):
+            print("test")
+            status=200
             serializer.save()
             order = Orders.objects.get(id=serializer.data['id'])
             order_lines = OrderLines.objects.filter(order__id=order.id)
@@ -220,7 +223,8 @@ class CustomerOrderAPI(ModelViewSet):
                 'success': 1,
                 'data': serializer.data
             }
-        return Response(data, status=200)
+
+        return Response(data, status=status)
 
 
 class MasterQROrderAPI(ModelViewSet):
