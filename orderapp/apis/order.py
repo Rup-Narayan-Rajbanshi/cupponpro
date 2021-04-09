@@ -208,7 +208,6 @@ class CustomerOrderAPI(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         status=400
         if serializer.is_valid(raise_exception=True):
-            print("test")
             status=200
             serializer.save()
             order = Orders.objects.get(id=serializer.data['id'])
