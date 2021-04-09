@@ -55,7 +55,7 @@ class CreditFilter(filters.FilterSet):
 
     class Meta:
         model = Bills
-        fields = ['from_date', 'to_date']
+        fields = ['from_date', 'to_date', 'customer']
 
 
 class TableSalesFilter(filters.FilterSet):
