@@ -263,6 +263,7 @@ class CompanyProductListView(generics.GenericAPIView):
                 tag_title_case = tag.title()
                 request.data._mutable = True
                 request.data['tag'] = tag_title_case
+                print(request.data)
             serializer = ProductSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
