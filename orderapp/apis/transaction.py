@@ -1,5 +1,6 @@
-from orderapp.serializers.transaction import TransactionHistoryBillSerializer
-from orderapp.models.transaction import TransactionHistoryBills
+from orderapp.serializers.transaction import TransactionHistoryBillSerializer, ComplimentarySerializer
+from orderapp.models.transaction import TransactionHistoryBills, Complimentary
+from orderapp.models.order import Orders
 from helpers.api_mixins import FAPIMixin
 from rest_framework.viewsets import GenericViewSet
 from helpers.paginations import FPagination
@@ -47,3 +48,25 @@ class CustomerCreditPaymentAPI(generics.CreateAPIView):
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
         return Response({'message':'Updated bill payment'}, status=200)
+
+
+
+class ComplimentaryAPI(FAPIMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, GenericViewSet):
+    queryset = Complimentary.objects.all().order_by('-created_at')
+    serializer_class = ComplimentarySerializer
+    pagination_class = FPagination
+    permission_classes = (CompanyUserPermission, )
+
+    def get_queryset(self):
+        company = getattr(self.request, 'company', None)
+        queryset = Complimentary.objects.filter(order__company=company).order_by('-created_at')
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        order = request.data['order']
+        Orders.objects.filter(id=order).update(status='COMPLETED')
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=200, headers=headers)

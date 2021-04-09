@@ -1,10 +1,13 @@
 from helpers.serializer import CustomModelSerializer
 from rest_framework import serializers
 from helpers.serializer_fields import DetailRelatedField
-from orderapp.models.transaction import TransactionHistoryBills
+from orderapp.models.transaction import TransactionHistoryBills, Complimentary
 from orderapp.models.bills import Bills
+from orderapp.models.order import Orders
 from orderapp.choice_variables import PAYMENT_CHOICES
 from orderapp.constants import DEFAULTS
+from userapp.models.user import User
+
 
 class TransactionHistoryBillSerializer(CustomModelSerializer):
     bill = DetailRelatedField(model=Bills, lookup='id', representation = 'order_representation')
@@ -38,3 +41,14 @@ class TransactionHistoryBillSerializer(CustomModelSerializer):
         if asset:
             data={'id': asset.id, 'name':asset.name}
         return data
+
+
+
+class ComplimentarySerializer(CustomModelSerializer):
+    order = DetailRelatedField(model=Orders, lookup='id', representation='to_representation')
+    user = DetailRelatedField(model=User, lookup='id', representation='to_representation', required=False, allow_null=True)
+
+
+    class Meta:
+        model = Complimentary
+        fields = '__all__'
