@@ -24,11 +24,16 @@ class ProductSerializer(CustomModelSerializer):
     selling_currency = serializers.ChoiceField(CURRENCY_TYPE_CHOICES, required=False)
     status = serializers.ChoiceField(PRODUCT_STATUS_CHOICES)
     types = serializers.ChoiceField(PRODUCT_TYPE_CHOICES, allow_blank=True, required=False)
+    company = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = "__all__"
 
+    def get_company(self, obj):
+        company = obj.company.id
+        return company
+        
     # def validate(self, attrs):
     #     print(attrs)
     #     tags = attrs.get('tag')
