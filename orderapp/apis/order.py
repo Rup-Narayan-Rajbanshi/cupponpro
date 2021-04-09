@@ -208,15 +208,17 @@ class CustomerOrderAPI(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         status=400
         if serializer.is_valid(raise_exception=True):
-            print("test")
             status=200
             serializer.save()
             order = Orders.objects.get(id=serializer.data['id'])
             order_lines = OrderLines.objects.filter(order__id=order.id)
+            print(request.data['order_lines'][0])
             for order_line in order_lines:
                 for item in request.data['order_lines']:
                     if str(order_line.product.id) == str(item['product']):
-                        if item['customer_comment']:
+                        # if request.data['order_lines'][0].has_key('customer_comment'):
+                        if 'customer_comment' in request.data['order_lines'][0]:
+                        # if item['customer_comment']:
                             order_line.customer_comment = item['customer_comment']
                             order_line.save()
             data = {

@@ -53,7 +53,7 @@ class AssetListView(generics.GenericAPIView):
             return Response(data, status=403)
 
 class AssetDetailView(generics.GenericAPIView):
-    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll]
+    permission_classes = [isCompanyOwnerAndAllowAll | isCompanyManagerAndAllowAll | publicReadOnly]
     serializer_class = AssetSerializer
 
     def get(self, request, company_id, asset_id):
