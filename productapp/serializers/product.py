@@ -26,7 +26,6 @@ class ProductSerializer(CustomModelSerializer):
     selling_currency = serializers.ChoiceField(CURRENCY_TYPE_CHOICES, required=False)
     status = serializers.ChoiceField(PRODUCT_STATUS_CHOICES)
     types = serializers.ChoiceField(PRODUCT_TYPE_CHOICES, allow_blank=True, required=False)
-    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False)
 
     class Meta:
         model = Product
