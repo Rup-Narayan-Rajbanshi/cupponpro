@@ -318,13 +318,13 @@ class FRelatedField(serializers.PrimaryKeyRelatedField):
                     # points to a `get_relationship()` method on the model
                     value = value().idx
                 else:
-                    value = getattr(instance, self.source_attrs[-1]).idx
+                    value = getattr(instance, self.source_attrs[-1]).id
                 return IDXOnlyObject(idx=value)
             except AttributeError:
                 pass
 
     def to_representation(self, obj):
-        return obj.id
+        return obj.idx
 
     def to_internal_value(self, data):
         try:
