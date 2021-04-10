@@ -4,6 +4,8 @@ from productapp.models.product import BulkQuantity, Product, ProductCategory
 from commonapp.serializers.image import ImageDetailSerializer
 from helpers.choices_variable import CURRENCY_TYPE_CHOICES, PRODUCT_STATUS_CHOICES, PRODUCT_TYPE_CHOICES
 from helpers.serializer import CustomModelSerializer
+from helpers.serializer_fields import DetailRelatedField
+from company.models.company import Company
 
 class BulkQuantitySerializer(CustomModelSerializer):
 
@@ -24,6 +26,7 @@ class ProductSerializer(CustomModelSerializer):
     selling_currency = serializers.ChoiceField(CURRENCY_TYPE_CHOICES, required=False)
     status = serializers.ChoiceField(PRODUCT_STATUS_CHOICES)
     types = serializers.ChoiceField(PRODUCT_TYPE_CHOICES, allow_blank=True, required=False)
+    company = DetailRelatedField(model=Company, lookup='id', representation='to_representation', required=False)
 
     class Meta:
         model = Product
