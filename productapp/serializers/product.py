@@ -32,6 +32,7 @@ class ProductSerializer(CustomModelSerializer):
         model = Product
         fields = "__all__"
 
+
     # def validate(self, attrs):
     #     print(attrs)
     #     tags = attrs.get('tag')
