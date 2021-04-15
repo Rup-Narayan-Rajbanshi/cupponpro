@@ -327,9 +327,10 @@ class CompanyProductDetailView(generics.GenericAPIView):
                     # print(request.data['tag'])
                     if 'tag' in request.data:
                         tag = request.data['tag']
-                        tag_titile_case = tag.title()
-                        request.data._mutable = True
-                        request.data['tag'] = tag_titile_case
+                        if tag:
+                            tag_titile_case = tag.title()
+                            request.data._mutable = True
+                            request.data['tag'] = tag_titile_case
                     serializer = ProductSerializer(instance=product_obj[0],\
                         data=request.data, context={'request':request})
                     if serializer.is_valid():
